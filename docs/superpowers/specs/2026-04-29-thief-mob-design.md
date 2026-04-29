@@ -28,7 +28,7 @@ Java 25 / NeoForge 26.1.2.30-beta / Minecraft 26.1.2. Same target as the existin
 **securitycore (new library mod):**
 - `api.SecurityAlly` — marker interface for entities Guards protect (initially: villagers, players-by-default, the Guard itself)
 - `api.SecurityHostile` — marker interface for entities Guards aggressively target (initially: revealed Thieves)
-- `ai.StunningMeleeGoal` — extracted from `BatonStrikeGoal`; configurable damage, stun duration, hit cooldown
+- `ai.StunningMeleeGoal` — extracted from `BatonStrikeGoal`; configurable stun duration, slowness/weakness amplifiers, knockback strength
 - `client.HeldItemLayer` — generalized version of `BatonHeldLayer`; renders a model in the entity's right hand
 
 **Thief mob:**
@@ -78,7 +78,7 @@ minecraft-mods/
 │   └── src/main/
 │       ├── java/com/tweeks/securitycore/
 │       │   ├── SecurityCoreMod.java
-│       │   ├── api/{SecurityAlly, SecurityHostile, Crime}.java
+│       │   ├── api/{SecurityAlly, SecurityHostile}.java
 │       │   ├── ai/StunningMeleeGoal.java
 │       │   └── client/HeldItemLayer.java
 │       └── resources/META-INF/neoforge.mods.toml
