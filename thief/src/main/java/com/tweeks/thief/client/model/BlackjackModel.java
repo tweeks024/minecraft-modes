@@ -14,7 +14,7 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.resources.Identifier;
 
 /** Tiny held model for the blackjack — short stubby cylinder. */
-public class BlackjackModel extends Model<HumanoidRenderState> {
+public class BlackjackModel<S extends HumanoidRenderState> extends Model<S> {
 
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(
         Identifier.fromNamespaceAndPath(ThiefMod.MOD_ID, "blackjack"),

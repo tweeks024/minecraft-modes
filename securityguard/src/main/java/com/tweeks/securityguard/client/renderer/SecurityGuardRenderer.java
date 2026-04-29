@@ -22,7 +22,7 @@ public class SecurityGuardRenderer
     public SecurityGuardRenderer(EntityRendererProvider.Context context) {
         super(context, new SecurityGuardModel(context.bakeLayer(SecurityGuardModel.LAYER_LOCATION)), 0.5f);
         BatonModel batonModel = new BatonModel(context.bakeLayer(BatonModel.LAYER_LOCATION));
-        this.addLayer(new HeldItemLayer<>(this,
+        this.addLayer(new HeldItemLayer<HumanoidRenderState, SecurityGuardModel>(this,
             batonModel,
             BATON_TEXTURE,
             -0.0625f, 0.625f, 0.0f,

@@ -10,7 +10,7 @@ import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.resources.Identifier;
 
-public class ThiefModel extends HumanoidModel<HumanoidRenderState> {
+public class ThiefModel<S extends HumanoidRenderState> extends HumanoidModel<S> {
 
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(
         Identifier.fromNamespaceAndPath(ThiefMod.MOD_ID, "thief"),

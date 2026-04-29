@@ -16,12 +16,13 @@ import net.minecraft.resources.Identifier;
  * Generalised from the Guard's baton-rendering layer so future humanoid mobs
  * (e.g. Thief's blackjack) can reuse the same hand-anchoring math.
  *
+ * @param <S> the render state type
  * @param <M> the parent humanoid model type whose {@code rightArm} bone we attach to
  */
-public class HeldItemLayer<M extends HumanoidModel<HumanoidRenderState>>
-        extends RenderLayer<HumanoidRenderState, M> {
+public class HeldItemLayer<S extends HumanoidRenderState, M extends HumanoidModel<S>>
+        extends RenderLayer<S, M> {
 
-    private final Model<HumanoidRenderState> heldModel;
+    private final Model<S> heldModel;
     private final Identifier texture;
     private final float translateX;
     private final float translateY;
@@ -37,8 +38,8 @@ public class HeldItemLayer<M extends HumanoidModel<HumanoidRenderState>>
      * @param translateZ   Z offset
      * @param xRotationDegrees  rotation about the X axis applied after translation
      */
-    public HeldItemLayer(RenderLayerParent<HumanoidRenderState, M> parent,
-                         Model<HumanoidRenderState> heldModel,
+    public HeldItemLayer(RenderLayerParent<S, M> parent,
+                         Model<S> heldModel,
                          Identifier texture,
                          float translateX,
                          float translateY,
@@ -57,7 +58,7 @@ public class HeldItemLayer<M extends HumanoidModel<HumanoidRenderState>>
     public void submit(PoseStack pose,
                        SubmitNodeCollector collector,
                        int lightCoords,
-                       HumanoidRenderState state,
+                       S state,
                        float yRot,
                        float xRot) {
         pose.pushPose();
