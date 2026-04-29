@@ -28,7 +28,8 @@ public class SecurityGuardEntity extends IronGolem {
 
     @Override
     protected void registerGoals() {
-        this.goalSelector.addGoal(1, new com.tweeks.securityguard.entity.ai.BatonStrikeGoal(this));
+        this.goalSelector.addGoal(1, new com.tweeks.securitycore.ai.StunningMeleeGoal(
+            this, 1.0, true, 60, 1, 0, 0.2));
         this.goalSelector.addGoal(2, new net.minecraft.world.entity.ai.goal.MoveTowardsTargetGoal(this, 0.9, 32.0f));
         this.goalSelector.addGoal(2, new net.minecraft.world.entity.ai.goal.MoveBackToVillageGoal(this, 0.6, false));
         this.goalSelector.addGoal(4, new net.minecraft.world.entity.ai.goal.GolemRandomStrollInVillageGoal(this, 0.6));
