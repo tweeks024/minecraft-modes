@@ -1,8 +1,6 @@
 package com.tweeks.securitycore.ai;
 
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
@@ -50,16 +48,8 @@ public class StunningMeleeGoal extends MeleeAttackGoal {
             this.mob.swing(this.mob.getUsedItemHand());
             this.mob.doHurtTarget((ServerLevel) this.mob.level(), target);
 
-            if (target.isAlive()) {
-                target.addEffect(new MobEffectInstance(
-                    MobEffects.SLOWNESS, stunDurationTicks, slownessAmplifier));
-                target.addEffect(new MobEffectInstance(
-                    MobEffects.WEAKNESS, stunDurationTicks, weaknessAmplifier));
-                target.knockback(
-                    knockbackStrength,
-                    this.mob.getX() - target.getX(),
-                    this.mob.getZ() - target.getZ());
-            }
+            StunEffects.applyStun(this.mob, target,
+                stunDurationTicks, slownessAmplifier, weaknessAmplifier, knockbackStrength);
         }
     }
 }
