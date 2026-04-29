@@ -852,7 +852,9 @@ public class SecurityGuardEntity extends IronGolem {
 }
 ```
 
-(Yes — we extend `IronGolem` despite the spec preferring `AbstractGolem`. Reason: `IronGolem` is the only public subclass that implements `Enemy`-aware target selection out of the box, and reimplementing that whole goal set just to skip a couple of unwanted defaults — repair counter, poppy offering — costs more lines than it saves. We'll override the unwanted methods explicitly in Task 9. Update the spec's architecture note in the same commit if you want to keep the docs accurate.)
+(Yes — we extend `IronGolem` despite the spec preferring `AbstractGolem`. Reason: `IronGolem` is the only public subclass that implements `Enemy`-aware target selection out of the box, and reimplementing that whole goal set just to skip a couple of unwanted defaults — repair counter, poppy offering — costs more lines than it saves. We'll override the unwanted methods explicitly in Task 9. Update the spec's architecture note in the same commit if you want to keep the docs accurate.
+
+**Note on iron-ingot healing:** subclassing `IronGolem` means the guard inherits its iron-ingot repair behavior — right-clicking the guard with an iron ingot heals it. This is kept as a feature for v1: it's lore-consistent ("guard wears iron armor; iron repairs it") and matches a behavior players already know from iron golems. If you want to disable it later, override `mobInteract` in this class.)
 
 - [ ] **Step 2: Register the entity type in `Registration.java`**
 
@@ -1974,6 +1976,8 @@ Walk through each item in a creative world (then switch to survival for the reci
 - [ ] Spawn egg spawns a visible Security Guard with cap and baton.
 - [ ] Construction recipe (3 iron blocks + Guard Helmet on top) spawns a guard, consumes the materials, plays sound.
 - [ ] Construction with only 2 iron blocks does nothing (helmet not consumed).
+- [ ] **Ceiling test**: build a 3-iron-block column with a stone ceiling 1 block above — right-clicking with the helmet does nothing, helmet not consumed (verifies `SpawnPattern`'s air-clearance check prevents suffocation-on-spawn).
+- [ ] Right-click the guard with an iron ingot — it heals (inherited `IronGolem` repair behavior, intentionally kept for v1).
 - [ ] Guard idles, makes occasional pitch-shifted villager noises.
 - [ ] Spawn a zombie nearby — guard targets it, swings baton, zombie gets slowness + weakness particles, dies in a few hits.
 - [ ] Guard does not attack the player (try hitting it with a sword — no retaliation).
