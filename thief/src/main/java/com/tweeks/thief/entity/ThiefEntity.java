@@ -70,6 +70,20 @@ public class ThiefEntity extends PathfinderMob implements SecurityHostile, Conta
         super(type, level);
     }
 
+    public static boolean checkSpawnRules(EntityType<ThiefEntity> type,
+                                          net.minecraft.world.level.LevelAccessor level,
+                                          EntitySpawnReason reason,
+                                          BlockPos pos,
+                                          net.minecraft.util.RandomSource random) {
+        if (reason == EntitySpawnReason.SPAWN_ITEM_USE) return true;
+        if (level instanceof ServerLevel sl) {
+            return sl.structureManager()
+                .getStructureWithPieceAt(pos, net.minecraft.tags.StructureTags.VILLAGE)
+                .isValid();
+        }
+        return false;
+    }
+
     public static AttributeSupplier.Builder createAttributes() {
         return PathfinderMob.createMobAttributes()
             .add(Attributes.MAX_HEALTH, 20.0)
