@@ -70,6 +70,9 @@ neoForge {
         "${mod_id}" {
             sourceSet(sourceSets.main)
         }
+        "securitycore" {
+            sourceSet(project(':securitycore').sourceSets.main)
+        }
     }
 }
 
