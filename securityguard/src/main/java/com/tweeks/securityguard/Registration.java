@@ -58,6 +58,7 @@ public final class Registration {
                 .build());
 
     public static void register(IEventBus modEventBus) {
+        com.tweeks.securityguard.sound.ModSounds.register(SOUND_EVENTS);
         // Entity types must register before items so SpawnEggItem can resolve SECURITY_GUARD.get().
         ENTITY_TYPES.register(modEventBus);
         ITEMS.register(modEventBus);

@@ -44,6 +44,26 @@ public class SecurityGuardEntity extends IronGolem {
         this.targetSelector.addGoal(4, new net.minecraft.world.entity.ai.goal.target.ResetUniversalAngerTargetGoal<>(this, false));
     }
 
+    @Override
+    protected net.minecraft.sounds.SoundEvent getAmbientSound() {
+        return com.tweeks.securityguard.sound.ModSounds.AMBIENT.get();
+    }
+
+    @Override
+    protected net.minecraft.sounds.SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source) {
+        return com.tweeks.securityguard.sound.ModSounds.HURT.get();
+    }
+
+    @Override
+    protected net.minecraft.sounds.SoundEvent getDeathSound() {
+        return com.tweeks.securityguard.sound.ModSounds.DEATH.get();
+    }
+
+    @Override
+    public float getVoicePitch() {
+        return 0.85f * super.getVoicePitch();
+    }
+
     /** Targets hostile mobs (Mob+Enemy) within follow range, except creepers. */
     public static class GuardTargetHostilesGoal
             extends net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal<net.minecraft.world.entity.Mob> {

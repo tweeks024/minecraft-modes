@@ -1,0 +1,25 @@
+{
+  "guard_ambient": {
+    "subtitle": "subtitles.entity.villager.ambient",
+    "sounds": [
+      "minecraft:entity/villager/idle1",
+      "minecraft:entity/villager/idle2",
+      "minecraft:entity/villager/idle3"
+    ]
+  },
+  "guard_hurt": {
+    "subtitle": "subtitles.entity.villager.hurt",
+    "sounds": [
+      "minecraft:entity/villager/hit1",
+      "minecraft:entity/villager/hit2",
+      "minecraft:entity/villager/hit3",
+      "minecraft:entity/villager/hit4"
+    ]
+  },
+  "guard_death": {
+    "subtitle": "subtitles.entity.villager.death",
+    "sounds": [
+      "minecraft:entity/villager/death"
+    ]
+  }
+}
