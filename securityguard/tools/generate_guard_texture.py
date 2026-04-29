@@ -190,9 +190,38 @@ def paint_uniform_shading(img: Image.Image) -> None:
 
 
 def paint_shield(img: Image.Image) -> None:
-    """Paint the gold police shield on BODY_FRONT."""
-    # Will be implemented in Task 6.
-    pass
+    """Paint a 3-wide x 4-tall gold shield on the left chest of BODY_FRONT.
+
+    BODY_FRONT is (20, 20)..(28, 32) — an 8x12 panel. The shield sits
+    centered vertically and slightly left of center horizontally so it
+    reads as "left chest" the way real police badges do.
+
+    Shield silhouette (rows top to bottom):
+      row 0: . X .
+      row 1: X X X
+      row 2: X X X
+      row 3: . X .
+
+    Top-left highlight pixel and bottom-right shadow pixel give it a
+    1-pixel pop without losing the silhouette at distance.
+    """
+    panel_x, panel_y = BODY_FRONT[0], BODY_FRONT[1]
+    # Shield top-left corner relative to BODY_FRONT origin
+    sx, sy = 2, 4
+
+    shield_pixels = [
+        (1, 0),                 # row 0: . X .
+        (0, 1), (1, 1), (2, 1),  # row 1: X X X
+        (0, 2), (1, 2), (2, 2),  # row 2: X X X
+        (1, 3),                 # row 3: . X .
+    ]
+    for dx, dy in shield_pixels:
+        pixel(img, panel_x + sx + dx, panel_y + sy + dy, GOLD)
+
+    # Highlight: top-left of the central body
+    pixel(img, panel_x + sx + 0, panel_y + sy + 1, GOLD_HIGHLIGHT)
+    # Shadow: bottom-right of the central body
+    pixel(img, panel_x + sx + 2, panel_y + sy + 2, GOLD_SHADOW)
 
 
 def main() -> None:
