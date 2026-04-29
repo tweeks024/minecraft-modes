@@ -10,4 +10,5 @@ plugins {
 
 rootProject.name = 'minecraft-mods'
 
+include 'securitycore'
 include 'securityguard'
