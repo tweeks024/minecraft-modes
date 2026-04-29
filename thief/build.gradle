@@ -92,6 +92,7 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
+// Make Minecraft + NeoForge classes visible to tests.
 sourceSets.test.compileClasspath += sourceSets.main.compileClasspath
 sourceSets.test.runtimeClasspath += sourceSets.main.runtimeClasspath
 
@@ -99,6 +100,7 @@ test {
     useJUnitPlatform()
 }
 
+// Process the templated mod metadata at src/main/templates/META-INF/neoforge.mods.toml.
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
     var replaceProperties = [
             minecraft_version      : minecraft_version,
