@@ -21,21 +21,38 @@ ITEM_TEXTURES = ROOT / "src/main/resources/assets/creeperskin/textures/item"
 
 
 def make_humanoid_body() -> Image.Image:
-    """64×32 humanoid armor sheet, plain creeper green with shading.
-       Face is added in a separate task; this is a clean green base."""
+    """64×32 humanoid armor sheet, creeper green base with the iconic
+       creeper face on the helmet front (UV 8..15, 8..15)."""
     img = Image.new("RGBA", (64, 32), TRANSPARENT)
-    # Vanilla netherite uses opaque pixels in the cube-net regions and
-    # transparent elsewhere. Easiest robust approach: fill everything with
-    # the green base, then re-zero the four-pixel margins the vanilla UV
-    # layout leaves transparent. The renderer ignores transparent pixels,
-    # so over-paint in the empty UV gutter is harmless.
     for x in range(64):
         for y in range(32):
             img.putpixel((x, y), GREEN_BASE)
-    # Light shading along a diagonal seam to give the armor depth.
     for i in range(0, 64, 8):
         for y in range(32):
             img.putpixel((i, y), GREEN_SHADE)
+
+    # Creeper face on the helmet front. The 8×8 region is UV (8..15, 8..15)
+    # in vanilla armor layout. Pixel coordinates within that region:
+    #   eyes:    (1,2)-(2,3)  and  (5,2)-(6,3)
+    #   nose gap: row 4 plain green
+    #   mouth:   horizontal bar (2,5)-(5,5)
+    #            two prongs going down: (2,6)-(2,7) and (5,6)-(5,7)
+    face_x0, face_y0 = 8, 8
+    face_pixels = [
+        # left eye
+        (1, 2), (2, 2), (1, 3), (2, 3),
+        # right eye
+        (5, 2), (6, 2), (5, 3), (6, 3),
+        # mouth horizontal bar
+        (2, 5), (3, 5), (4, 5), (5, 5),
+        # mouth left prong
+        (2, 6), (2, 7),
+        # mouth right prong
+        (5, 6), (5, 7),
+    ]
+    for dx, dy in face_pixels:
+        img.putpixel((face_x0 + dx, face_y0 + dy), FACE_BLACK)
+
     return img
 
 
