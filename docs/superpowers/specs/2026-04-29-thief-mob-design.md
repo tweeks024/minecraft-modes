@@ -13,7 +13,7 @@ Two coupled goals:
 
 ## Platform
 
-Java / NeoForge / MC 1.21.x. Same target as the existing Guard mod.
+Java 25 / NeoForge 26.1.2.30-beta / Minecraft 26.1.2. Same target as the existing Guard mod (see `securityguard/gradle.properties` and `securityguard/build.gradle`). Build plugin: `net.neoforged.moddev` 2.0.141.
 
 ## Scope
 
@@ -284,50 +284,32 @@ pluginManagement {
     }
 }
 
-plugins {
-    id 'org.gradle.toolchains.foojay-resolver-convention' version '0.8.0'
-}
-
 rootProject.name = 'security-pack'
 include 'securitycore'
 include 'securityguard'
 include 'thief'
 ```
 
+### gradle.properties (root)
+Existing root `gradle.properties` already holds shared JVM args + JDK install paths (Java 21 + 25). Move the version coordinates currently in `securityguard/gradle.properties` (`minecraft_version`, `minecraft_version_range`, `neo_version`) up to the root so all three modules share one source of truth. Module-level `gradle.properties` files keep only their own `mod_id`, `mod_name`, `mod_version`, `mod_group_id`.
+
 ### build.gradle (root)
-```gradle
-allprojects {
-    apply plugin: 'java'
-    apply plugin: 'net.neoforged.gradle.userdev'
-
-    java.toolchain.languageVersion = JavaLanguageVersion.of(21)
-
-    repositories {
-        mavenCentral()
-        maven { url = 'https://maven.neoforged.net/releases' }
-    }
-}
-```
+No `allprojects` block — the `net.neoforged.moddev` plugin must be applied per-module (it's a moddev plugin, not a vanilla java plugin and applying it via `allprojects` to a non-mod root project causes issues). Root `build.gradle` stays minimal or absent. Each module's `build.gradle` applies the plugin itself.
 
 ### securitycore/build.gradle
-- Standard NeoForge mod build.
-- Produces a jar that other modules consume.
-- Has its own `neoforge.mods.toml` declaring `modId = securitycore`.
+- Mirrors the structure of `securityguard/build.gradle`: applies `net.neoforged.moddev` 2.0.141, sets Java toolchain to 25, configures `neoForge { version = project.neo_version }`.
+- Produces a jar that other modules consume via `project(':securitycore')`.
+- Has its own `neoforge.mods.toml` template at `src/main/templates/META-INF/neoforge.mods.toml` declaring `modId = securitycore`.
+- Declares the `securitycore` mod block in `neoForge { mods { ... } }`.
 
 ### securityguard/build.gradle
-```gradle
-dependencies {
-    implementation project(':securitycore')
-}
-```
-Plus existing NeoForge config moved/inherited from root.
+- Existing file stays largely intact.
+- Add `dependencies { implementation project(':securitycore') }`.
+- Remove `minecraft_version`, `minecraft_version_range`, `neo_version` from `securityguard/gradle.properties` (they now live at the root and are inherited via `project.findProperty(...)` or by reading `rootProject` properties).
 
 ### thief/build.gradle
-```gradle
-dependencies {
-    implementation project(':securitycore')
-}
-```
+- Copies the `securityguard/build.gradle` template (same plugin config, same Java 25 toolchain, same datagen run config).
+- Adds `dependencies { implementation project(':securitycore') }`.
 
 ### Mod load-order
 `thief` and `securityguard` both declare `securitycore` as a required mod dependency in their `neoforge.mods.toml`:
