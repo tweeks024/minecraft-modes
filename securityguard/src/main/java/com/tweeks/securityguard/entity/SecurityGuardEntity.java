@@ -70,8 +70,9 @@ public class SecurityGuardEntity extends IronGolem {
             extends net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal<net.minecraft.world.entity.Mob> {
         public GuardTargetHostilesGoal(SecurityGuardEntity guard) {
             super(guard, net.minecraft.world.entity.Mob.class, 5, false, false,
-                (target, level) -> target instanceof net.minecraft.world.entity.monster.Enemy
-                                && !(target instanceof net.minecraft.world.entity.monster.Creeper));
+                (target, level) -> target instanceof com.tweeks.securitycore.api.SecurityHostile
+                                || (target instanceof net.minecraft.world.entity.monster.Enemy
+                                    && !(target instanceof net.minecraft.world.entity.monster.Creeper)));
         }
     }
 }
