@@ -25,4 +25,32 @@ public class SecurityGuardEntity extends IronGolem {
             .add(Attributes.KNOCKBACK_RESISTANCE, 0.5)
             .add(Attributes.FOLLOW_RANGE, 32.0);
     }
+
+    @Override
+    protected void registerGoals() {
+        this.goalSelector.addGoal(1, new com.tweeks.securityguard.entity.ai.BatonStrikeGoal(this));
+        this.goalSelector.addGoal(2, new net.minecraft.world.entity.ai.goal.MoveTowardsTargetGoal(this, 0.9, 32.0f));
+        this.goalSelector.addGoal(2, new net.minecraft.world.entity.ai.goal.MoveBackToVillageGoal(this, 0.6, false));
+        this.goalSelector.addGoal(4, new net.minecraft.world.entity.ai.goal.GolemRandomStrollInVillageGoal(this, 0.6));
+        this.goalSelector.addGoal(5, new net.minecraft.world.entity.ai.goal.OfferFlowerGoal(this));
+        this.goalSelector.addGoal(7, new net.minecraft.world.entity.ai.goal.RandomStrollGoal(this, 0.6));
+        this.goalSelector.addGoal(8, new net.minecraft.world.entity.ai.goal.LookAtPlayerGoal(this,
+            net.minecraft.world.entity.player.Player.class, 6.0f));
+        this.goalSelector.addGoal(8, new net.minecraft.world.entity.ai.goal.RandomLookAroundGoal(this));
+
+        this.targetSelector.addGoal(1, new net.minecraft.world.entity.ai.goal.target.DefendVillageTargetGoal(this));
+        this.targetSelector.addGoal(2, new net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal(this));
+        this.targetSelector.addGoal(3, new GuardTargetHostilesGoal(this));
+        this.targetSelector.addGoal(4, new net.minecraft.world.entity.ai.goal.target.ResetUniversalAngerTargetGoal<>(this, false));
+    }
+
+    /** Targets hostile mobs (Mob+Enemy) within follow range, except creepers. */
+    public static class GuardTargetHostilesGoal
+            extends net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal<net.minecraft.world.entity.Mob> {
+        public GuardTargetHostilesGoal(SecurityGuardEntity guard) {
+            super(guard, net.minecraft.world.entity.Mob.class, 5, false, false,
+                (target, level) -> target instanceof net.minecraft.world.entity.monster.Enemy
+                                && !(target instanceof net.minecraft.world.entity.monster.Creeper));
+        }
+    }
 }
