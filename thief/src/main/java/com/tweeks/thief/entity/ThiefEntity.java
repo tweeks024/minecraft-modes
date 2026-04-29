@@ -137,13 +137,20 @@ public class ThiefEntity extends PathfinderMob implements SecurityHostile, Conta
                                         @Nullable SpawnGroupData spawnData) {
         if (level instanceof ServerLevel serverLevel) {
             Optional<BlockPos> placed = HideoutPlacer.place(serverLevel, this.blockPosition());
-            if (placed.isEmpty()) {
+            if (placed.isPresent()) {
+                this.hideoutPos = placed.get();
+            } else if (!isPlayerInitiated(reason)) {
                 this.discard();
                 return spawnData;
             }
-            this.hideoutPos = placed.get();
         }
         return super.finalizeSpawn(level, difficulty, reason, spawnData);
+    }
+
+    private static boolean isPlayerInitiated(EntitySpawnReason reason) {
+        return reason == EntitySpawnReason.SPAWN_ITEM_USE
+            || reason == EntitySpawnReason.COMMAND
+            || reason == EntitySpawnReason.DISPENSER;
     }
 
     @Override
