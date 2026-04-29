@@ -1,0 +1,2 @@
+// Root project is purely an aggregator.
+// All mod-specific build logic lives in each subproject's build.gradle.
