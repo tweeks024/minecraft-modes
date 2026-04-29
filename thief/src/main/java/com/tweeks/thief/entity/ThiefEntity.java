@@ -287,6 +287,13 @@ public class ThiefEntity extends PathfinderMob implements SecurityHostile, Conta
                 && getTarget() != null) {
             triggerReveal(getTarget());
         }
+
+        if (hideoutPos != null && level().getBlockState(hideoutPos).isAir()) {
+            hideoutPos = null;
+            if (!getRevealState().isHostile()) {
+                triggerReveal(level().getNearestPlayer(this, 32.0));
+            }
+        }
     }
 
     private boolean hasAnyStolenItem() {
