@@ -241,6 +241,12 @@ public class ThiefEntity extends PathfinderMob implements SecurityHostile, Conta
         if (!current.canTransitionTo(next)) return;
         setRevealState(next);
         swapHysteresisTimer = REVEAL_SWAP_HYSTERESIS_TICKS;
+        if (next == RevealState.REVEALED_RANGED) {
+            if (getMainHandItem().isEmpty() || !getMainHandItem().is(net.minecraft.world.item.Items.CROSSBOW)) {
+                setItemSlot(net.minecraft.world.entity.EquipmentSlot.MAINHAND,
+                    new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.CROSSBOW));
+            }
+        }
     }
 
     private RevealState pickRevealStateFor(@Nullable LivingEntity who) {
