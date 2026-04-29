@@ -1053,32 +1053,38 @@ EOF
 **Files:**
 - Modify: `securityguard/build.gradle`
 
-**Why one-way only:** `:securityguard` already declares `implementation project(':securitycore')`, so gradle will always evaluate `:securitycore` while configuring `:securityguard` — adding `modSources.add(project(':securitycore').sourceSets.main)` to `:securityguard` is safe. The reverse (adding `modSources.add(project(':securityguard').sourceSets.main)` to `:securitycore`) creates a configuration-time cycle (`:securitycore` would need `:securityguard.sourceSets.main` while `:securityguard` is already mid-configuration via the project dep). Devs launch dev clients from `:securityguard:runClient` — the canonical command — and that loads both mods.
+**API note (moddev 2.0.141):** `RunModel` has no `modSources` property. An earlier draft of this plan prescribed `modSources.add(project(':securitycore').sourceSets.main)` inside each run block; that does not work — gradle errors with "Could not get unknown property 'modSources' for Run[client]". The actual aggregation path is through the `neoForge.mods { ... }` block: the moddev plugin defaults `RunModel.loadedMods` (via `convention()`) to the live `mods` container, so any mod added there is automatically included in every run (client, server, clientData, serverData, gameTestServer) without per-run changes. This is also nicer — one place to edit, no enumeration of run blocks.
 
-- [ ] **Step 1: Add `modSources` aggregation to `securityguard/build.gradle`**
+**Why one-way only:** `:securityguard` already declares `implementation project(':securitycore')`, so gradle evaluates `:securitycore` while configuring `:securityguard` — adding the second mod entry to `:securityguard`'s `mods` block is safe. The reverse (adding `:securityguard`'s source set into `:securitycore`'s `mods` block) creates a configuration-time cycle since `:securityguard` is already mid-configuration via the project dep. Devs launch dev clients from `:securityguard:runClient` — the canonical command — and that loads both mods.
 
-Open `securityguard/build.gradle`. Find the `runs { ... }` block inside `neoForge { ... }` (around line 32). For each of the four real run blocks (`client`, `server`, `clientData`, `serverData` — skip `gameTestServer` and `configureEach`), add a `modSources.add(...)` line that pulls in `securitycore`'s main source set.
+- [ ] **Step 1: Add a second `ModModel` entry to `securityguard/build.gradle`'s `mods` block**
 
-The `client` block currently looks like:
+Open `securityguard/build.gradle`. Find the `mods { ... }` block inside `neoForge { ... }` (around line 69-72). It currently contains a single entry:
+
 ```gradle
-client {
-    client()
-    systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+mods {
+    "${mod_id}" {
+        sourceSet(sourceSets.main)
+    }
 }
 ```
 
-Change to:
+Add a second entry for `securitycore`, immediately after the existing block, so the result is:
+
 ```gradle
-client {
-    client()
-    modSources.add(project(':securitycore').sourceSets.main)
-    systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+mods {
+    "${mod_id}" {
+        sourceSet(sourceSets.main)
+    }
+    "securitycore" {
+        sourceSet(project(':securitycore').sourceSets.main)
+    }
 }
 ```
 
-Apply the same `modSources.add(project(':securitycore').sourceSets.main)` line to the `server`, `clientData`, and `serverData` blocks.
+Do **not** modify `securitycore/build.gradle` for this task — see "Why one-way only" above. Do **not** touch the `runs { ... }` block at all.
 
-Do **not** modify `securitycore/build.gradle` for this task — see "Why one-way only" above.
+This single change wires `securitycore`'s main source set into every run defined in `securityguard` (client/server/clientData/serverData/gameTestServer) automatically.
 
 - [ ] **Step 2: Verify the configuration is valid by triggering a tasks listing (cheap dry run)**
 
@@ -1086,7 +1092,7 @@ Run:
 ```bash
 ./gradlew :securityguard:tasks --group neoforged > /dev/null && echo "config OK"
 ```
-Expected: prints `config OK`. Any gradle error (most likely "Cannot use ... before ... is configured" or "Unknown property 'sourceSets'") means the syntax is wrong; recheck spelling.
+Expected: prints `config OK`. Any gradle error means the syntax is wrong; recheck spelling.
 
 - [ ] **Step 3: Commit**
 
@@ -1095,15 +1101,17 @@ git add securityguard/build.gradle
 git commit -m "$(cat <<'EOF'
 build: aggregate securitycore source set into securityguard run configs
 
-securityguard's client/server/clientData/serverData runs now add
-:securitycore's main source set via modSources.add(...). Required
-because each module is a standalone NeoForge mod; without aggregation,
-:securityguard:runClient would only load securityguard's mod metadata
-and securitycore would be silently absent at runtime.
+Adds 'securitycore' as a second ModModel in securityguard's neoForge.mods
+block, pointing at project(':securitycore').sourceSets.main. Because
+RunModel.loadedMods defaults via convention() to the live neoForge.mods
+container, all securityguard runs (client/server/clientData/serverData/
+gameTestServer) automatically load both mods without per-run changes.
 
-Aggregation is one-way (only :securityguard adds :securitycore).
-Reverse aggregation creates a configuration-time cycle since
-:securityguard already declares a project dep on :securitycore.
+Note: modSources is not a property of RunModel in moddev 2.0.141; the
+correct aggregation path is through neoForge.mods. Aggregation is
+one-way (only :securityguard adds :securitycore). The reverse direction
+would create a configuration-time cycle since :securityguard already
+declares a project dep on :securitycore.
 Canonical dev command is :securityguard:runClient.
 EOF
 )"
@@ -1267,4 +1275,5 @@ The next step in the project is to invoke the brainstorming/writing-plans flow a
 - The numeric arguments in Task 8 (`60, 1, 0, 0.2`) are the most common "subagent guesses wrong" failure point. They MUST match the original constants in the deleted `BatonStrikeGoal`. Re-check those values from the original file (preserved in git history) if a smoke test shows different stun timing.
 - The translation `(-0.0625f, 0.625f, 0.0f)` and `180.0f` rotation in Task 9 must likewise come verbatim from the original `BatonHeldLayer.submit` body, NOT be re-derived.
 - Task 11 aggregation is intentionally one-way (`:securityguard` adds `:securitycore`, not the reverse). Adding the symmetric line to `:securitycore/build.gradle` causes a configuration-time cycle because `:securityguard` already has a project dep on `:securitycore`. If a subagent "fixes" this by adding the reverse aggregation, gradle will start failing with "Cannot use ... before ... is configured."
+- Task 11 also has a moddev-2.0.141 API gotcha: `RunModel.modSources` does NOT exist. The aggregation goes through `neoForge.mods { ... }` (a second `ModModel` entry pointing at the sibling project's source set), and the moddev plugin's `RunModel.loadedMods` convention picks it up for every run. If a subagent tries `modSources.add(...)` they will hit "Could not get unknown property 'modSources'".
 - Task 13 is a hard human-in-the-loop stop. The orchestrator must pause, the human must launch and drive the client, and the human must report pass/fail before checkboxes flip.
