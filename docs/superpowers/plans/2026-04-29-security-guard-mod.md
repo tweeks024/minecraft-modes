@@ -8,7 +8,48 @@
 
 **Tech Stack:** **Java 25**, **Minecraft 26.1.2**, **NeoForge 26.1.2.30-beta**, **ModDevGradle 2.0.141**, **Gradle 9.2.1** (via wrapper), JUnit 5 for unit tests, NeoForge GameTest framework for optional in-game tests.
 
-**Note on API drift:** The plan was originally drafted against MC 1.21.x but has been updated for MC 26.1.2. The Minecraft public API for entities, items, registries, and rendering is largely the same, but exact method signatures (especially `finalizeSpawn`, `useOn`, sound subtitles, `pack_format`) may differ. Each task's verification step will catch drift; expect minor inline fixes during execution.
+**Note on API drift:** The plan was originally drafted against MC 1.21.x but has been **rewritten for MC 26.1.2** below. Tasks 1–7 are already executed (see git commits); tasks 8–13 contain 26.1.2-correct code.
+
+## 26.1.2 API Reference Sheet
+
+The renames and pattern shifts that diverge from older NeoForge tutorials:
+
+| 1.21.x name / pattern | 26.1.2 equivalent |
+|---|---|
+| `net.minecraft.resources.ResourceLocation` | `net.minecraft.resources.Identifier` |
+| `net.minecraft.world.entity.animal.IronGolem` | `net.minecraft.world.entity.animal.golem.IronGolem` |
+| `EntityType.Builder.build("modid:name")` (string) | `EntityType.Builder.build(ResourceKey<EntityType<?>>)` |
+| `new SpawnEggItem(entityType, primary, secondary, props)` | `new SpawnEggItem(new Item.Properties().spawnEgg(entityType))` — colors baked into the texture |
+| Item asset path: only `assets/<ns>/models/item/<id>.json` | **Two** files now: `assets/<ns>/items/<id>.json` (item-model definition) + `assets/<ns>/models/item/<id>.json` (geometry + texture) |
+| `MobSpawnType.MOB_SUMMONED` | `EntitySpawnReason.MOB_SUMMONED` (also: `Mob.finalizeSpawn(...)` takes `EntitySpawnReason`) |
+| `extends MobRenderer<Entity, Model>` (2-arg generic) | `extends MobRenderer<Entity, RenderState, Model>` (3-arg). Renderers now have a pre-extracted `RenderState` class. |
+| `extends HumanoidModel<Entity>` | `extends HumanoidModel<S extends HumanoidRenderState>` (parameterized over render state, not entity) |
+| `RenderLayer<T, M>.render(PoseStack, MultiBufferSource, int, T, ...)` | `RenderLayer<S, M>.submit(PoseStack, SubmitNodeCollector, int lightCoords, S state, float yRot, float xRot)` |
+| `MultiBufferSource.getBuffer(RenderType)` then `model.renderToBuffer(...)` | `submitNodeCollector.submitModel(model, state, poseStack, Identifier texture, lightCoords, packedOverlay, color, null)` |
+| Renderer needs `getTextureLocation(Entity)` | Renderer needs `getTextureLocation(S state)` + `createRenderState()` (returns a fresh state instance) |
+| Animation: `model.setupAnim(entity, ...)` | Animation: `model.setupAnim(S state)` — driven from the pre-extracted state |
+| `Item.Properties()` setters chained directly | Same, plus new component-based methods: `.spawnEgg(EntityType)`, `.component(...)`, `.food(props, consumable)` |
+
+**`pack_format`:** 26.1.2 doesn't use a top-level `pack.mcmeta` in mod resources — NeoForge handles it.
+
+## Execution Status
+
+- ✅ **Task 1** (commit `4b041b8`) — Root Gradle multi-module setup
+- ✅ **Task 2** (commit `42f6197`) — NeoForge 26.1.2 MDK skeleton (rebased from 1.21.x)
+- ✅ **Task 3** (commit `053d1e9`) — Registration + creative tab
+- ✅ **Task 4** (commit `67a7b1e`) — Guard Helmet item
+- ✅ **Task 5** (commit `6e8220f`) — SpawnPattern + unit tests (predicate-based to avoid MC bootstrap)
+- ✅ **Task 6** (commit `e04c505`) — Entity registration
+- ✅ **Task 7** (commit `8d265b8`) — Spawn egg
+- ⏳ **Task 8** — Renderer + model (rewritten below)
+- ⏳ **Task 9** — Baton render layer (rewritten below)
+- ⏳ **Task 10** — Helmet useOn spawn logic (rewritten below)
+- ⏳ **Task 11** — BatonStrikeGoal combat AI (rewritten below)
+- ⏳ **Task 12** — Sound events (rewritten below)
+- ⏳ **Task 13** — Datagen (rewritten below)
+- ⏳ **Task 14** — Final verification (manual; user runs `./gradlew runClient`)
+
+The original Tasks 1-7 below contain 1.21.x-style snippets for historical reference; the actual committed code uses the 26.1.2 API.
 
 **Spec:** [`docs/superpowers/specs/2026-04-29-security-guard-mod-design.md`](../specs/2026-04-29-security-guard-mod-design.md)
 
@@ -1001,9 +1042,16 @@ git commit -m "feat(securityguard): add Security Guard spawn egg"
 
 ---
 
-## Task 8: Entity Renderer + Humanoid Model (No Baton Yet)
 
-Makes the entity visible. Humanoid model with an extra "cap" cube on the head. Baton render layer added in the next task.
+# === REWRITTEN FOR MC 26.1.2 BELOW ===
+
+The tasks below replace the 1.21.x-style snippets that originally followed Task 7. Use these for execution.
+
+---
+
+## Task 8: Entity Renderer + Humanoid Model (No Baton Yet) — 26.1.2
+
+Makes the entity visible. Humanoid model with an extra "cap" cube on the head. Uses the modern `RenderState` pattern: `HumanoidRenderState` is sufficient for our purposes (no extra state to track), so we don't define a custom render state class.
 
 **Files:**
 - Create: `securityguard/src/main/java/com/tweeks/securityguard/client/ClientSetup.java`
@@ -1016,7 +1064,7 @@ Makes the entity visible. Humanoid model with an extra "cap" cube on the head. B
 ```java
 package com.tweeks.securityguard.client.model;
 
-import com.tweeks.securityguard.entity.SecurityGuardEntity;
+import com.tweeks.securityguard.SecurityGuardMod;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
@@ -1026,41 +1074,35 @@ import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
-import net.minecraft.resources.ResourceLocation;
-import com.tweeks.securityguard.SecurityGuardMod;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
+import net.minecraft.resources.Identifier;
 
-public class SecurityGuardModel extends HumanoidModel<SecurityGuardEntity> {
+public class SecurityGuardModel extends HumanoidModel<HumanoidRenderState> {
 
-    public static final ModelLayerLocation LAYER_LOCATION =
-        new ModelLayerLocation(
-            ResourceLocation.fromNamespaceAndPath(SecurityGuardMod.MOD_ID, "guard"),
-            "main");
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(
+        Identifier.fromNamespaceAndPath(SecurityGuardMod.MOD_ID, "guard"),
+        "main");
 
     public SecurityGuardModel(ModelPart root) {
         super(root);
     }
 
     public static LayerDefinition createBodyLayer() {
-        // Start from the standard humanoid mesh, then add the cap to the head.
         MeshDefinition mesh = HumanoidModel.createMesh(CubeDeformation.NONE, 0.0f);
         PartDefinition root = mesh.getRoot();
-
         PartDefinition head = root.getChild("head");
-        // Cap brim: thin disc above the head
-        head.addOrReplaceChild(
-            "cap_brim",
+        // Cap brim (thin disc on top of the head)
+        head.addOrReplaceChild("cap_brim",
             CubeListBuilder.create()
                 .texOffs(32, 0)
                 .addBox(-4.5f, -9.0f, -4.5f, 9, 1, 9),
             PartPose.ZERO);
-        // Cap crown: shorter cube on top of the brim
-        head.addOrReplaceChild(
-            "cap_crown",
+        // Cap crown (shorter cube on top of the brim)
+        head.addOrReplaceChild("cap_crown",
             CubeListBuilder.create()
                 .texOffs(32, 10)
                 .addBox(-3.5f, -11.5f, -3.5f, 7, 2, 7),
             PartPose.ZERO);
-
         return LayerDefinition.create(mesh, 64, 64);
     }
 }
@@ -1076,20 +1118,26 @@ import com.tweeks.securityguard.client.model.SecurityGuardModel;
 import com.tweeks.securityguard.entity.SecurityGuardEntity;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
+import net.minecraft.resources.Identifier;
 
 public class SecurityGuardRenderer
-        extends HumanoidMobRenderer<SecurityGuardEntity, SecurityGuardModel> {
+        extends HumanoidMobRenderer<SecurityGuardEntity, HumanoidRenderState, SecurityGuardModel> {
 
-    private static final ResourceLocation TEXTURE =
-        ResourceLocation.fromNamespaceAndPath(SecurityGuardMod.MOD_ID, "textures/entity/security_guard.png");
+    private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(
+        SecurityGuardMod.MOD_ID, "textures/entity/security_guard.png");
 
     public SecurityGuardRenderer(EntityRendererProvider.Context context) {
         super(context, new SecurityGuardModel(context.bakeLayer(SecurityGuardModel.LAYER_LOCATION)), 0.5f);
     }
 
     @Override
-    public ResourceLocation getTextureLocation(SecurityGuardEntity entity) {
+    public HumanoidRenderState createRenderState() {
+        return new HumanoidRenderState();
+    }
+
+    @Override
+    public Identifier getTextureLocation(HumanoidRenderState state) {
         return TEXTURE;
     }
 }
@@ -1124,70 +1172,48 @@ public class ClientSetup {
 }
 ```
 
-- [ ] **Step 4: Create the placeholder texture**
+- [ ] **Step 4: Create the placeholder 64×64 texture**
 
-The model uses a 64×64 texture sheet (standard for `HumanoidModel`). For the placeholder, generate a solid-colored 64×64 PNG.
-
-ImageMagick:
 ```bash
-mkdir -p securityguard/src/main/resources/assets/securityguard/textures/entity
-magick -size 64x64 xc:'#162e5e' \
-    securityguard/src/main/resources/assets/securityguard/textures/entity/security_guard.png
-```
-
-Python:
-```bash
-mkdir -p securityguard/src/main/resources/assets/securityguard/textures/entity
 python3 -c "from PIL import Image; Image.new('RGBA',(64,64),(22,46,94,255)).save('securityguard/src/main/resources/assets/securityguard/textures/entity/security_guard.png')"
 ```
 
-- [ ] **Step 5: Build**
+- [ ] **Step 5: Build to verify it compiles**
 
 ```bash
-./gradlew :securityguard:build
+./securityguard/gradlew :securityguard:build --no-daemon
 ```
 
 Expected: `BUILD SUCCESSFUL`.
 
-- [ ] **Step 6: Run client, summon the guard, verify it renders**
-
-```bash
-./gradlew :securityguard:runClient
-```
-
-In a creative world: `/summon securityguard:guard`. The entity is now visible — a navy-blue humanoid with a cap-shape on its head. (It looks blocky and underdetailed; that's the placeholder texture — real art replaces this later.) Quit.
-
-- [ ] **Step 7: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
 git add securityguard/src/main/java/com/tweeks/securityguard/client/ \
         securityguard/src/main/resources/assets/securityguard/textures/entity/
-git commit -m "feat(securityguard): add humanoid model and renderer for Security Guard"
+git commit -m "feat(securityguard): add humanoid model and renderer"
 ```
 
 ---
 
-## Task 9: Baton Model + Render Layer
+## Task 9: Baton Model + Render Layer — 26.1.2
 
-Renders a small baton model in the guard's right hand, attached to the right-arm `ModelPart` so it swings naturally with the arm during walk/attack animations.
+Renders a baton in the guard's right hand via a custom `RenderLayer`. Uses the new `submit(...)` API and `SubmitNodeCollector.submitModel(...)` for queueing the draw.
 
 **Files:**
 - Create: `securityguard/src/main/java/com/tweeks/securityguard/client/model/BatonModel.java`
 - Create: `securityguard/src/main/java/com/tweeks/securityguard/client/renderer/BatonHeldLayer.java`
-- Create: `securityguard/src/main/resources/assets/securityguard/textures/entity/baton.png` (placeholder)
-- Modify: `securityguard/src/main/java/com/tweeks/securityguard/client/renderer/SecurityGuardRenderer.java`
-- Modify: `securityguard/src/main/java/com/tweeks/securityguard/client/ClientSetup.java`
+- Create: `securityguard/src/main/resources/assets/securityguard/textures/entity/baton.png`
+- Modify: `SecurityGuardRenderer.java` (add the layer)
+- Modify: `ClientSetup.java` (register baton layer definition)
 
 - [ ] **Step 1: Create `BatonModel.java`**
-
-A single elongated cube (the baton). Built as its own model so the layer can render it independently of the entity model.
 
 ```java
 package com.tweeks.securityguard.client.model;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.tweeks.securityguard.SecurityGuardMod;
+import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
@@ -1195,107 +1221,99 @@ import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.resources.Identifier;
 
-public class BatonModel {
+public class BatonModel extends Model<HumanoidRenderState> {
 
-    public static final ModelLayerLocation LAYER_LOCATION =
-        new ModelLayerLocation(
-            ResourceLocation.fromNamespaceAndPath(SecurityGuardMod.MOD_ID, "baton"),
-            "main");
-
-    private final ModelPart root;
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(
+        Identifier.fromNamespaceAndPath(SecurityGuardMod.MOD_ID, "baton"),
+        "main");
 
     public BatonModel(ModelPart root) {
-        this.root = root;
+        super(root, RenderTypes::entityCutout);
     }
 
     public static LayerDefinition createLayer() {
         MeshDefinition mesh = new MeshDefinition();
-        PartDefinition partRoot = mesh.getRoot();
-        // 1x1x6 stick, anchored so the "handle" sits in the hand
-        partRoot.addOrReplaceChild(
-            "baton",
+        PartDefinition root = mesh.getRoot();
+        // 1x1x6 stick, anchored at the handle
+        root.addOrReplaceChild("baton",
             CubeListBuilder.create()
                 .texOffs(0, 0)
                 .addBox(-0.5f, 0.0f, -0.5f, 1, 6, 1),
             PartPose.ZERO);
         return LayerDefinition.create(mesh, 16, 16);
     }
-
-    public void render(PoseStack pose, VertexConsumer buffer, int packedLight, int packedOverlay) {
-        root.render(pose, buffer, packedLight, packedOverlay);
-    }
 }
 ```
 
 - [ ] **Step 2: Create `BatonHeldLayer.java`**
 
-Attaches to the entity renderer, walks into the right-arm coordinate space during render, and draws the baton there.
-
 ```java
 package com.tweeks.securityguard.client.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import com.tweeks.securityguard.SecurityGuardMod;
 import com.tweeks.securityguard.client.model.BatonModel;
 import com.tweeks.securityguard.client.model.SecurityGuardModel;
-import com.tweeks.securityguard.entity.SecurityGuardEntity;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
-public class BatonHeldLayer
-        extends RenderLayer<SecurityGuardEntity, SecurityGuardModel> {
+public class BatonHeldLayer extends RenderLayer<HumanoidRenderState, SecurityGuardModel> {
 
-    private static final ResourceLocation TEXTURE =
-        ResourceLocation.fromNamespaceAndPath(SecurityGuardMod.MOD_ID, "textures/entity/baton.png");
+    private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(
+        SecurityGuardMod.MOD_ID, "textures/entity/baton.png");
 
     private final BatonModel batonModel;
 
-    public BatonHeldLayer(RenderLayerParent<SecurityGuardEntity, SecurityGuardModel> parent,
+    public BatonHeldLayer(RenderLayerParent<HumanoidRenderState, SecurityGuardModel> parent,
                           EntityRendererProvider.Context context) {
         super(parent);
         this.batonModel = new BatonModel(context.bakeLayer(BatonModel.LAYER_LOCATION));
     }
 
     @Override
-    public void render(PoseStack pose,
-                       MultiBufferSource buffers,
-                       int packedLight,
-                       SecurityGuardEntity entity,
-                       float limbSwing,
-                       float limbSwingAmount,
-                       float partialTicks,
-                       float ageInTicks,
-                       float netHeadYaw,
-                       float headPitch) {
+    public void submit(PoseStack pose,
+                       SubmitNodeCollector collector,
+                       int lightCoords,
+                       HumanoidRenderState state,
+                       float yRot,
+                       float xRot) {
         pose.pushPose();
-        // Walk into the right-arm's coordinate space so we inherit walk/attack rotation.
+        // Walk into the right-arm coordinate space so the baton inherits walk/attack rotation.
         getParentModel().rightArm.translateAndRotate(pose);
-
-        // Move to the hand position at the bottom of the arm cube (arm is 12 tall in vanilla).
+        // Move to fist position at the bottom of the arm cube.
         pose.translate(-0.0625f, 0.625f, 0.0f);
-        // Baton points straight down out of the fist (model is built upward; flip).
+        // Baton model is built upward; flip 180° so it points down out of the fist.
         pose.mulPose(Axis.XP.rotationDegrees(180.0f));
 
-        VertexConsumer buffer = buffers.getBuffer(RenderType.entityCutoutNoCull(TEXTURE));
-        batonModel.render(pose, buffer, packedLight, OverlayTexture.NO_OVERLAY);
+        collector.submitModel(
+            batonModel,
+            state,
+            pose,
+            TEXTURE,
+            lightCoords,
+            OverlayTexture.NO_OVERLAY,
+            -1,    // color (white = no tint)
+            null   // crumbling overlay (none)
+        );
 
         pose.popPose();
     }
 }
 ```
 
-- [ ] **Step 3: Add the layer in `SecurityGuardRenderer`**
+- [ ] **Step 3: Update `SecurityGuardRenderer` to add the layer**
 
-Modify the constructor body:
+Modify the constructor:
 
 ```java
     public SecurityGuardRenderer(EntityRendererProvider.Context context) {
@@ -1304,27 +1322,28 @@ Modify the constructor body:
     }
 ```
 
-- [ ] **Step 4: Register the baton layer definition in `ClientSetup`**
+Add the import:
+```java
+import com.tweeks.securityguard.client.renderer.BatonHeldLayer;
+```
 
-Add this inside `registerLayerDefinitions`, below the existing call:
+(self-import isn't needed if `BatonHeldLayer` is in the same package as `SecurityGuardRenderer`.)
+
+- [ ] **Step 4: Update `ClientSetup` to register the baton layer**
+
+Add inside `registerLayerDefinitions`:
 
 ```java
         event.registerLayerDefinition(BatonModel.LAYER_LOCATION, BatonModel::createLayer);
 ```
 
 Add the import:
-
 ```java
 import com.tweeks.securityguard.client.model.BatonModel;
 ```
 
-- [ ] **Step 5: Create the baton placeholder texture**
+- [ ] **Step 5: Create the baton texture**
 
-```bash
-magick -size 16x16 xc:'#1e1e1e' \
-    securityguard/src/main/resources/assets/securityguard/textures/entity/baton.png
-```
-Or with Python:
 ```bash
 python3 -c "from PIL import Image; Image.new('RGBA',(16,16),(30,30,30,255)).save('securityguard/src/main/resources/assets/securityguard/textures/entity/baton.png')"
 ```
@@ -1332,37 +1351,24 @@ python3 -c "from PIL import Image; Image.new('RGBA',(16,16),(30,30,30,255)).save
 - [ ] **Step 6: Build**
 
 ```bash
-./gradlew :securityguard:build
+./securityguard/gradlew :securityguard:build --no-daemon
 ```
 
 Expected: `BUILD SUCCESSFUL`.
 
-- [ ] **Step 7: Run client and verify the baton renders**
+- [ ] **Step 7: Commit**
 
 ```bash
-./gradlew :securityguard:runClient
-```
-
-`/summon securityguard:guard`. A small dark stick should now hang from the guard's right hand. Walk around the guard — the baton swings with the arm during the guard's idle walk cycle. (If the baton appears in the wrong place — through the hand or floating — the translate values in `BatonHeldLayer` are off; tweak the `pose.translate` line. The values above are tested but humanoid arm pivots vary by `0.0625` increments.)
-
-Quit.
-
-- [ ] **Step 8: Commit**
-
-```bash
-git add securityguard/src/main/java/com/tweeks/securityguard/client/model/BatonModel.java \
-        securityguard/src/main/java/com/tweeks/securityguard/client/renderer/BatonHeldLayer.java \
-        securityguard/src/main/java/com/tweeks/securityguard/client/renderer/SecurityGuardRenderer.java \
-        securityguard/src/main/java/com/tweeks/securityguard/client/ClientSetup.java \
+git add securityguard/src/main/java/com/tweeks/securityguard/client/ \
         securityguard/src/main/resources/assets/securityguard/textures/entity/baton.png
-git commit -m "feat(securityguard): render baton in guard's right hand via custom layer"
+git commit -m "feat(securityguard): render baton via custom RenderLayer (26.1.2 submit API)"
 ```
 
 ---
 
-## Task 10: Helmet `useOn` — Spawn-on-Construct
+## Task 10: Helmet `useOn` — Spawn-on-Construct — 26.1.2
 
-Wires the helmet item to the spawn pattern. Uses `SpawnPattern.matches` from Task 5 (now exercised in real game world via the helmet).
+Replaces the stub `GuardHelmetItem.useOn` with the full pattern-detect + spawn flow. Uses `EntitySpawnReason.MOB_SUMMONED` (the renamed `MobSpawnType`).
 
 **Files:**
 - Modify: `securityguard/src/main/java/com/tweeks/securityguard/item/GuardHelmetItem.java`
@@ -1373,19 +1379,19 @@ Wires the helmet item to the spawn pattern. Uses `SpawnPattern.matches` from Tas
 package com.tweeks.securityguard.item;
 
 import com.tweeks.securityguard.Registration;
+import com.tweeks.securityguard.entity.SecurityGuardEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
-import com.tweeks.securityguard.entity.SecurityGuardEntity;
 
 public class GuardHelmetItem extends Item {
 
@@ -1400,12 +1406,15 @@ public class GuardHelmetItem extends Item {
         Player player = ctx.getPlayer();
         if (player == null) return InteractionResult.PASS;
 
-        // 1. Pure-function pattern check (works on both client & server)
-        if (!SpawnPattern.matches(level::getBlockState, top)) {
+        // 1. Pure-function pattern check (works on both client and server)
+        if (!SpawnPattern.matches(
+                pos -> level.getBlockState(pos).is(Blocks.IRON_BLOCK),
+                pos -> level.getBlockState(pos).isAir(),
+                top)) {
             return InteractionResult.PASS;
         }
 
-        // 2. Permission check at every position we'd modify (respects spawn protection / WorldGuard)
+        // 2. Permission check at every position we'd modify (respects spawn protection)
         for (int dy = 0; dy >= -2; dy--) {
             BlockPos pos = top.offset(0, dy, 0);
             if (!level.mayInteract(player, pos)) {
@@ -1420,18 +1429,18 @@ public class GuardHelmetItem extends Item {
             }
 
             BlockPos spawnAt = top.below(2);
-            SecurityGuardEntity guard = Registration.SECURITY_GUARD.get().create(serverLevel);
+            SecurityGuardEntity guard = Registration.SECURITY_GUARD.get().create(serverLevel, EntitySpawnReason.MOB_SUMMONED);
             if (guard != null) {
                 guard.moveTo(
                     spawnAt.getX() + 0.5,
                     spawnAt.getY(),
                     spawnAt.getZ() + 0.5,
-                    player.getYRot() + 180.0f,  // face the player
+                    player.getYRot() + 180.0f,
                     0.0f);
                 guard.setPlayerCreated(true);
                 guard.finalizeSpawn(serverLevel,
                     serverLevel.getCurrentDifficultyAt(spawnAt),
-                    MobSpawnType.MOB_SUMMONED, null);
+                    EntitySpawnReason.MOB_SUMMONED, null);
                 serverLevel.addFreshEntity(guard);
 
                 serverLevel.playSound(null, spawnAt,
@@ -1444,35 +1453,22 @@ public class GuardHelmetItem extends Item {
             }
         }
 
-        return InteractionResult.sidedSuccess(level.isClientSide());
+        return InteractionResult.SUCCESS;
     }
 }
 ```
 
+(Note: the predicate-based `SpawnPattern.matches` was set up in Task 5 to take two `Predicate<BlockPos>` args.)
+
 - [ ] **Step 2: Build**
 
 ```bash
-./gradlew :securityguard:build
+./securityguard/gradlew :securityguard:build --no-daemon
 ```
 
-Expected: `BUILD SUCCESSFUL`.
+Expected: `BUILD SUCCESSFUL`. If `EntityType.create(level, EntitySpawnReason)` doesn't compile, fall back to `Registration.SECURITY_GUARD.get().create(serverLevel)` (single-arg overload) — vanilla still keeps it.
 
-- [ ] **Step 3: Run client, verify the construction recipe**
-
-```bash
-./gradlew :securityguard:runClient
-```
-
-In a creative world:
-1. Place 3 iron blocks in a vertical column (jump-place 2, then place 1 more).
-2. Take a Guard Helmet from the creative inventory.
-3. Right-click on the top of the column with the helmet.
-
-Expected: the 3 iron blocks vanish, an iron-golem-repair sound plays, a Security Guard appears at the base of the column facing you. Try a 2-block column → nothing happens, helmet not consumed. Try the recipe inside spawn protection (you can't easily test this in single-player; deferred to a multiplayer / `mayInteract` testing pass).
-
-Quit.
-
-- [ ] **Step 4: Commit**
+- [ ] **Step 3: Commit**
 
 ```bash
 git add securityguard/src/main/java/com/tweeks/securityguard/item/GuardHelmetItem.java
@@ -1481,9 +1477,9 @@ git commit -m "feat(securityguard): spawn Security Guard on Guard Helmet constru
 
 ---
 
-## Task 11: BatonStrikeGoal — Stun + Knockback Combat
+## Task 11: BatonStrikeGoal — Stun + Knockback Combat — 26.1.2
 
-Replaces the inherited iron-golem melee goal with a stun-applying version. Iron golem's default `MeleeAttackGoal` is registered in `IronGolem.registerGoals`, so we override `registerGoals` in our entity to swap it out.
+Custom melee goal applies Slowness II + Weakness I + small knockback on hit. AI goal classes are still in `net.minecraft.world.entity.ai.goal`/`ai.goal.target` (no rename).
 
 **Files:**
 - Create: `securityguard/src/main/java/com/tweeks/securityguard/entity/ai/BatonStrikeGoal.java`
@@ -1500,11 +1496,6 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 
-/**
- * Melee goal for the Security Guard. Standard reach + cooldown behavior, but each
- * landed hit applies Slowness II + Weakness I for 3 seconds and a small explicit
- * knockback to "reset" the target's momentum so the slowness feels visible.
- */
 public class BatonStrikeGoal extends MeleeAttackGoal {
 
     private static final int STUN_DURATION_TICKS = 60;       // 3 seconds
@@ -1513,19 +1504,16 @@ public class BatonStrikeGoal extends MeleeAttackGoal {
     private static final double KNOCKBACK_STRENGTH = 0.2;
 
     public BatonStrikeGoal(SecurityGuardEntity guard) {
-        // speedModifier=1.0, followingTargetEvenIfNotSeen=true (matches iron golem)
         super(guard, 1.0, true);
     }
 
     @Override
     protected void checkAndPerformAttack(LivingEntity target) {
-        // Use vanilla cooldown + range gating
         if (this.canPerformAttack(target)) {
             this.resetAttackCooldown();
             this.mob.swing(this.mob.getUsedItemHand());
-            this.mob.doHurtTarget(target);
+            this.mob.doHurtTarget((net.minecraft.server.level.ServerLevel) this.mob.level(), target);
 
-            // Apply stun + extra knockback only if the target is still alive after the hit
             if (target.isAlive()) {
                 target.addEffect(new MobEffectInstance(
                     MobEffects.MOVEMENT_SLOWDOWN, STUN_DURATION_TICKS, SLOWNESS_AMPLIFIER));
@@ -1541,14 +1529,15 @@ public class BatonStrikeGoal extends MeleeAttackGoal {
 }
 ```
 
-- [ ] **Step 2: Override `registerGoals` and tweak attack interval in `SecurityGuardEntity`**
+(Note: in 26.1.x, `Mob.doHurtTarget` requires a `ServerLevel` argument as the first parameter. Cast `this.mob.level()` to `ServerLevel` since this goal only runs server-side. If the cast fails on a build, fall back to `this.mob.doHurtTarget(target)` if that overload still exists.)
 
-Add these methods to `SecurityGuardEntity`:
+- [ ] **Step 2: Override `registerGoals` in `SecurityGuardEntity`**
+
+Add to the entity class:
 
 ```java
     @Override
     protected void registerGoals() {
-        // Re-add iron golem's full goal set, but swap MeleeAttackGoal for ours.
         this.goalSelector.addGoal(1, new com.tweeks.securityguard.entity.ai.BatonStrikeGoal(this));
         this.goalSelector.addGoal(2, new net.minecraft.world.entity.ai.goal.MoveTowardsTargetGoal(this, 0.9, 32.0f));
         this.goalSelector.addGoal(2, new net.minecraft.world.entity.ai.goal.MoveBackToVillageGoal(this, 0.6, false));
@@ -1561,18 +1550,11 @@ Add these methods to `SecurityGuardEntity`:
 
         this.targetSelector.addGoal(1, new net.minecraft.world.entity.ai.goal.target.DefendVillageTargetGoal(this));
         this.targetSelector.addGoal(2, new net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal(this));
-        this.targetSelector.addGoal(3, new com.tweeks.securityguard.entity.SecurityGuardEntity.GuardTargetHostilesGoal(this));
-        this.targetSelector.addGoal(4, new net.minecraft.world.entity.ai.goal.ResetUniversalAngerTargetGoal<>(this, false));
+        this.targetSelector.addGoal(3, new GuardTargetHostilesGoal(this));
+        this.targetSelector.addGoal(4, new net.minecraft.world.entity.ai.goal.target.ResetUniversalAngerTargetGoal<>(this, false));
     }
 
-    /**
-     * Targets any {@link net.minecraft.world.entity.Mob} that implements {@link net.minecraft.world.entity.monster.Enemy}
-     * (zombies, skeletons, spiders, pillagers, etc.) within follow range. Excludes creepers because aggro-ing one at melee
-     * range would just create a TNT trap that kills the guard, the player, and the village it's defending.
-     *
-     * <p>Player-targeting (for players with bad village reputation) comes from {@link net.minecraft.world.entity.ai.goal.target.DefendVillageTargetGoal}
-     * + the village reputation/anger system, not from this goal.
-     */
+    /** Targets hostile mobs (Mob+Enemy) within follow range, except creepers. */
     public static class GuardTargetHostilesGoal
             extends net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal<net.minecraft.world.entity.Mob> {
         public GuardTargetHostilesGoal(SecurityGuardEntity guard) {
@@ -1583,46 +1565,26 @@ Add these methods to `SecurityGuardEntity`:
     }
 ```
 
-(Creeper is excluded because aggro-ing a creeper at melee range would be a TNT trap. If you want creepers in scope, drop the exclusion in the predicate.)
-
 - [ ] **Step 3: Build**
 
 ```bash
-./gradlew :securityguard:build
+./securityguard/gradlew :securityguard:build --no-daemon
 ```
 
-Expected: `BUILD SUCCESSFUL`. If it fails on missing `MoveBackToVillageGoal` / `GolemRandomStrollInVillageGoal`, those classes do exist in MC 1.21.1 — verify the import path matches your NeoForge / mappings setup.
+Expected: `BUILD SUCCESSFUL`. If `MoveBackToVillageGoal` / `GolemRandomStrollInVillageGoal` / `OfferFlowerGoal` got moved into the `golem` subpackage to match `IronGolem`'s relocation, fix the imports.
 
-- [ ] **Step 4: Manual combat test in client**
-
-```bash
-./gradlew :securityguard:runClient
-```
-
-In a creative world:
-1. `/summon securityguard:guard`
-2. `/summon zombie ~ ~ ~5` — spawn a zombie 5 blocks away
-3. Watch.
-
-Expected: the guard turns to the zombie, walks to it, swings the right arm, and on each hit you see slowness particles (gray swirls) and weakness particles (gray X) on the zombie. The zombie stays slowed and is dead within 5-10 hits.
-
-Then: hit the guard with your sword once. Expected: nothing — the guard does not retaliate against players (player-created flag from Task 10 + iron-golem default behavior). Hit a villager nearby and run — the guard chases you. (`HurtByTargetGoal` chains via the `DefendVillageTargetGoal`.)
-
-Quit.
-
-- [ ] **Step 5: Commit**
+- [ ] **Step 4: Commit**
 
 ```bash
-git add securityguard/src/main/java/com/tweeks/securityguard/entity/ai/BatonStrikeGoal.java \
-        securityguard/src/main/java/com/tweeks/securityguard/entity/SecurityGuardEntity.java
-git commit -m "feat(securityguard): add stun-on-hit baton combat with custom AI goal set"
+git add securityguard/src/main/java/com/tweeks/securityguard/entity/
+git commit -m "feat(securityguard): add stun-on-hit baton combat goal"
 ```
 
 ---
 
-## Task 12: Sound Events
+## Task 12: Sound Events — 26.1.2
 
-Registers sound events that map to villager sounds with a pitch shift. These are registered as standalone sound events (not overridden vanilla events) so they can be remapped to custom audio in v2 without breaking existing maps.
+Registers sound events that map to villager sounds with a pitch shift (via `getVoicePitch()` override). API is unchanged from 1.21.x except `Identifier` instead of `ResourceLocation`.
 
 **Files:**
 - Create: `securityguard/src/main/java/com/tweeks/securityguard/sound/ModSounds.java`
@@ -1636,7 +1598,7 @@ Registers sound events that map to villager sounds with a pitch shift. These are
 package com.tweeks.securityguard.sound;
 
 import com.tweeks.securityguard.SecurityGuardMod;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -1657,7 +1619,7 @@ public final class ModSounds {
     }
 
     private static Supplier<SoundEvent> soundEvent(String name) {
-        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(SecurityGuardMod.MOD_ID, name);
+        Identifier id = Identifier.fromNamespaceAndPath(SecurityGuardMod.MOD_ID, name);
         return () -> SoundEvent.createVariableRangeEvent(id);
     }
 }
@@ -1665,23 +1627,19 @@ public final class ModSounds {
 
 - [ ] **Step 2: Wire `ModSounds.register` into `Registration.register`**
 
-Modify the `register` method in `Registration.java` to call sound registration before returning:
+In `Registration.java`, modify the `register` method:
 
 ```java
     public static void register(IEventBus modEventBus) {
         com.tweeks.securityguard.sound.ModSounds.register(SOUND_EVENTS);
-        ITEMS.register(modEventBus);
         ENTITY_TYPES.register(modEventBus);
+        ITEMS.register(modEventBus);
         SOUND_EVENTS.register(modEventBus);
         CREATIVE_TABS.register(modEventBus);
     }
 ```
 
-(The `ModSounds.register` call must run before `SOUND_EVENTS.register(modEventBus)` so that the deferred objects are populated when the mod-bus event fires.)
-
-- [ ] **Step 3: Create `securityguard/src/main/resources/assets/securityguard/sounds.json`**
-
-This file maps each registered sound event to a vanilla audio file with a pitch shift. NeoForge has no JSON-based pitch override per-sound-entry in 1.21, so we instead reference the same `.ogg` files vanilla uses; pitch is applied at the call site (overridden in entity sound methods below).
+- [ ] **Step 3: Create `sounds.json`**
 
 ```json
 {
@@ -1711,9 +1669,11 @@ This file maps each registered sound event to a vanilla audio file with a pitch 
 }
 ```
 
+Save to `securityguard/src/main/resources/assets/securityguard/sounds.json`.
+
 - [ ] **Step 4: Wire sound events into `SecurityGuardEntity`**
 
-Add these methods:
+Add these overrides to the entity class:
 
 ```java
     @Override
@@ -1733,30 +1693,14 @@ Add these methods:
 
     @Override
     public float getVoicePitch() {
-        // Slightly lower than default villager (which uses 1.0 ± 0.2 random) → "tougher" voice
         return 0.85f * super.getVoicePitch();
     }
 ```
 
-- [ ] **Step 5: Build**
+- [ ] **Step 5: Build + commit**
 
 ```bash
-./gradlew :securityguard:build
-```
-
-Expected: `BUILD SUCCESSFUL`.
-
-- [ ] **Step 6: Run client, verify sounds**
-
-```bash
-./gradlew :securityguard:runClient
-```
-
-Spawn a guard, stand near it. After ~10-30 seconds it makes pitch-shifted villager idle noises. Hit it with your sword (it won't retaliate but will play a pitch-shifted hurt grunt). Kill it; pitch-shifted death sound plays. Quit.
-
-- [ ] **Step 7: Commit**
-
-```bash
+./securityguard/gradlew :securityguard:build --no-daemon
 git add securityguard/src/main/java/com/tweeks/securityguard/sound/ \
         securityguard/src/main/resources/assets/securityguard/sounds.json \
         securityguard/src/main/java/com/tweeks/securityguard/Registration.java \
@@ -1766,9 +1710,9 @@ git commit -m "feat(securityguard): wire pitch-shifted villager sounds for the g
 
 ---
 
-## Task 13: Datagen — Recipe, Loot Table, Language
+## Task 13: Datagen — Recipe, Loot Table, Language — 26.1.2
 
-Replaces hand-written JSON with Java data providers run via `./gradlew runData`. Means future MC version bumps only require fixing Java, not JSONs.
+The 26.1.2 `RecipeProvider` API uses a `Runner` inner class pattern (the provider takes its own `RecipeOutput` rather than receiving one in `buildRecipes`).
 
 **Files:**
 - Create: `securityguard/src/main/java/com/tweeks/securityguard/data/DataGenerators.java`
@@ -1776,7 +1720,118 @@ Replaces hand-written JSON with Java data providers run via `./gradlew runData`.
 - Create: `securityguard/src/main/java/com/tweeks/securityguard/data/ModEntityLootProvider.java`
 - Create: `securityguard/src/main/java/com/tweeks/securityguard/data/ModLanguageProvider.java`
 
-- [ ] **Step 1: Create `DataGenerators.java`**
+- [ ] **Step 1: Create `ModRecipeProvider.java`**
+
+```java
+package com.tweeks.securityguard.data;
+
+import com.tweeks.securityguard.Registration;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.data.PackOutput;
+import net.minecraft.data.recipes.RecipeCategory;
+import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.world.item.Items;
+
+import java.util.concurrent.CompletableFuture;
+
+public class ModRecipeProvider extends RecipeProvider {
+
+    public ModRecipeProvider(HolderLookup.Provider registries, RecipeOutput output) {
+        super(registries, output);
+    }
+
+    @Override
+    protected void buildRecipes() {
+        ShapedRecipeBuilder.shaped(this.registries, RecipeCategory.MISC, Registration.GUARD_HELMET.get())
+            .pattern(" I ")
+            .pattern("IDI")
+            .define('I', Items.IRON_INGOT)
+            .define('D', Items.BLUE_DYE)
+            .unlockedBy("has_iron", this.has(Items.IRON_INGOT))
+            .save(this.output);
+    }
+
+    public static class Runner extends RecipeProvider.Runner {
+        public Runner(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
+            super(output, registries);
+        }
+
+        @Override
+        protected RecipeProvider createRecipeProvider(HolderLookup.Provider registries, RecipeOutput output) {
+            return new ModRecipeProvider(registries, output);
+        }
+
+        @Override
+        public String getName() {
+            return "Security Guard Recipes";
+        }
+    }
+}
+```
+
+- [ ] **Step 2: Create `ModEntityLootProvider.java`**
+
+```java
+package com.tweeks.securityguard.data;
+
+import com.tweeks.securityguard.Registration;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.data.loot.EntityLootSubProvider;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.flag.FeatureFlags;
+import net.minecraft.world.level.storage.loot.LootTable;
+
+import java.util.stream.Stream;
+
+public class ModEntityLootProvider extends EntityLootSubProvider {
+
+    public ModEntityLootProvider(HolderLookup.Provider lookup) {
+        super(FeatureFlags.REGISTRY.allFlags(), lookup);
+    }
+
+    @Override
+    public void generate() {
+        this.add(Registration.SECURITY_GUARD.get(), LootTable.lootTable());
+    }
+
+    @Override
+    protected Stream<EntityType<?>> getKnownEntityTypes() {
+        return BuiltInRegistries.ENTITY_TYPE.stream()
+            .filter(t -> t == Registration.SECURITY_GUARD.get());
+    }
+}
+```
+
+- [ ] **Step 3: Create `ModLanguageProvider.java`**
+
+```java
+package com.tweeks.securityguard.data;
+
+import com.tweeks.securityguard.Registration;
+import com.tweeks.securityguard.SecurityGuardMod;
+import net.minecraft.data.PackOutput;
+import net.neoforged.neoforge.common.data.LanguageProvider;
+
+public class ModLanguageProvider extends LanguageProvider {
+
+    public ModLanguageProvider(PackOutput output) {
+        super(output, SecurityGuardMod.MOD_ID, "en_us");
+    }
+
+    @Override
+    protected void addTranslations() {
+        add("itemGroup." + SecurityGuardMod.MOD_ID, "Security Guard");
+        add(Registration.GUARD_HELMET.get(), "Guard Helmet");
+        add(Registration.GUARD_SPAWN_EGG.get(), "Security Guard Spawn Egg");
+        add(Registration.SECURITY_GUARD.get(), "Security Guard");
+    }
+}
+```
+
+- [ ] **Step 4: Create `DataGenerators.java`**
 
 ```java
 package com.tweeks.securityguard.data;
@@ -1804,7 +1859,7 @@ public class DataGenerators {
         PackOutput output = gen.getPackOutput();
         CompletableFuture<HolderLookup.Provider> lookup = event.getLookupProvider();
 
-        gen.addProvider(event.includeServer(), new ModRecipeProvider(output, lookup));
+        gen.addProvider(event.includeServer(), new ModRecipeProvider.Runner(output, lookup));
 
         gen.addProvider(event.includeServer(), new LootTableProvider(
             output,
@@ -1818,111 +1873,12 @@ public class DataGenerators {
 }
 ```
 
-- [ ] **Step 2: Create `ModRecipeProvider.java`**
-
-```java
-package com.tweeks.securityguard.data;
-
-import com.tweeks.securityguard.Registration;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.data.PackOutput;
-import net.minecraft.data.recipes.RecipeCategory;
-import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.data.recipes.RecipeProvider;
-import net.minecraft.data.recipes.ShapedRecipeBuilder;
-import net.minecraft.world.item.Items;
-
-import java.util.concurrent.CompletableFuture;
-
-public class ModRecipeProvider extends RecipeProvider {
-
-    public ModRecipeProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookup) {
-        super(output, lookup);
-    }
-
-    @Override
-    protected void buildRecipes(RecipeOutput out) {
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, Registration.GUARD_HELMET.get())
-            .pattern(" I ")
-            .pattern("IDI")
-            .define('I', Items.IRON_INGOT)
-            .define('D', Items.BLUE_DYE)
-            .unlockedBy("has_iron", has(Items.IRON_INGOT))
-            .save(out);
-    }
-}
-```
-
-- [ ] **Step 3: Create `ModEntityLootProvider.java`**
-
-The guard drops nothing (per spec — prevents iron farms). We still register an empty loot table so MC doesn't log a warning.
-
-```java
-package com.tweeks.securityguard.data;
-
-import com.tweeks.securityguard.Registration;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.data.loot.EntityLootSubProvider;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.flag.FeatureFlags;
-import net.minecraft.world.level.storage.loot.LootTable;
-
-import java.util.stream.Stream;
-
-public class ModEntityLootProvider extends EntityLootSubProvider {
-
-    public ModEntityLootProvider(HolderLookup.Provider lookup) {
-        super(FeatureFlags.REGISTRY.allFlags(), lookup);
-    }
-
-    @Override
-    public void generate() {
-        // Empty loot table — guard drops nothing on death.
-        this.add(Registration.SECURITY_GUARD.get(), LootTable.lootTable());
-    }
-
-    @Override
-    protected Stream<EntityType<?>> getKnownEntityTypes() {
-        return BuiltInRegistries.ENTITY_TYPE.stream()
-            .filter(t -> t == Registration.SECURITY_GUARD.get());
-    }
-}
-```
-
-- [ ] **Step 4: Create `ModLanguageProvider.java`**
-
-```java
-package com.tweeks.securityguard.data;
-
-import com.tweeks.securityguard.Registration;
-import com.tweeks.securityguard.SecurityGuardMod;
-import net.minecraft.data.PackOutput;
-import net.neoforged.neoforge.common.data.LanguageProvider;
-
-public class ModLanguageProvider extends LanguageProvider {
-
-    public ModLanguageProvider(PackOutput output) {
-        super(output, SecurityGuardMod.MOD_ID, "en_us");
-    }
-
-    @Override
-    protected void addTranslations() {
-        add("itemGroup." + SecurityGuardMod.MOD_ID, "Security Guard");
-        add(Registration.GUARD_HELMET.get(), "Guard Helmet");
-        add(Registration.GUARD_SPAWN_EGG.get(), "Security Guard Spawn Egg");
-        add(Registration.SECURITY_GUARD.get(), "Security Guard");
-
-        // Subtitles for sounds (referenced by sounds.json — currently mapped to vanilla
-        // villager subtitles; if you want guard-specific subtitles, also override here)
-    }
-}
-```
+(If `GatherDataEvent` requires a `client()` / `server()` accessor pattern in newer NeoForge, swap `event.includeServer()` accordingly — check the example MDK's `Config.java` neighbor for the current event shape.)
 
 - [ ] **Step 5: Run datagen**
 
 ```bash
-./gradlew :securityguard:runData
+./securityguard/gradlew :securityguard:runData --no-daemon
 ```
 
 Expected: `BUILD SUCCESSFUL`. New files appear under `securityguard/src/generated/resources/`:
@@ -1930,66 +1886,46 @@ Expected: `BUILD SUCCESSFUL`. New files appear under `securityguard/src/generate
 - `data/securityguard/loot_table/entities/guard.json`
 - `assets/securityguard/lang/en_us.json`
 
-Inspect them — they should look like normal MC data files.
-
-- [ ] **Step 6: Run client and verify the recipe + names**
-
-```bash
-./gradlew :securityguard:runClient
-```
-
-In a survival world:
-1. Open the recipe book — Guard Helmet should appear under crafting recipes (you may need iron ingot in your inventory for it to show as "available").
-2. Craft it (1 iron ingot, 1 blue dye, 2 more iron ingots in the pattern from the spec).
-3. Open the creative tab — title now reads "Security Guard" instead of the raw key.
-4. Inventory tooltips show "Guard Helmet", "Security Guard Spawn Egg", and entity name on summon shows "Security Guard".
-
-Quit.
-
-- [ ] **Step 7: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
 git add securityguard/src/main/java/com/tweeks/securityguard/data/ \
         securityguard/src/generated/
-git commit -m "feat(securityguard): add datagen for recipe, loot table, and translations"
+git commit -m "feat(securityguard): add datagen for recipe, loot table, translations"
 ```
 
 ---
 
-## Task 14: Final Verification Pass
+## Task 14: Final Verification Pass — 26.1.2
 
-Walk through every spec requirement in a single dev-client session. Captures regressions accumulated over the prior tasks before declaring v1 done.
-
-**Files:**
-- None (manual testing only)
+Manual play-test in the dev client. Engineer must run this; no automated equivalent.
 
 - [ ] **Step 1: Launch dev client**
 
 ```bash
-./gradlew :securityguard:runClient
+./securityguard/gradlew :securityguard:runClient
 ```
 
 - [ ] **Step 2: Run the verification checklist**
 
-Walk through each item in a creative world (then switch to survival for the recipe one):
+In a creative world (then survival for the recipe item):
 
-- [ ] Mod appears in the title screen `Mods` list with name "Security Guard" and version 0.1.0.
-- [ ] Creative tab "Security Guard" exists, icon is the Guard Helmet, contains Guard Helmet + Spawn Egg.
-- [ ] Item names display as "Guard Helmet" and "Security Guard Spawn Egg".
-- [ ] Spawn egg spawns a visible Security Guard with cap and baton.
-- [ ] Construction recipe (3 iron blocks + Guard Helmet on top) spawns a guard, consumes the materials, plays sound.
-- [ ] Construction with only 2 iron blocks does nothing (helmet not consumed).
-- [ ] **Ceiling test**: build a 3-iron-block column with a stone ceiling 1 block above — right-clicking with the helmet does nothing, helmet not consumed (verifies `SpawnPattern`'s air-clearance check prevents suffocation-on-spawn).
-- [ ] Right-click the guard with an iron ingot — it heals (inherited `IronGolem` repair behavior, intentionally kept for v1).
-- [ ] Guard idles, makes occasional pitch-shifted villager noises.
-- [ ] Spawn a zombie nearby — guard targets it, swings baton, zombie gets slowness + weakness particles, dies in a few hits.
-- [ ] Guard does not attack the player (try hitting it with a sword — no retaliation).
-- [ ] Guard chases the player who attacks a villager.
-- [ ] Hit guard until it dies — death sound plays, no item drops.
-- [ ] Reload the world — surviving guard is still present at its last position.
-- [ ] In survival mode: craft Guard Helmet using 4 iron ingots + 1 blue dye in the recipe pattern.
+- [ ] Mod listed at title screen `Mods` with name "Security Guard" and version 0.1.0.
+- [ ] "Security Guard" creative tab exists with Guard Helmet (icon) + Spawn Egg.
+- [ ] Item names display as "Guard Helmet" and "Security Guard Spawn Egg" (post-datagen).
+- [ ] Spawn egg spawns a visible humanoid Security Guard with cap and baton.
+- [ ] In-world recipe: place 3 iron blocks in a column, right-click top with Guard Helmet → guard spawns, blocks consumed, sound plays.
+- [ ] 2-block column: nothing happens, helmet not consumed.
+- [ ] **Ceiling test**: 3-iron column with stone 1 block above the top → nothing happens, helmet not consumed.
+- [ ] Spawn a zombie nearby → guard targets, swings, slowness + weakness particles appear, zombie dies in ~5 hits.
+- [ ] Hit guard with sword → no retaliation against the player.
+- [ ] Attack a villager → guard targets you.
+- [ ] Hit guard until dead → death sound plays, no item drops.
+- [ ] Reload world → surviving guard still present.
+- [ ] Right-click guard with iron ingot → it heals (inherited from `IronGolem`, intentionally kept).
+- [ ] Survival: craft Guard Helmet using 4 iron ingots + 1 blue dye in the recipe pattern.
 
-- [ ] **Step 3: If anything fails, file a follow-up task. If everything passes, tag v0.1.0**
+- [ ] **Step 3: Tag v0.1.0 if all checks pass**
 
 ```bash
 git tag -a v0.1.0 -m "Security Guard mod v0.1.0"
@@ -1998,49 +1934,8 @@ git tag -a v0.1.0 -m "Security Guard mod v0.1.0"
 - [ ] **Step 4: Build the release jar**
 
 ```bash
-./gradlew :securityguard:build
+./securityguard/gradlew :securityguard:build
+ls securityguard/build/libs/securityguard-0.1.0.jar
 ```
 
-Verify `securityguard/build/libs/securityguard-0.1.0.jar` exists. This is the shippable mod.
-
-- [ ] **Step 5: Final commit + tag push (if applicable)**
-
-```bash
-git status  # confirm clean
-# Already tagged in step 3; if there's a remote, push:
-# git push origin main --tags
-```
-
----
-
-## Spec Coverage Map
-
-Every spec section/requirement maps to one or more tasks above:
-
-| Spec section | Tasks |
-|---|---|
-| Project / repo layout | 1, 2 |
-| Mod identity (id, NeoForge, 1.21.x) | 2 |
-| Entity stats | 6 (attributes), 11 (combat) |
-| Combat: stun + knockback | 11 |
-| Targeting (iron-golem rules) | 11 |
-| Persistence & no-drops | 6 (default), 13 (empty loot table) |
-| Appearance, model, cap | 8 |
-| Animations (walk, attack swing) | 8 (model), 11 (swing trigger) |
-| Sounds | 12 |
-| Construction recipe (3 iron + helmet) | 5 (pattern), 10 (useOn) |
-| Guard Helmet crafting recipe | 13 |
-| Guard Helmet not equippable in v1 | 4 (item construction with no Equippable component) |
-| Spawn egg | 7 |
-| Baton (no item, render-layer only) | 9 |
-| Creative tab | 3, 4, 7 |
-| `mayInteract` protection compatibility | 10 |
-| `setPlayerCreated(true)` | 10 |
-| Effects auto-sync (no custom packets) | 11 (relies on standard `addEffect`) |
-| Unit testing of pure logic | 5 |
-| Manual integration test checklist | 14 |
-| GameTest (optional) | (deferred — out of v1 scope per spec) |
-| Datagen for recipe / loot / lang | 13 |
-| Java 21, Gradle, NeoForge 1.21.1 | 2 |
-| MIT license | 2 (`mod_license` property) |
-| Out-of-scope items (player baton, armor variants, structures, Bedrock, multi-lang) | (intentionally absent from plan) |
+This is the shippable mod jar (drop into a NeoForge 26.1.2 server's `mods/` folder).
