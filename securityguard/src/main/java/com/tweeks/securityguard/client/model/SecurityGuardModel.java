@@ -37,6 +37,11 @@ public class SecurityGuardModel extends HumanoidModel<HumanoidRenderState> {
                 .texOffs(32, 10)
                 .addBox(-3.5f, -11.5f, -3.5f, 7, 2, 7),
             PartPose.ZERO);
+        head.addOrReplaceChild("nose",
+            CubeListBuilder.create()
+                .texOffs(56, 16)
+                .addBox(-1.0f, -2.0f, -5.0f, 2, 2, 2),
+            PartPose.ZERO);
         return LayerDefinition.create(mesh, 64, 64);
     }
 }
