@@ -20,7 +20,7 @@ Java mods (NeoForge/Fabric) and Bedrock add-ons are entirely separate ecosystems
 - One new entity: Security Guard
 - One new spawn mechanism: 3-iron-block I-shape + Guard Helmet trigger item
 - One new craftable item: Guard Helmet (spawn trigger only, not equippable armor)
-- One new internal item: Baton (held-item visual on the guard, not player-usable)
+- Baton rendered on the guard via a custom render layer (no item registration)
 - Creative spawn egg
 - Custom humanoid model + textures
 - Custom attack animation (overhead baton swing)
@@ -59,8 +59,9 @@ Java mods (NeoForge/Fabric) and Bedrock add-ons are entirely separate ecosystems
 On each successful melee hit, the guard applies to the target:
 - **Slowness II** for 3 seconds
 - **Weakness I** for 3 seconds
+- **Small explicit knockback** of 0.2 (in addition to the standard attack-damage knockback)
 
-Combined with the 1.2 s attack cooldown, this means a stunned target stays slowed and weakened for nearly the full re-strike window — letting the guard reliably chain hits on a single target.
+Combined with the 1.2 s attack cooldown, this means a stunned target stays slowed and weakened for nearly the full re-strike window — letting the guard reliably chain hits on a single target. The small extra knockback "resets" the target's momentum for an instant, making the Slowness application feel impactful rather than silent.
 
 ### Targeting (iron-golem rules)
 The guard targets:
@@ -150,14 +151,12 @@ The Guard Helmet is a regular item — not equippable armor in v1, only a spawn 
 - Stack size: 64
 - Use action: when used (`useOn`) on the top face of a block, checks for a 3-tall iron block column starting at that block. If matched, consumes the helmet, replaces the iron blocks with air, spawns a `SecurityGuardEntity` at the base.
 - No other in-world function.
+- **Not equippable in v1**: by default a plain `Item` does not gain the `Equippable` data component (introduced in 1.21.2+), so it cannot be worn in the head slot. Verified by ensuring no `equippable` data component is attached and the item is not added to any vanilla wearable tag. If a future version wants this as a cosmetic hat, add the `Equippable` data component then.
 
-### Baton (`securityguard:baton`)
-- Internal item used only as a visual hand-held by the guard.
-- Stack size: 1
-- Not in any creative tab.
-- Not craftable.
-- If somehow obtained (commands), it functions as a plain item with no special damage or effects.
-- Reasoning: Keeps v1 scoped. Player-wieldable baton is a clean v2 feature: add damage, stun-on-hit, durability — none of which complicate v1.
+### Baton (no item)
+The baton is **not** registered as an item. It exists only as a model rendered directly by the guard's renderer — see `SecurityGuardRenderer` below. This avoids any chance of the baton "leaking" into player inventories via dupe bugs, drop-on-death edge cases, or `/give` commands, and removes the need to maintain an unused item registration.
+
+A future v2 player-wieldable baton can be added as a separate, properly-stat'd item without needing to remove or rename anything from v1.
 
 ## Architecture
 
@@ -179,8 +178,7 @@ minecraft-mods/
         │   │   └── ai/
         │   │       └── BatonStrikeGoal.java
         │   ├── item/
-        │   │   ├── GuardHelmetItem.java
-        │   │   └── BatonItem.java
+        │   │   └── GuardHelmetItem.java
         │   ├── client/
         │   │   ├── ClientSetup.java          # renderer + model registration (client-only)
         │   │   ├── model/
@@ -202,7 +200,7 @@ minecraft-mods/
         │       ├── models/entity/...
         │       ├── textures/entity/security_guard.png
         │       ├── textures/item/guard_helmet.png
-        │       ├── textures/item/baton.png
+        │       ├── textures/entity/baton.png  # baton skin (rendered by SecurityGuardRenderer, no item)
         │       └── sounds.json               # remaps to villager sounds initially
         └── test/
             └── java/com/tweeks/securityguard/
@@ -213,12 +211,11 @@ minecraft-mods/
 
 - **`SecurityGuardMod`** — `@Mod` entry. Subscribes to mod-bus events: entity attribute creation, registries, client setup. Holds the mod ID constant.
 - **`Registration`** — All `DeferredRegister` instances for entities, items, sounds, creative tabs, and the entity attributes supplier. Single source of truth for registry IDs.
-- **`SecurityGuardEntity`** — Extends `net.minecraft.world.entity.animal.IronGolem` is tempting but couples too tightly to golem internals. Instead extends `AbstractGolem` (the shared parent of iron/snow golems) and reimplements the golem-style targeting goal set. Holds attribute defaults via a static `createAttributes()` method.
-- **`BatonStrikeGoal`** — Custom melee attack goal. Extends `MeleeAttackGoal`; overrides `checkAndPerformAttack` to apply Slowness II and Weakness I to the target on a successful hit.
-- **`GuardHelmetItem`** — Overrides `useOn(UseOnContext)`. On the server side: validates the 3-iron-block column above the clicked face, swaps blocks to air, spawns the entity, decrements the helmet stack, and plays a spawn sound + particle. Returns `InteractionResult.CONSUME` when matched, `PASS` otherwise.
-- **`BatonItem`** — Minimal `Item` subclass. No special methods overridden.
+- **`SecurityGuardEntity`** — Extends `net.minecraft.world.entity.animal.IronGolem` is tempting but couples too tightly to golem internals. Instead extends `AbstractGolem` (the shared parent of iron/snow golems) and reimplements the golem-style targeting goal set. Sets `setPlayerCreated(true)` after construction so it's marked as a player-built defender. Holds attribute defaults via a static `createAttributes()` method.
+- **`BatonStrikeGoal`** — Custom melee attack goal. Extends `MeleeAttackGoal`; overrides `checkAndPerformAttack` to (1) apply 5 damage, (2) apply Slowness II + Weakness I (60-tick duration) to the target, and (3) call `target.knockback(0.2, ...)` for the explicit momentum reset.
+- **`GuardHelmetItem`** — Overrides `useOn(UseOnContext)`. On the server side: validates `level.mayInteract(player, pos)` at each of the 3 iron-block positions (respects spawn protection / WorldGuard-style protection plugins), validates the 3-iron-block column above the clicked face, validates clear air above for the entity to fit, swaps blocks to air, spawns the entity, decrements the helmet stack, and plays a spawn sound + particle. Returns `InteractionResult.CONSUME` when matched and permitted, `FAIL` if a protection check denies, `PASS` otherwise.
 - **`SecurityGuardModel`** — Extends `HumanoidModel<SecurityGuardEntity>`. Adds the cap as a child cube of the head part. Defines `LayerDefinition` via `createBodyLayer()`.
-- **`SecurityGuardRenderer`** — Extends `MobRenderer`. Adds an `ItemInHandLayer` so the baton renders in the right hand.
+- **`SecurityGuardRenderer`** — Extends `MobRenderer`. Adds a custom `BatonHeldLayer` (subclass of `RenderLayer`) that renders the baton model directly in the right hand using the entity's right-arm transform — does **not** go through `ItemInHandLayer`, since there is no baton item to read from a hand slot.
 - **`ClientSetup`** — Subscribes to `EntityRenderersEvent.RegisterRenderers` and `EntityRenderersEvent.RegisterLayerDefinitions`. Client-side only via `@Mod.EventBusSubscriber(value = Dist.CLIENT)`.
 - **`DataGenerators`** + providers — Generate `en_us.json`, recipe JSON, and loot tables at build time from Java code rather than hand-writing JSON.
 
@@ -229,12 +226,17 @@ Player right-clicks Guard Helmet on top of a 3-iron-block column
     ↓
 GuardHelmetItem.useOn fires (server side)
     ↓
+For each of the 3 column positions: level.mayInteract(player, pos)?
+    ↓ yes (any no → return FAIL, no consumption)
 Check column: blockAt(pos), blockAt(pos.below()), blockAt(pos.below(2)) all IRON_BLOCK?
-    ↓ yes
+    ↓ yes (no → return PASS)
+Check 2 blocks of clear air above for entity to fit?
+    ↓ yes (no → return PASS)
 Replace those 3 positions with AIR
     ↓
 SecurityGuardEntity guard = new SecurityGuardEntity(EntityType, level)
 guard.moveTo(pos.below(2).getCenter())
+guard.setPlayerCreated(true)
 level.addFreshEntity(guard)
     ↓
 Decrement helmet stack
@@ -257,15 +259,20 @@ If target in range AND attack cooldown ≤ 0:
     target.hurt(level.damageSources().mobAttack(this), 5.0f)
     target.addEffect(new MobEffectInstance(SLOWNESS, 60, 1))   # 60 ticks = 3s, amplifier 1 = II
     target.addEffect(new MobEffectInstance(WEAKNESS, 60, 0))   # amplifier 0 = I
+    target.knockback(0.2, this.getX() - target.getX(), this.getZ() - target.getZ())  # explicit momentum reset
     Reset cooldown to 24 ticks (1.2s)
     Trigger swing animation on client (already standard for melee goal)
     Play attack swing sound, then attack hit sound on hit
+
+Note: MobEffectInstance application is automatically synced from server to clients
+by NeoForge's standard entity tracking — no custom packets required.
 ```
 
 ## Error Handling
 
 - **Guard Helmet on non-iron column**: returns `InteractionResult.PASS`. No message needed; player will figure it out from the recipe documentation. (Avoiding chat spam from common mistakes.)
 - **Helmet on iron column but not enough room above for entity**: spawn aborts, helmet not consumed, returns `PASS`. The 3-iron column means we need ~2 blocks of clear air above the bottom iron block for the guard to fit. Validate before consuming.
+- **Helmet used inside a protected region**: `level.mayInteract(player, pos)` returns false for one or more column positions → returns `InteractionResult.FAIL`, no blocks modified, no helmet consumed. This respects spawn protection, WorldGuard regions, and other protection plugins exactly the way vanilla block-break checks do.
 - **Server vs client**: All world mutation in `useOn` guarded by `level.isClientSide()` checks. Spawning happens on the server only.
 - **Missing translations**: NeoForge falls back to the translation key, which is human-readable. No defensive code needed.
 
@@ -290,6 +297,20 @@ Run `./gradlew runClient` to launch a dev MC instance with the mod loaded. Verif
 
 ### GameTest (NeoForge framework, optional for v1)
 If time allows: a `@GameTest` that spawns a guard and a zombie in a structure, asserts the zombie dies within N ticks. Skip if it adds material time — manual testing covers this.
+
+## Implementation Order
+
+A staged sequence that lets each step be independently tested before moving on:
+
+1. **Project scaffold & registry plumbing** — Gradle multi-module setup, NeoForge MDK skeleton in `securityguard/`, mod entry point, `Registration` class with empty `DeferredRegister` instances, creative tab registered (initially empty). Verify the mod loads in `runClient`.
+2. **Guard Helmet item + recipe** — register the item, add the crafting recipe via datagen, place it in the creative tab. Verify the recipe works in-game.
+3. **Entity registration + minimal model** — register `SecurityGuardEntity` (default `AbstractGolem` behavior, no custom AI yet), `SecurityGuardModel`, `SecurityGuardRenderer` with the cap but no baton yet. Verify spawning via `/summon securityguard:guard` shows a humanoid with a cap.
+4. **Spawn-on-helmet logic** — implement `GuardHelmetItem.useOn` with column detection, mayInteract checks, and air-clearance check. Verify the in-world recipe works.
+5. **Spawn egg** — register the spawn egg with navy/silver colors. Verify it appears in the creative tab and spawns a guard.
+6. **Baton render layer** — add the `BatonHeldLayer` to `SecurityGuardRenderer`, render the baton model in the right hand. Verify visually.
+7. **AI & combat** — implement `BatonStrikeGoal` with stun + knockback, wire up the targeting goal set (revenge, defend villagers, iron-golem-style hostile targeting). Verify with a zombie in `runClient`.
+8. **Sounds** — register sound events that map to villager sounds with pitch shift. Wire to entity sound methods.
+9. **Loot table (empty), language file, polish** — datagen the empty entity loot table and `en_us.json`. Run through the full manual test checklist.
 
 ## Build & Distribution
 
