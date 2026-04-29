@@ -313,4 +313,18 @@ public class ThiefEntity extends PathfinderMob implements SecurityHostile, Conta
         }
         return wasHurt;
     }
+
+    @Override
+    protected void dropCustomDeathLoot(net.minecraft.server.level.ServerLevel level,
+                                       net.minecraft.world.damagesource.DamageSource source,
+                                       boolean killedByPlayer) {
+        super.dropCustomDeathLoot(level, source, killedByPlayer);
+        for (int i = 0; i < stolenItems.getContainerSize(); i++) {
+            net.minecraft.world.item.ItemStack stack = stolenItems.getItem(i);
+            if (!stack.isEmpty()) {
+                this.spawnAtLocation(level, stack);
+                stolenItems.setItem(i, net.minecraft.world.item.ItemStack.EMPTY);
+            }
+        }
+    }
 }
