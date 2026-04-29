@@ -11,6 +11,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.SpawnEggItem;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -42,6 +43,9 @@ public final class Registration {
             .build(ResourceKey.create(Registries.ENTITY_TYPE,
                 Identifier.fromNamespaceAndPath(SecurityGuardMod.MOD_ID, "guard"))));
 
+    public static final DeferredItem<SpawnEggItem> GUARD_SPAWN_EGG = ITEMS.register("guard_spawn_egg",
+        () -> new SpawnEggItem(new Item.Properties().spawnEgg(SECURITY_GUARD.get())));
+
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> SECURITY_GUARD_TAB =
         CREATIVE_TABS.register("main", () ->
             CreativeModeTab.builder()
@@ -49,13 +53,14 @@ public final class Registration {
                 .icon(() -> GUARD_HELMET.get().getDefaultInstance())
                 .displayItems((params, output) -> {
                     output.accept(GUARD_HELMET.get());
-                    // entity spawn egg added in Task 7
+                    output.accept(GUARD_SPAWN_EGG.get());
                 })
                 .build());
 
     public static void register(IEventBus modEventBus) {
-        ITEMS.register(modEventBus);
+        // Entity types must register before items so SpawnEggItem can resolve SECURITY_GUARD.get().
         ENTITY_TYPES.register(modEventBus);
+        ITEMS.register(modEventBus);
         SOUND_EVENTS.register(modEventBus);
         CREATIVE_TABS.register(modEventBus);
     }
