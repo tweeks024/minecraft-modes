@@ -1,6 +1,7 @@
 package com.tweeks.securityguard;
 
 import com.tweeks.securityguard.entity.SecurityGuardEntity;
+import com.tweeks.securityguard.item.BatonItem;
 import com.tweeks.securityguard.item.GuardHelmetItem;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -8,10 +9,14 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -36,6 +41,19 @@ public final class Registration {
         GuardHelmetItem::new,
         p -> p.stacksTo(64));
 
+    private static final ItemAttributeModifiers BATON_ATTRIBUTES = ItemAttributeModifiers.builder()
+        .add(Attributes.ATTACK_DAMAGE,
+            new AttributeModifier(Item.BASE_ATTACK_DAMAGE_ID, 6.0, AttributeModifier.Operation.ADD_VALUE),
+            EquipmentSlotGroup.MAINHAND)
+        .add(Attributes.ATTACK_SPEED,
+            new AttributeModifier(Item.BASE_ATTACK_SPEED_ID, -2.4, AttributeModifier.Operation.ADD_VALUE),
+            EquipmentSlotGroup.MAINHAND)
+        .build();
+
+    public static final DeferredItem<BatonItem> BATON = ITEMS.registerItem("baton",
+        BatonItem::new,
+        p -> p.attributes(BATON_ATTRIBUTES).durability(250));
+
     public static final DeferredHolder<EntityType<?>, EntityType<SecurityGuardEntity>> SECURITY_GUARD =
         ENTITY_TYPES.register("guard", () -> EntityType.Builder.<SecurityGuardEntity>of(
                 SecurityGuardEntity::new, MobCategory.MISC)
@@ -55,6 +73,7 @@ public final class Registration {
                 .icon(() -> GUARD_HELMET.get().getDefaultInstance())
                 .displayItems((params, output) -> {
                     output.accept(GUARD_HELMET.get());
+                    output.accept(BATON.get());
                     output.accept(GUARD_SPAWN_EGG.get());
                 })
                 .build());
