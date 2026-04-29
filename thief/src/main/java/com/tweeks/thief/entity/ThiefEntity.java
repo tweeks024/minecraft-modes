@@ -185,6 +185,9 @@ public class ThiefEntity extends PathfinderMob implements SecurityHostile, Conta
         this.targetSelector.addGoal(1, new net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal(this));
         this.targetSelector.addGoal(2, new com.tweeks.thief.entity.ai.SecretGuardTargetGoal(this));
         this.targetSelector.addGoal(3, new net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal<>(this,
+            com.tweeks.securityguard.entity.SecurityGuardEntity.class, 10, true, false,
+            (target, level) -> getRevealState().isHostile()));
+        this.targetSelector.addGoal(4, new net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal<>(this,
             net.minecraft.world.entity.player.Player.class, 10, true, false,
             (target, level) -> {
                 RevealState s = this.getRevealState();
@@ -259,6 +262,16 @@ public class ThiefEntity extends PathfinderMob implements SecurityHostile, Conta
             if (getMainHandItem().isEmpty() || !getMainHandItem().is(net.minecraft.world.item.Items.CROSSBOW)) {
                 setItemSlot(net.minecraft.world.entity.EquipmentSlot.MAINHAND,
                     new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.CROSSBOW));
+            }
+            if (getOffhandItem().isEmpty() || !getOffhandItem().is(net.minecraft.world.item.Items.ARROW)) {
+                setItemSlot(net.minecraft.world.entity.EquipmentSlot.OFFHAND,
+                    new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.ARROW, 64));
+            }
+        } else if (next == RevealState.REVEALED_MELEE) {
+            if (getMainHandItem().isEmpty()
+                    || !getMainHandItem().is(com.tweeks.thief.Registration.BLACKJACK.get())) {
+                setItemSlot(net.minecraft.world.entity.EquipmentSlot.MAINHAND,
+                    new net.minecraft.world.item.ItemStack(com.tweeks.thief.Registration.BLACKJACK.get()));
             }
         }
     }
