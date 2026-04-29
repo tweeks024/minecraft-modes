@@ -1,14 +1,26 @@
 package com.tweeks.thief.entity;
 
 import com.tweeks.securitycore.api.SecurityHostile;
+import com.tweeks.thief.world.HideoutPlacer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+
+import javax.annotation.Nullable;
+import java.util.Optional;
 
 /**
  * The Thief entity. Disguises as a villager, steals from chests, hides loot.
@@ -20,6 +32,9 @@ public class ThiefEntity extends PathfinderMob implements SecurityHostile {
 
     private static final EntityDataAccessor<Byte> DATA_REVEAL_STATE =
         SynchedEntityData.defineId(ThiefEntity.class, EntityDataSerializers.BYTE);
+
+    @Nullable
+    private BlockPos hideoutPos;
 
     public ThiefEntity(EntityType<? extends ThiefEntity> type, Level level) {
         super(type, level);
@@ -48,9 +63,48 @@ public class ThiefEntity extends PathfinderMob implements SecurityHostile {
         this.entityData.set(DATA_REVEAL_STATE, state.toByte());
     }
 
+    public Optional<BlockPos> getHideoutPos() {
+        return Optional.ofNullable(hideoutPos);
+    }
+
+    public void setHideoutPos(@Nullable BlockPos pos) {
+        this.hideoutPos = pos;
+    }
+
     @Override
     public boolean isCurrentlyHostile() {
         return getRevealState().isHostile();
+    }
+
+    @Override
+    protected void addAdditionalSaveData(ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        if (hideoutPos != null) {
+            output.store("hideout_pos", BlockPos.CODEC, hideoutPos);
+        }
+    }
+
+    @Override
+    protected void readAdditionalSaveData(ValueInput input) {
+        super.readAdditionalSaveData(input);
+        this.hideoutPos = input.read("hideout_pos", BlockPos.CODEC).orElse(null);
+    }
+
+    @Nullable
+    @Override
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor level,
+                                        DifficultyInstance difficulty,
+                                        EntitySpawnReason reason,
+                                        @Nullable SpawnGroupData spawnData) {
+        if (level instanceof ServerLevel serverLevel) {
+            Optional<BlockPos> placed = HideoutPlacer.place(serverLevel, this.blockPosition());
+            if (placed.isEmpty()) {
+                this.discard();
+                return spawnData;
+            }
+            this.hideoutPos = placed.get();
+        }
+        return super.finalizeSpawn(level, difficulty, reason, spawnData);
     }
 
     @Override
