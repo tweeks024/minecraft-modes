@@ -16,6 +16,7 @@ public class SecurityGuardRenderer
 
     public SecurityGuardRenderer(EntityRendererProvider.Context context) {
         super(context, new SecurityGuardModel(context.bakeLayer(SecurityGuardModel.LAYER_LOCATION)), 0.5f);
+        this.addLayer(new BatonHeldLayer(this, context));
     }
 
     @Override

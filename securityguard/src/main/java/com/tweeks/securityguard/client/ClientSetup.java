@@ -2,6 +2,7 @@ package com.tweeks.securityguard.client;
 
 import com.tweeks.securityguard.Registration;
 import com.tweeks.securityguard.SecurityGuardMod;
+import com.tweeks.securityguard.client.model.BatonModel;
 import com.tweeks.securityguard.client.model.SecurityGuardModel;
 import com.tweeks.securityguard.client.renderer.SecurityGuardRenderer;
 import net.neoforged.api.distmarker.Dist;
@@ -20,5 +21,6 @@ public class ClientSetup {
     @SubscribeEvent
     public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(SecurityGuardModel.LAYER_LOCATION, SecurityGuardModel::createBodyLayer);
+        event.registerLayerDefinition(BatonModel.LAYER_LOCATION, BatonModel::createLayer);
     }
 }
