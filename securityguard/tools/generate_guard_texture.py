@@ -226,8 +226,11 @@ def paint_shield(img: Image.Image) -> None:
 
 def main() -> None:
     img = Image.new("RGBA", (64, 64), TRANSPARENT)
-    paint_skin(img)
+    # paint_uniform_base first; its CAP_CROWN_UNWRAP rectangle bleeds into the
+    # nose UV slot at (56..60, 16..19), so paint_skin (which covers the nose)
+    # must run AFTER it to win the overlap.
     paint_uniform_base(img)
+    paint_skin(img)
     paint_face(img)
     paint_uniform_shading(img)
     paint_shield(img)
