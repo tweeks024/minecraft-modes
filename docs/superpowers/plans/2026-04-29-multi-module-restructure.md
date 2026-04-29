@@ -821,6 +821,14 @@ EOF
 - Modify: `securityguard/src/main/java/com/tweeks/securityguard/entity/SecurityGuardEntity.java`
 - Delete: `securityguard/src/main/java/com/tweeks/securityguard/entity/ai/BatonStrikeGoal.java`
 
+- [ ] **Step 0: Sanity-check that `BatonStrikeGoal` only overrides `checkAndPerformAttack`**
+
+Run:
+```bash
+grep -n "@Override" securityguard/src/main/java/com/tweeks/securityguard/entity/ai/BatonStrikeGoal.java
+```
+Expected: exactly one `@Override` annotation (on `checkAndPerformAttack`). If you find others (`canUse`, `canContinueToUse`, `tick`, `start`, `stop`), **stop and port them into `StunningMeleeGoal` first** — the extracted class must preserve all original behavior. The current `StunningMeleeGoal` only carries the `checkAndPerformAttack` override; additional overrides would silently regress Guard combat.
+
 - [ ] **Step 1: Update `SecurityGuardEntity` to use `StunningMeleeGoal` from core**
 
 Open `securityguard/src/main/java/com/tweeks/securityguard/entity/SecurityGuardEntity.java`. Find the goal-registration line (line 31):
@@ -1044,7 +1052,8 @@ EOF
 
 **Files:**
 - Modify: `securityguard/build.gradle`
-- Modify: `securitycore/build.gradle`
+
+**Why one-way only:** `:securityguard` already declares `implementation project(':securitycore')`, so gradle will always evaluate `:securitycore` while configuring `:securityguard` — adding `modSources.add(project(':securitycore').sourceSets.main)` to `:securityguard` is safe. The reverse (adding `modSources.add(project(':securityguard').sourceSets.main)` to `:securitycore`) creates a configuration-time cycle (`:securitycore` would need `:securityguard.sourceSets.main` while `:securityguard` is already mid-configuration via the project dep). Devs launch dev clients from `:securityguard:runClient` — the canonical command — and that loads both mods.
 
 - [ ] **Step 1: Add `modSources` aggregation to `securityguard/build.gradle`**
 
@@ -1069,37 +1078,33 @@ client {
 
 Apply the same `modSources.add(project(':securitycore').sourceSets.main)` line to the `server`, `clientData`, and `serverData` blocks.
 
-- [ ] **Step 2: Add `modSources` aggregation to `securitycore/build.gradle`**
+Do **not** modify `securitycore/build.gradle` for this task — see "Why one-way only" above.
 
-Open `securitycore/build.gradle`. Apply the symmetric change so launching from `:securitycore` also loads `:securityguard`. In the `client`, `server`, `clientData`, `serverData` blocks, add:
-```gradle
-modSources.add(project(':securityguard').sourceSets.main)
-```
-
-This lets devs launch a dev client from either module and get both mods loaded.
-
-- [ ] **Step 3: Verify the configuration is valid by triggering an IDE sync (or a dry run)**
+- [ ] **Step 2: Verify the configuration is valid by triggering a tasks listing (cheap dry run)**
 
 Run:
 ```bash
-./gradlew :securityguard:tasks --group neoforged > /dev/null 2>&1 && echo "config OK"
-./gradlew :securitycore:tasks --group neoforged > /dev/null 2>&1 && echo "config OK"
+./gradlew :securityguard:tasks --group neoforged > /dev/null && echo "config OK"
 ```
-Expected: both lines print `config OK`. Any "modSources" / "project" error means the gradle syntax is wrong; recheck spelling.
+Expected: prints `config OK`. Any gradle error (most likely "Cannot use ... before ... is configured" or "Unknown property 'sourceSets'") means the syntax is wrong; recheck spelling.
 
-- [ ] **Step 4: Commit**
+- [ ] **Step 3: Commit**
 
 ```bash
-git add securityguard/build.gradle securitycore/build.gradle
+git add securityguard/build.gradle
 git commit -m "$(cat <<'EOF'
-build: aggregate sibling module source sets into NeoForge run configs
+build: aggregate securitycore source set into securityguard run configs
 
-Each module's client/server/clientData/serverData runs now include the
-other module's main source set via modSources.add(...). Devs can launch
-runClient from either :securityguard or :securitycore and have both
-mods loaded together. Required because each module is a standalone
-NeoForge mod; without aggregation, a runClient would only load that
-module's mod metadata.
+securityguard's client/server/clientData/serverData runs now add
+:securitycore's main source set via modSources.add(...). Required
+because each module is a standalone NeoForge mod; without aggregation,
+:securityguard:runClient would only load securityguard's mod metadata
+and securitycore would be silently absent at runtime.
+
+Aggregation is one-way (only :securityguard adds :securitycore).
+Reverse aggregation creates a configuration-time cycle since
+:securityguard already declares a project dep on :securitycore.
+Canonical dev command is :securityguard:runClient.
 EOF
 )"
 ```
@@ -1155,6 +1160,8 @@ If anything failed, **stop and fix before continuing**. The whole point of this 
 ## Task 13: Manual smoke test in dev client
 
 **Files:** none modified.
+
+> **HUMAN-IN-THE-LOOP STOP.** This task requires Minecraft to launch and a human to drive the client UI. An agentic worker MUST pause here, run the launch command, and wait for the human to report PASS/FAIL on each step before marking checkboxes. Do not auto-mark these steps complete from agent output alone — the agent has no way to verify the in-game visual.
 
 - [ ] **Step 1: Launch the dev client**
 
@@ -1259,3 +1266,5 @@ The next step in the project is to invoke the brainstorming/writing-plans flow a
 - The order of tasks matters: extracting classes (Tasks 5, 6) BEFORE swapping their use (Tasks 8, 9) BEFORE deleting the originals (still in Tasks 8, 9). This sequence keeps `:securityguard:build` green at every commit. If a subagent ever skips ahead and deletes an original before swapping the call site, the build breaks until the swap lands.
 - The numeric arguments in Task 8 (`60, 1, 0, 0.2`) are the most common "subagent guesses wrong" failure point. They MUST match the original constants in the deleted `BatonStrikeGoal`. Re-check those values from the original file (preserved in git history) if a smoke test shows different stun timing.
 - The translation `(-0.0625f, 0.625f, 0.0f)` and `180.0f` rotation in Task 9 must likewise come verbatim from the original `BatonHeldLayer.submit` body, NOT be re-derived.
+- Task 11 aggregation is intentionally one-way (`:securityguard` adds `:securitycore`, not the reverse). Adding the symmetric line to `:securitycore/build.gradle` causes a configuration-time cycle because `:securityguard` already has a project dep on `:securitycore`. If a subagent "fixes" this by adding the reverse aggregation, gradle will start failing with "Cannot use ... before ... is configured."
+- Task 13 is a hard human-in-the-loop stop. The orchestrator must pause, the human must launch and drive the client, and the human must report pass/fail before checkboxes flip.
