@@ -187,7 +187,8 @@ public class ThiefEntity extends PathfinderMob implements SecurityHostile, Conta
 
     @Override
     public void onCrossbowAttackPerformed() {
-        // Firing the crossbow blows cover — handled by reveal trigger #5 in Task 15.
+        hasFiredCrossbow = true;
+        triggerReveal(getTarget()); // Trigger #5
     }
 
     @Override
@@ -197,5 +198,112 @@ public class ThiefEntity extends PathfinderMob implements SecurityHostile, Conta
 
     public boolean isChargingCrossbow() {
         return chargingCrossbow;
+    }
+
+    // --- Reveal pipeline ---
+
+    private static final int SUSPICIOUS_DURATION_TICKS = 40;
+    private static final int REVEAL_SWAP_HYSTERESIS_TICKS = 20;
+    private static final double MELEE_DISTANCE_BLOCKS = 4.0;
+
+    private int suspiciousTimer;
+    private int swapHysteresisTimer;
+    private boolean hasFiredCrossbow;
+
+    /**
+     * Apply a reveal trigger. {@code triggeringEntity} is the entity whose
+     * proximity determines RANGED vs MELEE; pass null when the trigger is
+     * environmental (e.g. firing the crossbow).
+     */
+    public void triggerReveal(@Nullable LivingEntity triggeringEntity) {
+        RevealState current = getRevealState();
+        if (current == RevealState.SUSPICIOUS || current == RevealState.DISGUISED) {
+            transitionTo(pickRevealStateFor(triggeringEntity));
+            return;
+        }
+        if (swapHysteresisTimer > 0) return;
+        RevealState desired = pickRevealStateFor(triggeringEntity);
+        if (desired != current
+                && (desired == RevealState.REVEALED_RANGED || desired == RevealState.REVEALED_MELEE)) {
+            transitionTo(desired);
+        }
+    }
+
+    public void enterSuspicious() {
+        if (getRevealState() == RevealState.DISGUISED) {
+            transitionTo(RevealState.SUSPICIOUS);
+            suspiciousTimer = SUSPICIOUS_DURATION_TICKS;
+        }
+    }
+
+    private void transitionTo(RevealState next) {
+        RevealState current = getRevealState();
+        if (!current.canTransitionTo(next)) return;
+        setRevealState(next);
+        swapHysteresisTimer = REVEAL_SWAP_HYSTERESIS_TICKS;
+    }
+
+    private RevealState pickRevealStateFor(@Nullable LivingEntity who) {
+        if (who == null) return RevealState.REVEALED_RANGED;
+        return distanceTo(who) <= MELEE_DISTANCE_BLOCKS
+            ? RevealState.REVEALED_MELEE
+            : RevealState.REVEALED_RANGED;
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (level().isClientSide()) return;
+
+        if (swapHysteresisTimer > 0) swapHysteresisTimer--;
+
+        if (getRevealState() == RevealState.SUSPICIOUS) {
+            suspiciousTimer--;
+            if (suspiciousTimer <= 0) {
+                setRevealState(RevealState.DISGUISED);
+            }
+        }
+
+        if (getRevealState() == RevealState.DISGUISED && hasAnyStolenItem()) {
+            net.minecraft.world.entity.player.Player p = level().getNearestPlayer(this, 8.0);
+            if (p != null && p.hasLineOfSight(this)) {
+                triggerReveal(p);
+            }
+        }
+
+        if (getRevealState() == RevealState.DISGUISED) {
+            java.util.List<com.tweeks.securityguard.entity.SecurityGuardEntity> guards =
+                level().getEntitiesOfClass(com.tweeks.securityguard.entity.SecurityGuardEntity.class,
+                    getBoundingBox().inflate(8.0));
+            for (com.tweeks.securityguard.entity.SecurityGuardEntity g : guards) {
+                if (g.hasLineOfSight(this)) {
+                    triggerReveal(g);
+                    break;
+                }
+            }
+        }
+
+        if ((getRevealState() == RevealState.REVEALED_RANGED || getRevealState() == RevealState.REVEALED_MELEE)
+                && getTarget() != null) {
+            triggerReveal(getTarget());
+        }
+    }
+
+    private boolean hasAnyStolenItem() {
+        for (int i = 0; i < stolenItems.getContainerSize(); i++) {
+            if (!stolenItems.getItem(i).isEmpty()) return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level,
+                              net.minecraft.world.damagesource.DamageSource source,
+                              float amount) {
+        boolean wasHurt = super.hurtServer(level, source, amount);
+        if (wasHurt && source.getEntity() instanceof LivingEntity attacker) {
+            triggerReveal(attacker);
+        }
+        return wasHurt;
     }
 }

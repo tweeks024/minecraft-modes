@@ -83,6 +83,17 @@ public class StealFromChestGoal extends Goal {
         if (thief.distanceToSqr(targetChest.getX() + 0.5, targetChest.getY(), targetChest.getZ() + 0.5)
                 <= APPROACH_RANGE_SQR) {
             if (!opened) {
+                net.minecraft.world.entity.player.Player observer =
+                    thief.level().getNearestPlayer(thief, 16.0);
+                if (observer != null && observer.hasLineOfSight(thief)) {
+                    if (thief.distanceTo(observer) > 8.0) {
+                        thief.enterSuspicious();
+                    } else {
+                        thief.triggerReveal(observer);
+                    }
+                    stop();
+                    return;
+                }
                 getChestEntity().ifPresent(c -> {
                     thief.setOpenContainerPos(targetChest);
                     c.startOpen(thief);
