@@ -1,10 +1,14 @@
 package com.tweeks.securityguard;
 
+import com.tweeks.securityguard.entity.SecurityGuardEntity;
 import com.tweeks.securityguard.item.GuardHelmetItem;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.IEventBus;
@@ -29,6 +33,14 @@ public final class Registration {
 
     public static final DeferredItem<GuardHelmetItem> GUARD_HELMET = ITEMS.register("guard_helmet",
         () -> new GuardHelmetItem(new Item.Properties().stacksTo(64)));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<SecurityGuardEntity>> SECURITY_GUARD =
+        ENTITY_TYPES.register("guard", () -> EntityType.Builder.<SecurityGuardEntity>of(
+                SecurityGuardEntity::new, MobCategory.MISC)
+            .sized(0.6f, 1.95f)
+            .clientTrackingRange(10)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(SecurityGuardMod.MOD_ID, "guard"))));
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> SECURITY_GUARD_TAB =
         CREATIVE_TABS.register("main", () ->
