@@ -13,5 +13,6 @@ public class SecurityGuardMod {
 
     public SecurityGuardMod(IEventBus modEventBus, ModContainer modContainer) {
         LOGGER.info("Security Guard mod loading");
+        Registration.register(modEventBus);
     }
 }
