@@ -44,7 +44,7 @@ Java 25 / NeoForge 26.1.2.30-beta / Minecraft 26.1.2. Same target as the existin
 - Spawn egg
 - Natural village spawn (rare, 1 per village) + periodic repopulation tick
 - Loot table including the items the Thief was carrying when killed
-- English localization
+- English localization (entity name, item name, **custom blackjack death message**: `death.attack.blackjack` → "%1$s was sapped by %2$s")
 - Datagen for recipe (blackjack), loot table, language
 
 **Blackjack item:**
@@ -145,7 +145,7 @@ State stored as `EntityDataAccessor<Byte>` synced to client (renderer reads it).
 
 | State | Visual | Weapon | Triggers / behavior |
 |---|---|---|---|
-| `DISGUISED` | villager texture + eye-mask stripe | none visible | Default. Wanders village, opens chests when no player line-of-sight, secretly attacks Guards when alone. |
+| `DISGUISED` | villager texture + eye-mask stripe | blackjack (concealed, not rendered) | Default. Wanders village, opens chests when no player line-of-sight, secretly sneaks up on Guards and saps them with the blackjack when alone. The blackjack is NEVER drawn visibly while DISGUISED — the strike happens with hands-up, sap-from-sleeve flavor. Crossbow is never used while DISGUISED (firing it makes noise + visible projectile = automatic reveal). |
 | `SUSPICIOUS` | villager texture + mask half-down | none visible | 2s (40-tick) timer set when a player catches a chest-open between 8-16 blocks. During the window: if player closes to ≤8 blocks → escalate to REVEALED; if timer expires → return to DISGUISED. Thief breaks off the chest interaction immediately on entering SUSPICIOUS. |
 | `REVEALED_RANGED` | thief texture, crossbow drawn | crossbow | Fires at nearest target ≥5 blocks; kites away if pressed. |
 | `REVEALED_MELEE` | thief texture, blackjack drawn | blackjack | Strikes nearest target ≤4 blocks; uses `StunningMeleeGoal` from core. |
@@ -156,6 +156,7 @@ State stored as `EntityDataAccessor<Byte>` synced to client (renderer reads it).
 2. Player with line-of-sight within 16 blocks while opening chest → `SUSPICIOUS`, then escalates if player approaches within 8 blocks
 3. Guard with line-of-sight within 8 blocks → `REVEALED_*` (Guards are trained to spot Thieves at closer range)
 4. Carrying ≥1 stolen item AND player within 8 blocks with line-of-sight → `REVEALED_*` (the loot gives them away)
+5. **Thief fires the crossbow** → `REVEALED_RANGED` (the loud twang + visible bolt blow cover; Thief never fires while still DISGUISED — if a SecretGuardTargetGoal attack would require a ranged shot, the Thief instead aborts and continues sneaking)
 
 #### Distance check at reveal
 On reveal trigger, find the nearest entity that the Thief considers a threat (player, Guard, anything that hit them):
@@ -178,7 +179,7 @@ Goal selector (priority order, lower = higher priority):
 
 Target selector:
 1. `HurtByTargetGoal`
-2. `SecretGuardTargetGoal` — `DISGUISED` only; targets nearest Guard within 12 blocks IF no player has `canSee(thief)` AND player is within 32 blocks (don't bother with the secrecy gate if no players are around — just attack)
+2. `SecretGuardTargetGoal` — `DISGUISED` only; targets nearest Guard within 12 blocks IF (a) no player within 32 blocks (cheap early-exit via `level.getNearestPlayer(thief, 32)` — skip the LOS check entirely if null) OR (b) no player within 32 blocks has `canSee(thief)`. The early-exit avoids the O(N×M) ray-trace cost when no one is around. Once targeted, the goal pathfinds to within 4 blocks (blackjack range). If the Guard moves out of melee approach range OR a player gains LOS during the approach, the goal `canContinueToUse()` returns false — Thief drops the target without revealing. If Thief reaches melee, it strikes (using `StunningMeleeGoal`-style hit) WITHOUT transitioning out of DISGUISED. The strike-from-hidden is the entire mechanic.
 3. `NearestAttackableTargetGoal<Player>` — REVEALED states only; targets the player who hit them or who's been chasing them
 
 ### Disguise visuals
@@ -186,8 +187,8 @@ Target selector:
 Two textures, swapped at runtime by the renderer based on synced state:
 
 - `thief_disguised.png` — base villager-style texture with two pixel-level changes:
-  - 2px black horizontal stripe across the eyes (eye mask, partially lowered)
-  - Robe color shifted ~10% darker than vanilla villager green
+  - 2px black horizontal stripe across the eyes (eye mask, partially lowered) — must align with the standard `VillagerModel` head UV (top-front face region) so resource packs that re-skin villagers keep the mask on the face, not on the back of the head
+  - Robe color shifted ~10% darker than vanilla villager green (modify the body UV region only)
 - `thief_revealed.png` — full thief look:
   - Mask snapped up over face (eyes barely visible)
   - Black/dark-grey robe
@@ -210,6 +211,7 @@ Reveal transition is a 0.5s (10-tick) animation:
    - Block above candidate is opaque (`isSolidRender`) — provides visual cover
    - Block below candidate is solid (chest needs support)
    - Candidate is NOT within 8 blocks of any village POI (`PoiManager`)
+   - Candidate Y is within ±10 blocks of `spawnPos.y` (avoids the "sky-base" failure mode where a player platform 30 blocks up is the only "opaque cover" the placer can find)
 3. First valid candidate: place `Blocks.CHEST` with random horizontal facing.
 4. Return `Optional<BlockPos>`.
 
@@ -236,6 +238,7 @@ Hideout chest **persists after the Thief dies.** The player can find and loot it
 - Class `BlackjackItem extends Item` (no `SwordItem` parent — we don't want vanilla sword behavior like blocking)
 - Damage: 2 (set via `Item.Properties.attributes` with an `ItemAttributeModifiers` builder)
 - On-hit effect: `MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 1)` (Slowness II, 2s) applied via `Item.hurtEnemy` override
+- Custom damage type `thief:blackjack` so kills produce the localized death message above
 - Stack size: 1
 - Texture: `blackjack.png` (small dark-leather sap, ~6×3 pixels)
 - Model: standard handheld item model
@@ -311,6 +314,26 @@ No `allprojects` block — the `net.neoforged.moddev` plugin must be applied per
 - Copies the `securityguard/build.gradle` template (same plugin config, same Java 25 toolchain, same datagen run config).
 - Adds `dependencies { implementation project(':securitycore') }`.
 
+### Multi-module run aggregation
+
+Each module's `runs { client { ... } }` block adds the OTHER modules' main source sets so the dev client loads all three mods together. Concrete pattern:
+
+```gradle
+neoForge {
+    runs {
+        client {
+            client()
+            modSources.add(project(':securitycore').sourceSets.main)
+            modSources.add(project(':securityguard').sourceSets.main)
+            modSources.add(project(':thief').sourceSets.main)
+        }
+        // server, gameTestServer, clientData, serverData blocks: same modSources additions
+    }
+}
+```
+
+Convention: pick `:thief` as the "primary dev module" (run `./gradlew :thief:runClient` to launch a dev client with all three mods loaded). The other modules' `runClient` tasks load the same set — devs can launch from any module.
+
 ### Mod load-order
 `thief` and `securityguard` both declare `securitycore` as a required mod dependency in their `neoforge.mods.toml`:
 ```toml
@@ -335,7 +358,9 @@ side = "BOTH"
 3. **Player observation:** stand close while Thief opens chest → confirm reveal triggers; flee further away during chest-open → confirm SUSPICIOUS state then return to DISGUISED.
 4. **Distance-based weapon switch:** approach revealed Thief from 10 blocks → crossbow; close to 3 blocks → swap to blackjack.
 5. **Stun on blackjack hit:** confirm Slowness II applied for 2s.
-6. **Secret guard attack:** spawn Thief + Guard out of player line-of-sight (e.g. behind a wall) → observe Thief drawing crossbow on Guard (transition to REVEALED). Walk into view → confirm Thief stays REVEALED (the attack already broke cover) and continues to fight Guard. Then teleport away → Thief should NOT return to DISGUISED.
+6. **Secret guard attack (sap):** spawn Thief + Guard out of player line-of-sight (e.g. behind a wall, player in another room). Observe: Thief stays in DISGUISED appearance (no weapon visible), pathfinds to within 4 blocks of Guard, melee-strikes Guard (Slowness II applied), Guard takes damage. Guard's `HurtByTargetGoal` retaliates → that hit triggers Thief's reveal trigger #1 (hit by anything) → Thief transitions to REVEALED_MELEE (already in melee range). Walk into view: confirm Thief stays REVEALED. Then teleport far away: Thief should NOT return to DISGUISED.
+6b. **Secret-attack abort on player LOS:** spawn Thief + Guard with player in same room (LOS unobstructed). Confirm Thief does NOT begin the sap approach — `SecretGuardTargetGoal.canUse()` returns false because player has LOS. Move player behind a wall: Thief begins approach.
+6c. **Crossbow never used while disguised:** verify by inspection of `SecretGuardTargetGoal` that no crossbow-firing path exists. Optionally: hit Thief from 12 blocks away with an arrow → Thief reveals to REVEALED_RANGED and fires back; this confirms crossbow only fires post-reveal.
 7. **Hideout recovery:** kill Thief carrying iron ingots → confirm items drop; locate hideout chest → confirm previously-deposited items present.
 8. **Hideout destruction:** while Thief is alive, break its hideout chest → confirm Thief enters permanent revealed state.
 9. **Natural spawn:** generate a fresh village; wait or `/locate` it; check for a Thief presence after a few in-game days.
@@ -347,7 +372,8 @@ side = "BOTH"
 
 ## Open questions / risks
 
-1. **Multi-module NeoForge in dev.** The `runClient` and `runData` tasks need to know to load all three mods together. May require `runs { client { modSources = [...] } }` to include all module source sets. Will validate during implementation.
+1. **Multi-module NeoForge in dev.** Resolved in the "Multi-module run aggregation" section above — each module's run blocks explicitly add the other modules' source sets via `modSources.add(...)`. Will validate by launching `./gradlew :thief:runClient` and confirming all three mods appear in the in-game Mods list.
 2. **`MobCategory.MONSTER` despawn behavior.** Thieves count toward the hostile cap and despawn at distance like zombies. This may be wrong long-term — natural-spawn villager replacements should arguably persist. Acceptable for v1; revisit if testing shows villages emptying out.
-3. **`canSee` performance.** `SecretGuardTargetGoal` does a `Player.canSee(thief)` check across all loaded players each tick. With many Thieves + many players, this is O(N×M). Acceptable for typical SP/small SMP. If profiling shows hot path, throttle to every 5 ticks.
+3. **`canSee` performance.** Mitigated via the `getNearestPlayer` early-exit in `SecretGuardTargetGoal` (see goal description). Worst case is still O(N×M) when players ARE present, but the common case (no nearby players) is now O(1). If profiling shows hot path, throttle to every 5 ticks.
 4. **Hideout chest griefing/orphaning.** A killed Thief leaves its chest behind forever. World fills up over decades of play. Acceptable: it's a free chest for the player. Not addressing in v1.
+5. **`SecurityHostile` priority weighting.** Reviewer suggested adding a priority/weight method so Guards prioritize Thieves over Zombies. Deferred — vanilla `NearestAttackableTargetGoal` picks nearest, which is "good enough" for v1 and avoids a custom target-selection goal. Revisit when a second `SecurityHostile` mob (besides Thief) ships.
