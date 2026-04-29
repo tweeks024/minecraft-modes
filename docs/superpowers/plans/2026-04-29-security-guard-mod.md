@@ -2,11 +2,13 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Ship v1 of the Security Guard mod — a friendly humanoid mob for NeoForge MC 1.21.x that defends players and villagers using stun-on-hit baton attacks, deployable via a 3-iron-block + Guard Helmet construction recipe.
+**Goal:** Ship v1 of the Security Guard mod — a friendly humanoid mob for NeoForge MC 26.1.2 that defends players and villagers using stun-on-hit baton attacks, deployable via a 3-iron-block + Guard Helmet construction recipe.
 
-**Architecture:** Single Gradle subproject (`securityguard/`) under a multi-module root that will host the future mod series. Entity extends `AbstractGolem` for friendly-mob defaults; AI uses standard Minecraft goal system; baton is rendered via a custom `RenderLayer` (no item registration). Spawn logic is extracted into a pure-function `SpawnPattern` utility for unit-testability without a Minecraft runtime.
+**Architecture:** Single Gradle subproject (`securityguard/`) under a multi-module root that will host the future mod series. Entity extends `IronGolem` for friendly-mob defaults + village reputation hooks; AI uses standard Minecraft goal system with a custom `BatonStrikeGoal` swapped in; baton is rendered via a custom `RenderLayer` (no item registration). Spawn logic is extracted into a pure-function `SpawnPattern` utility for unit-testability without a Minecraft runtime.
 
-**Tech Stack:** Java 21, NeoForge 1.21.1 MDK (latest stable for 1.21.x), Gradle 8.x, JUnit 5 for unit tests, NeoForge GameTest framework for optional in-game tests.
+**Tech Stack:** **Java 25**, **Minecraft 26.1.2**, **NeoForge 26.1.2.30-beta**, **ModDevGradle 2.0.141**, **Gradle 9.2.1** (via wrapper), JUnit 5 for unit tests, NeoForge GameTest framework for optional in-game tests.
+
+**Note on API drift:** The plan was originally drafted against MC 1.21.x but has been updated for MC 26.1.2. The Minecraft public API for entities, items, registries, and rendering is largely the same, but exact method signatures (especially `finalizeSpawn`, `useOn`, sound subtitles, `pack_format`) may differ. Each task's verification step will catch drift; expect minor inline fixes during execution.
 
 **Spec:** [`docs/superpowers/specs/2026-04-29-security-guard-mod-design.md`](../specs/2026-04-29-security-guard-mod-design.md)
 
@@ -66,11 +68,12 @@
 ## Prerequisites
 
 The implementing engineer needs:
-- Java 21 JDK installed (`java -version` should report 21+)
+- **Java 25 JDK** installed (`java -version` should report 25+; via Homebrew: `brew install openjdk` installs the latest, then add `/opt/homebrew/opt/openjdk/bin` to PATH)
 - Git
 - About 4 GB of disk for Gradle cache + MC dev artifacts
 - Internet for the first Gradle build (downloads NeoForge MDK dependencies)
 - ImageMagick OR Python 3 with Pillow OR a 16×16 PNG editor (for placeholder textures)
+- **No need to install Gradle separately** — the NeoForge MDK ships with the Gradle wrapper (`./gradlew`)
 
 No prior Minecraft modding knowledge required — every NeoForge concept is explained at first use.
 

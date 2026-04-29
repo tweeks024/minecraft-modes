@@ -1,18 +1,18 @@
-modLoader="javafml"
-loaderVersion="${loader_version_range}"
 license="${mod_license}"
 
 [[mods]]
 modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
-authors="${mod_authors}"
-description='''${mod_description}'''
+authors="Tom Weeks"
+description='''
+Adds a friendly humanoid security guard mob who defends players and villagers with a stun baton.
+'''
 
 [[dependencies.${mod_id}]]
     modId="neoforge"
     type="required"
-    versionRange="${neo_version_range}"
+    versionRange="[${neo_version},)"
     ordering="NONE"
     side="BOTH"
 

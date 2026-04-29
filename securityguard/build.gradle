@@ -1,70 +1,72 @@
 plugins {
     id 'java-library'
-    id 'eclipse'
-    id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.moddev' version '1.0.21'
+    id 'net.neoforged.moddev' version '2.0.141'
+    id 'idea'
 }
 
 version = mod_version
 group = mod_group_id
 
+sourceSets.main.resources {
+    srcDir('src/generated/resources')
+    exclude("**/*.bbmodel")
+    exclude("src/generated/**/.cache")
+}
+
+repositories {
+    // Add additional repositories here if required.
+}
+
 base {
     archivesName = mod_id
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+// Mojang ships Java 25 to end users in 26.1.2, so mods target Java 25.
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 
 neoForge {
     version = project.neo_version
 
-    parchment {
-        mappingsVersion = '2024.07.28'
-        minecraftVersion = '1.21'
-    }
-
     runs {
-        configureEach {
-            systemProperty 'forge.logging.markers', 'REGISTRIES'
-            systemProperty 'forge.logging.console.level', 'debug'
-            logLevel = org.slf4j.event.Level.DEBUG
-        }
-
         client {
             client()
-            systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
         server {
             server()
             programArgument '--nogui'
-            systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
         gameTestServer {
-            type = 'gameTestServer'
-            systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
+            type = "gameTestServer"
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
         data {
-            data()
-            programArguments.addAll '--mod', mod_id, '--all',
+            clientData()
+            programArguments.addAll '--mod', project.mod_id, '--all',
                 '--output', file('src/generated/resources/').getAbsolutePath(),
                 '--existing', file('src/main/resources/').getAbsolutePath()
+        }
+
+        configureEach {
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            logLevel = org.slf4j.event.Level.DEBUG
         }
     }
 
     mods {
         "${mod_id}" {
-            sourceSet sourceSets.main
+            sourceSet(sourceSets.main)
         }
     }
 }
 
-sourceSets.main.resources { srcDir 'src/generated/resources' }
-
-repositories {
-    mavenLocal()
+configurations {
+    runtimeClasspath.extendsFrom localRuntime
 }
 
 dependencies {
@@ -77,31 +79,24 @@ test {
     useJUnitPlatform()
 }
 
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
-    options.release = 21
-}
-
-tasks.withType(ProcessResources).configureEach {
+// Process the templated mod metadata at src/main/templates/META-INF/neoforge.mods.toml.
+var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
     var replaceProperties = [
-        minecraft_version       : minecraft_version,
-        minecraft_version_range : minecraft_version_range,
-        neo_version             : neo_version,
-        neo_version_range       : neo_version_range,
-        loader_version_range    : loader_version_range,
-        mod_id                  : mod_id,
-        mod_name                : mod_name,
-        mod_license             : mod_license,
-        mod_version             : mod_version,
-        mod_authors             : mod_authors,
-        mod_description         : mod_description
+            minecraft_version      : minecraft_version,
+            minecraft_version_range: minecraft_version_range,
+            neo_version            : neo_version,
+            mod_id                 : mod_id,
+            mod_name               : mod_name,
+            mod_license            : mod_license,
+            mod_version            : mod_version,
     ]
     inputs.properties replaceProperties
-
-    filesMatching(['META-INF/neoforge.mods.toml', 'pack.mcmeta']) {
-        expand replaceProperties
-    }
+    expand replaceProperties
+    from "src/main/templates"
+    into "build/generated/sources/modMetadata"
 }
+sourceSets.main.resources.srcDir generateModMetadata
+neoForge.ideSyncTask generateModMetadata
 
 publishing {
     publications {
@@ -113,5 +108,16 @@ publishing {
         maven {
             url "file://${project.projectDir}/repo"
         }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
     }
 }

@@ -315,12 +315,17 @@ A staged sequence that lets each step be independently tested before moving on:
 ## Build & Distribution
 
 - Gradle multi-module (root project owns `securityguard` as a subproject) so future mods slot in as siblings.
-- NeoForge MDK template as the starting point for the subproject's build files.
-- Java 21 (required by MC 1.21.x).
+- NeoForge MDK template (MDK-26.1.2-ModDevGradle) as the starting point for the subproject's build files.
+- **Minecraft 26.1.2** (latest as of April 2026; Mojang switched to year-based versioning).
+- **NeoForge 26.1.2.30-beta** (latest stable for MC 26.1.2).
+- **Java 25** (required by MC 26.1.2; Mojang ships JRE 25 with the launcher).
+- **ModDevGradle 2.0.141** (Gradle plugin; significantly different from 1.x — uses `src/main/templates/META-INF/neoforge.mods.toml` instead of `src/main/resources/META-INF/`).
+- **Gradle 9.2.1** via the bundled wrapper.
 - No external runtime dependencies beyond NeoForge itself.
+- No Parchment mappings (not yet released for 26.1.x; using Mojang's official mappings only).
 - Output: `securityguard-<version>.jar` in `securityguard/build/libs/`.
 - Versioning: `0.1.0` for v1.
-- License: TBD by user (default to MIT in initial scaffold; easy to change).
+- License: MIT.
 
 ## Open Questions / Decisions Pending User Confirmation
 
