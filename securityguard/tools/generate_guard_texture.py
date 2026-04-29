@@ -148,9 +148,45 @@ def paint_face(img: Image.Image) -> None:
 
 
 def paint_uniform_shading(img: Image.Image) -> None:
-    """Add 1px shoulder highlights, 1px hem shadows, and the gold cap band."""
-    # Will be implemented in Task 5.
-    pass
+    """Add 1px shoulder highlights, 1px hem shadows, and the gold cap band.
+
+    Highlights run along the top row of BODY_FRONT/BODY_BACK and the
+    inner-shoulder edge. Shadows run along the bottom row of the torso
+    where the uniform meets the trousers. The cap gets a single-row gold
+    band along the top of the brim unwrap.
+    """
+    # Body shoulder highlight: top row of front and back
+    x0, y0, x1, _ = BODY_FRONT
+    for x in range(x0, x1):
+        pixel(img, x, y0, NAVY_HIGHLIGHT)
+    x0, y0, x1, _ = BODY_BACK
+    for x in range(x0, x1):
+        pixel(img, x, y0, NAVY_HIGHLIGHT)
+
+    # Body hem shadow: bottom row of front and back
+    x0, _, x1, y1 = BODY_FRONT
+    for x in range(x0, x1):
+        pixel(img, x, y1 - 1, NAVY_SHADOW)
+    x0, _, x1, y1 = BODY_BACK
+    for x in range(x0, x1):
+        pixel(img, x, y1 - 1, NAVY_SHADOW)
+
+    # Right arm shoulder highlight: top row of arm front
+    x0, y0, x1, _ = RIGHT_ARM_FRONT
+    for x in range(x0, x1):
+        pixel(img, x, y0, NAVY_HIGHLIGHT)
+
+    # Left arm shoulder highlight: top row of arm front
+    x0, y0, x1, _ = LEFT_ARM_FRONT
+    for x in range(x0, x1):
+        pixel(img, x, y0, NAVY_HIGHLIGHT)
+
+    # Cap brim — gold band along the row where brim meets crown.
+    # CAP_BRIM_UNWRAP is (32, 0, 64, 10); the bottom row at y=9 reads as
+    # the visible band where the brim front face transitions to the crown.
+    x0, _, x1, y1 = CAP_BRIM_UNWRAP
+    for x in range(x0, x1):
+        pixel(img, x, y1 - 1, GOLD)
 
 
 def paint_shield(img: Image.Image) -> None:
