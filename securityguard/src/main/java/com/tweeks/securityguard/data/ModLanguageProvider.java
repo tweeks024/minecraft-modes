@@ -15,6 +15,7 @@ public class ModLanguageProvider extends LanguageProvider {
     protected void addTranslations() {
         add("itemGroup." + SecurityGuardMod.MOD_ID, "Security Guard");
         add(Registration.GUARD_HELMET.get(), "Guard Helmet");
+        add(Registration.BATON.get(), "Baton");
         add(Registration.GUARD_SPAWN_EGG.get(), "Security Guard Spawn Egg");
         add(Registration.SECURITY_GUARD.get(), "Security Guard");
     }
