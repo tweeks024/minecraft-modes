@@ -1143,9 +1143,9 @@ Expected: `BUILD SUCCESSFUL`. The `SpawnPatternTest` cases (5 tests) all pass.
 
 The repo already contains generated resources at `securityguard/src/generated/`. Re-running datagen and diffing against git is the cleanest "no behavior change" check for the refactor.
 
-Run:
+In moddev 2.0.141 there is no aggregate `runData` task — datagen is split into `runClientData` (assets: lang, item models, etc.) and `runServerData` (data: recipes, loot tables, advancements). Run both:
 ```bash
-./gradlew :securityguard:runData
+./gradlew :securityguard:runClientData :securityguard:runServerData
 git status securityguard/src/generated/
 ```
 Expected: `git status` reports no changes (the datagen output is identical to what was committed before the refactor). If there ARE diffs, inspect them — most likely they are timestamp/cache files. The cache directory `.cache/` is the only directory expected to potentially churn; revert any unintentional changes to actual JSON files.
