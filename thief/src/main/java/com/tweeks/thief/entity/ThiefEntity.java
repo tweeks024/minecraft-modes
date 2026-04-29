@@ -52,4 +52,14 @@ public class ThiefEntity extends PathfinderMob implements SecurityHostile {
     public boolean isCurrentlyHostile() {
         return getRevealState().isHostile();
     }
+
+    @Override
+    protected void registerGoals() {
+        this.goalSelector.addGoal(1, new net.minecraft.world.entity.ai.goal.FloatGoal(this));
+        this.goalSelector.addGoal(6, new com.tweeks.thief.entity.ai.WanderInVillageGoal(this));
+        this.goalSelector.addGoal(7, new net.minecraft.world.entity.ai.goal.LookAtPlayerGoal(this,
+            net.minecraft.world.entity.player.Player.class, 8.0f));
+        this.goalSelector.addGoal(8, new net.minecraft.world.entity.ai.goal.RandomLookAroundGoal(this));
+        this.goalSelector.addGoal(9, new net.minecraft.world.entity.ai.goal.RandomStrollGoal(this, 0.6));
+    }
 }
