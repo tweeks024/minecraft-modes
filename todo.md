@@ -1,0 +1,12 @@
+- security guard mob
+- install minecraft java
+- install mod in minecraft java
+- test 
+- thief mob
+    - bad guy, pillager, security guard attacks him
+    - found in villages, disguised as a villager but with small tell
+    - also tries to break into players bases
+    - steals from them, hides items in chest nearby
+    - has a crossbow
+    - secretely attacks all security guards
+    - 
