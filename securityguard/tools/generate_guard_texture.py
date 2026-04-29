@@ -133,18 +133,19 @@ def paint_face(img: Image.Image) -> None:
     """Paint villager-style face features into HEAD_FRONT (8x8 panel at (8, 8)).
 
     Layout inside the 8x8 panel (x relative to panel origin):
-      row 2-3: blank (forehead)
-      row 3:   unibrow stripe spanning x=2..6
-      row 4:   eye dots at x=2 and x=5 (one column gap between for the nose center)
-      row 5-7: blank (cheeks/chin — no mouth, matching vanilla villagers)
+      row 2-3: unibrow stripe spanning x=1..7 (7px wide, 2px tall — high visibility)
+      row 4-5: eye blocks 2px wide x 2px tall at x=1..3 and x=4..6 (flanking the nose)
+      row 6-7: blank (cheeks/chin — no mouth, matching vanilla villagers)
     """
     panel_x, panel_y = HEAD_FRONT[0], HEAD_FRONT[1]
-    # Unibrow: 5 pixels wide
-    for dx in range(2, 7):
-        pixel(img, panel_x + dx, panel_y + 3, BROW)
-    # Eye dots, flanking where the nose protrudes
-    pixel(img, panel_x + 2, panel_y + 4, EYE)
-    pixel(img, panel_x + 5, panel_y + 4, EYE)
+    # Unibrow: 7 pixels wide x 2 pixels tall
+    for dx in range(1, 8):
+        for dy in range(2, 4):
+            pixel(img, panel_x + dx, panel_y + dy, BROW)
+    # Eye blocks: 2x2 each, flanking the nose center column
+    for dx, dy in [(1, 4), (2, 4), (1, 5), (2, 5),
+                   (5, 4), (6, 4), (5, 5), (6, 5)]:
+        pixel(img, panel_x + dx, panel_y + dy, EYE)
 
 
 def paint_uniform_shading(img: Image.Image) -> None:
