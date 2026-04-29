@@ -1,0 +1,10 @@
+{
+  "layers": {
+    "humanoid": [
+      { "texture": "creeperskin:creeper" }
+    ],
+    "humanoid_leggings": [
+      { "texture": "creeperskin:creeper" }
+    ]
+  }
+}
