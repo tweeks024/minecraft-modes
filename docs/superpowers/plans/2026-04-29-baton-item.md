@@ -4,7 +4,7 @@
 
 **Goal:** Make the Security Guard's baton a wieldable iron-tier item that applies the same Slowness II + Weakness I + knockback stun the Guard's AI applies on hit, and replace the white-placeholder textures with a readable police-nightstick design.
 
-**Architecture:** Extract a `StunEffects.applyStun(...)` static helper into `securitycore` so the existing `StunningMeleeGoal` and the new `BatonItem` both call the same code. `BatonItem extends SwordItem` with `Tiers.IRON`; override `postHurtEnemy` to apply the stun. Repaint the existing `entity/baton.png` and add a new `item/baton.png` icon, both 16×16 with a black-grip + dark-wood palette.
+**Architecture:** Extract a `StunEffects.applyStun(...)` static helper into `securitycore` so the existing `StunningMeleeGoal` and the new `BatonItem` both call the same code. `BatonItem extends Item` (the moddev classpath for NeoForge 26.1.2.30-beta strips `SwordItem`/`Tier`/`Tiers`); iron-tier feel comes from `ItemAttributeModifiers` on `Properties` plus a manual `stack.hurtAndBreak` call in `postHurtEnemy` alongside the stun apply. Repaint the existing `entity/baton.png` and add a new `item/baton.png` icon, both 16×16 with a black-grip + dark-wood palette.
 
 **Tech Stack:** Java 25, NeoForge 26.1.2.30-beta, Minecraft 26.1.2, gradle with `net.neoforged.moddev` 2.0.141, JUnit 5, Python 3 + Pillow for one-shot texture generation (already used by the Thief textures — see commit `416065e`).
 
@@ -20,7 +20,7 @@
 
 ```
 securitycore/src/main/java/com/tweeks/securitycore/ai/StunEffects.java                   # NEW: pure stun-application helper
-securityguard/src/main/java/com/tweeks/securityguard/item/BatonItem.java                 # NEW: SwordItem subclass with on-hit stun
+securityguard/src/main/java/com/tweeks/securityguard/item/BatonItem.java                 # NEW: Item subclass with on-hit stun + manual hurtAndBreak
 securityguard/src/main/resources/assets/securityguard/items/baton.json                   # NEW: client item-model selector
 securityguard/src/main/resources/assets/securityguard/models/item/baton.json             # NEW: item/handheld parent w/ baton texture
 securityguard/src/main/resources/assets/securityguard/textures/item/baton.png            # NEW: 16×16 inventory icon
@@ -45,7 +45,7 @@ None.
 
 **Files:** none modified.
 
-- [ ] **Step 1: Run the existing build to confirm a clean starting point**
+- [x] **Step 1: Run the existing build to confirm a clean starting point**
 
 Run:
 ```bash
@@ -53,7 +53,7 @@ Run:
 ```
 Expected: `BUILD SUCCESSFUL`. Both `securitycore-0.1.0.jar` and `securityguard-0.1.0.jar` (and `thief-0.1.0.jar`, if the thief module is in `settings.gradle`) build under `*/build/libs/`.
 
-- [ ] **Step 2: Run the existing test suite**
+- [x] **Step 2: Run the existing test suite**
 
 Run:
 ```bash
@@ -61,7 +61,7 @@ Run:
 ```
 Expected: `BUILD SUCCESSFUL`. All `SpawnPatternTest` cases pass.
 
-- [ ] **Step 3: No commit**
+- [x] **Step 3: No commit**
 
 Verification only. If either step fails, **stop and fix before proceeding** — every subsequent task assumes a green baseline.
 
@@ -75,7 +75,7 @@ Verification only. If either step fails, **stop and fix before proceeding** — 
 
 This task pulls the inline effect-application out of `StunningMeleeGoal` so a player-held `BatonItem` can call the same code in Task 4. Behavior must be byte-for-byte identical — same `MobEffects.SLOWNESS` / `MobEffects.WEAKNESS` instances, same `knockback` arguments, same dead-target short-circuit.
 
-- [ ] **Step 1: Create `StunEffects`**
+- [x] **Step 1: Create `StunEffects`**
 
 Create file `securitycore/src/main/java/com/tweeks/securitycore/ai/StunEffects.java` with:
 
@@ -128,7 +128,7 @@ public final class StunEffects {
 }
 ```
 
-- [ ] **Step 2: Refactor `StunningMeleeGoal.checkAndPerformAttack` to delegate**
+- [x] **Step 2: Refactor `StunningMeleeGoal.checkAndPerformAttack` to delegate**
 
 Open `securitycore/src/main/java/com/tweeks/securitycore/ai/StunningMeleeGoal.java`. Replace the `checkAndPerformAttack` method body so the inline effect block becomes a single `StunEffects.applyStun(...)` call. The full replacement method:
 
@@ -156,7 +156,7 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 ```
 
-- [ ] **Step 3: Compile securitycore**
+- [x] **Step 3: Compile securitycore**
 
 Run:
 ```bash
@@ -164,7 +164,7 @@ Run:
 ```
 Expected: `BUILD SUCCESSFUL`. If unused imports remain, the build will not fail (Java doesn't error on unused imports), but they should still be cleaned up for hygiene.
 
-- [ ] **Step 4: Compile and test the whole repo to verify no consumer broke**
+- [x] **Step 4: Compile and test the whole repo to verify no consumer broke**
 
 Run:
 ```bash
@@ -172,7 +172,7 @@ Run:
 ```
 Expected: `BUILD SUCCESSFUL`. `SpawnPatternTest` still passes. The `securityguard` module compiles unchanged — it doesn't reference `StunEffects` yet, only the goal, and the goal's public constructor signature is unchanged.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add securitycore/src/main/java/com/tweeks/securitycore/ai/StunEffects.java \
@@ -203,7 +203,7 @@ EOF
 
 The override point is `postHurtEnemy` — called server-side after vanilla damage has been applied. We chain `super.postHurtEnemy`, manually decrement durability with `stack.hurtAndBreak(1, attacker, EquipmentSlot.MAINHAND)`, and then call `StunEffects.applyStun` with the same numeric parameters Guard AI uses (`60, 1, 0, 0.2`).
 
-- [ ] **Step 1: Create `BatonItem`**
+- [x] **Step 1: Create `BatonItem`**
 
 Create file `securityguard/src/main/java/com/tweeks/securityguard/item/BatonItem.java` with:
 
@@ -253,7 +253,7 @@ public class BatonItem extends Item {
 
 (The constants must equal the parameters passed to `StunningMeleeGoal` in `SecurityGuardEntity.registerGoals` — currently `60, 1, 0, 0.2`. If those numbers ever drift, the player-baton and AI-baton will desync; both sites are deliberately tagged with the same numbers.)
 
-- [ ] **Step 2: Compile**
+- [x] **Step 2: Compile**
 
 Run:
 ```bash
@@ -261,7 +261,7 @@ Run:
 ```
 Expected: `BUILD SUCCESSFUL`. (BatonItem is not yet registered, so it compiles but doesn't appear in-game.)
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add securityguard/src/main/java/com/tweeks/securityguard/item/BatonItem.java
@@ -290,7 +290,7 @@ EOF
 
 Iron-sword effective stats this mirrors: durability 250, attack damage 6.0 + 1.0 (player base) = 7 damage, attack speed -2.4 (= 1.6 swings/sec). Vanilla iron sword's `SwordItem.createAttributes(Tiers.IRON, 3, -2.4F)` resolves to "3 + tier-bonus 6.0 = +9 attack damage" plus the +1 player base for 10 total — but that's because the Tier API stacks an extra base bonus on top. With the simpler manual API on the classpath we can just use `+6` for clean iron-tier feel; smoke test in Task 10 confirms it feels right.
 
-- [ ] **Step 1: Add the imports at the top of `Registration.java`**
+- [x] **Step 1: Add the imports at the top of `Registration.java`**
 
 Open `securityguard/src/main/java/com/tweeks/securityguard/Registration.java`. Add to the existing import block (alphabetical placement near the other `world` imports):
 
@@ -303,7 +303,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 ```
 
-- [ ] **Step 2: Add the BATON_ATTRIBUTES constant + `BATON` `DeferredItem`**
+- [x] **Step 2: Add the BATON_ATTRIBUTES constant + `BATON` `DeferredItem`**
 
 After the existing `GUARD_HELMET` declaration (around line 35) and before the `SECURITY_GUARD` entity-type declaration, add:
 
@@ -324,7 +324,7 @@ After the existing `GUARD_HELMET` declaration (around line 35) and before the `S
 
 The constructor reference `BatonItem::new` resolves to `BatonItem(Properties)` — single-arg form, matching the constructor created in Task 3.
 
-- [ ] **Step 3: Add `BATON` to the creative tab**
+- [x] **Step 3: Add `BATON` to the creative tab**
 
 Find the `SECURITY_GUARD_TAB.displayItems(...)` block (around line 56). It currently outputs `GUARD_HELMET` and `GUARD_SPAWN_EGG`. Insert `BATON` between them:
 
@@ -336,7 +336,7 @@ Find the `SECURITY_GUARD_TAB.displayItems(...)` block (around line 56). It curre
 })
 ```
 
-- [ ] **Step 4: Compile**
+- [x] **Step 4: Compile**
 
 Run:
 ```bash
@@ -344,7 +344,7 @@ Run:
 ```
 Expected: `BUILD SUCCESSFUL`.
 
-- [ ] **Step 5: Commit (don't run a full build yet — model JSON is missing, so the client would fail to resolve the baton's icon at runtime; we add JSONs in the next task before any in-game test)**
+- [x] **Step 5: Commit (don't run a full build yet — model JSON is missing, so the client would fail to resolve the baton's icon at runtime; we add JSONs in the next task before any in-game test)**
 
 ```bash
 git add securityguard/src/main/java/com/tweeks/securityguard/Registration.java
@@ -375,7 +375,7 @@ The two JSON files match the existing `guard_helmet` pattern:
 - `assets/<modid>/items/<id>.json` is the *client item-model selector* (1.21.4+ split-model format) that points at a model.
 - `assets/<modid>/models/item/<id>.json` is the actual model — for held tools, parented to `minecraft:item/handheld` (which orients the icon along the player's hand-axis in first-person).
 
-- [ ] **Step 1: Create the items selector**
+- [x] **Step 1: Create the items selector**
 
 Create file `securityguard/src/main/resources/assets/securityguard/items/baton.json`:
 
@@ -388,7 +388,7 @@ Create file `securityguard/src/main/resources/assets/securityguard/items/baton.j
 }
 ```
 
-- [ ] **Step 2: Create the item model**
+- [x] **Step 2: Create the item model**
 
 Create file `securityguard/src/main/resources/assets/securityguard/models/item/baton.json`:
 
@@ -403,7 +403,7 @@ Create file `securityguard/src/main/resources/assets/securityguard/models/item/b
 
 (`item/handheld` — same parent vanilla swords use — orients the texture so the bottom-left of the sprite ends up at the player's hand grip in first-person, which matches the diagonal layout we'll paint in Task 7.)
 
-- [ ] **Step 3: Add the lang entry**
+- [x] **Step 3: Add the lang entry**
 
 Open `securityguard/src/main/java/com/tweeks/securityguard/data/ModLanguageProvider.java`. After the `GUARD_HELMET` entry (line 17), add:
 
@@ -424,7 +424,7 @@ protected void addTranslations() {
 }
 ```
 
-- [ ] **Step 4: Build (textures still missing, but JSON wiring should be valid)**
+- [x] **Step 4: Build (textures still missing, but JSON wiring should be valid)**
 
 Run:
 ```bash
@@ -432,7 +432,7 @@ Run:
 ```
 Expected: `BUILD SUCCESSFUL`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add securityguard/src/main/resources/assets/securityguard/items/baton.json \
@@ -474,7 +474,7 @@ What the player sees in-game:
 
 Because the baton renders rotated 180° on the X axis, **what the texture calls "top" appears at the bottom of the on-screen baton**, and vice versa. The grip should therefore be painted at rows 5–6 of the side strips and the wood at rows 1–4.
 
-- [ ] **Step 1: Confirm Pillow is available in the local environment**
+- [x] **Step 1: Confirm Pillow is available in the local environment**
 
 Run:
 ```bash
@@ -482,7 +482,7 @@ python3 -c "import PIL; print(PIL.__version__)"
 ```
 Expected: a version string (e.g. `10.4.0`). If it fails, install with `pip3 install --user Pillow`.
 
-- [ ] **Step 2: Generate the texture**
+- [x] **Step 2: Generate the texture**
 
 Run the following one-shot Python script. It writes the new `entity/baton.png` directly. The script is intentionally throwaway — the binary PNG is the artifact committed to the repo (matching the precedent set by commit `416065e` for the Thief textures).
 
@@ -534,7 +534,7 @@ PY
 
 Expected output: `wrote entity/baton.png`. The file size will be small (~150 bytes). The white-placeholder version is overwritten in place.
 
-- [ ] **Step 3: Visually verify the PNG**
+- [x] **Step 3: Visually verify the PNG**
 
 Open the file:
 ```bash
@@ -545,7 +545,7 @@ At 16× zoom in Preview / VS Code, confirm:
 - Rows 1–6 of columns 0..3: visible vertical bands going dark-wood → mid-wood → highlight → mid-wood → dark grip → black grip.
 - Rest of image: transparent.
 
-- [ ] **Step 4: Commit (do NOT build yet — Task 7 lands the item icon, then Task 8 verifies the whole module)**
+- [x] **Step 4: Commit (do NOT build yet — Task 7 lands the item icon, then Task 8 verifies the whole module)**
 
 ```bash
 git add securityguard/src/main/resources/assets/securityguard/textures/entity/baton.png
@@ -573,7 +573,7 @@ EOF
 
 The item icon is rendered with `item/handheld`, which Minecraft draws diagonally (lower-left = held end at hand, upper-right = business end). The icon is independent of the entity texture, so we can use a denser pixel layout that's readable at inventory size.
 
-- [ ] **Step 1: Generate the icon**
+- [x] **Step 1: Generate the icon**
 
 Run:
 ```bash
@@ -650,7 +650,7 @@ PY
 
 Expected output: `wrote item/baton.png`.
 
-- [ ] **Step 2: Visually verify**
+- [x] **Step 2: Visually verify**
 
 Open the file:
 ```bash
@@ -658,7 +658,7 @@ open securityguard/src/main/resources/assets/securityguard/textures/item/baton.p
 ```
 At zoom, confirm: a diagonal black-grip-into-dark-wood baton running from lower-left to upper-right, with a one-pixel highlight along the upper-right edge of each segment. Pommel cap visible at the lower-left.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add securityguard/src/main/resources/assets/securityguard/textures/item/baton.png
@@ -684,7 +684,7 @@ EOF
 
 `ModLanguageProvider` populates `securityguard/src/generated/clientData/assets/securityguard/lang/en_us.json` at datagen time. Adding the Baton entry in Task 5 means re-running datagen should produce a one-line diff in that file.
 
-- [ ] **Step 1: Run client-side datagen for `securityguard`**
+- [x] **Step 1: Run client-side datagen for `securityguard`**
 
 Run:
 ```bash
@@ -692,7 +692,7 @@ Run:
 ```
 Expected: `BUILD SUCCESSFUL`.
 
-- [ ] **Step 2: Check what changed**
+- [x] **Step 2: Check what changed**
 
 Run:
 ```bash
@@ -701,7 +701,7 @@ git diff securityguard/src/generated/clientData/assets/securityguard/lang/en_us.
 ```
 Expected: a one-line addition for the Baton translation. If other generated files changed (recipe JSONs, loot-table JSONs, model JSONs), inspect them — most likely they're cache-only files that should be reverted.
 
-- [ ] **Step 3: Discard `.cache` directory churn but keep real generated changes**
+- [x] **Step 3: Discard `.cache` directory churn but keep real generated changes**
 
 Run:
 ```bash
@@ -711,7 +711,7 @@ git status securityguard/src/generated/
 ```
 Expected: only the lang JSON shows as modified (and possibly nothing else).
 
-- [ ] **Step 4: Commit the lang regeneration**
+- [x] **Step 4: Commit the lang regeneration**
 
 ```bash
 git add securityguard/src/generated/
@@ -734,7 +734,7 @@ EOF
 
 **Files:** none modified.
 
-- [ ] **Step 1: Clean build from scratch**
+- [x] **Step 1: Clean build from scratch**
 
 Run:
 ```bash
@@ -742,7 +742,7 @@ Run:
 ```
 Expected: `BUILD SUCCESSFUL`. All module jars (`securitycore-0.1.0.jar`, `securityguard-0.1.0.jar`, plus `thief-0.1.0.jar` if present) build.
 
-- [ ] **Step 2: Run the test suite**
+- [x] **Step 2: Run the test suite**
 
 Run:
 ```bash
@@ -750,7 +750,7 @@ Run:
 ```
 Expected: `BUILD SUCCESSFUL`. `SpawnPatternTest` (5 tests) and any thief-module tests still pass.
 
-- [ ] **Step 3: No commit**
+- [x] **Step 3: No commit**
 
 Verification only. If anything fails, **stop and fix before continuing**.
 
@@ -760,7 +760,7 @@ Verification only. If anything fails, **stop and fix before continuing**.
 
 **Files:** none modified.
 
-- [ ] **Step 1: Launch the dev client**
+- [x] **Step 1: Launch the dev client**
 
 Run:
 ```bash
@@ -768,11 +768,11 @@ Run:
 ```
 Wait for Minecraft to load to the title screen.
 
-- [ ] **Step 2: Confirm both core and guard mods are listed**
+- [x] **Step 2: Confirm both core and guard mods are listed**
 
 In the title screen → **Mods**, confirm `Security Core 0.1.0` and `Security Guard 0.1.0` appear. (If `thief` is in `settings.gradle`, it should appear too.)
 
-- [ ] **Step 3: Open creative inventory; find the Baton**
+- [x] **Step 3: Open creative inventory; find the Baton**
 
 Create a new Creative-mode flat world. Open the inventory and switch to the **Security Guard** creative tab. Verify three items: Guard Helmet, **Baton** (new), Guard Spawn Egg.
 
@@ -780,7 +780,7 @@ Hover the Baton:
 - Tooltip should read `Baton`.
 - Inventory icon should be the diagonal nightstick — black grip lower-left, wood shaft upper-right. **Not white**.
 
-- [ ] **Step 4: Test player attack stun**
+- [x] **Step 4: Test player attack stun**
 
 Pick up the Baton. Spawn a Zombie via `/summon zombie ~ ~ ~` or another spawn egg. Hit the Zombie once.
 
@@ -789,7 +789,7 @@ Verify:
 - Zombie shows blue Slowness particles AND grey Weakness particles for ~3 seconds.
 - Zombie gets knocked back slightly.
 
-- [ ] **Step 5: Test Guard AI stun (regression check)**
+- [x] **Step 5: Test Guard AI stun (regression check)**
 
 Spawn a Guard via the iron-block + helmet ritual. Spawn a Zombie nearby. Watch the Guard fight.
 
@@ -797,13 +797,13 @@ Verify:
 - The Guard's baton in-hand renders with the new texture (dark-wood shaft, black grip), not white.
 - The Zombie shows the same Slowness + Weakness particles after each Guard hit (matches your player-baton hits — confirms the StunEffects refactor preserved AI behavior).
 
-- [ ] **Step 6: Test durability**
+- [x] **Step 6: Test durability**
 
 Use `/give @s securityguard:baton 1` if needed (creative gives infinite durability — switch to survival via `/gamemode survival` to see the durability bar).
 
 Hit a passive mob (cow) ~5 times. The durability bar should appear under the icon and decrement by 1 per hit. Don't need to break it; just confirm decrement works.
 
-- [ ] **Step 7: Close the client; no commit needed**
+- [x] **Step 7: Close the client; no commit needed**
 
 Verification only. If any of Steps 3–6 fail:
 - Wrong icon → Task 7 PNG is malformed; regenerate.
@@ -817,11 +817,11 @@ Verification only. If any of Steps 3–6 fail:
 
 **Files:** none modified.
 
-- [ ] **Step 1: Mark every plan task complete**
+- [x] **Step 1: Mark every plan task complete**
 
 Open `docs/superpowers/plans/2026-04-29-baton-item.md`. Verify every `- [ ]` step is now `- [x]`. (If executing via subagent-driven-development, the orchestrator handles this automatically.)
 
-- [ ] **Step 2: Final clean rebuild**
+- [x] **Step 2: Final clean rebuild**
 
 Run:
 ```bash
@@ -829,7 +829,7 @@ Run:
 ```
 Expected: `BUILD SUCCESSFUL`.
 
-- [ ] **Step 3: No commit needed**
+- [x] **Step 3: No commit needed**
 
 The feature ships across the per-task commits already in place. The repo can be bisected if a future regression appears: each commit is independently runnable / reviewable / revertable.
 
