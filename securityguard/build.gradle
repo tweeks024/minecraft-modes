@@ -8,6 +8,8 @@ plugins {
 version = mod_version
 group = mod_group_id
 
+evaluationDependsOn(':thief')
+
 sourceSets.main.resources {
     srcDir('src/generated/clientData')
     srcDir('src/generated/serverData')
@@ -72,6 +74,9 @@ neoForge {
         }
         "securitycore" {
             sourceSet(project(':securitycore').sourceSets.main)
+        }
+        "thief" {
+            sourceSet(project(':thief').sourceSets.main)
         }
     }
 }
