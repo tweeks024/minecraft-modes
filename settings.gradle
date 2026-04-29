@@ -12,3 +12,4 @@ rootProject.name = 'minecraft-mods'
 
 include 'securitycore'
 include 'securityguard'
+include 'thief'
