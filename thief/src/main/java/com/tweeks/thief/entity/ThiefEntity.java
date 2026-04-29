@@ -149,6 +149,7 @@ public class ThiefEntity extends PathfinderMob implements SecurityHostile, Conta
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new net.minecraft.world.entity.ai.goal.FloatGoal(this));
+        this.goalSelector.addGoal(4, new com.tweeks.thief.entity.ai.ReturnToHideoutGoal(this));
         this.goalSelector.addGoal(5, new com.tweeks.thief.entity.ai.StealFromChestGoal(this));
         this.goalSelector.addGoal(6, new com.tweeks.thief.entity.ai.WanderInVillageGoal(this));
         this.goalSelector.addGoal(7, new net.minecraft.world.entity.ai.goal.LookAtPlayerGoal(this,
