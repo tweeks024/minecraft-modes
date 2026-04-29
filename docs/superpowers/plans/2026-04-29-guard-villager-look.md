@@ -94,7 +94,7 @@ The "hand area" of `RIGHT_ARM_BOTTOM` and `LEFT_ARM_BOTTOM` is where exposed-ski
 
 **Files:** none modified.
 
-- [ ] **Step 1: Build the securityguard module**
+- [x] **Step 1: Build the securityguard module**
 
 Run:
 ```bash
@@ -102,7 +102,7 @@ Run:
 ```
 Expected: `BUILD SUCCESSFUL`. Existing tests pass.
 
-- [ ] **Step 2: Confirm Pillow is available for the generator script we'll add later**
+- [x] **Step 2: Confirm Pillow is available for the generator script we'll add later**
 
 Run:
 ```bash
@@ -116,7 +116,7 @@ python3 -m pip install --user Pillow
 ```
 Re-run the import check; it must print `OK` before continuing.
 
-- [ ] **Step 3: No commit. Verification only.**
+- [x] **Step 3: No commit. Verification only.**
 
 If the build or Pillow check fails, **stop and fix before proceeding** — every later task assumes a green baseline.
 
@@ -127,7 +127,7 @@ If the build or Pillow check fails, **stop and fix before proceeding** — every
 **Files:**
 - Modify: `securityguard/src/main/java/com/tweeks/securityguard/client/model/SecurityGuardModel.java`
 
-- [ ] **Step 1: Add the nose part as a child of `head`**
+- [x] **Step 1: Add the nose part as a child of `head`**
 
 Open `securityguard/src/main/java/com/tweeks/securityguard/client/model/SecurityGuardModel.java`. Find the existing `cap_crown` block (the second `addOrReplaceChild` call inside `createBodyLayer()`):
 
@@ -163,7 +163,7 @@ The box parameters break down as:
 - `2, 2, 2` — 2×2×2 voxels
 - `texOffs(56, 16)` — UV slot in the free band immediately right of where the right-arm UV unwrap ends (right arm 4×12×4 at `texOffs(40,16)` unwraps to x=40..56, y=16..32; the strip from x=56..64, y=16..20 is unused and exactly fits an 8×4 cube unwrap)
 
-- [ ] **Step 2: Build and confirm the model compiles**
+- [x] **Step 2: Build and confirm the model compiles**
 
 Run:
 ```bash
@@ -171,7 +171,7 @@ Run:
 ```
 Expected: `BUILD SUCCESSFUL`.
 
-- [ ] **Step 3: Build the full module to ensure no other code broke**
+- [x] **Step 3: Build the full module to ensure no other code broke**
 
 Run:
 ```bash
@@ -179,7 +179,7 @@ Run:
 ```
 Expected: `BUILD SUCCESSFUL`. Existing tests pass.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add securityguard/src/main/java/com/tweeks/securityguard/client/model/SecurityGuardModel.java
@@ -203,14 +203,14 @@ EOF
 **Files:**
 - Create: `securityguard/tools/generate_guard_texture.py`
 
-- [ ] **Step 1: Create the tools directory**
+- [x] **Step 1: Create the tools directory**
 
 Run:
 ```bash
 mkdir -p securityguard/tools
 ```
 
-- [ ] **Step 2: Write the generator script with palette, region map, and a placeholder `main()`**
+- [x] **Step 2: Write the generator script with palette, region map, and a placeholder `main()`**
 
 Create file `securityguard/tools/generate_guard_texture.py`:
 
@@ -380,7 +380,7 @@ if __name__ == "__main__":
     main()
 ```
 
-- [ ] **Step 3: Run the script to confirm it executes cleanly (it produces a base-fill texture; we paint details in later tasks)**
+- [x] **Step 3: Run the script to confirm it executes cleanly (it produces a base-fill texture; we paint details in later tasks)**
 
 Run:
 ```bash
@@ -393,7 +393,7 @@ Wrote /Users/tweeks/code/minecraft-mods/securityguard/src/main/resources/assets/
 
 The texture is now overwritten with the new base layout (villager skin on head, navy uniform). Visually it differs from the previous placeholder; that's expected.
 
-- [ ] **Step 4: Confirm the build still works with the regenerated texture**
+- [x] **Step 4: Confirm the build still works with the regenerated texture**
 
 Run:
 ```bash
@@ -401,7 +401,7 @@ Run:
 ```
 Expected: `BUILD SUCCESSFUL`.
 
-- [ ] **Step 5: Commit (script + regenerated PNG together)**
+- [x] **Step 5: Commit (script + regenerated PNG together)**
 
 ```bash
 git add securityguard/tools/generate_guard_texture.py \
@@ -430,7 +430,7 @@ EOF
 - Modify: `securityguard/tools/generate_guard_texture.py` (replace `paint_face`)
 - Modify: `securityguard/src/main/resources/assets/securityguard/textures/entity/security_guard.png` (regenerated)
 
-- [ ] **Step 1: Implement `paint_face`**
+- [x] **Step 1: Implement `paint_face`**
 
 Open `securityguard/tools/generate_guard_texture.py`. Find:
 
@@ -464,7 +464,7 @@ def paint_face(img: Image.Image) -> None:
 
 (The eye-dot columns 2 and 5 leave columns 3 and 4 between them, which is where the 2-wide nose protrudes from the head. The brow stripe sits one row above the eyes.)
 
-- [ ] **Step 2: Run the script**
+- [x] **Step 2: Run the script**
 
 Run:
 ```bash
@@ -472,7 +472,7 @@ python3 securityguard/tools/generate_guard_texture.py
 ```
 Expected: `Wrote ...security_guard.png`. The PNG now has a face.
 
-- [ ] **Step 3: Build to confirm nothing broke**
+- [x] **Step 3: Build to confirm nothing broke**
 
 Run:
 ```bash
@@ -480,7 +480,7 @@ Run:
 ```
 Expected: `BUILD SUCCESSFUL`.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add securityguard/tools/generate_guard_texture.py \
@@ -503,7 +503,7 @@ EOF
 - Modify: `securityguard/tools/generate_guard_texture.py` (replace `paint_uniform_shading`)
 - Modify: `securityguard/src/main/resources/assets/securityguard/textures/entity/security_guard.png` (regenerated)
 
-- [ ] **Step 1: Implement `paint_uniform_shading`**
+- [x] **Step 1: Implement `paint_uniform_shading`**
 
 Open `securityguard/tools/generate_guard_texture.py`. Find:
 
@@ -559,7 +559,7 @@ def paint_uniform_shading(img: Image.Image) -> None:
         pixel(img, x, y1 - 1, GOLD)
 ```
 
-- [ ] **Step 2: Run the script**
+- [x] **Step 2: Run the script**
 
 Run:
 ```bash
@@ -567,7 +567,7 @@ python3 securityguard/tools/generate_guard_texture.py
 ```
 Expected: `Wrote ...security_guard.png`.
 
-- [ ] **Step 3: Build**
+- [x] **Step 3: Build**
 
 Run:
 ```bash
@@ -575,7 +575,7 @@ Run:
 ```
 Expected: `BUILD SUCCESSFUL`.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add securityguard/tools/generate_guard_texture.py \
@@ -599,7 +599,7 @@ EOF
 - Modify: `securityguard/tools/generate_guard_texture.py` (replace `paint_shield`)
 - Modify: `securityguard/src/main/resources/assets/securityguard/textures/entity/security_guard.png` (regenerated)
 
-- [ ] **Step 1: Implement `paint_shield`**
+- [x] **Step 1: Implement `paint_shield`**
 
 Open `securityguard/tools/generate_guard_texture.py`. Find:
 
@@ -648,7 +648,7 @@ def paint_shield(img: Image.Image) -> None:
     pixel(img, panel_x + sx + 2, panel_y + sy + 2, GOLD_SHADOW)
 ```
 
-- [ ] **Step 2: Run the script**
+- [x] **Step 2: Run the script**
 
 Run:
 ```bash
@@ -656,7 +656,7 @@ python3 securityguard/tools/generate_guard_texture.py
 ```
 Expected: `Wrote ...security_guard.png`.
 
-- [ ] **Step 3: Build**
+- [x] **Step 3: Build**
 
 Run:
 ```bash
@@ -664,7 +664,7 @@ Run:
 ```
 Expected: `BUILD SUCCESSFUL`.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add securityguard/tools/generate_guard_texture.py \
@@ -686,7 +686,7 @@ EOF
 **Files:**
 - Create: `securityguard/tools/README.md`
 
-- [ ] **Step 1: Create the README**
+- [x] **Step 1: Create the README**
 
 Create file `securityguard/tools/README.md` with:
 
@@ -716,7 +716,7 @@ python3 -m pip install --user Pillow
 ```
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add securityguard/tools/README.md
@@ -735,7 +735,7 @@ EOF
 
 **Files:** none modified.
 
-- [ ] **Step 1: Confirm re-running the generator produces no diff**
+- [x] **Step 1: Confirm re-running the generator produces no diff**
 
 Run:
 ```bash
@@ -744,7 +744,7 @@ git status securityguard/src/main/resources/assets/securityguard/textures/entity
 ```
 Expected: `git status` reports a clean working tree (or at most "nothing to commit, working tree clean"). If the PNG changed, the generator is non-deterministic — investigate before continuing.
 
-- [ ] **Step 2: No commit. Verification only.**
+- [x] **Step 2: No commit. Verification only.**
 
 If the PNG drifts, common causes:
 - Pillow version differences in PNG metadata (the `optimize=True` flag should be stable across versions but not guaranteed).
