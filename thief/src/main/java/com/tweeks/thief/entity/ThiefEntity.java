@@ -12,10 +12,12 @@ import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.ContainerUser;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.monster.CrossbowAttackMob;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.ContainerOpenersCounter;
 import net.minecraft.world.level.storage.ValueInput;
@@ -30,7 +32,7 @@ import java.util.Optional;
  * {@link SecurityHostile#isCurrentlyHostile()} based on its current
  * {@link RevealState}, so Guards ignore disguised Thieves.
  */
-public class ThiefEntity extends PathfinderMob implements SecurityHostile, ContainerUser {
+public class ThiefEntity extends PathfinderMob implements SecurityHostile, ContainerUser, CrossbowAttackMob {
 
     private static final EntityDataAccessor<Byte> DATA_REVEAL_STATE =
         SynchedEntityData.defineId(ThiefEntity.class, EntityDataSerializers.BYTE);
@@ -156,6 +158,7 @@ public class ThiefEntity extends PathfinderMob implements SecurityHostile, Conta
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new net.minecraft.world.entity.ai.goal.FloatGoal(this));
+        this.goalSelector.addGoal(2, new com.tweeks.thief.entity.ai.FleeAndFireCrossbowGoal(this));
         this.goalSelector.addGoal(3, new com.tweeks.thief.entity.ai.BlackjackStrikeGoal(this));
         this.goalSelector.addGoal(4, new com.tweeks.thief.entity.ai.ReturnToHideoutGoal(this));
         this.goalSelector.addGoal(5, new com.tweeks.thief.entity.ai.StealFromChestGoal(this));
@@ -164,5 +167,35 @@ public class ThiefEntity extends PathfinderMob implements SecurityHostile, Conta
             net.minecraft.world.entity.player.Player.class, 8.0f));
         this.goalSelector.addGoal(8, new net.minecraft.world.entity.ai.goal.RandomLookAroundGoal(this));
         this.goalSelector.addGoal(9, new net.minecraft.world.entity.ai.goal.RandomStrollGoal(this, 0.6));
+
+        this.targetSelector.addGoal(1, new net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal(this));
+        this.targetSelector.addGoal(2, new com.tweeks.thief.entity.ai.SecretGuardTargetGoal(this));
+        this.targetSelector.addGoal(3, new net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal<>(this,
+            net.minecraft.world.entity.player.Player.class, 10, true, false,
+            (target, level) -> {
+                RevealState s = this.getRevealState();
+                return s == RevealState.REVEALED_RANGED || s == RevealState.REVEALED_MELEE;
+            }));
+    }
+
+    private boolean chargingCrossbow;
+
+    @Override
+    public void performRangedAttack(LivingEntity target, float power) {
+        this.performCrossbowAttack(this, power);
+    }
+
+    @Override
+    public void onCrossbowAttackPerformed() {
+        // Firing the crossbow blows cover — handled by reveal trigger #5 in Task 15.
+    }
+
+    @Override
+    public void setChargingCrossbow(boolean charging) {
+        this.chargingCrossbow = charging;
+    }
+
+    public boolean isChargingCrossbow() {
+        return chargingCrossbow;
     }
 }
