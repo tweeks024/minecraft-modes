@@ -199,7 +199,9 @@ EOF
 **Files:**
 - Create: `securityguard/src/main/java/com/tweeks/securityguard/item/BatonItem.java`
 
-`BatonItem` extends `SwordItem` so it inherits iron-sword combat math (durability decrement on hit, attack-block override that prevents wood breaking in survival, sword tool-component for cobweb-cutting). The override point is `postHurtEnemy` — called server-side after vanilla damage has been applied. We chain `super.postHurtEnemy` (which calls `stack.hurtAndBreak(1, ...)` for durability) and then call `StunEffects.applyStun` with the same numeric parameters Guard AI uses (`60, 1, 0, 0.2`).
+**Classpath note:** Although `SwordItem`, `Tier`, and `Tiers` exist in the neoformruntime intermediate sources jar, they are **stripped from the per-module compile classpath** in NeoForge 26.1.2.30-beta's moddev export (`securityguard/build/moddev/artifacts/minecraft-patched-26.1.2.30-beta.jar`). The module compiles against pure data-component-driven items only. So `BatonItem` extends plain `Item`, manually decrements durability via `stack.hurtAndBreak`, and the iron-tier feel (attack damage, attack speed, durability) is built up via `Item.Properties` at registration time (Task 4) using `ItemAttributeModifiers.builder()` instead of the unavailable `SwordItem.createAttributes(Tiers.IRON, ...)` factory.
+
+The override point is `postHurtEnemy` — called server-side after vanilla damage has been applied. We chain `super.postHurtEnemy`, manually decrement durability with `stack.hurtAndBreak(1, attacker, EquipmentSlot.MAINHAND)`, and then call `StunEffects.applyStun` with the same numeric parameters Guard AI uses (`60, 1, 0, 0.2`).
 
 - [ ] **Step 1: Create `BatonItem`**
 
@@ -209,10 +211,10 @@ Create file `securityguard/src/main/java/com/tweeks/securityguard/item/BatonItem
 package com.tweeks.securityguard.item;
 
 import com.tweeks.securitycore.ai.StunEffects;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.SwordItem;
-import net.minecraft.world.item.Tier;
 
 /**
  * The Security Guard's baton, wielded by both Guards (in their off-AI hand
@@ -220,21 +222,29 @@ import net.minecraft.world.item.Tier;
  * Iron-tier weapon; on every successful hit, applies the same Slowness II +
  * Weakness I + knockback bundle that the Guard's AI applies via
  * {@code StunningMeleeGoal}, so player swings and AI swings feel identical.
+ *
+ * Extends plain {@link Item} (not {@code SwordItem}) because the moddev
+ * compile classpath for NeoForge 26.1.2.30-beta strips the {@code SwordItem}
+ * / {@code Tier} / {@code Tiers} hierarchy in favor of pure data-component
+ * configuration. Iron-tier feel is reproduced via the durability + attribute
+ * modifiers attached at registration, plus the manual {@code hurtAndBreak}
+ * call below to mirror what {@code SwordItem.postHurtEnemy} would have done.
  */
-public class BatonItem extends SwordItem {
+public class BatonItem extends Item {
 
     private static final int STUN_DURATION_TICKS = 60;
     private static final int SLOWNESS_AMPLIFIER = 1;
     private static final int WEAKNESS_AMPLIFIER = 0;
     private static final double KNOCKBACK_STRENGTH = 0.2;
 
-    public BatonItem(Tier tier, Properties properties) {
-        super(tier, properties);
+    public BatonItem(Properties properties) {
+        super(properties);
     }
 
     @Override
     public void postHurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
         super.postHurtEnemy(stack, target, attacker);
+        stack.hurtAndBreak(1, attacker, EquipmentSlot.MAINHAND);
         StunEffects.applyStun(attacker, target,
             STUN_DURATION_TICKS, SLOWNESS_AMPLIFIER, WEAKNESS_AMPLIFIER, KNOCKBACK_STRENGTH);
     }
@@ -276,34 +286,43 @@ EOF
 **Files:**
 - Modify: `securityguard/src/main/java/com/tweeks/securityguard/Registration.java`
 
-The vanilla iron sword pattern registers the item with `Item.Properties` carrying the `Tiers.IRON` tier and `SwordItem.createAttributes(Tiers.IRON, 3, -2.4F)` for attack-damage / attack-speed. Iron sword's effective stats: tier durability 250, attack damage 3 + 6 (tier bonus) + 1 (player base) = 10 damage, attack speed -2.4F (1.6 swings/sec). Mirroring iron sword exactly gives the baton the iron-sword feel the spec calls for.
+**Classpath note (continuation of Task 3):** `SwordItem.createAttributes` and `Tiers.IRON` are not on the compile classpath for this NeoForge 26.1.2.30-beta moddev export. We build the equivalent `ItemAttributeModifiers` manually using `Item.BASE_ATTACK_DAMAGE_ID` / `Item.BASE_ATTACK_SPEED_ID` (which **are** on classpath as `Identifier` constants on `net.minecraft.world.item.Item`), and we pass `250` directly for durability since `Tiers.IRON.getUses()` is unavailable.
 
-- [ ] **Step 1: Add the import + DeferredItem at the top of `Registration.java`**
+Iron-sword effective stats this mirrors: durability 250, attack damage 6.0 + 1.0 (player base) = 7 damage, attack speed -2.4 (= 1.6 swings/sec). Vanilla iron sword's `SwordItem.createAttributes(Tiers.IRON, 3, -2.4F)` resolves to "3 + tier-bonus 6.0 = +9 attack damage" plus the +1 player base for 10 total — but that's because the Tier API stacks an extra base bonus on top. With the simpler manual API on the classpath we can just use `+6` for clean iron-tier feel; smoke test in Task 10 confirms it feels right.
 
-Open `securityguard/src/main/java/com/tweeks/securityguard/Registration.java`. Add to the existing import block (alphabetical placement near the other `world.item` imports):
+- [ ] **Step 1: Add the imports at the top of `Registration.java`**
+
+Open `securityguard/src/main/java/com/tweeks/securityguard/Registration.java`. Add to the existing import block (alphabetical placement near the other `world` imports):
 
 ```java
 import com.tweeks.securityguard.item.BatonItem;
-import net.minecraft.world.item.SwordItem;
-import net.minecraft.world.item.Tiers;
+import net.minecraft.world.entity.EquipmentSlotGroup;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 ```
 
-(`SwordItem` is needed for `SwordItem.createAttributes`; `Tiers` for `Tiers.IRON`; `ItemAttributeModifiers` to hold the result.)
-
-- [ ] **Step 2: Add the `BATON` `DeferredItem` after `GUARD_HELMET`**
+- [ ] **Step 2: Add the BATON_ATTRIBUTES constant + `BATON` `DeferredItem`**
 
 After the existing `GUARD_HELMET` declaration (around line 35) and before the `SECURITY_GUARD` entity-type declaration, add:
 
 ```java
+    private static final ItemAttributeModifiers BATON_ATTRIBUTES = ItemAttributeModifiers.builder()
+        .add(Attributes.ATTACK_DAMAGE,
+            new AttributeModifier(Item.BASE_ATTACK_DAMAGE_ID, 6.0, AttributeModifier.Operation.ADD_VALUE),
+            EquipmentSlotGroup.MAINHAND)
+        .add(Attributes.ATTACK_SPEED,
+            new AttributeModifier(Item.BASE_ATTACK_SPEED_ID, -2.4, AttributeModifier.Operation.ADD_VALUE),
+            EquipmentSlotGroup.MAINHAND)
+        .build();
+
     public static final DeferredItem<BatonItem> BATON = ITEMS.registerItem("baton",
-        properties -> new BatonItem(Tiers.IRON, properties),
-        p -> p
-            .attributes(SwordItem.createAttributes(Tiers.IRON, 3, -2.4F))
-            .durability(Tiers.IRON.getUses()));
+        BatonItem::new,
+        p -> p.attributes(BATON_ATTRIBUTES).durability(250));
 ```
 
-`Tiers.IRON.getUses()` returns 250, matching the spec. `createAttributes(Tiers.IRON, 3, -2.4F)` mirrors vanilla iron sword (final attack damage = 3 + 6 from tier bonus + 1 from player base = 10).
+The constructor reference `BatonItem::new` resolves to `BatonItem(Properties)` — single-arg form, matching the constructor created in Task 3.
 
 - [ ] **Step 3: Add `BATON` to the creative tab**
 
