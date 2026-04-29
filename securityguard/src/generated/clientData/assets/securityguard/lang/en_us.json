@@ -1,0 +1,6 @@
+{
+  "entity.securityguard.guard": "Security Guard",
+  "item.securityguard.guard_helmet": "Guard Helmet",
+  "item.securityguard.guard_spawn_egg": "Security Guard Spawn Egg",
+  "itemGroup.securityguard": "Security Guard"
+}

@@ -32,8 +32,9 @@ public final class Registration {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_TABS =
         DeferredRegister.create(Registries.CREATIVE_MODE_TAB, SecurityGuardMod.MOD_ID);
 
-    public static final DeferredItem<GuardHelmetItem> GUARD_HELMET = ITEMS.register("guard_helmet",
-        () -> new GuardHelmetItem(new Item.Properties().stacksTo(64)));
+    public static final DeferredItem<GuardHelmetItem> GUARD_HELMET = ITEMS.registerItem("guard_helmet",
+        GuardHelmetItem::new,
+        p -> p.stacksTo(64));
 
     public static final DeferredHolder<EntityType<?>, EntityType<SecurityGuardEntity>> SECURITY_GUARD =
         ENTITY_TYPES.register("guard", () -> EntityType.Builder.<SecurityGuardEntity>of(
@@ -43,8 +44,9 @@ public final class Registration {
             .build(ResourceKey.create(Registries.ENTITY_TYPE,
                 Identifier.fromNamespaceAndPath(SecurityGuardMod.MOD_ID, "guard"))));
 
-    public static final DeferredItem<SpawnEggItem> GUARD_SPAWN_EGG = ITEMS.register("guard_spawn_egg",
-        () -> new SpawnEggItem(new Item.Properties().spawnEgg(SECURITY_GUARD.get())));
+    public static final DeferredItem<SpawnEggItem> GUARD_SPAWN_EGG = ITEMS.registerItem("guard_spawn_egg",
+        SpawnEggItem::new,
+        p -> p.spawnEgg(SECURITY_GUARD.get()));
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> SECURITY_GUARD_TAB =
         CREATIVE_TABS.register("main", () ->
