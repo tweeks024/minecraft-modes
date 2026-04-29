@@ -55,7 +55,7 @@ securityguard/src/main/java/com/tweeks/securityguard/client/renderer/BatonHeldLa
 
 **Files:** none modified.
 
-- [ ] **Step 1: Run the existing build and test suite to confirm a clean starting point**
+- [x] **Step 1: Run the existing build and test suite to confirm a clean starting point**
 
 Run:
 ```bash
@@ -63,7 +63,7 @@ Run:
 ```
 Expected: `BUILD SUCCESSFUL`. The artifact `securityguard/build/libs/securityguard-0.1.0.jar` exists.
 
-- [ ] **Step 2: Run the existing JUnit tests**
+- [x] **Step 2: Run the existing JUnit tests**
 
 Run:
 ```bash
@@ -71,7 +71,7 @@ Run:
 ```
 Expected: `BUILD SUCCESSFUL`. All `SpawnPatternTest` cases pass.
 
-- [ ] **Step 3: Note the baseline in the commit log for reference**
+- [x] **Step 3: Note the baseline in the commit log for reference**
 
 No file changes; no commit. This task only verifies the starting state. If either step fails, **stop and fix before proceeding** — every subsequent task assumes a green baseline.
 
@@ -83,7 +83,7 @@ No file changes; no commit. This task only verifies the starting state. If eithe
 - Modify: `gradle.properties` (root)
 - Modify: `securityguard/gradle.properties`
 
-- [ ] **Step 1: Add Minecraft/NeoForge version coordinates to root `gradle.properties`**
+- [x] **Step 1: Add Minecraft/NeoForge version coordinates to root `gradle.properties`**
 
 Append to `gradle.properties` (repo root):
 ```properties
@@ -95,7 +95,7 @@ minecraft_version_range=[26.1.2]
 neo_version=26.1.2.30-beta
 ```
 
-- [ ] **Step 2: Remove the same three properties from `securityguard/gradle.properties`**
+- [x] **Step 2: Remove the same three properties from `securityguard/gradle.properties`**
 
 Open `securityguard/gradle.properties`. Delete lines:
 ```properties
@@ -108,7 +108,7 @@ neo_version=26.1.2.30-beta
 
 The remaining file should keep only the JVM args at the top and the `## Mod Properties` block at the bottom (`mod_id`, `mod_name`, `mod_license`, `mod_version`, `mod_group_id`).
 
-- [ ] **Step 3: Verify gradle still resolves the properties**
+- [x] **Step 3: Verify gradle still resolves the properties**
 
 Run:
 ```bash
@@ -123,7 +123,7 @@ neo_version: 26.1.2.30-beta
 
 (Subprojects automatically inherit properties from the root `gradle.properties` — no code change needed in `securityguard/build.gradle`.)
 
-- [ ] **Step 4: Confirm `securityguard` still builds with hoisted properties**
+- [x] **Step 4: Confirm `securityguard` still builds with hoisted properties**
 
 Run:
 ```bash
@@ -131,7 +131,7 @@ Run:
 ```
 Expected: `BUILD SUCCESSFUL`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add gradle.properties securityguard/gradle.properties
@@ -157,7 +157,7 @@ EOF
 - Create: `securitycore/src/main/java/com/tweeks/securitycore/SecurityCoreMod.java`
 - Modify: `settings.gradle`
 
-- [ ] **Step 1: Create the directory tree**
+- [x] **Step 1: Create the directory tree**
 
 Run:
 ```bash
@@ -166,7 +166,7 @@ mkdir -p securitycore/src/main/templates/META-INF
 mkdir -p securitycore/src/main/resources
 ```
 
-- [ ] **Step 2: Create `securitycore/gradle.properties`**
+- [x] **Step 2: Create `securitycore/gradle.properties`**
 
 Create file `securitycore/gradle.properties` with:
 ```properties
@@ -178,7 +178,7 @@ mod_version=0.1.0
 mod_group_id=com.tweeks.securitycore
 ```
 
-- [ ] **Step 3: Create `securitycore/build.gradle`**
+- [x] **Step 3: Create `securitycore/build.gradle`**
 
 Create file `securitycore/build.gradle` with the same structure as `securityguard/build.gradle`. Full content:
 
@@ -318,7 +318,7 @@ idea {
 }
 ```
 
-- [ ] **Step 4: Create the mod metadata template**
+- [x] **Step 4: Create the mod metadata template**
 
 Create file `securitycore/src/main/templates/META-INF/neoforge.mods.toml` with:
 
@@ -355,7 +355,7 @@ reusable AI/client classes consumed by Security Pack mods.
 
 (The `securityguard` template is missing the `modLoader="javafml"` line at the top — that may be inherited from defaults. Keep this template explicit; if you find later that the existing `securityguard` template works without it, you can remove from this one too.)
 
-- [ ] **Step 5: Verify `modLoader` line is needed by checking `securityguard`'s working template**
+- [x] **Step 5: Verify `modLoader` line is needed by checking `securityguard`'s working template**
 
 Run:
 ```bash
@@ -364,7 +364,7 @@ head -5 securityguard/src/main/templates/META-INF/neoforge.mods.toml
 
 If the first line is `license="${mod_license}"` (no `modLoader` line), then `modLoader` is supplied automatically by the moddev plugin and you should **remove the `modLoader="javafml"` and `loaderVersion="[1,)"` lines from the new `securitycore` template** to match.
 
-- [ ] **Step 6: Create the empty mod entrypoint**
+- [x] **Step 6: Create the empty mod entrypoint**
 
 Create file `securitycore/src/main/java/com/tweeks/securitycore/SecurityCoreMod.java` with:
 
@@ -388,7 +388,7 @@ public class SecurityCoreMod {
 }
 ```
 
-- [ ] **Step 7: Register `securitycore` in root `settings.gradle`**
+- [x] **Step 7: Register `securitycore` in root `settings.gradle`**
 
 Modify `settings.gradle`. Change:
 ```gradle
@@ -400,7 +400,7 @@ include 'securitycore'
 include 'securityguard'
 ```
 
-- [ ] **Step 8: Build the new module standalone**
+- [x] **Step 8: Build the new module standalone**
 
 Run:
 ```bash
@@ -410,7 +410,7 @@ Expected: `BUILD SUCCESSFUL`. A jar appears at `securitycore/build/libs/security
 
 If the build fails with a "modLoader missing" or similar mods.toml validation error, restore the `modLoader="javafml"` + `loaderVersion="[1,)"` lines at the top of the template (i.e. the alternative outcome of Step 5).
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add settings.gradle securitycore/
@@ -433,14 +433,14 @@ EOF
 - Create: `securitycore/src/main/java/com/tweeks/securitycore/api/SecurityHostile.java`
 - Create: `securitycore/src/main/java/com/tweeks/securitycore/api/SecurityAlly.java`
 
-- [ ] **Step 1: Create the api package directory**
+- [x] **Step 1: Create the api package directory**
 
 Run:
 ```bash
 mkdir -p securitycore/src/main/java/com/tweeks/securitycore/api
 ```
 
-- [ ] **Step 2: Create `SecurityHostile`**
+- [x] **Step 2: Create `SecurityHostile`**
 
 Create file `securitycore/src/main/java/com/tweeks/securitycore/api/SecurityHostile.java`:
 
@@ -458,7 +458,7 @@ public interface SecurityHostile {
 }
 ```
 
-- [ ] **Step 3: Create `SecurityAlly`**
+- [x] **Step 3: Create `SecurityAlly`**
 
 Create file `securitycore/src/main/java/com/tweeks/securitycore/api/SecurityAlly.java`:
 
@@ -476,7 +476,7 @@ public interface SecurityAlly {
 }
 ```
 
-- [ ] **Step 4: Verify the module compiles**
+- [x] **Step 4: Verify the module compiles**
 
 Run:
 ```bash
@@ -484,7 +484,7 @@ Run:
 ```
 Expected: `BUILD SUCCESSFUL`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add securitycore/src/main/java/com/tweeks/securitycore/api/
@@ -505,14 +505,14 @@ EOF
 **Files:**
 - Create: `securitycore/src/main/java/com/tweeks/securitycore/ai/StunningMeleeGoal.java`
 
-- [ ] **Step 1: Create the ai package directory**
+- [x] **Step 1: Create the ai package directory**
 
 Run:
 ```bash
 mkdir -p securitycore/src/main/java/com/tweeks/securitycore/ai
 ```
 
-- [ ] **Step 2: Create the parameterised goal**
+- [x] **Step 2: Create the parameterised goal**
 
 The original `BatonStrikeGoal` (at `securityguard/src/main/java/com/tweeks/securityguard/entity/ai/BatonStrikeGoal.java`) has hardcoded constants. The extracted version takes them as constructor parameters so both Guard's baton and Thief's blackjack can share the class.
 
@@ -586,7 +586,7 @@ public class StunningMeleeGoal extends MeleeAttackGoal {
 }
 ```
 
-- [ ] **Step 3: Verify it compiles**
+- [x] **Step 3: Verify it compiles**
 
 Run:
 ```bash
@@ -594,7 +594,7 @@ Run:
 ```
 Expected: `BUILD SUCCESSFUL`.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add securitycore/src/main/java/com/tweeks/securitycore/ai/
@@ -618,14 +618,14 @@ EOF
 **Files:**
 - Create: `securitycore/src/main/java/com/tweeks/securitycore/client/HeldItemLayer.java`
 
-- [ ] **Step 1: Create the client package directory**
+- [x] **Step 1: Create the client package directory**
 
 Run:
 ```bash
 mkdir -p securitycore/src/main/java/com/tweeks/securitycore/client
 ```
 
-- [ ] **Step 2: Create the parameterised layer**
+- [x] **Step 2: Create the parameterised layer**
 
 The original `BatonHeldLayer` hardcodes the texture, model, translation, and rotation. The extracted version takes all of them via constructor.
 
@@ -715,7 +715,7 @@ public class HeldItemLayer<M extends HumanoidModel<HumanoidRenderState>>
 }
 ```
 
-- [ ] **Step 3: Verify it compiles**
+- [x] **Step 3: Verify it compiles**
 
 Run:
 ```bash
@@ -723,7 +723,7 @@ Run:
 ```
 Expected: `BUILD SUCCESSFUL`.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add securitycore/src/main/java/com/tweeks/securitycore/client/
@@ -746,7 +746,7 @@ EOF
 - Modify: `securityguard/build.gradle`
 - Modify: `securityguard/src/main/templates/META-INF/neoforge.mods.toml`
 
-- [ ] **Step 1: Add the project dependency to `securityguard/build.gradle`**
+- [x] **Step 1: Add the project dependency to `securityguard/build.gradle`**
 
 Open `securityguard/build.gradle`. Find the existing `dependencies { ... }` block (around line 80):
 ```gradle
@@ -768,7 +768,7 @@ dependencies {
 }
 ```
 
-- [ ] **Step 2: Add `securitycore` as a required mod dependency in `securityguard`'s mods.toml**
+- [x] **Step 2: Add `securitycore` as a required mod dependency in `securityguard`'s mods.toml**
 
 Open `securityguard/src/main/templates/META-INF/neoforge.mods.toml`. Append after the existing `dependencies.${mod_id}` blocks (after the `[[dependencies.${mod_id}]]` block that declares the `minecraft` dependency):
 
@@ -782,7 +782,7 @@ Open `securityguard/src/main/templates/META-INF/neoforge.mods.toml`. Append afte
     side="BOTH"
 ```
 
-- [ ] **Step 3: Verify securityguard still compiles (it doesn't yet USE securitycore classes, but the linkage must be valid)**
+- [x] **Step 3: Verify securityguard still compiles (it doesn't yet USE securitycore classes, but the linkage must be valid)**
 
 Run:
 ```bash
@@ -790,7 +790,7 @@ Run:
 ```
 Expected: `BUILD SUCCESSFUL`.
 
-- [ ] **Step 4: Verify securityguard still builds end-to-end**
+- [x] **Step 4: Verify securityguard still builds end-to-end**
 
 Run:
 ```bash
@@ -798,7 +798,7 @@ Run:
 ```
 Expected: `BUILD SUCCESSFUL`. Existing tests pass.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add securityguard/build.gradle securityguard/src/main/templates/META-INF/neoforge.mods.toml
@@ -821,7 +821,7 @@ EOF
 - Modify: `securityguard/src/main/java/com/tweeks/securityguard/entity/SecurityGuardEntity.java`
 - Delete: `securityguard/src/main/java/com/tweeks/securityguard/entity/ai/BatonStrikeGoal.java`
 
-- [ ] **Step 0: Sanity-check that `BatonStrikeGoal` only overrides `checkAndPerformAttack`**
+- [x] **Step 0: Sanity-check that `BatonStrikeGoal` only overrides `checkAndPerformAttack`**
 
 Run:
 ```bash
@@ -829,7 +829,7 @@ grep -n "@Override" securityguard/src/main/java/com/tweeks/securityguard/entity/
 ```
 Expected: exactly one `@Override` annotation (on `checkAndPerformAttack`). If you find others (`canUse`, `canContinueToUse`, `tick`, `start`, `stop`), **stop and port them into `StunningMeleeGoal` first** — the extracted class must preserve all original behavior. The current `StunningMeleeGoal` only carries the `checkAndPerformAttack` override; additional overrides would silently regress Guard combat.
 
-- [ ] **Step 1: Update `SecurityGuardEntity` to use `StunningMeleeGoal` from core**
+- [x] **Step 1: Update `SecurityGuardEntity` to use `StunningMeleeGoal` from core**
 
 Open `securityguard/src/main/java/com/tweeks/securityguard/entity/SecurityGuardEntity.java`. Find the goal-registration line (line 31):
 ```java
@@ -849,7 +849,7 @@ The numeric arguments preserve the original `BatonStrikeGoal` behavior exactly:
 - `0` weakness amplifier = Weakness I (was `WEAKNESS_AMPLIFIER`)
 - `0.2` knockback strength (was `KNOCKBACK_STRENGTH`)
 
-- [ ] **Step 2: Build to confirm the swap compiles**
+- [x] **Step 2: Build to confirm the swap compiles**
 
 Run:
 ```bash
@@ -857,7 +857,7 @@ Run:
 ```
 Expected: `BUILD SUCCESSFUL`.
 
-- [ ] **Step 3: Delete the original `BatonStrikeGoal.java`**
+- [x] **Step 3: Delete the original `BatonStrikeGoal.java`**
 
 Run:
 ```bash
@@ -866,7 +866,7 @@ git rm securityguard/src/main/java/com/tweeks/securityguard/entity/ai/BatonStrik
 
 (If the directory `securityguard/src/main/java/com/tweeks/securityguard/entity/ai/` becomes empty after this delete, leave the empty directory — git ignores it and we don't want stray rmdir commands.)
 
-- [ ] **Step 4: Build the whole securityguard module to confirm nothing else referenced the deleted class**
+- [x] **Step 4: Build the whole securityguard module to confirm nothing else referenced the deleted class**
 
 Run:
 ```bash
@@ -874,7 +874,7 @@ Run:
 ```
 Expected: `BUILD SUCCESSFUL`. Existing tests pass.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add securityguard/src/main/java/com/tweeks/securityguard/entity/SecurityGuardEntity.java
@@ -897,7 +897,7 @@ EOF
 - Modify: `securityguard/src/main/java/com/tweeks/securityguard/client/renderer/SecurityGuardRenderer.java`
 - Delete: `securityguard/src/main/java/com/tweeks/securityguard/client/renderer/BatonHeldLayer.java`
 
-- [ ] **Step 1: Update `SecurityGuardRenderer` to construct `HeldItemLayer` directly**
+- [x] **Step 1: Update `SecurityGuardRenderer` to construct `HeldItemLayer` directly**
 
 Open `securityguard/src/main/java/com/tweeks/securityguard/client/renderer/SecurityGuardRenderer.java`. Replace the entire file content with:
 
@@ -947,7 +947,7 @@ public class SecurityGuardRenderer
 
 The translation `(-0.0625f, 0.625f, 0.0f)` and rotation `180.0f` come directly from the original `BatonHeldLayer.submit()` (was `BatonHeldLayer.java:38-39`).
 
-- [ ] **Step 2: Build to confirm it compiles**
+- [x] **Step 2: Build to confirm it compiles**
 
 Run:
 ```bash
@@ -955,14 +955,14 @@ Run:
 ```
 Expected: `BUILD SUCCESSFUL`.
 
-- [ ] **Step 3: Delete the original `BatonHeldLayer.java`**
+- [x] **Step 3: Delete the original `BatonHeldLayer.java`**
 
 Run:
 ```bash
 git rm securityguard/src/main/java/com/tweeks/securityguard/client/renderer/BatonHeldLayer.java
 ```
 
-- [ ] **Step 4: Build the whole module to confirm nothing else referenced it**
+- [x] **Step 4: Build the whole module to confirm nothing else referenced it**
 
 Run:
 ```bash
@@ -970,7 +970,7 @@ Run:
 ```
 Expected: `BUILD SUCCESSFUL`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add securityguard/src/main/java/com/tweeks/securityguard/client/renderer/SecurityGuardRenderer.java
@@ -992,7 +992,7 @@ EOF
 **Files:**
 - Modify: `securityguard/src/main/java/com/tweeks/securityguard/entity/SecurityGuardEntity.java`
 
-- [ ] **Step 1: Broaden the target predicate**
+- [x] **Step 1: Broaden the target predicate**
 
 Open `securityguard/src/main/java/com/tweeks/securityguard/entity/SecurityGuardEntity.java`. Find the inner class `GuardTargetHostilesGoal` (line 68-75):
 
@@ -1023,7 +1023,7 @@ public static class GuardTargetHostilesGoal
 
 (`SecurityHostile` mobs do NOT get the Creeper exclusion — that exclusion exists because Creepers explode when nearby, and our mods control which entities implement `SecurityHostile`, so we don't need defensive filtering there.)
 
-- [ ] **Step 2: Build**
+- [x] **Step 2: Build**
 
 Run:
 ```bash
@@ -1031,7 +1031,7 @@ Run:
 ```
 Expected: `BUILD SUCCESSFUL`. Existing tests still pass.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add securityguard/src/main/java/com/tweeks/securityguard/entity/SecurityGuardEntity.java
@@ -1057,7 +1057,7 @@ EOF
 
 **Why one-way only:** `:securityguard` already declares `implementation project(':securitycore')`, so gradle evaluates `:securitycore` while configuring `:securityguard` — adding the second mod entry to `:securityguard`'s `mods` block is safe. The reverse (adding `:securityguard`'s source set into `:securitycore`'s `mods` block) creates a configuration-time cycle since `:securityguard` is already mid-configuration via the project dep. Devs launch dev clients from `:securityguard:runClient` — the canonical command — and that loads both mods.
 
-- [ ] **Step 1: Add a second `ModModel` entry to `securityguard/build.gradle`'s `mods` block**
+- [x] **Step 1: Add a second `ModModel` entry to `securityguard/build.gradle`'s `mods` block**
 
 Open `securityguard/build.gradle`. Find the `mods { ... }` block inside `neoForge { ... }` (around line 69-72). It currently contains a single entry:
 
@@ -1086,7 +1086,7 @@ Do **not** modify `securitycore/build.gradle` for this task — see "Why one-way
 
 This single change wires `securitycore`'s main source set into every run defined in `securityguard` (client/server/clientData/serverData/gameTestServer) automatically.
 
-- [ ] **Step 2: Verify the configuration is valid by triggering a tasks listing (cheap dry run)**
+- [x] **Step 2: Verify the configuration is valid by triggering a tasks listing (cheap dry run)**
 
 Run:
 ```bash
@@ -1094,7 +1094,7 @@ Run:
 ```
 Expected: prints `config OK`. Any gradle error means the syntax is wrong; recheck spelling.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add securityguard/build.gradle
@@ -1123,7 +1123,7 @@ EOF
 
 **Files:** none modified.
 
-- [ ] **Step 1: Build all modules**
+- [x] **Step 1: Build all modules**
 
 Run:
 ```bash
@@ -1131,7 +1131,7 @@ Run:
 ```
 Expected: `BUILD SUCCESSFUL`. Both `securitycore-0.1.0.jar` and `securityguard-0.1.0.jar` exist under `*/build/libs/`.
 
-- [ ] **Step 2: Run the test suite**
+- [x] **Step 2: Run the test suite**
 
 Run:
 ```bash
@@ -1139,7 +1139,7 @@ Run:
 ```
 Expected: `BUILD SUCCESSFUL`. The `SpawnPatternTest` cases (5 tests) all pass.
 
-- [ ] **Step 3: Re-run securityguard datagen to confirm it still produces identical output**
+- [x] **Step 3: Re-run securityguard datagen to confirm it still produces identical output**
 
 The repo already contains generated resources at `securityguard/src/generated/`. Re-running datagen and diffing against git is the cleanest "no behavior change" check for the refactor.
 
@@ -1157,7 +1157,7 @@ git checkout -- securityguard/src/generated/serverData/data/
 ```
 And investigate why datagen output drifted (probably a code change broke a provider).
 
-- [ ] **Step 4: No commit needed for verification**
+- [x] **Step 4: No commit needed for verification**
 
 Verification only. If everything passed, proceed to Task 13 (manual smoke test).
 
@@ -1214,7 +1214,7 @@ Verification only. If both smoke tests pass, the restructure is complete.
 **Files:**
 - Modify: `hoto.md` (existing how-to-install doc)
 
-- [ ] **Step 1: Update `hoto.md` to reflect the new jar layout**
+- [x] **Step 1: Update `hoto.md` to reflect the new jar layout**
 
 Open `hoto.md`. The existing instructions reference `securityguard/build/libs/securityguard-0.1.0.jar` as the only artifact. After this restructure, BOTH `securitycore-0.1.0.jar` AND `securityguard-0.1.0.jar` must be installed.
 
@@ -1231,7 +1231,7 @@ cp securityguard/build/libs/securityguard-0.1.0.jar ~/Library/Application\ Suppo
 
 And add a sentence above explaining: "The Security Guard mod now requires the Security Core library mod. Install both jars."
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add hoto.md
@@ -1250,7 +1250,7 @@ EOF
 
 **Files:** none modified.
 
-- [ ] **Step 1: One final clean build from scratch**
+- [x] **Step 1: One final clean build from scratch**
 
 Run:
 ```bash
@@ -1258,11 +1258,11 @@ Run:
 ```
 Expected: `BUILD SUCCESSFUL`. Both jars rebuild from a fresh state.
 
-- [ ] **Step 2: Confirm the plan checkbox state in this file**
+- [x] **Step 2: Confirm the plan checkbox state in this file**
 
 Open `docs/superpowers/plans/2026-04-29-multi-module-restructure.md`. Verify every `- [ ]` step is now `- [x]`. (If executing via subagent-driven-development, the orchestrator handles this; if executing inline, mark them by hand.)
 
-- [ ] **Step 3: Done — no further commit. Move on to writing the Thief mob plan.**
+- [x] **Step 3: Done — no further commit. Move on to writing the Thief mob plan.**
 
 The next step in the project is to invoke the brainstorming/writing-plans flow again for the Thief mob itself, building on top of this restructured base. The Thief plan was deliberately scoped out of this plan to keep both PRs focused.
 
