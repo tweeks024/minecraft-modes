@@ -34,9 +34,9 @@
             {
               "add": false,
               "count": {
-                "type": "uniform",
                 "max": 2.0,
-                "min": 0.0
+                "min": 0.0,
+                "type": "uniform"
               },
               "function": "set_count"
             }

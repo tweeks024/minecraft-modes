@@ -87,7 +87,7 @@ class LootTableTransform(
         val out = buildJsonObject {
             put("pools", translatedPools)
         }
-        return JSON.encodeToString(JsonElement.serializer(), out) + "\n"
+        return JsonFormat.PRETTY.encodeToString(JsonElement.serializer(), out) + "\n"
     }
 
     private fun translatePool(pool: JsonObject): JsonObject = buildJsonObject {
@@ -120,7 +120,8 @@ class LootTableTransform(
     }
 
     private fun translateFunction(fn: JsonObject): JsonObject = buildJsonObject {
-        for ((k, v) in fn) {
+        // Sort keys so output is byte-stable regardless of source key order.
+        for ((k, v) in fn.entries.sortedBy { it.key }) {
             when {
                 k == "function" && v is JsonPrimitive ->
                     put("function", JsonPrimitive(dropMinecraftPrefix(v.content)))
@@ -139,27 +140,25 @@ class LootTableTransform(
      * (notably item ids in `name`) are preserved.
      */
     private fun stripMinecraftNamespaces(elem: JsonElement): JsonElement = when (elem) {
-        is JsonObject -> JsonObject(
-            elem.mapValues { (k, v) ->
-                if (v is JsonPrimitive && v.contentOrNull != null &&
-                    (k == "condition" || k == "function" || k == "type") &&
-                    v.content.startsWith("minecraft:")
-                ) {
-                    JsonPrimitive(v.content.removePrefix("minecraft:"))
-                } else {
-                    stripMinecraftNamespaces(v)
+        is JsonObject -> {
+            // Sort keys for byte-stable output regardless of source order.
+            val sorted = elem.entries.sortedBy { it.key }
+            buildJsonObject {
+                for ((k, v) in sorted) {
+                    val transformed: JsonElement =
+                        if (v is JsonPrimitive && v.contentOrNull != null &&
+                            (k == "condition" || k == "function" || k == "type") &&
+                            v.content.startsWith("minecraft:")
+                        ) {
+                            JsonPrimitive(v.content.removePrefix("minecraft:"))
+                        } else {
+                            stripMinecraftNamespaces(v)
+                        }
+                    put(k, transformed)
                 }
             }
-        )
+        }
         is JsonArray -> JsonArray(elem.map { stripMinecraftNamespaces(it) })
         else -> elem
-    }
-
-    companion object {
-        @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
-        val JSON: Json = Json {
-            prettyPrint = true
-            prettyPrintIndent = "  "
-        }
     }
 }
