@@ -1,0 +1,39 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Security Core (Resource Pack)",
+    "description": "Shared interfaces and helpers for the Security Pack mod series.\nProvides marker interfaces (SecurityAlly, SecurityHostile) and\nreusable AI/client classes consumed by Security Pack mods.",
+    "uuid": "389f75f3-8ab3-5ddf-b20e-9d214816bbc9",
+    "version": [
+      1,
+      0,
+      0
+    ],
+    "min_engine_version": [
+      1,
+      21,
+      80
+    ]
+  },
+  "modules": [
+    {
+      "type": "resources",
+      "uuid": "5168c509-8739-5c85-ad64-9efc8f8eea8e",
+      "version": [
+        1,
+        0,
+        0
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "8cbe1225-3a59-5939-ac01-d69cf7308da0",
+      "version": [
+        1,
+        0,
+        0
+      ]
+    }
+  ]
+}

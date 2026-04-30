@@ -1,0 +1,67 @@
+{
+  "pools": [
+    {
+      "rolls": 1.0,
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "item",
+          "name": "minecraft:emerald",
+          "weight": 50,
+          "functions": [
+            {
+              "add": false,
+              "count": 1.0,
+              "function": "set_count"
+            }
+          ]
+        },
+        {
+          "type": "empty",
+          "weight": 50
+        }
+      ]
+    },
+    {
+      "rolls": 1.0,
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "item",
+          "name": "minecraft:arrow",
+          "weight": 60,
+          "functions": [
+            {
+              "add": false,
+              "count": {
+                "max": 2.0,
+                "min": 0.0,
+                "type": "uniform"
+              },
+              "function": "set_count"
+            }
+          ]
+        },
+        {
+          "type": "empty",
+          "weight": 40
+        }
+      ]
+    },
+    {
+      "rolls": 1.0,
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "item",
+          "name": "thief:blackjack",
+          "weight": 25
+        },
+        {
+          "type": "empty",
+          "weight": 75
+        }
+      ]
+    }
+  ]
+}

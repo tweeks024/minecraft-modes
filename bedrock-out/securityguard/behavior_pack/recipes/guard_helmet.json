@@ -1,0 +1,26 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "securityguard:guard_helmet"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      " I ",
+      "IDI"
+    ],
+    "key": {
+      "D": {
+        "item": "minecraft:blue_dye"
+      },
+      "I": {
+        "item": "minecraft:iron_ingot"
+      }
+    },
+    "result": {
+      "item": "securityguard:guard_helmet"
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "resource_pack_name": "creeperskin",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "creeperskin:creeper_boots": {
+      "textures": "textures/items/creeper_boots"
+    },
+    "creeperskin:creeper_chestplate": {
+      "textures": "textures/items/creeper_chestplate"
+    },
+    "creeperskin:creeper_helmet": {
+      "textures": "textures/items/creeper_helmet"
+    },
+    "creeperskin:creeper_leggings": {
+      "textures": "textures/items/creeper_leggings"
+    }
+  }
+}
