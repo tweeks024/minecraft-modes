@@ -1,0 +1,241 @@
+{
+	"meta": {
+		"format_version": "5.0",
+		"model_format": "modded_entity",
+		"box_uv": true
+	},
+	"name": "creeper_armor_leggings",
+	"model_identifier": "",
+	"modded_entity_entity_class": "",
+	"modded_entity_version": "1.21",
+	"modded_entity_flip_y": true,
+	"visible_box": [
+		1,
+		1,
+		0
+	],
+	"variable_placeholders": "",
+	"variable_placeholder_buttons": [],
+	"timeline_setups": [],
+	"unhandled_root_fields": {},
+	"resolution": {
+		"width": 64,
+		"height": 32
+	},
+	"elements": [
+		{
+			"name": "right_leg",
+			"from": [
+				-3.9,
+				0,
+				-2
+			],
+			"to": [
+				0.1,
+				12,
+				2
+			],
+			"origin": [
+				-1.9,
+				12,
+				0
+			],
+			"autouv": 0,
+			"box_uv": true,
+			"uv_offset": [
+				0,
+				16
+			],
+			"rotation": null,
+			"rescale": null,
+			"locked": false,
+			"render_order": "default",
+			"export": true,
+			"scope": 0,
+			"allow_mirror_modeling": true,
+			"color": 0,
+			"type": "cube",
+			"uuid": "b3993cc2-4fc2-4303-aa99-917168b28017",
+			"faces": {
+				"north": {
+					"uv": [
+						4,
+						20,
+						8.0,
+						32
+					],
+					"texture": 0
+				},
+				"east": {
+					"uv": [
+						0,
+						20,
+						4,
+						32
+					],
+					"texture": 0
+				},
+				"south": {
+					"uv": [
+						12.0,
+						20,
+						16.0,
+						32
+					],
+					"texture": 0
+				},
+				"west": {
+					"uv": [
+						8.0,
+						20,
+						12.0,
+						32
+					],
+					"texture": 0
+				},
+				"up": {
+					"uv": [
+						8.0,
+						20,
+						4,
+						16
+					],
+					"texture": 0
+				},
+				"down": {
+					"uv": [
+						12.0,
+						20,
+						8.0,
+						16
+					],
+					"texture": 0
+				}
+			}
+		},
+		{
+			"name": "left_leg",
+			"from": [
+				-0.1,
+				0,
+				-2
+			],
+			"to": [
+				3.9,
+				12,
+				2
+			],
+			"origin": [
+				1.9,
+				12,
+				0
+			],
+			"autouv": 0,
+			"box_uv": true,
+			"uv_offset": [
+				0,
+				16
+			],
+			"rotation": null,
+			"rescale": null,
+			"locked": false,
+			"render_order": "default",
+			"export": true,
+			"scope": 0,
+			"allow_mirror_modeling": true,
+			"color": 0,
+			"type": "cube",
+			"uuid": "d32945b7-97c2-49b8-8325-910d5c193bf7",
+			"faces": {
+				"north": {
+					"uv": [
+						4,
+						20,
+						8.0,
+						32
+					],
+					"texture": 0
+				},
+				"east": {
+					"uv": [
+						0,
+						20,
+						4,
+						32
+					],
+					"texture": 0
+				},
+				"south": {
+					"uv": [
+						12.0,
+						20,
+						16.0,
+						32
+					],
+					"texture": 0
+				},
+				"west": {
+					"uv": [
+						8.0,
+						20,
+						12.0,
+						32
+					],
+					"texture": 0
+				},
+				"up": {
+					"uv": [
+						8.0,
+						20,
+						4,
+						16
+					],
+					"texture": 0
+				},
+				"down": {
+					"uv": [
+						12.0,
+						20,
+						8.0,
+						16
+					],
+					"texture": 0
+				}
+			}
+		}
+	],
+	"groups": [],
+	"outliner": [
+		"b3993cc2-4fc2-4303-aa99-917168b28017",
+		"d32945b7-97c2-49b8-8325-910d5c193bf7"
+	],
+	"textures": [
+		{
+			"path": null,
+			"name": "creeper.png",
+			"folder": "entity/equipment/humanoid_leggings",
+			"namespace": "creeperskin",
+			"id": "0",
+			"particle": false,
+			"render_mode": "default",
+			"render_sides": "auto",
+			"frame_time": 1,
+			"frame_order_type": "loop",
+			"frame_order": "",
+			"frame_interpolate": false,
+			"visible": true,
+			"internal": true,
+			"saved": true,
+			"uuid": "685fe24c-89ea-464f-ac77-02c2c606a7a2",
+			"relative_path": "../src/main/resources/assets/creeperskin/textures/entity/equipment/humanoid_leggings/creeper.png",
+			"use_as_default": false,
+			"layers_enabled": false,
+			"sync_to_project": "",
+			"width": 64,
+			"height": 32,
+			"uv_width": 64,
+			"uv_height": 32,
+			"source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAgCAYAAACinX6EAAAAT0lEQVR4nOXOMQEAIAzAsNJ//iUgE2TsaBTkzJ1HmMRJnMRJnMRJnMRJnMRJnMRJnMRJnMRJnMRJnMRJnMRJnMRJnMRJnMRJnMRJnNuBbR9aJgIAgmmnVwAAAABJRU5ErkJggg=="
+		}
+	]
+}
