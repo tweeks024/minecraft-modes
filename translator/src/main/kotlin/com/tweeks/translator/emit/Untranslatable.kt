@@ -26,6 +26,11 @@ class Untranslatable {
     private val soundSubtitleDropped = TreeMap<String, TreeSet<String>>()
     private val vanillaSoundPaths = TreeMap<String, TreeMap<String, String>>()
     private val textureCategoriesSkipped = TreeMap<String, TreeSet<String>>()
+    private val bbmodelFaceUv = TreeMap<String, TreeSet<String>>()
+    private val bbmodelLocatorSkipped = TreeMap<String, TreeSet<String>>()
+    private val bbmodelElementTypeSkipped = TreeMap<String, TreeMap<String, String>>()
+    private val bbmodelMultiDataPoint = TreeMap<String, TreeSet<String>>()
+    private val bbmodelNonLinearInterp = TreeMap<String, TreeMap<String, String>>()
 
     fun recordRecipeCategoryDropped(modId: String, recipeName: String) {
         recipeCategoryDropped.getOrPut(modId) { TreeSet() }.add(recipeName)
@@ -51,6 +56,26 @@ class Untranslatable {
         textureCategoriesSkipped.getOrPut(modId) { TreeSet() }.add(category)
     }
 
+    fun recordBbmodelFaceUv(modId: String, location: String) {
+        bbmodelFaceUv.getOrPut(modId) { TreeSet() }.add(location)
+    }
+
+    fun recordBbmodelLocatorSkipped(modId: String, location: String) {
+        bbmodelLocatorSkipped.getOrPut(modId) { TreeSet() }.add(location)
+    }
+
+    fun recordBbmodelElementTypeSkipped(modId: String, location: String, type: String) {
+        bbmodelElementTypeSkipped.getOrPut(modId) { TreeMap() }[location] = type
+    }
+
+    fun recordBbmodelMultiDataPointKeyframe(modId: String, location: String) {
+        bbmodelMultiDataPoint.getOrPut(modId) { TreeSet() }.add(location)
+    }
+
+    fun recordBbmodelNonLinearInterpolation(modId: String, location: String, interpolation: String) {
+        bbmodelNonLinearInterp.getOrPut(modId) { TreeMap() }[location] = interpolation
+    }
+
     /** Set of mod ids that have at least one recorded finding. */
     fun modsWithFindings(): Set<String> {
         val ids = TreeSet<String>()
@@ -60,6 +85,11 @@ class Untranslatable {
         ids.addAll(soundSubtitleDropped.keys)
         ids.addAll(vanillaSoundPaths.keys)
         ids.addAll(textureCategoriesSkipped.keys)
+        ids.addAll(bbmodelFaceUv.keys)
+        ids.addAll(bbmodelLocatorSkipped.keys)
+        ids.addAll(bbmodelElementTypeSkipped.keys)
+        ids.addAll(bbmodelMultiDataPoint.keys)
+        ids.addAll(bbmodelNonLinearInterp.keys)
         return ids
     }
 
@@ -129,6 +159,41 @@ class Untranslatable {
             sb.append("These top-level categories under `assets/").append(modId)
                 .append("/textures/` are not mapped to Bedrock locations by the translator. Files inside were not copied:\n\n")
             for (c in categories) sb.append("- `").append(c).append("`\n")
+            sb.append('\n')
+        }
+        bbmodelFaceUv[modId]?.takeIf { it.isNotEmpty() }?.let { items ->
+            any = true
+            sb.append("## Bbmodel face-UV translated approximately\n\n")
+            sb.append("These cubes use Blockbench's per-face UV mode. Bedrock's per-face UV is structurally similar, but the face uv-size is reconstructed as a best-effort `[x2 - x1, y2 - y1]` from Blockbench's `[x1, y1, x2, y2]` rectangle. Verify visually:\n\n")
+            for (i in items) sb.append("- `").append(i).append("`\n")
+            sb.append('\n')
+        }
+        bbmodelLocatorSkipped[modId]?.takeIf { it.isNotEmpty() }?.let { items ->
+            any = true
+            sb.append("## Bbmodel locator nodes skipped\n\n")
+            sb.append("Locator nodes are not yet translated to Bedrock locators (Phase 1b out of scope):\n\n")
+            for (i in items) sb.append("- `").append(i).append("`\n")
+            sb.append('\n')
+        }
+        bbmodelElementTypeSkipped[modId]?.takeIf { it.isNotEmpty() }?.let { items ->
+            any = true
+            sb.append("## Bbmodel element types not supported\n\n")
+            sb.append("Only cube elements are translated. These elements were skipped:\n\n")
+            for ((loc, type) in items) sb.append("- `").append(loc).append("`: type `").append(type).append("`\n")
+            sb.append('\n')
+        }
+        bbmodelMultiDataPoint[modId]?.takeIf { it.isNotEmpty() }?.let { items ->
+            any = true
+            sb.append("## Bbmodel multi-data-point keyframes\n\n")
+            sb.append("These keyframes carry multiple `data_points`. Phase 1b takes the first one and ignores the rest:\n\n")
+            for (i in items) sb.append("- `").append(i).append("`\n")
+            sb.append('\n')
+        }
+        bbmodelNonLinearInterp[modId]?.takeIf { it.isNotEmpty() }?.let { items ->
+            any = true
+            sb.append("## Bbmodel non-linear interpolation downgraded\n\n")
+            sb.append("Phase 1b emits keyframes without explicit interpolation hints (treated as linear). These keyframes used a non-linear curve in the source:\n\n")
+            for ((loc, interp) in items) sb.append("- `").append(loc).append("`: `").append(interp).append("`\n")
             sb.append('\n')
         }
 

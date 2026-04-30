@@ -1,5 +1,6 @@
 package com.tweeks.translator
 
+import com.tweeks.translator.bbmodel.BbmodelConverter
 import com.tweeks.translator.discover.ModDiscovery
 import com.tweeks.translator.discover.ModMetadata
 import com.tweeks.translator.emit.AddonWriter
@@ -76,6 +77,7 @@ fun main(args: Array<String>) {
     val soundTransform = { unt: Untranslatable -> SoundTransform(target, unt) }
     val assetCopier = { unt: Untranslatable -> AssetCopier(unt) }
     val atlasBuilder = ItemAtlasBuilder()
+    val bbmodelConverter = { unt: Untranslatable -> BbmodelConverter(target, unt) }
 
     for (mod in mods) {
         // Clean the per-mod output dir so stale files (e.g. removed/renamed
@@ -101,6 +103,7 @@ fun main(args: Array<String>) {
         soundTransform(unt).translate(mod.rootDir, mod.modId, outputRoot)
         val copyResult = assetCopier(unt).copy(mod.rootDir, mod.modId, outputRoot)
         atlasBuilder.build(mod.modId, copyResult.itemTextureShortNames, outputRoot)
+        bbmodelConverter(unt).convert(mod.modId, mod.rootDir.resolve("tools"), outputRoot)
         unt.writeFor(mod.modId, outputRoot)
 
         println("[translator] Wrote ${result.modId}: ${result.outputDir.absolutePathString()}")
