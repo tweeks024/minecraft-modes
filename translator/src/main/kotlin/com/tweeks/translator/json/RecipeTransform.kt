@@ -106,7 +106,7 @@ class RecipeTransform(
                 bedrockRecipe,
             )
         }
-        return JSON.encodeToString(JsonElement.serializer(), bedrock) + "\n"
+        return JsonFormat.PRETTY.encodeToString(JsonElement.serializer(), bedrock) + "\n"
     }
 
     private fun buildShaped(java: JsonObject, identifier: String): JsonObject = buildJsonObject {
@@ -183,12 +183,4 @@ class RecipeTransform(
         }
     }
 
-    companion object {
-        // Pretty-printed for human review and stable golden diffs.
-        @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
-        val JSON: Json = Json {
-            prettyPrint = true
-            prettyPrintIndent = "  "
-        }
-    }
 }

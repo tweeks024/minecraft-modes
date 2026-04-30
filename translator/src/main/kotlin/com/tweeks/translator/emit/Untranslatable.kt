@@ -25,6 +25,7 @@ class Untranslatable {
     private val lootRandomSequenceDropped = TreeMap<String, TreeSet<String>>()
     private val soundSubtitleDropped = TreeMap<String, TreeSet<String>>()
     private val vanillaSoundPaths = TreeMap<String, TreeMap<String, String>>()
+    private val textureCategoriesSkipped = TreeMap<String, TreeSet<String>>()
 
     fun recordRecipeCategoryDropped(modId: String, recipeName: String) {
         recipeCategoryDropped.getOrPut(modId) { TreeSet() }.add(recipeName)
@@ -46,6 +47,10 @@ class Untranslatable {
         vanillaSoundPaths.getOrPut(modId) { TreeMap() }[javaPath] = bedrockPath
     }
 
+    fun recordTextureCategorySkipped(modId: String, category: String) {
+        textureCategoriesSkipped.getOrPut(modId) { TreeSet() }.add(category)
+    }
+
     /** Set of mod ids that have at least one recorded finding. */
     fun modsWithFindings(): Set<String> {
         val ids = TreeSet<String>()
@@ -54,6 +59,7 @@ class Untranslatable {
         ids.addAll(lootRandomSequenceDropped.keys)
         ids.addAll(soundSubtitleDropped.keys)
         ids.addAll(vanillaSoundPaths.keys)
+        ids.addAll(textureCategoriesSkipped.keys)
         return ids
     }
 
@@ -115,6 +121,14 @@ class Untranslatable {
             for ((java, bedrock) in mappings) {
                 sb.append("- `").append(java).append("` → `").append(bedrock).append("`\n")
             }
+            sb.append('\n')
+        }
+        textureCategoriesSkipped[modId]?.takeIf { it.isNotEmpty() }?.let { categories ->
+            any = true
+            sb.append("## Texture categories skipped\n\n")
+            sb.append("These top-level categories under `assets/").append(modId)
+                .append("/textures/` are not mapped to Bedrock locations by the translator. Files inside were not copied:\n\n")
+            for (c in categories) sb.append("- `").append(c).append("`\n")
             sb.append('\n')
         }
 

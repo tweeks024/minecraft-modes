@@ -7,6 +7,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.add
+import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonArray
@@ -108,7 +109,7 @@ class SoundTransform(
             put("format_version", target.format_versions.sounds)
             put("sound_definitions", definitions)
         }
-        return JSON.encodeToString(JsonElement.serializer(), out) + "\n"
+        return JsonFormat.PRETTY.encodeToString(JsonElement.serializer(), out) + "\n"
     }
 
     /**
@@ -121,7 +122,7 @@ class SoundTransform(
             is JsonPrimitive -> entry.content to false
             is JsonObject -> {
                 val name = entry["name"]?.jsonPrimitive?.content ?: ""
-                val s = entry["stream"]?.jsonPrimitive?.content?.toBoolean() ?: false
+                val s = entry["stream"]?.jsonPrimitive?.booleanOrNull ?: false
                 name to s
             }
             else -> "" to false
@@ -161,13 +162,5 @@ class SoundTransform(
             untranslatable.recordVanillaSoundPath(modId, rawName, "sounds/$swapped")
         }
         return "sounds/$swapped"
-    }
-
-    companion object {
-        @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
-        val JSON: Json = Json {
-            prettyPrint = true
-            prettyPrintIndent = "  "
-        }
     }
 }

@@ -1,5 +1,6 @@
 package com.tweeks.translator.json
 
+import com.tweeks.translator.emit.Untranslatable
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
@@ -19,12 +20,15 @@ import kotlin.io.path.nameWithoutExtension
  *   textures/entity/<rel>     → resource_pack/textures/entity/<rel>
  *   textures/block/<rel>      → resource_pack/textures/blocks/<rel>
  *
- * Other top-level categories under `textures/` log a warning and are skipped.
+ * Other top-level categories under `textures/` log a warning and are recorded
+ * in `UNTRANSLATABLE.md` via [Untranslatable.recordTextureCategorySkipped].
  *
  * The list of item-texture short names collected during the walk feeds
  * [ItemAtlasBuilder] so the atlas accurately reflects what was copied.
  */
-class AssetCopier {
+class AssetCopier(
+    private val untranslatable: Untranslatable,
+) {
 
     /**
      * Result of a copy pass. `itemTextureShortNames` is the set of item PNG
@@ -61,10 +65,12 @@ class AssetCopier {
                     "entity" -> copyTreeOfPngs(categoryDir, rpDir.resolve("textures/entity"))
                     "block" -> copyTreeOfPngs(categoryDir, rpDir.resolve("textures/blocks"))
                     else -> {
+                        val category = categoryDir.fileName.toString()
                         System.err.println(
                             "[translator] Skipping unknown texture category " +
-                                "'$modId/textures/${categoryDir.fileName}'."
+                                "'$modId/textures/$category'."
                         )
+                        untranslatable.recordTextureCategorySkipped(modId, category)
                     }
                 }
             }

@@ -1,6 +1,5 @@
 package com.tweeks.translator.json
 
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
@@ -52,14 +51,6 @@ class ItemAtlasBuilder {
             )
         }
 
-        outputPath.writeText(JSON.encodeToString(JsonElement.serializer(), atlas) + "\n")
-    }
-
-    companion object {
-        @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
-        val JSON: Json = Json {
-            prettyPrint = true
-            prettyPrintIndent = "  "
-        }
+        outputPath.writeText(JsonFormat.PRETTY.encodeToString(JsonElement.serializer(), atlas) + "\n")
     }
 }
