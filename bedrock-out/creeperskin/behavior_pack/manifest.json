@@ -1,0 +1,39 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Creeper Skin (Behavior Pack)",
+    "description": "Wearable creeper-skin armor: 4-piece netherite-tier set with creeper-green\ntextures and the creeper face on the helmet. Wear all four pieces and real\nCreepers will ignore you, and creeper explosions deal zero damage.",
+    "uuid": "6eecf60d-2d73-5f89-aaa5-38982a36eac3",
+    "version": [
+      1,
+      0,
+      0
+    ],
+    "min_engine_version": [
+      1,
+      21,
+      80
+    ]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "1e680481-bcbb-50e1-b599-729d9fb77d60",
+      "version": [
+        1,
+        0,
+        0
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "312af6ae-04ca-5d97-87ec-db626fa7d13c",
+      "version": [
+        1,
+        0,
+        0
+      ]
+    }
+  ]
+}

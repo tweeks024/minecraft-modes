@@ -1,0 +1,47 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Thief (Behavior Pack)",
+    "description": "Adds a Thief mob that disguises as a villager, steals from chests, and reveals\ninto a crossbow or blackjack wielder when discovered. Part of the Security Pack.",
+    "uuid": "1d547b6e-8a97-59e2-8723-4a9da0e59b4e",
+    "version": [
+      1,
+      0,
+      0
+    ],
+    "min_engine_version": [
+      1,
+      21,
+      80
+    ]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "89595467-485d-5774-a859-0de8ed5eee08",
+      "version": [
+        1,
+        0,
+        0
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "f2c2275d-b04f-5d8e-a8df-edcbc0d07ddd",
+      "version": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "uuid": "8cbe1225-3a59-5939-ac01-d69cf7308da0",
+      "version": [
+        1,
+        0,
+        0
+      ]
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Security Guard (Behavior Pack)",
+    "description": "Adds a friendly humanoid security guard mob who defends players and villagers with a stun baton.",
+    "uuid": "0476fc0c-8c62-58d1-aceb-e20194fd7dec",
+    "version": [
+      1,
+      0,
+      0
+    ],
+    "min_engine_version": [
+      1,
+      21,
+      80
+    ]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "e0137c25-5a24-5ec8-b275-d1fc408c97f8",
+      "version": [
+        1,
+        0,
+        0
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "0777286e-f644-596a-8769-7b0998c22b0e",
+      "version": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "uuid": "8cbe1225-3a59-5939-ac01-d69cf7308da0",
+      "version": [
+        1,
+        0,
+        0
+      ]
+    }
+  ]
+}

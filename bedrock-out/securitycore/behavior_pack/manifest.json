@@ -1,0 +1,39 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Security Core (Behavior Pack)",
+    "description": "Shared interfaces and helpers for the Security Pack mod series.\nProvides marker interfaces (SecurityAlly, SecurityHostile) and\nreusable AI/client classes consumed by Security Pack mods.",
+    "uuid": "8cbe1225-3a59-5939-ac01-d69cf7308da0",
+    "version": [
+      1,
+      0,
+      0
+    ],
+    "min_engine_version": [
+      1,
+      21,
+      80
+    ]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "a3ae8c95-68b4-548c-a1c4-efe6d286dbfc",
+      "version": [
+        1,
+        0,
+        0
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "389f75f3-8ab3-5ddf-b20e-9d214816bbc9",
+      "version": [
+        1,
+        0,
+        0
+      ]
+    }
+  ]
+}

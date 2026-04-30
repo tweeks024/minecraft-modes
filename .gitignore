@@ -4,6 +4,10 @@ build/
 out/
 *.iml
 .idea/
+.kotlin/
+
+# Translator local caches (Phase 3+ source-hash cache).
+translator/.cache/
 
 # NeoForge dev
 run/
