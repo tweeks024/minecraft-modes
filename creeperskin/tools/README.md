@@ -6,16 +6,28 @@ editor for Minecraft. This directory holds the canonical Blockbench
 project files:
 
 ```
-creeper_armor_humanoid.bbmodel    # head + body + arms + boots
-                                  # uses humanoid/creeper.png (64×32)
-creeper_armor_leggings.bbmodel    # legs only
-                                  # uses humanoid_leggings/creeper.png (64×32)
+creeper_armor_helmet.bbmodel      # head cube
+creeper_armor_chestplate.bbmodel  # body + both arms
+creeper_armor_boots.bbmodel       # boot cubes (legs region of humanoid layer)
+creeper_armor_leggings.bbmodel    # leg cubes
 ```
 
-Two bbmodels because the worn armor splits across two textures: the
-`humanoid` layer renders on the helmet, chestplate, and boots; the
-`humanoid_leggings` layer renders on the leggings. Each bbmodel embeds
-the relevant PNG as base64 so it opens self-contained in Blockbench.
+One bbmodel per armor piece, so you can focus on whichever piece you're
+editing. The first three (helmet / chestplate / boots) all share the
+**same** PNG: `assets/creeperskin/textures/entity/equipment/humanoid/creeper.png`
+— that single 64×32 sheet contains the helmet, chestplate, and boots
+pixels in different UV regions. **Editing any of the three bbmodels and
+saving the texture writes to the same PNG file.** Use the per-piece
+split for visual focus, not isolation; if you want to repaint just the
+helmet face you'd open the helmet bbmodel and Blockbench will only
+show the head cube, but the underlying texture you're modifying is
+shared with chestplate and boots.
+
+The leggings bbmodel writes to a different PNG (humanoid_leggings layer):
+`assets/creeperskin/textures/entity/equipment/humanoid_leggings/creeper.png`.
+
+Each bbmodel embeds the relevant PNG as base64 so it opens self-contained
+in Blockbench.
 
 ## Workflow
 
@@ -62,11 +74,11 @@ Blockbench treats them as opaque identifiers).
   resolution 64×32 — the standard humanoid armor sheet layout. Cube
   pivots match vanilla `HumanoidModel` so the in-Blockbench preview
   matches what the game actually renders on a player wearing the armor.
-- The cubes in `creeper_armor_humanoid.bbmodel` are labelled "head /
-  body / right_arm / left_arm / right_boot / left_boot." The leg-shaped
-  cubes are labelled `boot` rather than `leg` because their UV (0, 16)
-  on the humanoid texture is the boots region; on the in-game player,
-  the same UV pixels are drawn on the boots, not the bare legs.
+- The cubes in `creeper_armor_boots.bbmodel` use UV (0, 16) on the
+  humanoid texture. That UV slot is shaped like a leg in the texture
+  but the renderer maps it onto the boots region of the in-game player,
+  which is why the cubes are named `right_boot` / `left_boot` rather
+  than `right_leg` / `left_leg`.
 - `creeperskin/build.gradle` excludes `**/*.bbmodel` from the runtime
   jar (via `processResources`), so these files live alongside the
   source but never ship with the mod.

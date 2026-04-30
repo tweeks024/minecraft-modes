@@ -2,18 +2,25 @@
 """
 Regenerates the Blockbench .bbmodel project files for :creeperskin armor.
 
-Two bbmodels are produced, one per equipment-asset layer:
+Four bbmodels are produced, one per armor item:
 
-    creeper_armor_humanoid.bbmodel  -> shows head + body + arms + boots,
-                                       textured with humanoid/creeper.png.
-                                       Edit pixels for the helmet, chest,
-                                       and boots in 3D.
+    creeper_armor_helmet.bbmodel      -> head cube,
+                                         humanoid/creeper.png
+    creeper_armor_chestplate.bbmodel  -> body + both arms,
+                                         humanoid/creeper.png
+    creeper_armor_boots.bbmodel       -> boot cubes (left + right),
+                                         humanoid/creeper.png
+    creeper_armor_leggings.bbmodel    -> leg cubes (left + right),
+                                         humanoid_leggings/creeper.png
 
-    creeper_armor_leggings.bbmodel  -> shows legs, textured with
-                                       humanoid_leggings/creeper.png. Edit
-                                       pixels for the leggings in 3D.
+The first three all read from the SAME humanoid/creeper.png because
+that PNG carries three pieces' worth of pixels (helmet UV at top-left,
+chestplate UV at center, boots UV at left of leggings row). Edit any
+of those three bbmodels and Blockbench saves to the same shared PNG;
+the per-piece split exists for visual focus, not for separate textures.
+Only the leggings bbmodel writes to a different PNG (humanoid_leggings).
 
-Each bbmodel embeds the current PNG as base64 so the file is portable —
+Each bbmodel embeds its linked PNG as base64 so the file is portable —
 Blockbench can show the texture immediately on first open. When the user
 edits and saves the texture in Blockbench (right-click thumbnail -> Save),
 the linked PNG file under src/main/resources/.../textures/entity/equipment/
@@ -40,8 +47,15 @@ RESOURCES = ROOT / "src/main/resources/assets/creeperskin"
 HUMANOID_PNG = RESOURCES / "textures/entity/equipment/humanoid/creeper.png"
 LEGGINGS_PNG = RESOURCES / "textures/entity/equipment/humanoid_leggings/creeper.png"
 
-HUMANOID_BBMODEL = TOOLS_DIR / "creeper_armor_humanoid.bbmodel"
-LEGGINGS_BBMODEL = TOOLS_DIR / "creeper_armor_leggings.bbmodel"
+HELMET_BBMODEL     = TOOLS_DIR / "creeper_armor_helmet.bbmodel"
+CHESTPLATE_BBMODEL = TOOLS_DIR / "creeper_armor_chestplate.bbmodel"
+BOOTS_BBMODEL      = TOOLS_DIR / "creeper_armor_boots.bbmodel"
+LEGGINGS_BBMODEL   = TOOLS_DIR / "creeper_armor_leggings.bbmodel"
+
+# A bbmodel that previous generator runs produced. Removed in favor of the
+# four per-piece bbmodels above. Keep this entry so re-running the script
+# also cleans up any stale combined file from an older checkout.
+LEGACY_BBMODELS = [TOOLS_DIR / "creeper_armor_humanoid.bbmodel"]
 
 # -----------------------------------------------------------------------------
 # Cube layout — matches vanilla HumanoidModel armor pivots / sizes
@@ -57,11 +71,17 @@ LEGGINGS_BBMODEL = TOOLS_DIR / "creeper_armor_leggings.bbmodel"
 #   r_leg     4 x 12 x 4  uv (0, 16)  on leggings layer
 #   l_leg     4 x 12 x 4  uv (0, 16)  on leggings layer  (mirrored)
 
-HUMANOID_CUBES = [
-    ("head",     [-4, 24, -4], [4, 32, 4], [0, 24, 0],  (0, 0)),
-    ("body",     [-4, 12, -2], [4, 24, 2], [0, 24, 0],  (16, 16)),
+HELMET_CUBES = [
+    ("head", [-4, 24, -4], [4, 32, 4], [0, 24, 0], (0, 0)),
+]
+
+CHESTPLATE_CUBES = [
+    ("body",      [-4, 12, -2], [4, 24, 2],  [0, 24, 0], (16, 16)),
     ("right_arm", [-8, 12, -2], [-4, 24, 2], [-5, 22, 0], (40, 16)),
     ("left_arm",  [4, 12, -2],  [8, 24, 2],  [5, 22, 0],  (40, 16)),
+]
+
+BOOTS_CUBES = [
     ("right_boot", [-3.9, 0, -2], [0.1, 12, 2], [-1.9, 12, 0], (0, 16)),
     ("left_boot",  [-0.1, 0, -2], [3.9, 12, 2], [1.9, 12, 0],  (0, 16)),
 ]
@@ -198,11 +218,34 @@ def main() -> None:
             f"`python3 creeperskin/tools/generate_textures.py` first."
         )
 
+    for legacy in LEGACY_BBMODELS:
+        if legacy.exists():
+            legacy.unlink()
+            print(f"removed stale {legacy.relative_to(ROOT.parent)}")
+
     write(
-        HUMANOID_BBMODEL,
+        HELMET_BBMODEL,
         build_bbmodel(
-            name="creeper_armor_humanoid",
-            cube_specs=HUMANOID_CUBES,
+            name="creeper_armor_helmet",
+            cube_specs=HELMET_CUBES,
+            png_path=HUMANOID_PNG,
+            folder="entity/equipment/humanoid",
+        ),
+    )
+    write(
+        CHESTPLATE_BBMODEL,
+        build_bbmodel(
+            name="creeper_armor_chestplate",
+            cube_specs=CHESTPLATE_CUBES,
+            png_path=HUMANOID_PNG,
+            folder="entity/equipment/humanoid",
+        ),
+    )
+    write(
+        BOOTS_BBMODEL,
+        build_bbmodel(
+            name="creeper_armor_boots",
+            cube_specs=BOOTS_CUBES,
             png_path=HUMANOID_PNG,
             folder="entity/equipment/humanoid",
         ),

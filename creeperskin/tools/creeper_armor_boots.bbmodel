@@ -4,7 +4,7 @@
 		"model_format": "modded_entity",
 		"box_uv": true
 	},
-	"name": "creeper_armor_leggings",
+	"name": "creeper_armor_boots",
 	"model_identifier": "",
 	"modded_entity_entity_class": "",
 	"modded_entity_version": "1.21",
@@ -24,7 +24,7 @@
 	},
 	"elements": [
 		{
-			"name": "right_leg",
+			"name": "right_boot",
 			"from": [
 				-3.9,
 				0,
@@ -55,7 +55,7 @@
 			"allow_mirror_modeling": true,
 			"color": 0,
 			"type": "cube",
-			"uuid": "5deda0da-1d93-435f-a033-091cbe748a4a",
+			"uuid": "4d15eb76-ec62-4890-b92e-6dc1acb21a32",
 			"faces": {
 				"north": {
 					"uv": [
@@ -114,7 +114,7 @@
 			}
 		},
 		{
-			"name": "left_leg",
+			"name": "left_boot",
 			"from": [
 				-0.1,
 				0,
@@ -145,7 +145,7 @@
 			"allow_mirror_modeling": true,
 			"color": 0,
 			"type": "cube",
-			"uuid": "5ddfcfa1-4530-46cb-97b6-a16888d4df01",
+			"uuid": "e4e6e80c-b7a0-48ea-9104-c0f095c091cb",
 			"faces": {
 				"north": {
 					"uv": [
@@ -206,14 +206,14 @@
 	],
 	"groups": [],
 	"outliner": [
-		"5deda0da-1d93-435f-a033-091cbe748a4a",
-		"5ddfcfa1-4530-46cb-97b6-a16888d4df01"
+		"4d15eb76-ec62-4890-b92e-6dc1acb21a32",
+		"e4e6e80c-b7a0-48ea-9104-c0f095c091cb"
 	],
 	"textures": [
 		{
 			"path": null,
 			"name": "creeper.png",
-			"folder": "entity/equipment/humanoid_leggings",
+			"folder": "entity/equipment/humanoid",
 			"namespace": "creeperskin",
 			"id": "0",
 			"particle": false,
@@ -226,8 +226,8 @@
 			"visible": true,
 			"internal": true,
 			"saved": true,
-			"uuid": "5b314811-1bfa-41e9-a7f3-4c00247de0de",
-			"relative_path": "../src/main/resources/assets/creeperskin/textures/entity/equipment/humanoid_leggings/creeper.png",
+			"uuid": "9e1cdb66-6e29-43c4-a9a3-9c0f3126cc8e",
+			"relative_path": "../src/main/resources/assets/creeperskin/textures/entity/equipment/humanoid/creeper.png",
 			"use_as_default": false,
 			"layers_enabled": false,
 			"sync_to_project": "",
@@ -235,7 +235,7 @@
 			"height": 32,
 			"uv_width": 64,
 			"uv_height": 32,
-			"source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAgCAYAAACinX6EAAAAT0lEQVR4nOXOMQEAIAzAsNJ//iUgE2TsaBTkzJ1HmMRJnMRJnMRJnMRJnMRJnMRJnMRJnMRJnMRJnMRJnMRJnMRJnMRJnMRJnMRJnNuBbR9aJgIAgmmnVwAAAABJRU5ErkJggg=="
+			"source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAgCAYAAACinX6EAAAAjElEQVR4nOXSywkCQRAG4bLWkyEYocl4N0Kz8MEKgggr60mc+mAOzfyH6Z7e7I6727SfWHI5Xxj5XuIkTuIkTuIkTuIkTuJcFTr4OEv1P5O47ZrQ9XT9WA8/gNn7yo8yBL8Jz02P0viTxLk2+PrzI22BxEmcxEmcxEmcxEmcxEmcxEmcxEmcv37Ar90BBzkrLAAvdfgAAAAASUVORK5CYII="
 		}
 	]
 }

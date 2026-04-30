@@ -4,7 +4,7 @@
 		"model_format": "modded_entity",
 		"box_uv": true
 	},
-	"name": "creeper_armor_humanoid",
+	"name": "creeper_armor_chestplate",
 	"model_identifier": "",
 	"modded_entity_entity_class": "",
 	"modded_entity_version": "1.21",
@@ -23,96 +23,6 @@
 		"height": 32
 	},
 	"elements": [
-		{
-			"name": "head",
-			"from": [
-				-4,
-				24,
-				-4
-			],
-			"to": [
-				4,
-				32,
-				4
-			],
-			"origin": [
-				0,
-				24,
-				0
-			],
-			"autouv": 0,
-			"box_uv": true,
-			"uv_offset": [
-				0,
-				0
-			],
-			"rotation": null,
-			"rescale": null,
-			"locked": false,
-			"render_order": "default",
-			"export": true,
-			"scope": 0,
-			"allow_mirror_modeling": true,
-			"color": 0,
-			"type": "cube",
-			"uuid": "2d142bff-7b1c-41cf-8986-f04872a59048",
-			"faces": {
-				"north": {
-					"uv": [
-						8,
-						8,
-						16,
-						16
-					],
-					"texture": 0
-				},
-				"east": {
-					"uv": [
-						0,
-						8,
-						8,
-						16
-					],
-					"texture": 0
-				},
-				"south": {
-					"uv": [
-						24,
-						8,
-						32,
-						16
-					],
-					"texture": 0
-				},
-				"west": {
-					"uv": [
-						16,
-						8,
-						24,
-						16
-					],
-					"texture": 0
-				},
-				"up": {
-					"uv": [
-						16,
-						8,
-						8,
-						0
-					],
-					"texture": 0
-				},
-				"down": {
-					"uv": [
-						24,
-						8,
-						16,
-						0
-					],
-					"texture": 0
-				}
-			}
-		},
 		{
 			"name": "body",
 			"from": [
@@ -145,7 +55,7 @@
 			"allow_mirror_modeling": true,
 			"color": 0,
 			"type": "cube",
-			"uuid": "3f660649-b7d6-41bf-8e9a-cd137d3523c5",
+			"uuid": "de8fe01d-416f-43a1-afc3-f2ce6cf2c626",
 			"faces": {
 				"north": {
 					"uv": [
@@ -235,7 +145,7 @@
 			"allow_mirror_modeling": true,
 			"color": 0,
 			"type": "cube",
-			"uuid": "68fb9846-62be-4034-9560-24151e7e7997",
+			"uuid": "80d67674-3dde-4820-95fe-0a76328e9317",
 			"faces": {
 				"north": {
 					"uv": [
@@ -325,7 +235,7 @@
 			"allow_mirror_modeling": true,
 			"color": 0,
 			"type": "cube",
-			"uuid": "c3d8b054-afa5-4a5f-a067-cfdc25113058",
+			"uuid": "dd2136d8-c98d-4089-bb08-36e8a2f36724",
 			"faces": {
 				"north": {
 					"uv": [
@@ -382,196 +292,13 @@
 					"texture": 0
 				}
 			}
-		},
-		{
-			"name": "right_boot",
-			"from": [
-				-3.9,
-				0,
-				-2
-			],
-			"to": [
-				0.1,
-				12,
-				2
-			],
-			"origin": [
-				-1.9,
-				12,
-				0
-			],
-			"autouv": 0,
-			"box_uv": true,
-			"uv_offset": [
-				0,
-				16
-			],
-			"rotation": null,
-			"rescale": null,
-			"locked": false,
-			"render_order": "default",
-			"export": true,
-			"scope": 0,
-			"allow_mirror_modeling": true,
-			"color": 0,
-			"type": "cube",
-			"uuid": "9e9fd367-63cc-4934-8250-73452c4b3e6d",
-			"faces": {
-				"north": {
-					"uv": [
-						4,
-						20,
-						8.0,
-						32
-					],
-					"texture": 0
-				},
-				"east": {
-					"uv": [
-						0,
-						20,
-						4,
-						32
-					],
-					"texture": 0
-				},
-				"south": {
-					"uv": [
-						12.0,
-						20,
-						16.0,
-						32
-					],
-					"texture": 0
-				},
-				"west": {
-					"uv": [
-						8.0,
-						20,
-						12.0,
-						32
-					],
-					"texture": 0
-				},
-				"up": {
-					"uv": [
-						8.0,
-						20,
-						4,
-						16
-					],
-					"texture": 0
-				},
-				"down": {
-					"uv": [
-						12.0,
-						20,
-						8.0,
-						16
-					],
-					"texture": 0
-				}
-			}
-		},
-		{
-			"name": "left_boot",
-			"from": [
-				-0.1,
-				0,
-				-2
-			],
-			"to": [
-				3.9,
-				12,
-				2
-			],
-			"origin": [
-				1.9,
-				12,
-				0
-			],
-			"autouv": 0,
-			"box_uv": true,
-			"uv_offset": [
-				0,
-				16
-			],
-			"rotation": null,
-			"rescale": null,
-			"locked": false,
-			"render_order": "default",
-			"export": true,
-			"scope": 0,
-			"allow_mirror_modeling": true,
-			"color": 0,
-			"type": "cube",
-			"uuid": "671e7771-fe94-41ba-9654-a8b605875829",
-			"faces": {
-				"north": {
-					"uv": [
-						4,
-						20,
-						8.0,
-						32
-					],
-					"texture": 0
-				},
-				"east": {
-					"uv": [
-						0,
-						20,
-						4,
-						32
-					],
-					"texture": 0
-				},
-				"south": {
-					"uv": [
-						12.0,
-						20,
-						16.0,
-						32
-					],
-					"texture": 0
-				},
-				"west": {
-					"uv": [
-						8.0,
-						20,
-						12.0,
-						32
-					],
-					"texture": 0
-				},
-				"up": {
-					"uv": [
-						8.0,
-						20,
-						4,
-						16
-					],
-					"texture": 0
-				},
-				"down": {
-					"uv": [
-						12.0,
-						20,
-						8.0,
-						16
-					],
-					"texture": 0
-				}
-			}
 		}
 	],
 	"groups": [],
 	"outliner": [
-		"2d142bff-7b1c-41cf-8986-f04872a59048",
-		"3f660649-b7d6-41bf-8e9a-cd137d3523c5",
-		"68fb9846-62be-4034-9560-24151e7e7997",
-		"c3d8b054-afa5-4a5f-a067-cfdc25113058",
-		"9e9fd367-63cc-4934-8250-73452c4b3e6d",
-		"671e7771-fe94-41ba-9654-a8b605875829"
+		"de8fe01d-416f-43a1-afc3-f2ce6cf2c626",
+		"80d67674-3dde-4820-95fe-0a76328e9317",
+		"dd2136d8-c98d-4089-bb08-36e8a2f36724"
 	],
 	"textures": [
 		{
@@ -590,7 +317,7 @@
 			"visible": true,
 			"internal": true,
 			"saved": true,
-			"uuid": "b734c5ea-7aa3-4469-abed-1a42ecb27139",
+			"uuid": "cd49afa0-4024-4ebc-8638-7b9f548aacb5",
 			"relative_path": "../src/main/resources/assets/creeperskin/textures/entity/equipment/humanoid/creeper.png",
 			"use_as_default": false,
 			"layers_enabled": false,
