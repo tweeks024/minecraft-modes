@@ -9,6 +9,7 @@ version = mod_version
 group = mod_group_id
 
 evaluationDependsOn(':thief')
+evaluationDependsOn(':wildwest')
 
 sourceSets.main.resources {
     srcDir('src/generated/clientData')
@@ -77,6 +78,9 @@ neoForge {
         }
         "thief" {
             sourceSet(project(':thief').sourceSets.main)
+        }
+        "wildwest" {
+            sourceSet(project(':wildwest').sourceSets.main)
         }
     }
 }

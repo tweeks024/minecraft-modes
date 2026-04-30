@@ -8,8 +8,6 @@ plugins {
 version = mod_version
 group = mod_group_id
 
-evaluationDependsOn(':wildwest')
-
 sourceSets.main.resources {
     srcDir('src/generated/clientData')
     srcDir('src/generated/serverData')
@@ -78,8 +76,8 @@ neoForge {
         "securityguard" {
             sourceSet(project(':securityguard').sourceSets.main)
         }
-        "wildwest" {
-            sourceSet(project(':wildwest').sourceSets.main)
+        "thief" {
+            sourceSet(project(':thief').sourceSets.main)
         }
     }
 }
@@ -91,6 +89,7 @@ configurations {
 dependencies {
     implementation project(':securitycore')
     implementation project(':securityguard')
+    implementation project(':thief')
 
     testImplementation platform('org.junit:junit-bom:5.10.2')
     testImplementation 'org.junit.jupiter:junit-jupiter'
