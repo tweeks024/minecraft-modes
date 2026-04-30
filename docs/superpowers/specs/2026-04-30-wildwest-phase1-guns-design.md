@@ -180,6 +180,9 @@ PistolItem.use(Level, Player, Hand):
       nearestEntityDist = start.distanceTo(optional.get())
 
   if nearestEntityHit:
+    // Reset hurt-immunity so pistol cooldown (8 tk) isn't swallowed by vanilla
+    // 10-tk invuln window when retargeting the same entity.
+    nearestEntityHit.invulnerableTime = 0
     nearestEntityHit.hurt(WildWestDamageTypes.gunshot(player), 5.0F)
 
   stack.hurtAndBreak(1, player, EquipmentSlot.MAINHAND)
@@ -198,6 +201,10 @@ Mob-side helper:
 PistolItem.fireFromMob(shooter, target):
   // Same hitscan, but uses shooter's eye + look direction toward target.
   // Adds slight inaccuracy (random Gaussian) so mobs don't pixel-perfect-snipe.
+  // Tracer packet: when shooter is NOT a ServerPlayer, use
+  //   PacketDistributor.sendToPlayersTrackingEntity(shooter, packet)
+  // instead of `...AndSelf` (which assumes shooter IS a ServerPlayer).
+  // Phase-1 player path uses AndSelf; phase-2 mob path branches on type.
 ```
 
 ### Rifle firing (bolt-action projectile)
@@ -217,14 +224,34 @@ RifleItem.use(Level, Player, Hand):
   stack.hurtAndBreak(1, player, EquipmentSlot.MAINHAND)
   player.getCooldowns().addCooldown(stack, 40)
   level.playSound(null, player, ModSounds.RIFLE_FIRE, SoundSource.PLAYERS, 1.0F, 1.0F)
-  // bolt_cycle scheduled via TickEvent or TickScheduler at +10 ticks
+  // bolt_cycle sound emitted by inventoryTick (see below) — not scheduled here
   return SUCCESS
 ```
+
+The delayed `bolt_cycle` sound (~10 ticks after firing, mid-cooldown) is emitted from `RifleItem.inventoryTick`, not a side-channel scheduler. Stateless, leak-free, runs only while the rifle is in a player's inventory:
+
+```java
+@Override
+public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
+    if (level.isClientSide || !(entity instanceof Player player)) return;
+    // ItemCooldowns: cooldown started at 40, drains by 1/tick. Tick 30 = ~10 ticks after fire.
+    // Verify exact accessor at implementation; equivalents exist via getCooldownPercent + total.
+    int remaining = remainingCooldownTicks(player, stack.getItem());
+    if (remaining == 30) {
+        level.playSound(null, player.blockPosition(), ModSounds.BOLT_CYCLE.get(),
+                        SoundSource.PLAYERS, 1.0F, 1.0F);
+    }
+}
+```
+
+`remainingCooldownTicks` is a helper that reads from `Player.getCooldowns()`. The exact API for "remaining ticks" varies by NeoForge minor version — `ItemCooldowns.getCooldownInstance(item)` exposes `endTime - level.getGameTime()` in this branch; a wrapper insulates the call site.
 
 `BulletEntity extends AbstractArrow`:
 - `pickup = NO_PICKUP`.
 - `getDefaultHitGroundSoundEvent()` → `null` or quiet thud.
-- Override `onHitEntity(EntityHitResult)`: apply `getBaseDamage()` via `wildwest:gunshot`, then `discard()`.
+- Override `onHitEntity(EntityHitResult)`:
+  - Reset `target.invulnerableTime = 0` before applying damage so rapid back-to-back shots (relevant once phase 2 ships multiple bandits firing at once) don't drop hits inside vanilla's 10-tk hurt-immunity window.
+  - Apply `getBaseDamage()` via `wildwest:gunshot`. Then `discard()`.
 - Override `onHitBlock(BlockHitResult)`: spawn `SMOKE` particle puff, `discard()`.
 - Override `tick()`: every tick, spawn `CRIT` particle at current position. Despawn at age 12.
 
@@ -250,13 +277,18 @@ Item model JSON (`models/item/rifle.json`) has predicate overrides:
   "parent": "minecraft:item/handheld",
   "textures": { "layer0": "wildwest:item/rifle" },
   "overrides": [
-    { "predicate": { "wildwest:bolt_state": 0.7 }, "model": "wildwest:item/rifle_bolt_open" },
-    { "predicate": { "wildwest:bolt_state": 0.3 }, "model": "wildwest:item/rifle_bolt_closing" }
+    { "predicate": { "wildwest:bolt_state": 0.3 }, "model": "wildwest:item/rifle_bolt_closing" },
+    { "predicate": { "wildwest:bolt_state": 0.7 }, "model": "wildwest:item/rifle_bolt_open" }
   ]
 }
 ```
 
-Predicate semantics: NeoForge picks the highest-threshold override whose value the predicate ≥ matches, so the swap order is `ready` (cd ≤ 0.3) → `closing` (0.3 < cd ≤ 0.7) → `open` (cd > 0.7) walking forward in time after firing. Each variant is one of the three bbmodel states.
+Predicate semantics: vanilla iterates overrides in declaration order and the **last** override whose `predicate.value ≤ current predicate value` wins. With ascending order:
+- `bolt_state = 0.0` (ready) → neither override matches → base model (`rifle`) shown.
+- `bolt_state = 0.5` (mid-cooldown) → `0.3` matches, `0.7` does not → `rifle_bolt_closing`.
+- `bolt_state = 1.0` (just fired) → `0.3` matches, `0.7` matches → `rifle_bolt_open` (last match wins).
+
+Walking forward in time after firing: cd starts at 1.0 and drains to 0.0, so the model lifecycle is `bolt_open` → `bolt_closing` → `ready`. Each variant is one of the three bbmodel states.
 
 ## Damage type definition
 
@@ -333,6 +365,6 @@ public final class WildWestDamageTypes {
 1. **Hitscan sync.** Server raycast can disagree with what the player saw client-side (lag, view interpolation). Acceptable for v1 — vanilla bow has the same class of issue. Revisit only if testing shows obvious feel-bad misses.
 2. **bbmodel display transforms.** Each item bbmodel needs five+ camera transforms (first-person main hand, first-person off hand, third-person main, third-person off, ground, GUI, fixed). This is normal Blockbench export work but is fiddly. Plan to validate transforms during phase-1 implementation, not defer to phase 2.
 3. **Cooldown predicate accuracy.** `Cooldowns.getCooldownPercent` returns 1.0 right after firing and 0.0 when ready — verify the predicate threshold direction matches the expected bolt-state lerp (0.0 = ready, 1.0 = just fired). If reversed, flip the override threshold values.
-4. **`AbstractArrow` rendering.** Vanilla `ArrowRenderer` won't pick up our bbmodel automatically — we register a `BulletRenderer` that loads the bbmodel-exported JSON and draws it instead.
+4. **`AbstractArrow` rendering.** Vanilla `ArrowRenderer` won't pick up our bbmodel automatically — we register a `BulletRenderer` (bound via `EntityRenderers.register` in `ClientSetup`) that loads the bbmodel-exported JSON and draws it. `AbstractArrow.tick()` updates `yRot` and `xRot` from velocity each tick but the renderer must apply them explicitly (`poseStack.mulPose(Axis.YP.rotationDegrees(...))` and `Axis.XP.rotationDegrees(...)`) using interpolated values (`Mth.lerp(partialTick, yRotO, yRot)`) so the lead slug points along its trajectory instead of facing world-axis-aligned.
 5. **Sound asset placeholder strategy.** Phase-1 ships placeholder `.ogg` files (sine bursts or short royalty-free clips) committed to the repo. They WILL be heard in dev. Design assumes user replaces them in a follow-up; not a phase-1 deliverable to source final audio.
 6. **Block-pierce question.** A bullet hitting a 1-block-thick wall with a window slit should pass through the slit. Hitscan handles this naturally via `ClipContext`; projectile relies on `AbstractArrow` collision which uses block hitboxes. No special handling needed.

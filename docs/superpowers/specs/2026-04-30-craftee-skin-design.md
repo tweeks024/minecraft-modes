@@ -173,26 +173,12 @@ public final class SetBonusHandler {
         else if (!shouldHave && has) inst.removeModifier(mod.id());
     }
 
-    /** Strip our modifiers when armor item leaves the wearer's body
-     *  (player death, container moves outside ticking). Defensive only —
-     *  the per-tick path will catch most cases. */
-    @SubscribeEvent
-    public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
-        Player player = event.getEntity();
-        clearAll(player);
-    }
-
-    private static void clearAll(LivingEntity entity) {
-        for (var pair : List.of(
-                Map.entry(Attributes.MOVEMENT_SPEED, SPEED_ID),
-                Map.entry(Attributes.JUMP_STRENGTH, JUMP_ID),
-                Map.entry(Attributes.STEP_HEIGHT, STEP_ID))) {
-            AttributeInstance inst = entity.getAttribute(pair.getKey());
-            if (inst != null) inst.removeModifier(pair.getValue());
-        }
-    }
 }
 ```
+
+**Why per-tick rather than event-driven:** A `LivingEquipmentChangeEvent`-based path is technically a few microseconds cheaper, but introduces edge cases (world load, dimension change, item breakage, respawn, third-party-mod gear swaps that bypass the event) that each need an extra hook to re-sync. The per-tick path is self-correcting — any missed transition heals on the next tick — and the cost (4 cached `ItemStack.is()` checks plus 3 `hasModifier` lookups per player per tick) is negligible. If a profiler ever flags this, swap to event-driven and add `PlayerLoggedInEvent` + `PlayerRespawnEvent` + a dimension-change hook to cover the load-time gap.
+
+**Why no defensive cleanup on logout / death:** Vanilla rebuilds the `AttributeMap` from `DefaultAttributes` for each newly-constructed entity. Attribute modifiers added via `addPermanentModifier` live on the `AttributeInstance` belonging to that entity and are discarded when the entity is. The respawned player after death is a fresh entity with a fresh attribute map — no ghost-modifier path exists. A logout cleanup would be clearing modifiers on an entity that is about to be garbage-collected; pure overhead.
 
 **Verify at implementation:**
 
@@ -222,7 +208,7 @@ Vanilla armor-texture path. With asset key `craftee:craftee`:
 **Texture content (palette + layout, locked here; exact pixels finalised at implementation):**
 
 - **Body PNG (humanoid layer):** vanilla armor UV layout. Solid black base (`#0F0F0F`). One vertical orange filmstrip stripe (`#F08A1F`, 2 pixels wide) running down the centre-front of the chestplate UV and the centre-front of the helmet UV. Inside the orange stripe, evenly-spaced black "sprocket holes" — small 1×1 black squares at vertical intervals — give the filmstrip-perforation effect. Helmet has the same stripe motif on the front face panel.
-- **Leggings PNG:** same black base; the filmstrip stripe runs down the centre-front of each leg UV (two parallel stripes total, mirroring the leg geometry). No sprocket holes on legs (at 1× UV scale they'd render as a single noisy pixel column — leave the legs as plain stripes).
+- **Leggings PNG:** same black base; the filmstrip stripe runs down the centre-front of each leg UV (two parallel stripes total, mirroring the leg geometry). No sprocket holes on legs (at 1× UV scale they'd render as a single noisy pixel column — leave the legs as plain stripes). **Waist-joint alignment:** the topmost row of the leggings stripe must align horizontally with the bottommost row of the chestplate stripe so the filmstrip reads as one continuous line through the walk cycle. Verify in dev client; if off, nudge by ±1 px on the leggings UV.
 
 **Palette:**
 - Base black: `#0F0F0F`
@@ -339,6 +325,7 @@ If mocking entity classes proves heavyweight, fall back to a smoke-test that con
 10. Open a crafting table. Lay out 1 netherite scrap centre, 8 paper around it. Output is 2× `craftee_upgrade_smithing_template`.
 11. Verify a partial set (e.g. helmet only) gives plain netherite-stat armor with no movement / jump / step changes.
 12. Disconnect from a single-player world while wearing the full set; reconnect; modifiers re-apply correctly within one tick (no double-stack).
+13. **Death / respawn:** equip full set, sprint to confirm boost is active, kill player (`/kill @s`). After respawn (with armor dropped/lost): confirm `/attribute @s minecraft:movement_speed get` shows base value with no `craftee:set_bonus_speed` modifier present. Re-collect the dropped armor, re-equip; confirm modifier returns within one tick.
 
 ### Datagen check
 
