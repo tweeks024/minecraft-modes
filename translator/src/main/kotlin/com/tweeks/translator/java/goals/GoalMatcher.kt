@@ -1,0 +1,273 @@
+package com.tweeks.translator.java.goals
+
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
+import com.github.javaparser.ast.body.MethodDeclaration
+import com.github.javaparser.ast.expr.BooleanLiteralExpr
+import com.github.javaparser.ast.expr.CharLiteralExpr
+import com.github.javaparser.ast.expr.ClassExpr
+import com.github.javaparser.ast.expr.DoubleLiteralExpr
+import com.github.javaparser.ast.expr.Expression
+import com.github.javaparser.ast.expr.FieldAccessExpr
+import com.github.javaparser.ast.expr.IntegerLiteralExpr
+import com.github.javaparser.ast.expr.LongLiteralExpr
+import com.github.javaparser.ast.expr.MethodCallExpr
+import com.github.javaparser.ast.expr.NameExpr
+import com.github.javaparser.ast.expr.ObjectCreationExpr
+import com.github.javaparser.ast.expr.StringLiteralExpr
+import com.github.javaparser.ast.expr.UnaryExpr
+import com.github.javaparser.ast.expr.ThisExpr
+import com.tweeks.translator.emit.Untranslatable
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
+
+/**
+ * Inspects an entity class's `registerGoals()` method and produces:
+ *   - a list of Bedrock `minecraft:behavior.*` components (one per High-bucket
+ *     goal), each tagged with the goal's `addGoal(priority, ...)` value;
+ *   - an [Untranslatable] log entry for every Medium / Low goal (catalog miss
+ *     or non-literal args).
+ *
+ * Per the Phase 2b spec, this only emits the High bucket. Phase 3's LLM
+ * stage walks `entityGoalsDeferred` to pick up the rest.
+ */
+internal class GoalMatcher(private val unt: Untranslatable) {
+
+    /** One emitted Bedrock behavior. */
+    data class MatchedComponent(
+        val priority: Int,
+        val componentName: String,
+        val body: JsonObject,
+    )
+
+    data class Result(
+        val components: List<MatchedComponent>,
+    )
+
+    fun match(modId: String, entity: ClassOrInterfaceDeclaration): Result {
+        val components = mutableListOf<MatchedComponent>()
+        val registerGoals = entity.methods.firstOrNull { it.nameAsString == "registerGoals" }
+            ?: return Result(emptyList())
+
+        for (call in registerGoals.findAll(MethodCallExpr::class.java)) {
+            val matched = processAddGoalCall(modId, entity, call) ?: continue
+            components.add(matched)
+        }
+        return Result(components)
+    }
+
+    /**
+     * Process one `addGoal(priority, ...)` call. Returns the matched
+     * Bedrock component on success, or null on any of:
+     *   - the call isn't an `addGoal` on `goalSelector` / `targetSelector`;
+     *   - the goal class is non-vanilla (Medium/Low) — logged.
+     *   - the goal class is vanilla but its argMapper returned null — logged.
+     */
+    private fun processAddGoalCall(
+        modId: String,
+        entity: ClassOrInterfaceDeclaration,
+        call: MethodCallExpr,
+    ): MatchedComponent? {
+        if (call.nameAsString != "addGoal") return null
+        // We only care about `this.goalSelector.addGoal(...)` and
+        // `this.targetSelector.addGoal(...)`.
+        val scope = call.scope.orElse(null) ?: return null
+        val scopeName = when (scope) {
+            is FieldAccessExpr -> scope.nameAsString
+            is NameExpr -> scope.nameAsString
+            else -> return null
+        }
+        if (scopeName != "goalSelector" && scopeName != "targetSelector") return null
+
+        // Args: addGoal(priority, goalCtor)
+        if (call.arguments.size != 2) return null
+        val priority = readIntLiteral(call.arguments[0])
+        if (priority == null) {
+            logDeferral(modId, entity, call, "non-literal priority", Untranslatable.GoalBucket.MEDIUM)
+            return null
+        }
+        val goalExpr = call.arguments[1]
+        val ctor = goalExpr as? ObjectCreationExpr
+        if (ctor == null) {
+            logDeferral(modId, entity, call, "non-constructor goal expression", Untranslatable.GoalBucket.LOW)
+            return null
+        }
+
+        val fqn = resolveFqn(ctor)
+        if (fqn == null) {
+            logDeferral(modId, entity, call, "could not resolve goal class FQN", Untranslatable.GoalBucket.MEDIUM)
+            return null
+        }
+
+        val mapping = VanillaGoalCatalog.lookup(fqn)
+        if (mapping == null) {
+            val bucket = bucketFor(modId, fqn, entity)
+            logDeferral(
+                modId, entity, call,
+                reason = "catalog miss for $fqn",
+                bucket = bucket,
+                fqnOverride = fqn,
+                priority = priority,
+            )
+            return null
+        }
+
+        val literals = ctor.arguments.map { argToLiteral(it) }
+        if (literals.any { it == null }) {
+            logDeferral(
+                modId, entity, call,
+                reason = "non-literal argument to $fqn",
+                bucket = Untranslatable.GoalBucket.MEDIUM,
+                fqnOverride = fqn,
+                priority = priority,
+            )
+            return null
+        }
+
+        @Suppress("UNCHECKED_CAST")
+        val body = mapping.argMapper(literals as List<VanillaGoalCatalog.LiteralArg>)
+        if (body == null) {
+            logDeferral(
+                modId, entity, call,
+                reason = "$fqn has no clean Bedrock 1.21.0 equivalent",
+                bucket = Untranslatable.GoalBucket.MEDIUM,
+                fqnOverride = fqn,
+                priority = priority,
+            )
+            return null
+        }
+
+        return MatchedComponent(
+            priority = priority,
+            componentName = mapping.bedrockComponent,
+            body = body,
+        )
+    }
+
+    /**
+     * Heuristic Medium-vs-Low classification for a *non-vanilla* goal class.
+     * Medium = looks like a vanilla goal extension or composition of
+     * recognizable primitives. Low = touches NBT serialization, IO, maps/sets,
+     * or other novel state machinery.
+     */
+    private fun bucketFor(
+        modId: String,
+        goalFqn: String,
+        @Suppress("UNUSED_PARAMETER") entity: ClassOrInterfaceDeclaration,
+    ): Untranslatable.GoalBucket {
+        // Vanilla goal classes — but unmapped — are Medium by definition.
+        if (goalFqn.startsWith("net.minecraft.world.entity.ai.goal.")) {
+            return Untranslatable.GoalBucket.MEDIUM
+        }
+        // Custom classes: try to find the source. If we can find it and it
+        // looks novel (HashMap/HashSet/IO), Low; otherwise Medium.
+        // Without cross-mod source resolution at this layer, default Medium —
+        // Phase 3's LLM will read the source anyway and re-bucket.
+        return Untranslatable.GoalBucket.MEDIUM
+    }
+
+    private fun logDeferral(
+        modId: String,
+        entity: ClassOrInterfaceDeclaration,
+        call: MethodCallExpr,
+        reason: String,
+        bucket: Untranslatable.GoalBucket,
+        fqnOverride: String? = null,
+        priority: Int? = null,
+    ) {
+        val key = buildString {
+            if (priority != null) {
+                append(priority).append(":")
+            }
+            append(fqnOverride ?: extractCtorName(call) ?: "<unknown>")
+        }
+        unt.recordEntityGoalDeferred(
+            modId = modId,
+            entityName = entity.nameAsString,
+            goalKey = key,
+            bucket = bucket,
+            reason = reason,
+            sourceExcerpt = call.toString(),
+        )
+    }
+
+    private fun extractCtorName(call: MethodCallExpr): String? {
+        val ctor = call.arguments.lastOrNull() as? ObjectCreationExpr ?: return null
+        return ctor.type.nameAsString
+    }
+
+    private fun readIntLiteral(expr: Expression): Int? {
+        return when (expr) {
+            is IntegerLiteralExpr -> expr.asNumber().toInt()
+            is UnaryExpr -> {
+                val inner = readIntLiteral(expr.expression) ?: return null
+                when (expr.operator) {
+                    UnaryExpr.Operator.MINUS -> -inner
+                    UnaryExpr.Operator.PLUS -> inner
+                    else -> null
+                }
+            }
+            else -> null
+        }
+    }
+
+    /**
+     * Resolve the FQN of a constructor expression. Tries JavaParser's
+     * symbol-resolver first (gives a fully-qualified name); falls back to
+     * the source-text package-qualifier when resolution fails (e.g.
+     * sibling-mod classes whose source isn't on the type-solver chain).
+     */
+    private fun resolveFqn(ctor: ObjectCreationExpr): String? {
+        val resolved = try {
+            ctor.resolve().declaringType().qualifiedName
+        } catch (e: Throwable) {
+            null
+        }
+        if (resolved != null) return resolved
+
+        // Fallback: if the source uses an FQN-qualified `new` expression
+        // (which is how the four mods invoke vanilla goals), pull the
+        // qualifier directly from the AST.
+        val typeName = ctor.type
+        val qualifier = typeName.scope.orElse(null)
+        return if (qualifier != null) "${qualifier}.${typeName.nameAsString}" else null
+    }
+
+    private fun argToLiteral(expr: Expression): VanillaGoalCatalog.LiteralArg? {
+        return when (expr) {
+            is IntegerLiteralExpr -> VanillaGoalCatalog.LiteralArg.IntArg(expr.asNumber().toInt())
+            is LongLiteralExpr -> VanillaGoalCatalog.LiteralArg.IntArg(expr.asNumber().toInt())
+            is DoubleLiteralExpr -> VanillaGoalCatalog.LiteralArg.DoubleArg(expr.asDouble())
+            is BooleanLiteralExpr -> VanillaGoalCatalog.LiteralArg.BoolArg(expr.value)
+            is StringLiteralExpr -> VanillaGoalCatalog.LiteralArg.StringArg(expr.asString())
+            is CharLiteralExpr -> VanillaGoalCatalog.LiteralArg.StringArg(expr.asChar().toString())
+            is ClassExpr -> VanillaGoalCatalog.LiteralArg.ClassArg(expr.type.toString())
+            is ThisExpr -> VanillaGoalCatalog.LiteralArg.StringArg("this")
+            is FieldAccessExpr -> {
+                // Treat `Foo.BAR.BAZ` as a class arg name — it's the only
+                // shape we care about for vanilla constructors that take a
+                // `Class<? extends LivingEntity>`.
+                VanillaGoalCatalog.LiteralArg.ClassArg(expr.toString())
+            }
+            is NameExpr -> {
+                // A bare identifier — could be a constant. Pretty rare in
+                // vanilla goal calls; treat as Medium-bucket trigger.
+                null
+            }
+            is UnaryExpr -> {
+                // `-2.4` is parsed as UnaryExpr(MINUS, DoubleLiteralExpr).
+                val inner = argToLiteral(expr.expression) ?: return null
+                when (expr.operator) {
+                    UnaryExpr.Operator.MINUS -> when (inner) {
+                        is VanillaGoalCatalog.LiteralArg.IntArg -> VanillaGoalCatalog.LiteralArg.IntArg(-inner.value)
+                        is VanillaGoalCatalog.LiteralArg.DoubleArg -> VanillaGoalCatalog.LiteralArg.DoubleArg(-inner.value)
+                        else -> null
+                    }
+                    UnaryExpr.Operator.PLUS -> inner
+                    else -> null
+                }
+            }
+            else -> null
+        }
+    }
+}
