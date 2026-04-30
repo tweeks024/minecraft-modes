@@ -27,5 +27,7 @@ public class DataGenerators {
             .add(Registries.DAMAGE_TYPE, ModDamageTypeProvider::bootstrap);
         gen.addProvider(true, new DatapackBuiltinEntriesProvider(
             output, lookup, builder, Set.of(WildWestMod.MOD_ID)));
+
+        gen.addProvider(true, new ModRecipeProvider.Runner(output, lookup));
     }
 }
