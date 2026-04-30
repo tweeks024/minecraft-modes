@@ -5,6 +5,8 @@ import com.tweeks.translator.discover.ModDiscovery
 import com.tweeks.translator.discover.ModMetadata
 import com.tweeks.translator.emit.AddonWriter
 import com.tweeks.translator.emit.Untranslatable
+import com.tweeks.translator.java.ClasspathResolver
+import com.tweeks.translator.java.JavaSourceLoader
 import com.tweeks.translator.json.AssetCopier
 import com.tweeks.translator.json.ItemAtlasBuilder
 import com.tweeks.translator.json.LangTransform
@@ -79,6 +81,18 @@ fun main(args: Array<String>) {
     val atlasBuilder = ItemAtlasBuilder()
     val bbmodelConverter = { unt: Untranslatable -> BbmodelConverter(target, unt) }
 
+    // Phase 2a Java pipeline foundation. The full discovered list is
+    // needed so [JavaSourceLoader] can wire sibling mods' src dirs as
+    // type solvers when we run analysis on a single mod.
+    val classpathResolver = ClasspathResolver.fromSystemProperties()
+    if (!classpathResolver.isAvailable()) {
+        System.err.println(
+            "[translator] note: ${ClasspathResolver.SYSTEM_PROPERTY} not set; skipping Java pipeline. " +
+                "Run via :translator:translate to enable it."
+        )
+    }
+    val allDiscovered = discovery.discover()
+
     for (mod in mods) {
         // Clean the per-mod output dir so stale files (e.g. removed/renamed
         // recipes) don't survive across runs. Sibling-mod subdirs are
@@ -104,6 +118,18 @@ fun main(args: Array<String>) {
         val copyResult = assetCopier(unt).copy(mod.rootDir, mod.modId, outputRoot)
         atlasBuilder.build(mod.modId, copyResult.itemTextureShortNames, outputRoot)
         bbmodelConverter(unt).convert(mod.modId, mod.rootDir.resolve("tools"), outputRoot)
+
+        // Phase 2a: parse the Java sources and report the unit count.
+        // No analysis yet — Phase 2b builds EntityAnalyzer/ItemAnalyzer
+        // on top of this. The classpath property is set by the Gradle
+        // task; if it isn't available, skip silently (we already warned
+        // once at startup).
+        if (classpathResolver.isAvailable()) {
+            val loader = JavaSourceLoader(classpathResolver, unt)
+            val resolved = loader.load(mod, allDiscovered)
+            System.err.println("[translator] ${mod.modId}: parsed ${resolved.units.size} java files")
+        }
+
         unt.writeFor(mod.modId, outputRoot)
 
         println("[translator] Wrote ${result.modId}: ${result.outputDir.absolutePathString()}")
