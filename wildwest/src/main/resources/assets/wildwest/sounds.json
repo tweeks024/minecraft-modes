@@ -1,0 +1,23 @@
+{
+  "pistol_fire": {
+    "category": "player",
+    "subtitle": "subtitle.wildwest.pistol_fire",
+    "sounds": [
+      { "name": "minecraft:item.crossbow.shoot", "type": "event" }
+    ]
+  },
+  "rifle_fire": {
+    "category": "player",
+    "subtitle": "subtitle.wildwest.rifle_fire",
+    "sounds": [
+      { "name": "minecraft:item.crossbow.shoot", "type": "event" }
+    ]
+  },
+  "bolt_cycle": {
+    "category": "player",
+    "subtitle": "subtitle.wildwest.bolt_cycle",
+    "sounds": [
+      { "name": "minecraft:item.crossbow.loading_middle", "type": "event" }
+    ]
+  }
+}

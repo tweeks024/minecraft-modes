@@ -14,5 +14,6 @@ public class WildWestMod {
     public WildWestMod(IEventBus modEventBus, ModContainer modContainer) {
         LOGGER.info("Wild West mod loading");
         Registration.register(modEventBus);
+        ModSounds.register(modEventBus);
     }
 }
