@@ -20,3 +20,6 @@ Thumbs.db
 .classpath
 .project
 .settings/
+
+# Worktrees
+.worktrees/

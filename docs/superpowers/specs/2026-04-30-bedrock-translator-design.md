@@ -118,6 +118,12 @@ Every transform is unit-tested with a golden file in `goldens/<mod>/<category>/<
 
 For features the `.bbmodel` includes that have no Bedrock geometry equivalent (Java-only render flags, exotic UV modes), the converter logs a warning and degrades gracefully.
 
+**Pivot and rotation-origin translation.** The `.bbmodel` JSON stores cube `origin` and bone `pivot` in Blockbench's global (model-space) coordinates. Bedrock geometry expects bone `pivot` in global model space (matches), but cube `origin` is interpreted differently between renderers depending on whether `bind_pose_rotation` and `parent` are set. Java's `ModelPart`, by contrast, uses parent-local coordinates throughout. Because the source-of-truth in this repo is `.bbmodel` (not Java `ModelPart`), the converter only needs the Blockbench → Bedrock mapping, not the Java mapping. However, the converter must still:
+
+1. Walk the bone tree once to compute each bone's parent chain.
+2. Emit cube `origin` values in the coordinate system Bedrock geometry expects for the chosen `format_version` (1.16.0 in `bedrock-target.json`).
+3. Verify visual alignment in-game during Phase 1 against a known-good Bedrock test entity. Phase 1's verification step explicitly includes manually spawning the security guard via a temporary spawn-egg JSON and confirming limb attachment points are correct. If alignment is off, add a small offset-correction step in `BbmodelConverter` rather than hand-editing the emitted `.geo.json`.
+
 This is fully deterministic and unit-testable with golden files. Lives in the `bbmodel/` package but conceptually belongs to the deterministic side of the project alongside the JSON pipeline. Critically: this means `.bbmodel` files remain the source of truth, and Bedrock geometry is regenerated on every build — Java mod and Bedrock Add-On stay visually in sync without manual export discipline.
 
 ## Java pipeline
@@ -173,7 +179,9 @@ The translator operates per Gradle subproject — it cannot be invoked on a sing
   2. Worked examples (`bedrock-api/worked-examples.md`) showing canonical event-driven idioms (event subscription, `system.runInterval` with sensible cadences, `entity.setDynamicProperty` for state).
   3. Performance rules (see below).
 - **Per-request user message:** the original Java goal source, the resolved type info (parent class, called methods, referenced fields), and the surrounding context (entity class summary, mod manifest).
-- **Output cache key:** `sha256(java_source + prompt_version + model_id + bedrock_api_version)`. Stored at `translator/.cache/llm/<key>.json`. Invalidates automatically when any input changes.
+- **Output cache key:** `sha256(java_source + resolved_symbol_closure + classpath_fingerprint + prompt_version + model_id + bedrock_api_version)`. Stored at `translator/.cache/llm/<key>.json`. Invalidates automatically when any input changes.
+  - `resolved_symbol_closure`: For each method or field the goal class references that resolves outside its own source file (via `JavaSymbolSolver`), the FQN plus the resolved declaration's signature hash (parameter types, return type, declared exceptions). This catches the case where a utility class the goal depends on changes signature without the goal's own source changing — e.g. `SecurityCoreUtil.applyStun(Entity)` becoming `applyStun(Entity, int)` would have produced a stale cache hit under a `java_source`-only key.
+  - `classpath_fingerprint`: SHA-256 of the sorted list of `(jarFileName, jarSha256)` pairs for the resolved `runtimeClasspath`. Coarser than the symbol closure but cheap to compute, and busts the cache on any NeoForge/Minecraft version bump even when the resolved closure doesn't visibly change.
 
 ### Performance rules in the system prompt
 
