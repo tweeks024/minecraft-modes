@@ -29,6 +29,7 @@ public class DataGenerators {
             output, lookup, builder, Set.of(WildWestMod.MOD_ID)));
 
         gen.addProvider(true, new ModRecipeProvider.Runner(output, lookup));
+        gen.addProvider(true, new ModDamageTypeTagsProvider(output, lookup));
     }
 
     @SubscribeEvent

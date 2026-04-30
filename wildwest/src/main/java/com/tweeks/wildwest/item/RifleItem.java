@@ -51,6 +51,7 @@ public class RifleItem extends Item {
 
     @Override
     public void inventoryTick(ItemStack stack, ServerLevel level, Entity entity, EquipmentSlot slot) {
+        if (slot != EquipmentSlot.MAINHAND) return;
         if (!(entity instanceof Player player)) return;
         int remaining = remainingCooldownTicks(player, stack);
         if (remaining == BOLT_CYCLE_REMAINING) {

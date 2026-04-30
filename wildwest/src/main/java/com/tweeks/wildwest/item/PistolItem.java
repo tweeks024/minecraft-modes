@@ -3,6 +3,7 @@ package com.tweeks.wildwest.item;
 import com.tweeks.wildwest.Hitscan;
 import com.tweeks.wildwest.WildWestDamageTypes;
 import com.tweeks.wildwest.network.S2CTracerPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -76,7 +77,7 @@ public class PistolItem extends Item {
         if (hit.isPresent()) {
             LivingEntity target = byId.get(hit.get().id());
             target.invulnerableTime = 0;
-            target.hurt(WildWestDamageTypes.gunshot(player), DAMAGE);
+            target.hurtServer((ServerLevel) level, WildWestDamageTypes.gunshot(player), DAMAGE);
             endPoint = target.position().add(0, target.getBbHeight() * 0.5, 0);
         }
 
