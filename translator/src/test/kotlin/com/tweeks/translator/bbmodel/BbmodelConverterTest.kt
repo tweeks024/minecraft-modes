@@ -122,6 +122,153 @@ class BbmodelConverterTest {
         assertFalse(out.resolve("nosuch").exists())
     }
 
+    /**
+     * Synthetic fixture: one face-UV cube with explicit per-face UV
+     * rectangles. Pins the box_uv:false branch so it doesn't bit-rot
+     * before Phase 2 work lands.
+     */
+    private val faceUvBbmodel = """
+        {
+          "name": "faceuv",
+          "resolution": { "width": 64, "height": 64 },
+          "elements": [
+            {
+              "uuid": "F1",
+              "type": "cube",
+              "name": "box",
+              "from": [0, 0, 0],
+              "to": [4, 4, 4],
+              "origin": [0, 0, 0],
+              "box_uv": false,
+              "faces": {
+                "north": { "uv": [0, 0, 4, 4], "texture": 0 },
+                "south": { "uv": [4, 0, 8, 4], "texture": 0 },
+                "east":  { "uv": [8, 0, 12, 4], "texture": 0 },
+                "west":  { "uv": [12, 0, 16, 4], "texture": 0 },
+                "up":    { "uv": [0, 4, 4, 8], "texture": 0 },
+                "down":  { "uv": [4, 4, 8, 8], "texture": 0 }
+              }
+            }
+          ],
+          "outliner": ["F1"]
+        }
+    """.trimIndent()
+
+    @Test
+    fun `synthetic face-UV cube matches golden`() {
+        val unt = Untranslatable()
+        val converter = BbmodelConverter(target, unt)
+        val bb = BbmodelConverter.JSON.decodeFromString(Bbmodel.serializer(), faceUvBbmodel)
+        val actual = converter.buildGeometryJson(bb, "testmod", "faceuv")
+        val expected = repoRoot.resolve(
+            "translator/src/test/resources/goldens/geometry/synthetic_face_uv.geo.json",
+        ).readText()
+        assertJsonEquals(expected, actual)
+        // And we should have recorded the face-UV cube in the untranslatable report.
+        assertTrue(unt.renderReport("testmod").contains("face-UV translated approximately")) {
+            unt.renderReport("testmod")
+        }
+    }
+
+    /**
+     * Synthetic fixture: one cube with cube-level rotation (and a non-zero
+     * origin acting as the rotation pivot). Pins the rotated-cube path.
+     */
+    private val rotatedCubeBbmodel = """
+        {
+          "name": "rotcube",
+          "resolution": { "width": 64, "height": 64 },
+          "elements": [
+            {
+              "uuid": "R1",
+              "type": "cube",
+              "name": "tilted",
+              "from": [-2, 0, -2],
+              "to": [2, 4, 2],
+              "origin": [0, 2, 0],
+              "rotation": [0, 45, 0],
+              "uv_offset": [0, 0]
+            }
+          ],
+          "outliner": ["R1"]
+        }
+    """.trimIndent()
+
+    @Test
+    fun `synthetic rotated cube matches golden`() {
+        val unt = Untranslatable()
+        val converter = BbmodelConverter(target, unt)
+        val bb = BbmodelConverter.JSON.decodeFromString(Bbmodel.serializer(), rotatedCubeBbmodel)
+        val actual = converter.buildGeometryJson(bb, "testmod", "rotcube")
+        val expected = repoRoot.resolve(
+            "translator/src/test/resources/goldens/geometry/synthetic_rotated_cube.geo.json",
+        ).readText()
+        assertJsonEquals(expected, actual)
+    }
+
+    /**
+     * Synthetic fixture: bbmodel with explicit `meta.modded_entity_flip_y:
+     * false`. Verifies the converter records a Y-axis caveat in the
+     * untranslatable report.
+     */
+    private val flipYUnsetBbmodel = """
+        {
+          "name": "ydown",
+          "meta": {
+            "format_version": "4.5",
+            "model_format": "modded_entity",
+            "modded_entity_flip_y": false
+          },
+          "resolution": { "width": 16, "height": 16 },
+          "elements": [
+            {
+              "uuid": "Y1",
+              "type": "cube",
+              "name": "block",
+              "from": [0, 0, 0],
+              "to": [1, 1, 1],
+              "origin": [0, 0, 0],
+              "uv_offset": [0, 0]
+            }
+          ],
+          "outliner": ["Y1"]
+        }
+    """.trimIndent()
+
+    @Test
+    fun `flip_y false records an untranslatable note`(@TempDir out: Path) {
+        val toolsDir = out.resolve("input")
+        toolsDir.toFile().mkdirs()
+        val input = toolsDir.resolve("ydown.bbmodel")
+        input.toFile().writeText(flipYUnsetBbmodel)
+
+        val unt = Untranslatable()
+        val converter = BbmodelConverter(target, unt)
+        converter.convertOne(input, "testmod", out)
+
+        val report = unt.renderReport("testmod")
+        assertTrue(report.contains("Bbmodel authored Y-down")) { report }
+        assertTrue(report.contains("`ydown`")) { report }
+    }
+
+    @Test
+    fun `flip_y true does NOT record an untranslatable note`(@TempDir out: Path) {
+        // Same fixture with flip_y: true — should NOT trigger the warning.
+        val flipYTrueBbmodel = flipYUnsetBbmodel.replace(
+            "\"modded_entity_flip_y\": false",
+            "\"modded_entity_flip_y\": true",
+        )
+        val toolsDir = out.resolve("input")
+        toolsDir.toFile().mkdirs()
+        val input = toolsDir.resolve("yup.bbmodel")
+        input.toFile().writeText(flipYTrueBbmodel)
+
+        val unt = Untranslatable()
+        val converter = BbmodelConverter(target, unt)
+        converter.convertOne(input, "testmod", out)
+        assertFalse(unt.renderReport("testmod").contains("Bbmodel authored Y-down"))
+    }
+
     // ---- helpers ----
 
     private fun renderGeometry(modId: String, bbmodelPath: String, modelName: String): Pair<Bbmodel, String> {

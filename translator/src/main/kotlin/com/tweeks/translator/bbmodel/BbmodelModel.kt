@@ -33,6 +33,28 @@ internal data class Bbmodel(
     val animations: List<BbAnimation> = emptyList(),
     /** `[width, height, depthOffset?]` — [w, h] in blocks; offset optional. */
     val visible_box: List<Double>? = null,
+    /**
+     * Blockbench's `meta` object. Carries `format_version`, `model_format`,
+     * and (for modded-entity exports) `modded_entity_flip_y`. The converter
+     * inspects only the flip-Y flag.
+     */
+    val meta: BbMeta? = null,
+)
+
+@Serializable
+internal data class BbMeta(
+    val format_version: String? = null,
+    val model_format: String? = null,
+    val box_uv: Boolean? = null,
+    /**
+     * Modded-entity exports flag whether the model's Y axis is flipped to
+     * match Java's screen-down convention. When the bbmodel was authored
+     * with `modded_entity_flip_y: false`, the Y axis is in its native
+     * Blockbench/Bedrock orientation; alignment differs from the typical
+     * modded-entity case and is worth flagging in the untranslatable report
+     * so a reviewer can verify in-game.
+     */
+    val modded_entity_flip_y: Boolean? = null,
 )
 
 @Serializable

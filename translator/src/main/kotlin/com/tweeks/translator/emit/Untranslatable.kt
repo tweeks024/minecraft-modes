@@ -31,6 +31,8 @@ class Untranslatable {
     private val bbmodelElementTypeSkipped = TreeMap<String, TreeMap<String, String>>()
     private val bbmodelMultiDataPoint = TreeMap<String, TreeSet<String>>()
     private val bbmodelNonLinearInterp = TreeMap<String, TreeMap<String, String>>()
+    private val bbmodelFlipYUnset = TreeMap<String, TreeSet<String>>()
+    private val javaParseErrors = TreeMap<String, TreeMap<String, String>>()
 
     fun recordRecipeCategoryDropped(modId: String, recipeName: String) {
         recipeCategoryDropped.getOrPut(modId) { TreeSet() }.add(recipeName)
@@ -76,6 +78,24 @@ class Untranslatable {
         bbmodelNonLinearInterp.getOrPut(modId) { TreeMap() }[location] = interpolation
     }
 
+    /**
+     * Record a `.bbmodel` whose `meta.modded_entity_flip_y` is explicitly
+     * `false` — the Y axis is not flipped to match Java's modded-entity
+     * convention, so visual alignment in Bedrock should be verified.
+     */
+    fun recordBbmodelFlipYUnset(modId: String, modelName: String) {
+        bbmodelFlipYUnset.getOrPut(modId) { TreeSet() }.add(modelName)
+    }
+
+    /**
+     * Record a `.java` source file that JavaParser failed to parse. The
+     * file is identified by its repo-relative path so reviewers can find
+     * it; [error] is a short human-readable summary of the failure.
+     */
+    fun recordJavaParseError(modId: String, file: String, error: String) {
+        javaParseErrors.getOrPut(modId) { TreeMap() }[file] = error
+    }
+
     /** Set of mod ids that have at least one recorded finding. */
     fun modsWithFindings(): Set<String> {
         val ids = TreeSet<String>()
@@ -90,6 +110,8 @@ class Untranslatable {
         ids.addAll(bbmodelElementTypeSkipped.keys)
         ids.addAll(bbmodelMultiDataPoint.keys)
         ids.addAll(bbmodelNonLinearInterp.keys)
+        ids.addAll(bbmodelFlipYUnset.keys)
+        ids.addAll(javaParseErrors.keys)
         return ids
     }
 
@@ -194,6 +216,20 @@ class Untranslatable {
             sb.append("## Bbmodel non-linear interpolation downgraded\n\n")
             sb.append("Phase 1b emits keyframes without explicit interpolation hints (treated as linear). These keyframes used a non-linear curve in the source:\n\n")
             for ((loc, interp) in items) sb.append("- `").append(loc).append("`: `").append(interp).append("`\n")
+            sb.append('\n')
+        }
+        bbmodelFlipYUnset[modId]?.takeIf { it.isNotEmpty() }?.let { items ->
+            any = true
+            sb.append("## Bbmodel authored Y-down — verify alignment in-game\n\n")
+            sb.append("These bbmodels declare `meta.modded_entity_flip_y: false`. The Y axis was not flipped at authoring time, so vertical alignment in Bedrock may not match the Java mod. Spawn each entity in-game and confirm pivots line up:\n\n")
+            for (i in items) sb.append("- `").append(i).append("`\n")
+            sb.append('\n')
+        }
+        javaParseErrors[modId]?.takeIf { it.isNotEmpty() }?.let { items ->
+            any = true
+            sb.append("## Java source files JavaParser could not parse\n\n")
+            sb.append("These files were skipped by the Java pipeline. Phase 2 analyses (entity attributes, AI goals, item logic) will not see them:\n\n")
+            for ((f, err) in items) sb.append("- `").append(f).append("`: ").append(err).append('\n')
             sb.append('\n')
         }
 

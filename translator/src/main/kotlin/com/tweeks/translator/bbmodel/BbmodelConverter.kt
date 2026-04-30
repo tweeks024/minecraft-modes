@@ -80,6 +80,14 @@ class BbmodelConverter(
         val raw = input.readText()
         val bb = JSON.decodeFromString(Bbmodel.serializer(), raw)
 
+        // Flip-Y guard: modded-entity bbmodels normally declare
+        // `meta.modded_entity_flip_y: true` to match Java's screen-down Y.
+        // When the flag is explicitly false, alignment in Bedrock is
+        // worth verifying — record so reviewers see it in the report.
+        if (bb.meta?.modded_entity_flip_y == false) {
+            unt.recordBbmodelFlipYUnset(modId, modelName)
+        }
+
         val geoText = buildGeometryJson(bb, modId, modelName)
         val geoOut = outputRoot.resolve("$modId/resource_pack/models/entity/$modelName.geo.json")
         geoOut.parent?.createDirectories()
