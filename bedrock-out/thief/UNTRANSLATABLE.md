@@ -42,5 +42,5 @@ These spawn eggs received default base/overlay colors because the Java side comp
 
 The Java entity renderer is too complex to parse statically. Phase 2 fell back to a heuristic geometry/texture name. Verify visually in-game and adjust the emitted `<entity_id>.entity.json` if wrong:
 
-- `thief`: no bbmodel matched id 'thief'; defaulted to 'thief.geo.json'.
+- `thief`: no bbmodel matched id 'thief'; defaulted to 'geometry.humanoid'.
 

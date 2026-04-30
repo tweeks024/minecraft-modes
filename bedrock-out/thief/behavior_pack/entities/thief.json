@@ -63,6 +63,7 @@
       "minecraft:type_family": {
         "family": [
           "thief",
+          "security_hostile",
           "monster",
           "mob"
         ]

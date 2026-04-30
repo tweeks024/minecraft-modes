@@ -10,7 +10,7 @@
         "default": "textures/entity/thief_revealed.png"
       },
       "geometry": {
-        "default": "geometry.thief.thief"
+        "default": "geometry.humanoid"
       },
       "render_controllers": [
         "controller.render.default"
