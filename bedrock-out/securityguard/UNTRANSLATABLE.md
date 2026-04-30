@@ -36,3 +36,39 @@ Java→Bedrock vanilla-sound path mapping is best-effort for Phase 1a (the trans
 - `minecraft:entity/villager/idle2` → `sounds/mob/villager/idle2`
 - `minecraft:entity/villager/idle3` → `sounds/mob/villager/idle3`
 
+## Entity goals deferred to Phase 3 LLM
+
+Phase 2 only emits Bedrock `minecraft:behavior.*` components for the **High** bucket — vanilla goals with simple-literal constructor args. Everything else is logged here for the Phase 3 LLM stage to pick up:
+
+### `SecurityGuardEntity`
+
+- `1:com.tweeks.securitycore.ai.StunningMeleeGoal` — Medium bucket — Phase 3 LLM: catalog miss for com.tweeks.securitycore.ai.StunningMeleeGoal
+    ```java
+    this.goalSelector.addGoal(1, new com.tweeks.securitycore.ai.StunningMeleeGoal(this, 1.0, true, 60, 1, 0, 0.2))
+    ```
+- `3:com.tweeks.securityguard.entity.SecurityGuardEntity.GuardTargetHostilesGoal` — Medium bucket — Phase 3 LLM: catalog miss for com.tweeks.securityguard.entity.SecurityGuardEntity.GuardTargetHostilesGoal
+    ```java
+    this.targetSelector.addGoal(3, new GuardTargetHostilesGoal(this))
+    ```
+- `4:net.minecraft.world.entity.ai.goal.target.ResetUniversalAngerTargetGoal` — Medium bucket — Phase 3 LLM: net.minecraft.world.entity.ai.goal.target.ResetUniversalAngerTargetGoal has no clean Bedrock 1.21.0 equivalent
+    ```java
+    this.targetSelector.addGoal(4, new net.minecraft.world.entity.ai.goal.target.ResetUniversalAngerTargetGoal<>(this, false))
+    ```
+- `5:net.minecraft.world.entity.ai.goal.OfferFlowerGoal` — Medium bucket — Phase 3 LLM: net.minecraft.world.entity.ai.goal.OfferFlowerGoal has no clean Bedrock 1.21.0 equivalent
+    ```java
+    this.goalSelector.addGoal(5, new net.minecraft.world.entity.ai.goal.OfferFlowerGoal(this))
+    ```
+
+## Item custom behavior
+
+These items override `Item` methods (e.g. `postHurtEnemy`, `useOn`, `hurtEnemy`) with custom logic. Phase 3 (LLM stage) translates these to `behavior_pack/scripts/items/*.ts` event handlers; Phase 2 only emits the static item JSON:
+
+- `baton`: BatonItem overrides: postHurtEnemy
+- `guard_helmet`: GuardHelmetItem overrides: useOn
+
+## Spawn egg colors hardcoded
+
+These spawn eggs received default base/overlay colors because the Java side computes them at runtime via `EntityType.Builder` defaults. Hand-tune per the source mod's mob palette if the colors look wrong in-game:
+
+- `guard_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
+

@@ -14,3 +14,63 @@ Bedrock has no equivalent of Java's `random_sequence` field; loot rolls use the 
 
 - `entities/thief.json`
 
+## Entity goals deferred to Phase 3 LLM
+
+Phase 2 only emits Bedrock `minecraft:behavior.*` components for the **High** bucket — vanilla goals with simple-literal constructor args. Everything else is logged here for the Phase 3 LLM stage to pick up:
+
+### `ThiefEntity`
+
+- `2:com.tweeks.thief.entity.ai.FleeAndFireCrossbowGoal` — Medium bucket — Phase 3 LLM: catalog miss for com.tweeks.thief.entity.ai.FleeAndFireCrossbowGoal
+    ```java
+    this.goalSelector.addGoal(2, new com.tweeks.thief.entity.ai.FleeAndFireCrossbowGoal(this))
+    ```
+- `2:com.tweeks.thief.entity.ai.SecretGuardTargetGoal` — Medium bucket — Phase 3 LLM: catalog miss for com.tweeks.thief.entity.ai.SecretGuardTargetGoal
+    ```java
+    this.targetSelector.addGoal(2, new com.tweeks.thief.entity.ai.SecretGuardTargetGoal(this))
+    ```
+- `3:com.tweeks.thief.entity.ai.BlackjackStrikeGoal` — Medium bucket — Phase 3 LLM: catalog miss for com.tweeks.thief.entity.ai.BlackjackStrikeGoal
+    ```java
+    this.goalSelector.addGoal(3, new com.tweeks.thief.entity.ai.BlackjackStrikeGoal(this))
+    ```
+- `3:net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal` — Medium bucket — Phase 3 LLM: non-literal argument to net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal
+    ```java
+    this.targetSelector.addGoal(3, new net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal<>(this, com.tweeks.securityguard.entity.SecurityGuardEntity.class, 10, true, false, (target, level) -> getRevealState().isHostile()))
+    ```
+- `4:com.tweeks.thief.entity.ai.ReturnToHideoutGoal` — Medium bucket — Phase 3 LLM: catalog miss for com.tweeks.thief.entity.ai.ReturnToHideoutGoal
+    ```java
+    this.goalSelector.addGoal(4, new com.tweeks.thief.entity.ai.ReturnToHideoutGoal(this))
+    ```
+- `4:net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal` — Medium bucket — Phase 3 LLM: non-literal argument to net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal
+    ```java
+    this.targetSelector.addGoal(4, new net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal<>(this, net.minecraft.world.entity.player.Player.class, 10, true, false, (target, level) -> {
+        RevealState s = this.getRevealState();
+        return s == RevealState.REVEALED_RANGED || s == RevealState.REVEALED_MELEE;
+    }))
+    ```
+- `5:com.tweeks.thief.entity.ai.StealFromChestGoal` — Medium bucket — Phase 3 LLM: catalog miss for com.tweeks.thief.entity.ai.StealFromChestGoal
+    ```java
+    this.goalSelector.addGoal(5, new com.tweeks.thief.entity.ai.StealFromChestGoal(this))
+    ```
+- `6:com.tweeks.thief.entity.ai.WanderInVillageGoal` — Medium bucket — Phase 3 LLM: catalog miss for com.tweeks.thief.entity.ai.WanderInVillageGoal
+    ```java
+    this.goalSelector.addGoal(6, new com.tweeks.thief.entity.ai.WanderInVillageGoal(this))
+    ```
+
+## Item custom behavior
+
+These items override `Item` methods (e.g. `postHurtEnemy`, `useOn`, `hurtEnemy`) with custom logic. Phase 3 (LLM stage) translates these to `behavior_pack/scripts/items/*.ts` event handlers; Phase 2 only emits the static item JSON:
+
+- `blackjack`: BlackjackItem overrides: hurtEnemy
+
+## Spawn egg colors hardcoded
+
+These spawn eggs received default base/overlay colors because the Java side computes them at runtime via `EntityType.Builder` defaults. Hand-tune per the source mod's mob palette if the colors look wrong in-game:
+
+- `thief_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
+
+## Render-controller texture mapping ambiguous
+
+The Java entity renderer is too complex to parse statically. Phase 2 fell back to a heuristic geometry/texture name. Verify visually in-game and adjust the emitted `<entity_id>.entity.json` if wrong:
+
+- `thief`: no bbmodel matched id 'thief'; defaulted to 'thief.geo.json'.
+
