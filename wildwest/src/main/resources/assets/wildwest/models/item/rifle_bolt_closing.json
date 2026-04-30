@@ -1,0 +1,17 @@
+{
+  "parent": "wildwest:item/rifle",
+  "elements": [
+    {
+      "from": [7, 9, 14],
+      "to": [9, 11, 18],
+      "faces": {
+        "north": { "uv": [0, 0, 2, 2], "texture": "#0" },
+        "east":  { "uv": [0, 2, 4, 4], "texture": "#0" },
+        "south": { "uv": [0, 4, 2, 6], "texture": "#0" },
+        "west":  { "uv": [0, 6, 4, 8], "texture": "#0" },
+        "up":    { "uv": [0, 8, 2, 12], "texture": "#0" },
+        "down":  { "uv": [2, 8, 4, 12], "texture": "#0" }
+      }
+    }
+  ]
+}
