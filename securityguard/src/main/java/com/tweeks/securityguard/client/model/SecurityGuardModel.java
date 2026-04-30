@@ -21,6 +21,12 @@ public class SecurityGuardModel extends HumanoidModel<HumanoidRenderState> {
 
     public SecurityGuardModel(ModelPart root) {
         super(root);
+        // HumanoidModel auto-creates a "hat" overlay child of head whose UV
+        // samples from (32..64, 0..16) — the same region our cap_brim/cap_crown
+        // child cubes occupy. Leaving it visible renders an opaque navy plane
+        // directly in front of the face, hiding the painted features. The
+        // explicit cap parts replace it.
+        this.hat.visible = false;
     }
 
     public static LayerDefinition createBodyLayer() {
