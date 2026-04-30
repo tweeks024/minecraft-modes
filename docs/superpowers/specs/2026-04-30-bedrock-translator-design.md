@@ -209,11 +209,16 @@ Manifest UUIDs are derived deterministically:
 
 ```
 namespace = UUIDv5(DNS_NAMESPACE, "minecraft-mods.tweeks.dev")
-header_uuid     = UUIDv5(namespace, mod_id + ":header")
+bp_header_uuid  = UUIDv5(namespace, mod_id + ":header")            # behavior pack header
+rp_header_uuid  = UUIDv5(namespace, mod_id + ":resource_header")   # resource pack header (must be distinct per Bedrock)
 behavior_module = UUIDv5(namespace, mod_id + ":modules.behavior")
 resource_module = UUIDv5(namespace, mod_id + ":modules.resource")
-core_dependency = UUIDv5(namespace, "securitycore:header")  # for sibling-mod refs
+core_dependency = bp_header_uuid for mod_id="securitycore"         # behavior-pack header of securitycore, used by sibling mods
 ```
+
+Bedrock requires distinct header UUIDs per pack (BP and RP). The bare `header` name above is the BP header for backward-compatible references; RP headers use the explicit `:resource_header` suffix. Sibling-mod dependencies (`securityguard`, `thief` → `securitycore`) reference securitycore's BP header UUID.
+
+BP↔RP pairing inside a single mod is wired by listing the other pack's header UUID under `dependencies` in each manifest, mirroring the documented Bedrock convention.
 
 Same input → same UUID forever. Stable across reruns, machines, and `git clone`. This is critical: Bedrock identifies installed packs by header UUID, so non-deterministic UUIDs would break existing world saves on every translator rerun.
 
