@@ -7,6 +7,7 @@ import com.tweeks.wildwest.item.RifleItem;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.SpawnEggItem;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -33,6 +34,18 @@ public final class Registration {
     public static final DeferredItem<BanditKnifeItem> BANDIT_KNIFE = ITEMS.registerItem(
         "bandit_knife", BanditKnifeItem::new, p -> p);
 
+    public static final DeferredItem<SpawnEggItem> DEPUTY_SPAWN_EGG = ITEMS.registerItem(
+        "deputy_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.DEPUTY.get()));
+
+    public static final DeferredItem<SpawnEggItem> SHERRIF_SPAWN_EGG = ITEMS.registerItem(
+        "sherrif_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.SHERRIF.get()));
+
+    public static final DeferredItem<SpawnEggItem> BANDIT_SPAWN_EGG = ITEMS.registerItem(
+        "bandit_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.BANDIT.get()));
+
+    public static final DeferredItem<SpawnEggItem> BANDIT_LEADER_SPAWN_EGG = ITEMS.registerItem(
+        "bandit_leader_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.BANDIT_LEADER.get()));
+
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> WILDWEST_TAB =
         CREATIVE_TABS.register("main", () ->
             CreativeModeTab.builder()
@@ -43,6 +56,10 @@ public final class Registration {
                     output.accept(RIFLE.get());
                     output.accept(BILLY_CLUB.get());
                     output.accept(BANDIT_KNIFE.get());
+                    output.accept(DEPUTY_SPAWN_EGG.get());
+                    output.accept(SHERRIF_SPAWN_EGG.get());
+                    output.accept(BANDIT_SPAWN_EGG.get());
+                    output.accept(BANDIT_LEADER_SPAWN_EGG.get());
                 })
                 .build());
 

@@ -1,6 +1,10 @@
 package com.tweeks.wildwest;
 
+import com.tweeks.wildwest.entity.BanditEntity;
+import com.tweeks.wildwest.entity.BanditLeaderEntity;
 import com.tweeks.wildwest.entity.BulletEntity;
+import com.tweeks.wildwest.entity.DeputyEntity;
+import com.tweeks.wildwest.entity.SherrifEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
@@ -24,6 +28,38 @@ public final class ModEntities {
             .updateInterval(1)
             .build(ResourceKey.create(Registries.ENTITY_TYPE,
                 Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "bullet"))));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<DeputyEntity>> DEPUTY =
+        ENTITY_TYPES.register("deputy", () -> EntityType.Builder.<DeputyEntity>of(
+                DeputyEntity::new, MobCategory.CREATURE)
+            .sized(0.6f, 1.95f)
+            .clientTrackingRange(10)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "deputy"))));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<SherrifEntity>> SHERRIF =
+        ENTITY_TYPES.register("sherrif", () -> EntityType.Builder.<SherrifEntity>of(
+                SherrifEntity::new, MobCategory.CREATURE)
+            .sized(0.6f, 1.95f)
+            .clientTrackingRange(10)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "sherrif"))));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<BanditEntity>> BANDIT =
+        ENTITY_TYPES.register("bandit", () -> EntityType.Builder.<BanditEntity>of(
+                BanditEntity::new, MobCategory.MONSTER)
+            .sized(0.6f, 1.95f)
+            .clientTrackingRange(10)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "bandit"))));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<BanditLeaderEntity>> BANDIT_LEADER =
+        ENTITY_TYPES.register("bandit_leader", () -> EntityType.Builder.<BanditLeaderEntity>of(
+                BanditLeaderEntity::new, MobCategory.MONSTER)
+            .sized(0.6f, 1.95f)
+            .clientTrackingRange(10)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "bandit_leader"))));
 
     public static void register(IEventBus modEventBus) {
         ENTITY_TYPES.register(modEventBus);
