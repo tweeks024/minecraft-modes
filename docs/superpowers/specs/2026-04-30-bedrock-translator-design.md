@@ -65,7 +65,9 @@ translator/
       RecipeTransform.kt
       LootTableTransform.kt
       LangTransform.kt
-      AssetCopier.kt                   # textures, sounds + item_texture.json atlas
+      SoundTransform.kt                # sounds.json → sound_definitions.json
+      AssetCopier.kt                   # texture file copy
+      ItemAtlasBuilder.kt              # item_texture.json atlas
     bbmodel/
       BbmodelConverter.kt              # native .bbmodel → .geo.json + .animation.json
     java/
