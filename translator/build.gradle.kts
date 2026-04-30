@@ -38,6 +38,11 @@ dependencies {
     // Phase 2a: Java AST + symbol resolution. Pulls in javaparser-core
     // transitively, so no separate javaparser-core dependency.
     implementation("com.github.javaparser:javaparser-symbol-solver-core:3.26.2")
+    // Phase 3: Anthropic SDK. Wired into RealClaudeClient. Tests do NOT
+    // exercise this (they use MockClaudeClient); removing this dependency
+    // would break the main classpath via the RealClaudeClient import — that
+    // is the intended check (see README "Cost expectations").
+    implementation("com.anthropic:anthropic-java:2.27.0")
 
     testImplementation(platform("org.junit:junit-bom:5.10.2"))
     testImplementation("org.junit.jupiter:junit-jupiter")
