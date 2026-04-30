@@ -30,4 +30,10 @@ public class DataGenerators {
 
         gen.addProvider(true, new ModRecipeProvider.Runner(output, lookup));
     }
+
+    @SubscribeEvent
+    public static void gatherDataClient(GatherDataEvent.Client event) {
+        DataGenerator gen = event.getGenerator();
+        gen.addProvider(true, new ModLanguageProvider(gen.getPackOutput()));
+    }
 }

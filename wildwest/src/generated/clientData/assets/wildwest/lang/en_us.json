@@ -1,0 +1,11 @@
+{
+  "death.attack.wildwest.gunshot": "%1$s was shot",
+  "death.attack.wildwest.gunshot.item": "%1$s was shot by %2$s using %3$s",
+  "death.attack.wildwest.gunshot.player": "%1$s was shot by %2$s",
+  "item.wildwest.pistol": "Pistol",
+  "item.wildwest.rifle": "Rifle",
+  "itemGroup.wildwest": "Wild West",
+  "subtitle.wildwest.bolt_cycle": "Bolt cycles",
+  "subtitle.wildwest.pistol_fire": "Pistol fires",
+  "subtitle.wildwest.rifle_fire": "Rifle fires"
+}
