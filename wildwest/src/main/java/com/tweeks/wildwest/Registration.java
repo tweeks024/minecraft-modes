@@ -1,6 +1,7 @@
 package com.tweeks.wildwest;
 
 import com.tweeks.wildwest.item.PistolItem;
+import com.tweeks.wildwest.item.RifleItem;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
@@ -21,6 +22,9 @@ public final class Registration {
     public static final DeferredItem<PistolItem> PISTOL = ITEMS.registerItem(
         "pistol", PistolItem::new, p -> p);
 
+    public static final DeferredItem<RifleItem> RIFLE = ITEMS.registerItem(
+        "rifle", RifleItem::new, p -> p);
+
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> WILDWEST_TAB =
         CREATIVE_TABS.register("main", () ->
             CreativeModeTab.builder()
@@ -28,6 +32,7 @@ public final class Registration {
                 .icon(() -> PISTOL.get().getDefaultInstance())
                 .displayItems((params, output) -> {
                     output.accept(PISTOL.get());
+                    output.accept(RIFLE.get());
                 })
                 .build());
 
