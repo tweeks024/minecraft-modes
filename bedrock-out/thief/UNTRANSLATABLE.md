@@ -14,47 +14,17 @@ Bedrock has no equivalent of Java's `random_sequence` field; loot rolls use the 
 
 - `entities/thief.json`
 
-## Entity goals deferred to Phase 3 LLM
+## Entity goals stubbed for LLM (cache miss; run :translate --with-llm to translate)
 
-Phase 2 only emits Bedrock `minecraft:behavior.*` components for the **High** bucket — vanilla goals with simple-literal constructor args. Everything else is logged here for the Phase 3 LLM stage to pick up:
+These goals produced a `// TODO LLM:` stub at `behavior_pack/scripts/goals/<GoalClass>.ts`. Either re-run with `--with-llm` (and `ANTHROPIC_API_KEY` set) to fill them in, or hand-translate them:
 
-### `ThiefEntity`
-
-- `2:com.tweeks.thief.entity.ai.FleeAndFireCrossbowGoal` — Medium bucket — Phase 3 LLM: catalog miss for com.tweeks.thief.entity.ai.FleeAndFireCrossbowGoal
-    ```java
-    this.goalSelector.addGoal(2, new com.tweeks.thief.entity.ai.FleeAndFireCrossbowGoal(this))
-    ```
-- `2:com.tweeks.thief.entity.ai.SecretGuardTargetGoal` — Medium bucket — Phase 3 LLM: catalog miss for com.tweeks.thief.entity.ai.SecretGuardTargetGoal
-    ```java
-    this.targetSelector.addGoal(2, new com.tweeks.thief.entity.ai.SecretGuardTargetGoal(this))
-    ```
-- `3:com.tweeks.thief.entity.ai.BlackjackStrikeGoal` — Medium bucket — Phase 3 LLM: catalog miss for com.tweeks.thief.entity.ai.BlackjackStrikeGoal
-    ```java
-    this.goalSelector.addGoal(3, new com.tweeks.thief.entity.ai.BlackjackStrikeGoal(this))
-    ```
-- `3:net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal` — Medium bucket — Phase 3 LLM: non-literal argument to net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal
-    ```java
-    this.targetSelector.addGoal(3, new net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal<>(this, com.tweeks.securityguard.entity.SecurityGuardEntity.class, 10, true, false, (target, level) -> getRevealState().isHostile()))
-    ```
-- `4:com.tweeks.thief.entity.ai.ReturnToHideoutGoal` — Medium bucket — Phase 3 LLM: catalog miss for com.tweeks.thief.entity.ai.ReturnToHideoutGoal
-    ```java
-    this.goalSelector.addGoal(4, new com.tweeks.thief.entity.ai.ReturnToHideoutGoal(this))
-    ```
-- `4:net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal` — Medium bucket — Phase 3 LLM: non-literal argument to net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal
-    ```java
-    this.targetSelector.addGoal(4, new net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal<>(this, net.minecraft.world.entity.player.Player.class, 10, true, false, (target, level) -> {
-        RevealState s = this.getRevealState();
-        return s == RevealState.REVEALED_RANGED || s == RevealState.REVEALED_MELEE;
-    }))
-    ```
-- `5:com.tweeks.thief.entity.ai.StealFromChestGoal` — Medium bucket — Phase 3 LLM: catalog miss for com.tweeks.thief.entity.ai.StealFromChestGoal
-    ```java
-    this.goalSelector.addGoal(5, new com.tweeks.thief.entity.ai.StealFromChestGoal(this))
-    ```
-- `6:com.tweeks.thief.entity.ai.WanderInVillageGoal` — Medium bucket — Phase 3 LLM: catalog miss for com.tweeks.thief.entity.ai.WanderInVillageGoal
-    ```java
-    this.goalSelector.addGoal(6, new com.tweeks.thief.entity.ai.WanderInVillageGoal(this))
-    ```
+- `BlackjackStrikeGoal` — cache miss; run :translate --with-llm to translate
+- `FleeAndFireCrossbowGoal` — cache miss; run :translate --with-llm to translate
+- `NearestAttackableTargetGoal` — cache miss; run :translate --with-llm to translate
+- `ReturnToHideoutGoal` — cache miss; run :translate --with-llm to translate
+- `SecretGuardTargetGoal` — cache miss; run :translate --with-llm to translate
+- `StealFromChestGoal` — cache miss; run :translate --with-llm to translate
+- `WanderInVillageGoal` — cache miss; run :translate --with-llm to translate
 
 ## Item custom behavior
 

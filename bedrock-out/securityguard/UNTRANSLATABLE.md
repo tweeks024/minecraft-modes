@@ -36,28 +36,14 @@ Java→Bedrock vanilla-sound path mapping is best-effort for Phase 1a (the trans
 - `minecraft:entity/villager/idle2` → `sounds/mob/villager/idle2`
 - `minecraft:entity/villager/idle3` → `sounds/mob/villager/idle3`
 
-## Entity goals deferred to Phase 3 LLM
+## Entity goals stubbed for LLM (cache miss; run :translate --with-llm to translate)
 
-Phase 2 only emits Bedrock `minecraft:behavior.*` components for the **High** bucket — vanilla goals with simple-literal constructor args. Everything else is logged here for the Phase 3 LLM stage to pick up:
+These goals produced a `// TODO LLM:` stub at `behavior_pack/scripts/goals/<GoalClass>.ts`. Either re-run with `--with-llm` (and `ANTHROPIC_API_KEY` set) to fill them in, or hand-translate them:
 
-### `SecurityGuardEntity`
-
-- `1:com.tweeks.securitycore.ai.StunningMeleeGoal` — Medium bucket — Phase 3 LLM: catalog miss for com.tweeks.securitycore.ai.StunningMeleeGoal
-    ```java
-    this.goalSelector.addGoal(1, new com.tweeks.securitycore.ai.StunningMeleeGoal(this, 1.0, true, 60, 1, 0, 0.2))
-    ```
-- `3:com.tweeks.securityguard.entity.SecurityGuardEntity.GuardTargetHostilesGoal` — Medium bucket — Phase 3 LLM: catalog miss for com.tweeks.securityguard.entity.SecurityGuardEntity.GuardTargetHostilesGoal
-    ```java
-    this.targetSelector.addGoal(3, new GuardTargetHostilesGoal(this))
-    ```
-- `4:net.minecraft.world.entity.ai.goal.target.ResetUniversalAngerTargetGoal` — Medium bucket — Phase 3 LLM: net.minecraft.world.entity.ai.goal.target.ResetUniversalAngerTargetGoal has no clean Bedrock 1.21.0 equivalent
-    ```java
-    this.targetSelector.addGoal(4, new net.minecraft.world.entity.ai.goal.target.ResetUniversalAngerTargetGoal<>(this, false))
-    ```
-- `5:net.minecraft.world.entity.ai.goal.OfferFlowerGoal` — Medium bucket — Phase 3 LLM: net.minecraft.world.entity.ai.goal.OfferFlowerGoal has no clean Bedrock 1.21.0 equivalent
-    ```java
-    this.goalSelector.addGoal(5, new net.minecraft.world.entity.ai.goal.OfferFlowerGoal(this))
-    ```
+- `GuardTargetHostilesGoal` — cache miss; run :translate --with-llm to translate
+- `OfferFlowerGoal` — cache miss; run :translate --with-llm to translate
+- `ResetUniversalAngerTargetGoal` — cache miss; run :translate --with-llm to translate
+- `StunningMeleeGoal` — cache miss; run :translate --with-llm to translate
 
 ## Item custom behavior
 
