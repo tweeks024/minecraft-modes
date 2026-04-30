@@ -10,5 +10,9 @@ public final class ModDamageTypeProvider {
     public static void bootstrap(BootstrapContext<DamageType> ctx) {
         ctx.register(WildWestDamageTypes.GUNSHOT,
             new DamageType("wildwest.gunshot", 0.1f));
+        ctx.register(WildWestDamageTypes.CLUB,
+            new DamageType("wildwest.club", 0.1f));
+        ctx.register(WildWestDamageTypes.KNIFE,
+            new DamageType("wildwest.knife", 0.1f));
     }
 }

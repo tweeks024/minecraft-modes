@@ -14,11 +14,35 @@ public final class WildWestDamageTypes {
         Registries.DAMAGE_TYPE,
         Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "gunshot"));
 
+    public static final ResourceKey<DamageType> CLUB = ResourceKey.create(
+        Registries.DAMAGE_TYPE,
+        Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "club"));
+
+    public static final ResourceKey<DamageType> KNIFE = ResourceKey.create(
+        Registries.DAMAGE_TYPE,
+        Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "knife"));
+
     public static DamageSource gunshot(Entity attacker) {
         return new DamageSource(
             attacker.level().registryAccess()
                 .lookupOrThrow(Registries.DAMAGE_TYPE)
                 .getOrThrow(GUNSHOT),
+            attacker);
+    }
+
+    public static DamageSource club(Entity attacker) {
+        return new DamageSource(
+            attacker.level().registryAccess()
+                .lookupOrThrow(Registries.DAMAGE_TYPE)
+                .getOrThrow(CLUB),
+            attacker);
+    }
+
+    public static DamageSource knife(Entity attacker) {
+        return new DamageSource(
+            attacker.level().registryAccess()
+                .lookupOrThrow(Registries.DAMAGE_TYPE)
+                .getOrThrow(KNIFE),
             attacker);
     }
 }

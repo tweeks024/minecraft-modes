@@ -1,5 +1,7 @@
 package com.tweeks.wildwest;
 
+import com.tweeks.wildwest.item.BanditKnifeItem;
+import com.tweeks.wildwest.item.BillyClubItem;
 import com.tweeks.wildwest.item.PistolItem;
 import com.tweeks.wildwest.item.RifleItem;
 import net.minecraft.core.registries.Registries;
@@ -25,6 +27,12 @@ public final class Registration {
     public static final DeferredItem<RifleItem> RIFLE = ITEMS.registerItem(
         "rifle", RifleItem::new, p -> p);
 
+    public static final DeferredItem<BillyClubItem> BILLY_CLUB = ITEMS.registerItem(
+        "billy_club", BillyClubItem::new, p -> p);
+
+    public static final DeferredItem<BanditKnifeItem> BANDIT_KNIFE = ITEMS.registerItem(
+        "bandit_knife", BanditKnifeItem::new, p -> p);
+
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> WILDWEST_TAB =
         CREATIVE_TABS.register("main", () ->
             CreativeModeTab.builder()
@@ -33,6 +41,8 @@ public final class Registration {
                 .displayItems((params, output) -> {
                     output.accept(PISTOL.get());
                     output.accept(RIFLE.get());
+                    output.accept(BILLY_CLUB.get());
+                    output.accept(BANDIT_KNIFE.get());
                 })
                 .build());
 
