@@ -32,6 +32,20 @@ data class BedrockTarget(
          * a newer sounds format and we want to opt in.
          */
         val sounds: String = "1.14.0",
+        /**
+         * Format version for `resource_pack/entity/<entity_id>.entity.json`
+         * (the client-side entity description). Defaulted to "1.10.0" — the
+         * Bedrock value still in active use — so older `bedrock-target.json`
+         * files load. Bump in the JSON if a newer client_entity schema is
+         * needed.
+         */
+        val client_entity: String = "1.10.0",
+        /**
+         * Format version for `resource_pack/attachables/<item_id>.json`
+         * (held-item attachable descriptions). Defaulted to "1.10.0" for the
+         * same reasons as [client_entity].
+         */
+        val attachable: String = "1.10.0",
     )
 
     companion object {

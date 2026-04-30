@@ -33,6 +33,11 @@ class Untranslatable {
     private val bbmodelNonLinearInterp = TreeMap<String, TreeMap<String, String>>()
     private val bbmodelFlipYUnset = TreeMap<String, TreeSet<String>>()
     private val javaParseErrors = TreeMap<String, TreeMap<String, String>>()
+    private val entityGoalsDeferred = TreeMap<String, TreeMap<String, TreeMap<String, GoalDeferral>>>()
+    private val itemCustomBehavior = TreeMap<String, TreeMap<String, String>>()
+    private val spawnEggColorsHardcoded = TreeMap<String, TreeMap<String, String>>()
+    private val renderControllerAmbiguous = TreeMap<String, TreeMap<String, String>>()
+    private val phase2Failures = TreeMap<String, String>()
 
     fun recordRecipeCategoryDropped(modId: String, recipeName: String) {
         recipeCategoryDropped.getOrPut(modId) { TreeSet() }.add(recipeName)
@@ -96,6 +101,73 @@ class Untranslatable {
         javaParseErrors.getOrPut(modId) { TreeMap() }[file] = error
     }
 
+    /**
+     * Whether to demote an AI goal to the Phase 3 LLM (Medium bucket) or
+     * label it as Low — a hand-written-JS placeholder for novel logic.
+     */
+    enum class GoalBucket { MEDIUM, LOW }
+
+    data class GoalDeferral(
+        val bucket: GoalBucket,
+        val reason: String,
+        val sourceExcerpt: String?,
+    )
+
+    /**
+     * Record an AI goal that the High-bucket pattern matcher could not
+     * translate. [entityName] is the simple class name (e.g.
+     * `SecurityGuardEntity`); [goalKey] is a stable key for the goal
+     * call site (`<priority>:<goalFqn>`) so the report orders by the
+     * priority position in `registerGoals()`.
+     */
+    fun recordEntityGoalDeferred(
+        modId: String,
+        entityName: String,
+        goalKey: String,
+        bucket: GoalBucket,
+        reason: String,
+        sourceExcerpt: String? = null,
+    ) {
+        entityGoalsDeferred
+            .getOrPut(modId) { TreeMap() }
+            .getOrPut(entityName) { TreeMap() }[goalKey] = GoalDeferral(bucket, reason, sourceExcerpt)
+    }
+
+    /**
+     * Record a custom item class whose behavior overrides (e.g.
+     * `postHurtEnemy`, `useOn`) cannot be translated by Phase 2's
+     * deterministic analyzer.
+     */
+    fun recordItemCustomBehavior(modId: String, itemId: String, summary: String) {
+        itemCustomBehavior.getOrPut(modId) { TreeMap() }[itemId] = summary
+    }
+
+    /**
+     * Record a spawn-egg item that received hardcoded base/overlay
+     * colors because the Java side computes them at runtime.
+     */
+    fun recordSpawnEggColorsHardcoded(modId: String, itemId: String, summary: String) {
+        spawnEggColorsHardcoded.getOrPut(modId) { TreeMap() }[itemId] = summary
+    }
+
+    /**
+     * Record an entity whose Java renderer's texture/geometry mapping
+     * couldn't be determined statically — the reviewer should verify the
+     * heuristic guess.
+     */
+    fun recordRenderControllerAmbiguous(modId: String, entityId: String, summary: String) {
+        renderControllerAmbiguous.getOrPut(modId) { TreeMap() }[entityId] = summary
+    }
+
+    /**
+     * Record a Phase 2 analyzer that threw on this mod. The CLI catches
+     * the exception so other mods continue to translate; this entry
+     * tells the user what went wrong.
+     */
+    fun recordPhase2Failure(modId: String, summary: String) {
+        phase2Failures[modId] = summary
+    }
+
     /** Set of mod ids that have at least one recorded finding. */
     fun modsWithFindings(): Set<String> {
         val ids = TreeSet<String>()
@@ -112,6 +184,11 @@ class Untranslatable {
         ids.addAll(bbmodelNonLinearInterp.keys)
         ids.addAll(bbmodelFlipYUnset.keys)
         ids.addAll(javaParseErrors.keys)
+        ids.addAll(entityGoalsDeferred.keys)
+        ids.addAll(itemCustomBehavior.keys)
+        ids.addAll(spawnEggColorsHardcoded.keys)
+        ids.addAll(renderControllerAmbiguous.keys)
+        ids.addAll(phase2Failures.keys)
         return ids
     }
 
@@ -231,6 +308,57 @@ class Untranslatable {
             sb.append("These files were skipped by the Java pipeline. Phase 2 analyses (entity attributes, AI goals, item logic) will not see them:\n\n")
             for ((f, err) in items) sb.append("- `").append(f).append("`: ").append(err).append('\n')
             sb.append('\n')
+        }
+        entityGoalsDeferred[modId]?.takeIf { it.isNotEmpty() }?.let { entities ->
+            any = true
+            sb.append("## Entity goals deferred to Phase 3 LLM\n\n")
+            sb.append("Phase 2 only emits Bedrock `minecraft:behavior.*` components for the **High** bucket — vanilla goals with simple-literal constructor args. Everything else is logged here for the Phase 3 LLM stage to pick up:\n\n")
+            for ((entityName, goals) in entities) {
+                sb.append("### `").append(entityName).append("`\n\n")
+                for ((goalKey, deferral) in goals) {
+                    val bucketLabel = when (deferral.bucket) {
+                        GoalBucket.MEDIUM -> "Medium bucket — Phase 3 LLM"
+                        GoalBucket.LOW -> "Low bucket — manual JS"
+                    }
+                    sb.append("- `").append(goalKey).append("` — ").append(bucketLabel)
+                    sb.append(": ").append(deferral.reason).append('\n')
+                    if (!deferral.sourceExcerpt.isNullOrBlank()) {
+                        sb.append("    ```java\n")
+                        for (line in deferral.sourceExcerpt.lines()) {
+                            sb.append("    ").append(line).append('\n')
+                        }
+                        sb.append("    ```\n")
+                    }
+                }
+                sb.append('\n')
+            }
+        }
+        itemCustomBehavior[modId]?.takeIf { it.isNotEmpty() }?.let { items ->
+            any = true
+            sb.append("## Item custom behavior\n\n")
+            sb.append("These items override `Item` methods (e.g. `postHurtEnemy`, `useOn`, `hurtEnemy`) with custom logic. Phase 3 (LLM stage) translates these to `behavior_pack/scripts/items/*.ts` event handlers; Phase 2 only emits the static item JSON:\n\n")
+            for ((itemId, summary) in items) sb.append("- `").append(itemId).append("`: ").append(summary).append('\n')
+            sb.append('\n')
+        }
+        spawnEggColorsHardcoded[modId]?.takeIf { it.isNotEmpty() }?.let { items ->
+            any = true
+            sb.append("## Spawn egg colors hardcoded\n\n")
+            sb.append("These spawn eggs received default base/overlay colors because the Java side computes them at runtime via `EntityType.Builder` defaults. Hand-tune per the source mod's mob palette if the colors look wrong in-game:\n\n")
+            for ((itemId, summary) in items) sb.append("- `").append(itemId).append("`: ").append(summary).append('\n')
+            sb.append('\n')
+        }
+        renderControllerAmbiguous[modId]?.takeIf { it.isNotEmpty() }?.let { items ->
+            any = true
+            sb.append("## Render-controller texture mapping ambiguous\n\n")
+            sb.append("The Java entity renderer is too complex to parse statically. Phase 2 fell back to a heuristic geometry/texture name. Verify visually in-game and adjust the emitted `<entity_id>.entity.json` if wrong:\n\n")
+            for ((entityId, summary) in items) sb.append("- `").append(entityId).append("`: ").append(summary).append('\n')
+            sb.append('\n')
+        }
+        phase2Failures[modId]?.let { summary ->
+            any = true
+            sb.append("## Phase 2 analyzer failure\n\n")
+            sb.append("A Phase 2 analyzer (entity / item) threw on this mod. Other mods still translated. Stack-trace summary:\n\n")
+            sb.append("```\n").append(summary).append("\n```\n\n")
         }
 
         if (!any) {
