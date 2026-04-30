@@ -6,6 +6,8 @@ import com.tweeks.translator.discover.ModMetadata
 import com.tweeks.translator.emit.AddonWriter
 import com.tweeks.translator.emit.Untranslatable
 import com.tweeks.translator.java.ClasspathResolver
+import com.tweeks.translator.java.EntityAnalyzer
+import com.tweeks.translator.java.ItemAnalyzer
 import com.tweeks.translator.java.JavaSourceLoader
 import com.tweeks.translator.json.AssetCopier
 import com.tweeks.translator.json.ItemAtlasBuilder
@@ -111,28 +113,51 @@ fun main(args: Array<String>) {
         // JSON pipeline: each transform shares one Untranslatable so the
         // per-mod report aggregates findings across the whole pipeline.
         val unt = Untranslatable()
-        recipeTransform(unt).translate(mod.rootDir, mod.modId, outputRoot)
-        lootTransform(unt).translate(mod.rootDir, mod.modId, outputRoot)
-        langTransform.translate(mod.rootDir, mod.modId, outputRoot)
-        soundTransform(unt).translate(mod.rootDir, mod.modId, outputRoot)
-        val copyResult = assetCopier(unt).copy(mod.rootDir, mod.modId, outputRoot)
-        atlasBuilder.build(mod.modId, copyResult.itemTextureShortNames, outputRoot)
-        bbmodelConverter(unt).convert(mod.modId, mod.rootDir.resolve("tools"), outputRoot)
 
-        // Phase 2a: parse the Java sources and report the unit count.
-        // No analysis yet — Phase 2b builds EntityAnalyzer/ItemAnalyzer
-        // on top of this. The classpath property is set by the Gradle
-        // task; if it isn't available, skip silently (we already warned
-        // once at startup).
+        // Phase 1 transforms each get their own try/catch so a single
+        // mod-shaped surprise doesn't kill the rest of the pipeline.
+        runStage("recipes", mod.modId, unt) { recipeTransform(unt).translate(mod.rootDir, mod.modId, outputRoot) }
+        runStage("loot", mod.modId, unt) { lootTransform(unt).translate(mod.rootDir, mod.modId, outputRoot) }
+        runStage("lang", mod.modId, unt) { langTransform.translate(mod.rootDir, mod.modId, outputRoot) }
+        runStage("sound", mod.modId, unt) { soundTransform(unt).translate(mod.rootDir, mod.modId, outputRoot) }
+        var copyResult: com.tweeks.translator.json.AssetCopier.CopyResult? = null
+        runStage("assets", mod.modId, unt) { copyResult = assetCopier(unt).copy(mod.rootDir, mod.modId, outputRoot) }
+        copyResult?.let { runStage("atlas", mod.modId, unt) { atlasBuilder.build(mod.modId, it.itemTextureShortNames, outputRoot) } }
+        runStage("bbmodel", mod.modId, unt) { bbmodelConverter(unt).convert(mod.modId, mod.rootDir.resolve("tools"), outputRoot) }
+
+        // Phase 2: parse the Java sources, then run entity + item
+        // analyzers against the AST. The classpath property is set by
+        // the Gradle task; if it isn't available, skip silently (we
+        // already warned once at startup).
         if (classpathResolver.isAvailable()) {
-            val loader = JavaSourceLoader(classpathResolver, unt)
-            val resolved = loader.load(mod, allDiscovered)
-            System.err.println("[translator] ${mod.modId}: parsed ${resolved.units.size} java files")
+            runStage("java-pipeline", mod.modId, unt) {
+                val loader = JavaSourceLoader(classpathResolver, unt)
+                val resolved = loader.load(mod, allDiscovered)
+                System.err.println("[translator] ${mod.modId}: parsed ${resolved.units.size} java files")
+                EntityAnalyzer(target, unt).analyze(mod, resolved, outputRoot)
+                ItemAnalyzer(target, unt).analyze(mod, resolved, outputRoot)
+            }
         }
 
         unt.writeFor(mod.modId, outputRoot)
 
         println("[translator] Wrote ${result.modId}: ${result.outputDir.absolutePathString()}")
+    }
+}
+
+/**
+ * Run one transform stage with a per-mod try/catch. If the stage throws,
+ * the failure is logged on the Untranslatable accumulator (so it appears
+ * in the per-mod UNTRANSLATABLE.md) and the loop continues. Phase 2's
+ * analyzers in particular can throw on unfamiliar AST shapes; one bad
+ * mod shouldn't kill the others.
+ */
+private inline fun runStage(name: String, modId: String, unt: Untranslatable, block: () -> Unit) {
+    try {
+        block()
+    } catch (e: Throwable) {
+        System.err.println("[translator] $modId: stage '$name' failed: ${e.javaClass.simpleName}: ${e.message}")
+        unt.recordPhase2Failure(modId, "stage='$name': ${e.javaClass.simpleName}: ${e.message}")
     }
 }
 
