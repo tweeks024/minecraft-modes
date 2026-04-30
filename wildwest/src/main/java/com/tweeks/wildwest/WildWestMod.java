@@ -15,5 +15,6 @@ public class WildWestMod {
         LOGGER.info("Wild West mod loading");
         Registration.register(modEventBus);
         ModSounds.register(modEventBus);
+        ModEntities.register(modEventBus);
     }
 }
