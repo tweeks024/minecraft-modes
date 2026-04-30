@@ -1,0 +1,52 @@
+{
+  "format_version": "1.14.0",
+  "sound_definitions": {
+    "securityguard:guard_ambient": {
+      "category": "neutral",
+      "sounds": [
+        {
+          "name": "sounds/mob/villager/idle1",
+          "stream": false
+        },
+        {
+          "name": "sounds/mob/villager/idle2",
+          "stream": false
+        },
+        {
+          "name": "sounds/mob/villager/idle3",
+          "stream": false
+        }
+      ]
+    },
+    "securityguard:guard_death": {
+      "category": "neutral",
+      "sounds": [
+        {
+          "name": "sounds/mob/villager/death",
+          "stream": false
+        }
+      ]
+    },
+    "securityguard:guard_hurt": {
+      "category": "neutral",
+      "sounds": [
+        {
+          "name": "sounds/mob/villager/hit1",
+          "stream": false
+        },
+        {
+          "name": "sounds/mob/villager/hit2",
+          "stream": false
+        },
+        {
+          "name": "sounds/mob/villager/hit3",
+          "stream": false
+        },
+        {
+          "name": "sounds/mob/villager/hit4",
+          "stream": false
+        }
+      ]
+    }
+  }
+}

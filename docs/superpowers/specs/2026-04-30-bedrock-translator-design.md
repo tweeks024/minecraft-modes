@@ -245,7 +245,8 @@ Bedrock requires a single dictionary at `resource_pack/textures/item_texture.jso
     "recipe": "1.20.10",
     "geometry": "1.16.0",
     "animation": "1.10.0",
-    "loot_table": "1.20.10"
+    "loot_table": "1.20.10",
+    "sounds": "1.14.0"
   },
   "scripting_api_version": "1.21.80"
 }

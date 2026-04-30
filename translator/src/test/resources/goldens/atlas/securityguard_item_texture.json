@@ -1,0 +1,15 @@
+{
+  "resource_pack_name": "securityguard",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "securityguard:baton": {
+      "textures": "textures/items/baton"
+    },
+    "securityguard:guard_helmet": {
+      "textures": "textures/items/guard_helmet"
+    },
+    "securityguard:guard_spawn_egg": {
+      "textures": "textures/items/guard_spawn_egg"
+    }
+  }
+}

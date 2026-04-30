@@ -24,6 +24,14 @@ data class BedrockTarget(
         val geometry: String,
         val animation: String,
         val loot_table: String,
+        /**
+         * Format version for `resource_pack/sounds/sound_definitions.json`.
+         * Defaulted to "1.14.0" — the published Bedrock value for sound
+         * definitions today — so that older `bedrock-target.json` files (no
+         * `sounds` key) continue to load. Override in the JSON if Mojang ships
+         * a newer sounds format and we want to opt in.
+         */
+        val sounds: String = "1.14.0",
     )
 
     companion object {

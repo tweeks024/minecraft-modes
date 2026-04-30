@@ -1,0 +1,12 @@
+{
+  "resource_pack_name": "thief",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "thief:blackjack": {
+      "textures": "textures/items/blackjack"
+    },
+    "thief:thief_spawn_egg": {
+      "textures": "textures/items/thief_spawn_egg"
+    }
+  }
+}

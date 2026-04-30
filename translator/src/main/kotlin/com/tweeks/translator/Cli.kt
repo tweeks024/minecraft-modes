@@ -3,6 +3,13 @@ package com.tweeks.translator
 import com.tweeks.translator.discover.ModDiscovery
 import com.tweeks.translator.discover.ModMetadata
 import com.tweeks.translator.emit.AddonWriter
+import com.tweeks.translator.emit.Untranslatable
+import com.tweeks.translator.json.AssetCopier
+import com.tweeks.translator.json.ItemAtlasBuilder
+import com.tweeks.translator.json.LangTransform
+import com.tweeks.translator.json.LootTableTransform
+import com.tweeks.translator.json.RecipeTransform
+import com.tweeks.translator.json.SoundTransform
 import com.tweeks.translator.manifest.BedrockTarget
 import com.tweeks.translator.manifest.ManifestWriter
 import java.nio.file.Path
@@ -61,6 +68,14 @@ fun main(args: Array<String>) {
         return
     }
 
+    val outputRoot = AddonWriter.defaultOutputRoot(repoRoot)
+    val recipeTransform = { unt: Untranslatable -> RecipeTransform(target, unt) }
+    val lootTransform = { unt: Untranslatable -> LootTableTransform(unt) }
+    val langTransform = LangTransform()
+    val soundTransform = { unt: Untranslatable -> SoundTransform(target, unt) }
+    val assetCopier = AssetCopier()
+    val atlasBuilder = ItemAtlasBuilder()
+
     for (mod in mods) {
         val metadata = ModMetadata.read(mod.rootDir, mod.modId)
         val inputs = ManifestWriter.ModManifestInputs(
@@ -70,6 +85,18 @@ fun main(args: Array<String>) {
             requiresSecurityCore = metadata.requiresSecurityCore,
         )
         val result = addonWriter.write(mod, inputs)
+
+        // JSON pipeline: each transform shares one Untranslatable so the
+        // per-mod report aggregates findings across the whole pipeline.
+        val unt = Untranslatable()
+        recipeTransform(unt).translate(mod.rootDir, mod.modId, outputRoot)
+        lootTransform(unt).translate(mod.rootDir, mod.modId, outputRoot)
+        langTransform.translate(mod.rootDir, mod.modId, outputRoot)
+        soundTransform(unt).translate(mod.rootDir, mod.modId, outputRoot)
+        val copyResult = assetCopier.copy(mod.rootDir, mod.modId, outputRoot)
+        atlasBuilder.build(mod.modId, copyResult.itemTextureShortNames, outputRoot)
+        unt.writeFor(mod.modId, outputRoot)
+
         println("[translator] Wrote ${result.modId}: ${result.outputDir.absolutePathString()}")
     }
 }
