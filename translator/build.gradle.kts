@@ -124,3 +124,78 @@ tasks.register<JavaExec>("translate") {
     dependsOn(dumpModClasspaths)
     systemProperty("translator.classpathDir", classpathManifestDir.get().asFile.absolutePath)
 }
+
+// ---------------------------------------------------------------------
+// Phase 5.1: .mcaddon packaging.
+//
+// A Bedrock Add-On is a `.zip` renamed to `.mcaddon` containing one or more
+// pack subdirectories (BP and/or RP). Mojang's importer drops every BP and
+// RP it finds inside the zip into the user's "My Packs" list at once.
+//
+// Per spec section "Phased build plan / Phase 5":
+//   - One `.mcaddon` per mod, written to `bedrock-out/<modId>.mcaddon`.
+//   - For securityguard and thief (which depend on securitycore), bundle
+//     securitycore's BP and RP inside the same `.mcaddon` so the user
+//     drops one file and gets every required pack.
+//   - For securitycore and creeperskin, bundle only their own packs.
+//
+// Determinism: zips must be byte-stable across reruns, otherwise our drift
+// gate (Phase 5.4) would fire on every build. `preserveFileTimestamps =
+// false` zeroes mtimes; `reproducibleFileOrder = true` sorts entries.
+//
+// Each `packAddon_<modId>` task is wired from a single helper to keep the
+// configuration DRY. The aggregator `packAddon` depends on every per-mod
+// task — that's the user-facing entry point.
+// ---------------------------------------------------------------------
+val mcaddonModProjects = listOf("securitycore", "securityguard", "creeperskin", "thief")
+
+// Mods that bundle securitycore's packs alongside their own. Keep this in
+// sync with `ModMetadata.requiresSecurityCoreFor` — the truth is the same
+// "needs securitycore" relationship on the runtime side.
+val mcaddonRequiresSecurityCore = setOf("securityguard", "thief")
+
+val bedrockOutDir = rootProject.layout.projectDirectory.dir("bedrock-out")
+
+val perModPackAddonTasks: Map<String, TaskProvider<Zip>> = mcaddonModProjects.associateWith { modId ->
+    tasks.register<Zip>("packAddon_$modId") {
+        group = "translator"
+        description = "Build bedrock-out/$modId.mcaddon from the translated $modId Add-On."
+        // The translator must have produced bedrock-out/<modId>/ before we zip it.
+        dependsOn("translate")
+
+        archiveBaseName.set(modId)
+        archiveExtension.set("mcaddon")
+        archiveVersion.set("")
+        destinationDirectory.set(bedrockOutDir)
+
+        // Reproducibility — see spec Repo Conventions.
+        isPreserveFileTimestamps = false
+        isReproducibleFileOrder = true
+
+        // <modId>_BP and <modId>_RP from this mod's own pack tree.
+        from(bedrockOutDir.dir("$modId/behavior_pack")) {
+            into("${modId}_BP")
+        }
+        from(bedrockOutDir.dir("$modId/resource_pack")) {
+            into("${modId}_RP")
+        }
+
+        // Sibling-dependent mods: also bundle securitycore's BP and RP so
+        // the .mcaddon is self-contained for the user.
+        if (modId in mcaddonRequiresSecurityCore) {
+            from(bedrockOutDir.dir("securitycore/behavior_pack")) {
+                into("securitycore_BP")
+            }
+            from(bedrockOutDir.dir("securitycore/resource_pack")) {
+                into("securitycore_RP")
+            }
+        }
+    }
+}
+
+tasks.register("packAddon") {
+    group = "translator"
+    description = "Build .mcaddon files for every mod under bedrock-out/."
+    perModPackAddonTasks.values.forEach { dependsOn(it) }
+}
+
