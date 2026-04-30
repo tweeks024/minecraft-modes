@@ -25,9 +25,11 @@ class AddonWriter(
     private val manifestWriter: ManifestWriter,
 ) {
     /**
-     * Emit the Bedrock Add-On scaffold for [mod]. Existing files for this
-     * specific mod are overwritten; sibling mods' subdirectories under
-     * [outputRoot] are left untouched.
+     * Emit the Bedrock Add-On scaffold for [mod]. The caller (`Cli`) is
+     * responsible for clean-before-write of `<outputRoot>/<modId>/` so each
+     * translate run produces a from-scratch tree per mod; this method only
+     * (re)creates the directories it needs and writes the manifests.
+     * Sibling mods' subdirectories under [outputRoot] are left untouched.
      */
     fun write(mod: DiscoveredMod, inputs: ManifestWriter.ModManifestInputs): WriteResult {
         require(mod.modId == inputs.modId) {
@@ -64,8 +66,8 @@ class AddonWriter(
     companion object {
         /**
          * Default output root: `<repoRoot>/bedrock-out`. Created if missing.
-         * Does not delete or scrub the directory — siblings' subdirs are
-         * preserved across runs.
+         * The root itself is preserved across runs; clean-before-write only
+         * scrubs the per-mod subdirectory `<root>/<modId>/` (see `Cli`).
          */
         fun defaultOutputRoot(repoRoot: Path): Path {
             val out = repoRoot.resolve("bedrock-out")

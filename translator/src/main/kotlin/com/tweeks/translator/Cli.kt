@@ -14,6 +14,7 @@ import com.tweeks.translator.manifest.BedrockTarget
 import com.tweeks.translator.manifest.ManifestWriter
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
+import kotlin.io.path.exists
 import kotlin.system.exitProcess
 
 /**
@@ -73,10 +74,15 @@ fun main(args: Array<String>) {
     val lootTransform = { unt: Untranslatable -> LootTableTransform(unt) }
     val langTransform = LangTransform()
     val soundTransform = { unt: Untranslatable -> SoundTransform(target, unt) }
-    val assetCopier = AssetCopier()
+    val assetCopier = { unt: Untranslatable -> AssetCopier(unt) }
     val atlasBuilder = ItemAtlasBuilder()
 
     for (mod in mods) {
+        // Clean the per-mod output dir so stale files (e.g. removed/renamed
+        // recipes) don't survive across runs. Sibling-mod subdirs are
+        // untouched.
+        cleanModOutputDir(outputRoot, mod.modId)
+
         val metadata = ModMetadata.read(mod.rootDir, mod.modId)
         val inputs = ManifestWriter.ModManifestInputs(
             modId = metadata.modId,
@@ -93,12 +99,40 @@ fun main(args: Array<String>) {
         lootTransform(unt).translate(mod.rootDir, mod.modId, outputRoot)
         langTransform.translate(mod.rootDir, mod.modId, outputRoot)
         soundTransform(unt).translate(mod.rootDir, mod.modId, outputRoot)
-        val copyResult = assetCopier.copy(mod.rootDir, mod.modId, outputRoot)
+        val copyResult = assetCopier(unt).copy(mod.rootDir, mod.modId, outputRoot)
         atlasBuilder.build(mod.modId, copyResult.itemTextureShortNames, outputRoot)
         unt.writeFor(mod.modId, outputRoot)
 
         println("[translator] Wrote ${result.modId}: ${result.outputDir.absolutePathString()}")
     }
+}
+
+/**
+ * Recursively delete `<outputRoot>/<modId>/` so the next translate run
+ * produces a from-scratch tree for that mod. No-op if the directory does
+ * not yet exist. Other mods' subdirectories under [outputRoot] are not
+ * touched.
+ *
+ * Guards against pathological inputs: if [modId] is blank or contains a
+ * path separator, refuse to delete anything (would otherwise risk wiping
+ * the bedrock-out root or escaping it entirely).
+ */
+internal fun cleanModOutputDir(outputRoot: Path, modId: String) {
+    require(modId.isNotBlank() && !modId.contains('/') && !modId.contains('\\') && modId != "." && modId != "..") {
+        "Refusing to clean output dir for suspicious modId '$modId'."
+    }
+    val modOut = outputRoot.resolve(modId)
+    if (!modOut.exists()) return
+    // Sanity-check: confirm modOut actually lives under outputRoot. (Defense
+    // in depth — `resolve` with a benign modId can never escape, but the
+    // require() above is the only thing standing between us and a
+    // user-supplied path.)
+    val realRoot = outputRoot.toAbsolutePath().normalize()
+    val realMod = modOut.toAbsolutePath().normalize()
+    require(realMod.startsWith(realRoot) && realMod != realRoot) {
+        "Refusing to clean '$realMod' — not strictly inside output root '$realRoot'."
+    }
+    modOut.toFile().deleteRecursively()
 }
 
 internal data class CliOptions(
