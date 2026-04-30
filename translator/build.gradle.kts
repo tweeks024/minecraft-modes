@@ -199,3 +199,26 @@ tasks.register("packAddon") {
     perModPackAddonTasks.values.forEach { dependsOn(it) }
 }
 
+// ---------------------------------------------------------------------
+// Phase 5.4: CI drift gate.
+//
+// Runs the translator in --diff --no-llm mode (cache-only, never touches
+// Anthropic). Translates to a temp directory, diffs against bedrock-out/,
+// exits 1 with a diff summary if drifted. Wired into `:translator:check`
+// so the standard `./gradlew check` lifecycle catches stale committed
+// output without spending LLM tokens.
+// ---------------------------------------------------------------------
+tasks.register<JavaExec>("driftCheck") {
+    group = "translator"
+    description = "Translate in-memory and diff against bedrock-out/. Fails the build on drift."
+    classpath = sourceSets.main.get().runtimeClasspath
+    mainClass.set("com.tweeks.translator.CliKt")
+    workingDir = rootProject.projectDir
+    dependsOn(dumpModClasspaths)
+    systemProperty("translator.classpathDir", classpathManifestDir.get().asFile.absolutePath)
+    args = listOf("--diff", "--no-llm")
+}
+
+// Hook driftCheck into the standard `check` lifecycle so CI runs it
+// automatically. Dev `./gradlew :translator:check` also triggers it.
+tasks.named("check").configure { dependsOn("driftCheck") }

@@ -7,16 +7,13 @@ import org.junit.jupiter.api.Test
 /**
  * Unit tests for the flag-handling helpers in [Cli].
  *
- * Phase 3 status:
- *   - `--no-llm` and `--clear-cache` are now implemented; they no longer
- *     trigger an unimplemented-flag exit. `--no-llm` is a no-op alias for
- *     "default behavior" (cache-or-stub). `--clear-cache` wipes the on-disk
- *     LLM cache before running. `--with-llm` opts into live API calls.
- *   - `--diff` is still unimplemented (planned Phase 4+).
+ * Phase 5: every CLI flag is now implemented, so [collectUnimplementedFlags]
+ * always returns the empty list. The flag wiring (parseArgs) is still the
+ * thing under test — Phase 6+ flags will go back through the unimplemented
+ * helpers when they land.
  *
  * `main()` itself isn't tested here (it calls `exitProcess`); these tests
- * exercise the pure helpers `parseArgs`, `collectUnimplementedFlags`, and
- * `unimplementedFlagMessage`.
+ * exercise the pure helpers `parseArgs` and `collectUnimplementedFlags`.
  */
 class CliFlagsTest {
 
@@ -33,7 +30,9 @@ class CliFlagsTest {
     }
 
     @Test
-    fun `diff alone is reported`() {
+    fun `diff is now implemented`() {
+        // Phase 5.4: --diff translates to a temp dir and compares against
+        // bedrock-out/. No longer an unimplemented flag.
         val opts = CliOptions(
             modId = null,
             diff = true,
@@ -41,7 +40,7 @@ class CliFlagsTest {
             withLlm = false,
             clearCache = false,
         )
-        assertEquals(listOf(UnimplementedFlag.DIFF), collectUnimplementedFlags(opts))
+        assertEquals(emptyList<UnimplementedFlag>(), collectUnimplementedFlags(opts))
     }
 
     @Test
@@ -82,20 +81,17 @@ class CliFlagsTest {
     }
 
     @Test
-    fun `single flag message names the flag and its phase`() {
-        val msg = unimplementedFlagMessage(listOf(UnimplementedFlag.DIFF))
-        assertTrue(msg.startsWith("[translator] Flag not yet implemented:")) {
-            "Expected singular header, got: $msg"
-        }
-        assertTrue(msg.contains("--diff")) { "Message must name --diff: $msg" }
-        assertTrue(msg.contains("Phase 4+")) { "Message must name --diff's planned phase: $msg" }
-    }
-
-    @Test
     fun `parseArgs accepts with-llm and clear-cache together`() {
         val opts = parseArgs(arrayOf("--with-llm", "--clear-cache", "securityguard"))
         assertTrue(opts.withLlm)
         assertTrue(opts.clearCache)
         assertEquals("securityguard", opts.modId)
+    }
+
+    @Test
+    fun `parseArgs accepts diff and no-llm together`() {
+        val opts = parseArgs(arrayOf("--diff", "--no-llm"))
+        assertTrue(opts.diff)
+        assertTrue(opts.noLlm)
     }
 }

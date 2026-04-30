@@ -1,6 +1,7 @@
 package com.tweeks.translator
 
 import com.tweeks.translator.bbmodel.BbmodelConverter
+import com.tweeks.translator.diff.TreeDiff
 import com.tweeks.translator.discover.ModDiscovery
 import com.tweeks.translator.discover.ModMetadata
 import com.tweeks.translator.emit.AddonWriter
@@ -23,6 +24,7 @@ import com.tweeks.translator.json.RecipeTransform
 import com.tweeks.translator.json.SoundTransform
 import com.tweeks.translator.manifest.BedrockTarget
 import com.tweeks.translator.manifest.ManifestWriter
+import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.exists
@@ -34,35 +36,67 @@ import kotlin.system.exitProcess
  * Usage (via Gradle wrapper):
  *   ./gradlew :translator:translate
  *   ./gradlew :translator:translate --args="securityguard"
- *   ./gradlew :translator:translate --args="--diff"            # not yet implemented (exits 2)
+ *   ./gradlew :translator:translate --args="--diff"            # Phase 5: drift check vs bedrock-out/
  *   ./gradlew :translator:translate --args="--with-llm"        # Phase 3: enable live API calls
  *   ./gradlew :translator:translate --args="--clear-cache"     # Phase 3: wipe translator/.cache/llm/ first
  *
- * Phase 3 status:
+ * Phase status:
  *   - `--with-llm` opts into live Anthropic API calls (requires `ANTHROPIC_API_KEY`).
  *     Without it, Medium-bucket goals produce `// TODO LLM:` stubs except where a
  *     pre-populated cache entry hits.
  *   - `--clear-cache` deletes `translator/.cache/llm/` before running.
- *   - `--no-llm` is recognized as the default and accepted as a no-op alias for
- *     forward compatibility (CI configs that pass it explicitly should keep working).
- *   - `--diff` is still unimplemented; see Phase 4.
+ *   - `--no-llm` is the default and accepted as a no-op alias for forward
+ *     compatibility (CI configs that pass it explicitly should keep working).
+ *   - `--diff` (Phase 5) translates to a temp dir and compares against
+ *     `bedrock-out/`. Exits 0 if matching, 1 (with a diff summary) otherwise.
  */
 fun main(args: Array<String>) {
     val opts = parseArgs(args)
 
-    val unimplemented = collectUnimplementedFlags(opts)
-    if (unimplemented.isNotEmpty()) {
-        System.err.println(unimplementedFlagMessage(unimplemented))
-        exitProcess(2)
-    }
-
     val workingDir = Path.of(System.getProperty("user.dir"))
     val repoRoot = ModDiscovery.findRepoRoot(workingDir)
+
+    // --diff translates into a temp directory, then walks the temp tree
+    // and the on-disk bedrock-out tree and compares file by file. Useful
+    // for CI: any drift between sources and committed Bedrock output
+    // surfaces here. Live LLM calls in --diff mode would defeat the
+    // determinism the gate is trying to enforce, so we forbid them.
+    if (opts.diff) {
+        if (opts.withLlm) {
+            System.err.println("[translator] --diff is incompatible with --with-llm (drift check must be deterministic).")
+            exitProcess(2)
+        }
+        val tempOut = Files.createTempDirectory("translator-diff-")
+        try {
+            runPipeline(repoRoot, opts, tempOut)
+            val expected = AddonWriter.defaultOutputRoot(repoRoot)
+            val entries = TreeDiff.diff(expected = expected, actual = tempOut, modFilter = opts.modId)
+            if (entries.isEmpty()) {
+                println("[translator] --diff: no drift detected. bedrock-out/ is in sync.")
+                exitProcess(0)
+            } else {
+                System.err.print(TreeDiff.summary(entries))
+                exitProcess(1)
+            }
+        } finally {
+            tempOut.toFile().deleteRecursively()
+        }
+    } else {
+        runPipeline(repoRoot, opts, AddonWriter.defaultOutputRoot(repoRoot))
+    }
+}
+
+/**
+ * The actual translation pipeline, parameterized over the output root so
+ * callers can target the real `bedrock-out/` (the default) or a temp
+ * directory (`--diff` mode).
+ */
+private fun runPipeline(repoRoot: Path, opts: CliOptions, outputRoot: Path) {
     val target = BedrockTarget.load(repoRoot.resolve("translator/bedrock-target.json"))
     val discovery = ModDiscovery(repoRoot)
     val writer = ManifestWriter(target)
     val addonWriter = AddonWriter(
-        outputRoot = AddonWriter.defaultOutputRoot(repoRoot),
+        outputRoot = outputRoot,
         manifestWriter = writer,
     )
 
@@ -106,7 +140,6 @@ fun main(args: Array<String>) {
         return
     }
 
-    val outputRoot = AddonWriter.defaultOutputRoot(repoRoot)
     val recipeTransform = { unt: Untranslatable -> RecipeTransform(target, unt) }
     val lootTransform = { unt: Untranslatable -> LootTableTransform(unt) }
     val langTransform = LangTransform()
@@ -127,7 +160,23 @@ fun main(args: Array<String>) {
     }
     val allDiscovered = discovery.discover()
 
-    for (mod in mods) {
+    // For --diff mode the temp output is also empty before securitycore's
+    // pipeline writes — but securityguard / thief depend on securitycore
+    // being already present (sibling-mod source-solver chain). To keep the
+    // diff comparison apples-to-apples, we always run all four mods (even
+    // when --diff is scoped to one, we still need siblings on disk to
+    // produce an accurate per-mod tree). The TreeDiff filter then narrows
+    // the comparison to the requested mod id.
+    val modsToWrite = if (opts.diff && opts.modId != null) {
+        // Translate the full set so cross-mod symbol resolution stays
+        // honest, but keep the user's narrow filter so diff output is
+        // scoped to what they asked about.
+        allDiscovered
+    } else {
+        mods
+    }
+
+    for (mod in modsToWrite) {
         // Clean the per-mod output dir so stale files (e.g. removed/renamed
         // recipes) don't survive across runs. Sibling-mod subdirs are
         // untouched.
@@ -245,19 +294,23 @@ internal data class CliOptions(
 /**
  * Phase in which an unimplemented flag is scheduled to land. Surfaces in the
  * usage-error message when one is passed before its phase ships.
+ *
+ * As of Phase 5 every CLI flag is implemented; this enum is empty but kept
+ * around so the wiring (collectUnimplementedFlags / unimplementedFlagMessage)
+ * is in place when the next batch of in-flight flags lands.
  */
 internal enum class UnimplementedFlag(val flag: String, val plannedPhase: String) {
-    DIFF("--diff", "Phase 4+"),
+    @Suppress("unused")
+    PLACEHOLDER("--__placeholder__", "(unused)");
 }
 
 /**
  * Returns every unimplemented flag the user asked for, in flag-declaration
- * order so error output is stable.
+ * order so error output is stable. Phase 5: every documented flag is
+ * implemented, so this currently always returns the empty list.
  */
-internal fun collectUnimplementedFlags(opts: CliOptions): List<UnimplementedFlag> {
-    val out = mutableListOf<UnimplementedFlag>()
-    if (opts.diff) out += UnimplementedFlag.DIFF
-    return out
+internal fun collectUnimplementedFlags(@Suppress("UNUSED_PARAMETER") opts: CliOptions): List<UnimplementedFlag> {
+    return emptyList()
 }
 
 /**
