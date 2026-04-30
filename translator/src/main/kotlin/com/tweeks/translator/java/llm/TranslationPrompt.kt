@@ -29,6 +29,14 @@ class TranslationPrompt(
     private val typeDeclarations: String,
     /** Worked Java→Bedrock idioms (worked-examples.md). */
     private val workedExamples: String,
+    /**
+     * Family-filter reference. Phase 4: instructs the LLM how to translate
+     * `instanceof SecurityAlly`/`SecurityHostile` targeting to Bedrock family
+     * filters instead of hard-coded entity ids. The marker→family mapping is
+     * done deterministically by [com.tweeks.translator.java.EntityAnalyzer];
+     * this prompt block tells the LLM how to *consume* those family tags.
+     */
+    private val familyFilters: String,
 ) {
 
     /**
@@ -59,7 +67,7 @@ class TranslationPrompt(
         val modManifestExcerpt: String,
     )
 
-    /** Three [ClaudeClient.SystemBlock]s, all marked `cached = true`. */
+    /** Four [ClaudeClient.SystemBlock]s, all marked `cached = true`. */
     fun systemBlocks(): List<ClaudeClient.SystemBlock> = listOf(
         ClaudeClient.SystemBlock(
             text = performanceRulesText(),
@@ -71,6 +79,10 @@ class TranslationPrompt(
         ),
         ClaudeClient.SystemBlock(
             text = "## Worked examples\n\n$workedExamples\n",
+            cached = true,
+        ),
+        ClaudeClient.SystemBlock(
+            text = "## Family-filter reference\n\n$familyFilters\n",
             cached = true,
         ),
     )
@@ -127,7 +139,7 @@ class TranslationPrompt(
          * bust every cached translation. Cached results carry the version
          * they were generated against; mismatches are treated as misses.
          */
-        const val PROMPT_VERSION: String = "phase3-1"
+        const val PROMPT_VERSION: String = "phase4-1"
 
         /** Default LLM model. Spec section "LLM integration" pins this. */
         const val DEFAULT_MODEL_ID: String = "claude-opus-4-7"
@@ -143,7 +155,9 @@ class TranslationPrompt(
                 ?: error("missing /bedrock-api/server-*.d.ts resource bundle")
             val examples = readResource("/bedrock-api/worked-examples.md")
                 ?: error("missing /bedrock-api/worked-examples.md resource bundle")
-            return TranslationPrompt(target, typeDecls, examples)
+            val families = readResource("/bedrock-api/family-filters.md")
+                ?: error("missing /bedrock-api/family-filters.md resource bundle")
+            return TranslationPrompt(target, typeDecls, examples, families)
         }
 
         private fun readResource(path: String): String? {

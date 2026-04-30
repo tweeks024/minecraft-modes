@@ -96,6 +96,7 @@ internal class EntityAnalyzer(
     ) {
         val attrs = readAttributes(entityClass)
         val goals = GoalMatcher(unt).match(mod.modId, entityClass)
+        val securityFamilies = readSecurityFamilies(entityClass)
 
         // Phase 3: route every Medium-bucket goal through the LLM gate. Each
         // route call writes either cache-hit JS or a TODO stub to
@@ -131,7 +132,7 @@ internal class EntityAnalyzer(
         }
 
         val identifier = "${mod.modId}:${reg.entityId}"
-        val components = buildEntityComponents(reg, attrs, goals)
+        val components = buildEntityComponents(reg, attrs, goals, securityFamilies)
 
         val entityJson = buildJsonObject {
             put("format_version", target.format_versions.entity)
@@ -157,12 +158,17 @@ internal class EntityAnalyzer(
         behaviorPath.writeText(JsonFormat.PRETTY.encodeToString(JsonElement.serializer(), entityJson) + "\n")
 
         // Resource-pack client_entity description.
-        val (geometryName, ambiguous) = pickGeometryName(mod, reg.entityId)
+        // Pick geometry by checking the emitted `.geo.json` files first
+        // (Phase 1b's BbmodelConverter output) so the reference is guaranteed
+        // to resolve. If nothing matches, fall back to a vanilla geometry —
+        // Bedrock 1.16+ ships `geometry.humanoid` as the safe default.
+        val emittedGeoNames = listEmittedGeometryNames(mod, outputRoot)
+        val (geometryRef, ambiguous) = pickGeometryReference(mod, reg.entityId, emittedGeoNames)
         if (ambiguous) {
             unt.recordRenderControllerAmbiguous(
                 mod.modId,
                 reg.entityId,
-                "no bbmodel matched id '${reg.entityId}'; defaulted to '${mod.modId}.geo.json'.",
+                "no bbmodel matched id '${reg.entityId}'; defaulted to '$geometryRef'.",
             )
         }
         val textureShort = pickTextureShortName(mod, reg.entityId)
@@ -189,7 +195,7 @@ internal class EntityAnalyzer(
                             put(
                                 "geometry",
                                 buildJsonObject {
-                                    put("default", JsonPrimitive("geometry.${mod.modId}.$geometryName"))
+                                    put("default", JsonPrimitive(geometryRef))
                                 },
                             )
                             put(
@@ -212,6 +218,7 @@ internal class EntityAnalyzer(
         reg: EntityRegistration,
         attrs: Map<String, Double>,
         goals: GoalMatcher.Result,
+        securityFamilies: List<String>,
     ): JsonObject {
         // Use a sorted map so the output is byte-stable regardless of
         // catalog insertion order.
@@ -222,6 +229,14 @@ internal class EntityAnalyzer(
                 "family",
                 buildJsonArray {
                     add(JsonPrimitive(reg.entityId))
+                    // Security marker interfaces (`SecurityAlly`/`SecurityHostile`)
+                    // become Bedrock family tags. This is what cross-mod targeting
+                    // (e.g. SecurityGuard's `nearest_attackable_target`) keys off
+                    // — see `bedrock-api/family-filters.md` and the LLM prompt.
+                    // Insert them in stable order for byte-deterministic output.
+                    for (family in securityFamilies) {
+                        add(JsonPrimitive(family))
+                    }
                     when (reg.mobCategory) {
                         "MONSTER" -> { add(JsonPrimitive("monster")); add(JsonPrimitive("mob")) }
                         "CREATURE" -> { add(JsonPrimitive("mob")) }
@@ -303,6 +318,52 @@ internal class EntityAnalyzer(
         }
 
         return JsonObject(sorted)
+    }
+
+    // ---------- Reading SecurityAlly / SecurityHostile marker interfaces ----------
+
+    /**
+     * Detect whether [entity] implements `com.tweeks.securitycore.api.SecurityAlly`
+     * or `com.tweeks.securitycore.api.SecurityHostile` (directly or transitively),
+     * and return the corresponding Bedrock family tags in stable order.
+     *
+     * Per the spec's "securitycore deduplication" section, these Java marker
+     * interfaces have no Bedrock equivalent. They are translated to family tags
+     * on the Bedrock entity JSON so cross-mod targeting becomes family-based.
+     *
+     * Symbol resolution may legitimately fail when the source's classpath isn't
+     * fully wired (e.g. test fixtures that mock the resolver), so this falls
+     * back to a string-match on the raw `implements` clause if `resolve()`
+     * throws — the marker's simple name is unique enough in practice.
+     */
+    private fun readSecurityFamilies(entity: ClassOrInterfaceDeclaration): List<String> {
+        val out = sortedSetOf<String>()
+        val implemented = entity.implementedTypes ?: return emptyList()
+        for (t in implemented) {
+            // Try fully-resolved qualifiedName via JavaSymbolSolver. Falls back
+            // to the bare simple name from the AST if the classpath can't
+            // resolve the marker (e.g. test fixtures with no symbol solver, or
+            // securitycore not on the per-mod source-solver chain). The two
+            // markers' simple names don't collide with anything else in this
+            // repo, so the fallback is safe in practice.
+            val fqn: String = try {
+                val resolved = t.resolve()
+                if (resolved.isReferenceType) {
+                    resolved.asReferenceType().qualifiedName
+                } else {
+                    t.nameAsString
+                }
+            } catch (_: Throwable) {
+                t.nameAsString
+            }
+            when {
+                fqn == "com.tweeks.securitycore.api.SecurityAlly" || fqn == "SecurityAlly" ->
+                    out.add("security_ally")
+                fqn == "com.tweeks.securitycore.api.SecurityHostile" || fqn == "SecurityHostile" ->
+                    out.add("security_hostile")
+            }
+        }
+        return out.toList()
     }
 
     // ---------- Reading attributes ----------
@@ -413,40 +474,85 @@ internal class EntityAnalyzer(
     // ---------- Render-controller wiring ----------
 
     /**
-     * Pick the bbmodel filename whose base name will be used as the
-     * `geometry.<modid>.<name>` identifier. Tries:
-     *   1. exact match — `<entityId>.bbmodel`.
-     *   2. case-insensitive simple-name match.
-     *   3. for the special `securityguard:guard` case, prefer
-     *      `security_guard.bbmodel` (the only humanoid-shape bbmodel with
-     *      head/body/arm bones).
-     *   4. fallback to `<modId>` and flag as ambiguous.
+     * Enumerate the `<name>.geo.json` files BbmodelConverter has already
+     * emitted for [mod]. Returns the set of base names (no extension), used to
+     * make sure every entity's geometry reference resolves to a real file.
+     *
+     * BbmodelConverter writes geometries with `identifier:
+     * "geometry.<modid>.<name>"` matching the bbmodel basename, so we use the
+     * file basename as the canonical name.
      */
-    private fun pickGeometryName(
-        mod: ModDiscovery.DiscoveredMod,
-        entityId: String,
-    ): Pair<String, Boolean> {
+    private fun listEmittedGeometryNames(mod: ModDiscovery.DiscoveredMod, outputRoot: Path): Set<String> {
+        val geoDir = outputRoot.resolve("${mod.modId}/resource_pack/models/entity")
+        if (geoDir.isDirectory()) {
+            val emitted = Files.list(geoDir).use { stream ->
+                stream
+                    .filter { it.isRegularFile() && it.fileName.toString().endsWith(".geo.json") }
+                    .map { it.fileName.toString().removeSuffix(".geo.json") }
+                    .toList()
+                    .toSet()
+            }
+            if (emitted.isNotEmpty()) return emitted
+        }
+        // Fallback: BbmodelConverter hasn't run yet (typical in unit tests
+        // exercising the analyzer in isolation). Treat the source bbmodels
+        // as authoritative — they're what BbmodelConverter would emit.
         val toolsDir = mod.rootDir.resolve("tools")
-        if (!toolsDir.isDirectory()) return mod.modId to true
-        val bbmodels = Files.list(toolsDir).use { stream ->
+        if (!toolsDir.isDirectory()) return emptySet()
+        return Files.list(toolsDir).use { stream ->
             stream
                 .filter { it.isRegularFile() && it.extension == "bbmodel" }
                 .map { it.nameWithoutExtension }
                 .toList()
+                .toSet()
         }
+    }
 
-        // 1) exact id match.
-        bbmodels.firstOrNull { it == entityId }?.let { return it to false }
+    /**
+     * Pick the geometry identifier for the resource_pack `<entity>.entity.json`'s
+     * `geometry.default` slot.
+     *
+     * The returned String is the *Bedrock geometry identifier* (e.g.
+     * `geometry.securityguard.security_guard`) — already ready to drop into the
+     * client_entity JSON. The returned Boolean is `ambiguous`: true when the
+     * pick was a fallback, so the caller logs it on Untranslatable.
+     *
+     * Resolution order:
+     *   1. exact-match against [emittedGeometries] for `<entityId>`.
+     *   2. case-insensitive match.
+     *   3. `securityguard:guard` → `security_guard` exception (humanoid shape).
+     *   4. substring contains the entity id (ambiguous).
+     *   5. fallback: vanilla `geometry.humanoid` (Bedrock built-in) — ambiguous.
+     *
+     * The vanilla fallback guarantees the entity JSON's geometry reference
+     * resolves at load time even when no bbmodel ships with the mod (e.g.
+     * thief, which has no bbmodel under `tools/` today).
+     */
+    private fun pickGeometryReference(
+        mod: ModDiscovery.DiscoveredMod,
+        entityId: String,
+        emittedGeometries: Set<String>,
+    ): Pair<String, Boolean> {
+        fun geom(name: String) = "geometry.${mod.modId}.$name"
+
+        // 1) exact id match against emitted geometry.
+        if (emittedGeometries.contains(entityId)) return geom(entityId) to false
         // 2) case-insensitive.
-        bbmodels.firstOrNull { it.equals(entityId, ignoreCase = true) }?.let { return it to false }
-        // 3) securityguard-specific exception: `guard` → `security_guard`.
+        emittedGeometries.firstOrNull { it.equals(entityId, ignoreCase = true) }
+            ?.let { return geom(it) to false }
+        // 3) securityguard-specific exception.
         if (mod.modId == "securityguard" && entityId == "guard") {
-            bbmodels.firstOrNull { it == "security_guard" }?.let { return it to false }
+            emittedGeometries.firstOrNull { it == "security_guard" }
+                ?.let { return geom(it) to false }
         }
-        // 4) thief-specific exception: id and bbmodel name happen to match.
-        bbmodels.firstOrNull { it.contains(entityId, ignoreCase = true) }?.let { return it to true }
+        // 4) substring contains.
+        emittedGeometries.firstOrNull { it.contains(entityId, ignoreCase = true) }
+            ?.let { return geom(it) to true }
 
-        return mod.modId to true
+        // 5) Vanilla fallback. Every Bedrock client ships `geometry.humanoid`
+        // as a baseline — references resolve and the entity at least renders
+        // as a Steve-shape until a bbmodel is added.
+        return "geometry.humanoid" to true
     }
 
     /**

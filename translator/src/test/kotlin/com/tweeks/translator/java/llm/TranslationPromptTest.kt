@@ -14,9 +14,11 @@ class TranslationPromptTest {
     private val prompt = TranslationPrompt.load(target)
 
     @Test
-    fun `system blocks include type declarations and worked examples and rules`() {
+    fun `system blocks include type declarations and worked examples and rules and family filters`() {
         val blocks = prompt.systemBlocks()
-        assertEquals(3, blocks.size)
+        // Phase 4: a fourth block was added for family-filter targeting
+        // (SecurityAlly / SecurityHostile → Bedrock family tags).
+        assertEquals(4, blocks.size)
         val combined = blocks.joinToString("\n") { it.text }
         assertTrue(combined.contains("@minecraft/server")) {
             "system prompt must include the type declarations"
@@ -27,12 +29,15 @@ class TranslationPromptTest {
         assertTrue(combined.contains("performance rules") || combined.contains("Performance") || combined.contains("performance")) {
             "system prompt must include the performance rules"
         }
+        assertTrue(combined.contains("security_hostile") && combined.contains("is_family")) {
+            "system prompt must include the family-filter reference"
+        }
     }
 
     @Test
-    fun `at least 2 of 3 blocks are marked cached`() {
+    fun `at least 3 of 4 blocks are marked cached`() {
         val cached = prompt.systemBlocks().count { it.cached }
-        assertTrue(cached >= 2) { "expected at least 2 cached blocks, got $cached" }
+        assertTrue(cached >= 3) { "expected at least 3 cached blocks, got $cached" }
     }
 
     @Test

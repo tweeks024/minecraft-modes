@@ -128,6 +128,13 @@ class EntityAnalyzerTest {
         val family = components["minecraft:type_family"]!!.jsonObject["family"]!!
         assertTrue(family.toString().contains("monster"))
 
+        // Phase 4.1: ThiefEntity implements SecurityHostile, so the family
+        // list must include `security_hostile`. This is what cross-mod
+        // targeting (SecurityGuard's nearest_attackable_target) keys off.
+        assertTrue(family.toString().contains("security_hostile")) {
+            "Thief implements SecurityHostile; expected `security_hostile` family tag in $family"
+        }
+
         val report = unt.renderReport("thief")
         assertTrue(report.contains("BlackjackStrikeGoal") || report.contains("FleeAndFireCrossbowGoal"))
     }
