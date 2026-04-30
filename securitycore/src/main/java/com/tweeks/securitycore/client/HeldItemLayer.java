@@ -8,7 +8,6 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
 
 /**
@@ -66,16 +65,12 @@ public class HeldItemLayer<S extends HumanoidRenderState, M extends HumanoidMode
         pose.translate(translateX, translateY, translateZ);
         pose.mulPose(Axis.XP.rotationDegrees(xRotationDegrees));
 
-        collector.submitModel(
-            heldModel,
-            state,
-            pose,
-            texture,
-            lightCoords,
-            OverlayTexture.NO_OVERLAY,
-            -1,
-            null
-        );
+        // Use the canonical RenderLayer helper — it computes overlay coords
+        // from hurt/death state, derives the entity-cutout RenderType from
+        // the texture, and routes through the ordered submit pipeline. Our
+        // previous direct submitModel call passed args in the wrong slots,
+        // which left the model rendered without its texture binding (white).
+        renderColoredCutoutModel(heldModel, texture, pose, collector, lightCoords, state, -1, 0);
 
         pose.popPose();
     }
