@@ -1,0 +1,101 @@
+{
+  "meta": {
+    "format_version": "4.5",
+    "model_format": "free",
+    "box_uv": true
+  },
+  "name": "baton",
+  "model_identifier": "",
+  "visible_box": [
+    2,
+    6,
+    0
+  ],
+  "variable_placeholders": "",
+  "variable_placeholder_buttons": [],
+  "unhandled_root_fields": {},
+  "resolution": {
+    "width": 16,
+    "height": 16
+  },
+  "elements": [
+    {
+      "name": "baton",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -0.5,
+        0,
+        -0.5
+      ],
+      "to": [
+        0.5,
+        6,
+        0.5
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "uv_offset": [
+        0,
+        0
+      ],
+      "type": "cube",
+      "uuid": "95ca6703-dc2d-43d0-ad9e-305db2c65ff3"
+    }
+  ],
+  "outliner": [
+    {
+      "name": "baton",
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "color": 0,
+      "uuid": "e1f648d0-543b-48e6-9431-5ae7b0423cd1",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "95ca6703-dc2d-43d0-ad9e-305db2c65ff3"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "path": "/Users/tweeks/code/minecraft-mods/securityguard/src/main/resources/assets/securityguard/textures/entity/baton.png",
+      "name": "baton.png",
+      "folder": "entity",
+      "namespace": "securityguard",
+      "id": "0",
+      "particle": false,
+      "render_mode": "default",
+      "render_sides": "auto",
+      "frame_time": 1,
+      "frame_order_type": "loop",
+      "frame_order": "",
+      "frame_interpolate": false,
+      "visible": true,
+      "internal": true,
+      "saved": true,
+      "uuid": "f5489f7c-28ea-440a-9d38-214daf95a77c",
+      "relative_path": "../src/main/resources/assets/securityguard/textures/entity/baton.png",
+      "use_as_default": false,
+      "layers_enabled": false,
+      "sync_to_project": "",
+      "width": 16,
+      "height": 16,
+      "uv_width": 16,
+      "uv_height": 16,
+      "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAVElEQVR4nGNgYGBg4ODg+g/CDGQAJmSN5BjCwsPDgyLw48c30gyQlJRCEXjz5hVpBjx//owkDRgGaGlpowgcOkSaCxjRA+7Hj2+MFDlpFIwCBjIAAALoFDHEEpxRAAAAAElFTkSuQmCC"
+    }
+  ]
+}

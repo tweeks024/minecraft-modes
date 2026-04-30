@@ -2,10 +2,11 @@
 
 The Security Guard's appearance is authored in [Blockbench](https://www.blockbench.net/),
 a free 3D model and texture editor for Minecraft. This directory holds the
-canonical Blockbench project file:
+canonical Blockbench project files:
 
 ```
-security_guard.bbmodel
+security_guard.bbmodel    # body, head, cap, nose — uses security_guard.png (64×64)
+baton.bbmodel             # held baton — uses baton.png (16×16)
 ```
 
 ## Workflow
@@ -17,8 +18,8 @@ security_guard.bbmodel
    - **Cubes** — switch to the *Edit* tab, drag cubes, resize, add new ones.
 4. Save the bbmodel: **File → Save** (overwrites `security_guard.bbmodel`).
 5. Export the texture back into the resource pack:
-   - **File → Export → Export Texture (PNG)**
-   - Overwrite `../src/main/resources/assets/securityguard/textures/entity/security_guard.png`
+   - In the **Textures** panel (right sidebar), right-click the texture thumbnail → **Save** (overwrites the linked PNG)
+   - Or use **Save As...** and point at `../src/main/resources/assets/securityguard/textures/entity/security_guard.png` (or `baton.png` for the baton bbmodel)
 6. If you changed cube geometry (added a part, moved a part, resized), update
    `SecurityGuardModel.java` to match. Blockbench coords map to Java coords as:
    - Blockbench `from`/`to` → Java `addBox(x, y, z, w, h, d)`
