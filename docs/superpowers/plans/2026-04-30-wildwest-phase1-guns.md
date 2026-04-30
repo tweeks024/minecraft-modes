@@ -88,7 +88,9 @@ dependencies {
 
 Leave the rest of `thief/build.gradle`'s body untouched when copying.
 
-- [ ] **Step 4: Update thief/build.gradle and securityguard/build.gradle to know about wildwest**
+- [ ] **Step 4: Update thief/build.gradle and securityguard/build.gradle to know about wildwest (dev-client load only, NO compile dep)**
+
+The dev client launched from any sibling module needs to load wildwest's source set so all four mods appear in the in-game Mods list. Crucially: do **NOT** add `implementation project(':wildwest')` to thief or securityguard — wildwest depends on both of them, so a reverse compile dep would form a circular `compileJava` task graph. The `mods { sourceSet(...) }` reference is sufficient for runtime loading without a compile dep, but it requires `evaluationDependsOn(':wildwest')` so the source-set lookup resolves at evaluation time. (Existing precedent: `securityguard/build.gradle` references `:thief`'s source set in its `mods` block via `evaluationDependsOn(':thief')` without adding `implementation project(':thief')`.)
 
 In `thief/build.gradle`, inside `neoForge { mods { ... } }`, append:
 
@@ -98,13 +100,15 @@ In `thief/build.gradle`, inside `neoForge { mods { ... } }`, append:
         }
 ```
 
-And in `dependencies { ... }`:
+And at the top level of the same file (matching the existing `evaluationDependsOn(':thief')` line in `securityguard/build.gradle`), add:
 
 ```gradle
-    implementation project(':wildwest')
+evaluationDependsOn(':wildwest')
 ```
 
-Same two additions in `securityguard/build.gradle`. (`securitycore` doesn't need updating — it's the leaf dependency.)
+Apply the same two additions to `securityguard/build.gradle`. (`securitycore` doesn't need updating — it's the leaf dependency.)
+
+**Do NOT** add `implementation project(':wildwest')` to either module's `dependencies` block.
 
 - [ ] **Step 5: Create wildwest/src/main/templates/META-INF/neoforge.mods.toml**
 
