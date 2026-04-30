@@ -65,12 +65,11 @@ public class HeldItemLayer<S extends HumanoidRenderState, M extends HumanoidMode
         pose.translate(translateX, translateY, translateZ);
         pose.mulPose(Axis.XP.rotationDegrees(xRotationDegrees));
 
-        // Use the canonical RenderLayer helper — it computes overlay coords
-        // from hurt/death state, derives the entity-cutout RenderType from
-        // the texture, and routes through the ordered submit pipeline. Our
-        // previous direct submitModel call passed args in the wrong slots,
-        // which left the model rendered without its texture binding (white).
-        renderColoredCutoutModel(heldModel, texture, pose, collector, lightCoords, state, -1, 0);
+        // Use the canonical RenderLayer helper. Last arg is render-order
+        // priority — vanilla layers pass 1, 2, 3 to stack on top of the
+        // parent body; 0 ties with the body and can leave the model
+        // invisible behind arm geometry.
+        renderColoredCutoutModel(heldModel, texture, pose, collector, lightCoords, state, -1, 1);
 
         pose.popPose();
     }
