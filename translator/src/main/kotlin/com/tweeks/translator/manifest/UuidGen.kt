@@ -25,8 +25,18 @@ object UuidGen {
      */
     val PROJECT_NAMESPACE: UUID = uuidV5(DNS_NAMESPACE, "minecraft-mods.tweeks.dev")
 
-    /** UUID for the pack header (the user-visible pack identity). */
-    fun headerUuid(modId: String): UUID = uuidV5(PROJECT_NAMESPACE, "$modId:header")
+    /**
+     * Header UUID for the *behavior* pack. The spec calls this `header_uuid`
+     * (no qualifier); we name it explicitly to make BP/RP symmetry obvious.
+     */
+    fun behaviorHeaderUuid(modId: String): UUID = uuidV5(PROJECT_NAMESPACE, "$modId:header")
+
+    /**
+     * Header UUID for the *resource* pack, derived in the same namespace with
+     * a distinct discriminator so it's globally unique. Bedrock requires each
+     * pack (BP, RP) to have its own header UUID.
+     */
+    fun resourceHeaderUuid(modId: String): UUID = uuidV5(PROJECT_NAMESPACE, "$modId:resource_header")
 
     /** UUID for the behavior-pack module. */
     fun behaviorModuleUuid(modId: String): UUID = uuidV5(PROJECT_NAMESPACE, "$modId:modules.behavior")
@@ -35,7 +45,7 @@ object UuidGen {
     fun resourceModuleUuid(modId: String): UUID = uuidV5(PROJECT_NAMESPACE, "$modId:modules.resource")
 
     /** Header UUID of the securitycore pack — used by sibling mods that depend on it. */
-    fun coreDependencyUuid(): UUID = headerUuid("securitycore")
+    fun coreDependencyUuid(): UUID = behaviorHeaderUuid("securitycore")
 
     /**
      * Compute UUIDv5 per RFC 4122 §4.3:

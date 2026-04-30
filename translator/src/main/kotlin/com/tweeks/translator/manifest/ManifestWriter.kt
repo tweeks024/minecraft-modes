@@ -168,19 +168,13 @@ class ManifestWriter(private val target: BedrockTarget) {
         }
 
         /**
-         * Per-pack header UUID for the *behavior* pack. The spec calls this
-         * `header_uuid` (no qualifier) — Bedrock requires each pack to have
-         * its own unique header UUID, so we treat the spec's bare name as the
-         * BP header.
+         * Per-pack header UUID for the *behavior* pack. Thin alias for
+         * [UuidGen.behaviorHeaderUuid] kept here so callers reading the
+         * manifest writer don't need to jump files.
          */
-        fun behaviorPackHeaderUuid(modId: String) =
-            UuidGen.uuidV5(UuidGen.PROJECT_NAMESPACE, "$modId:header")
+        fun behaviorPackHeaderUuid(modId: String) = UuidGen.behaviorHeaderUuid(modId)
 
-        /**
-         * Per-pack header UUID for the *resource* pack, derived in the same
-         * namespace with a distinct discriminator so it's globally unique.
-         */
-        fun resourcePackHeaderUuid(modId: String) =
-            UuidGen.uuidV5(UuidGen.PROJECT_NAMESPACE, "$modId:resource_header")
+        /** Per-pack header UUID for the *resource* pack. Alias for [UuidGen.resourceHeaderUuid]. */
+        fun resourcePackHeaderUuid(modId: String) = UuidGen.resourceHeaderUuid(modId)
     }
 }

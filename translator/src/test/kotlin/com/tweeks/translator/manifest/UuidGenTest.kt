@@ -28,8 +28,8 @@ class UuidGenTest {
 
     @Test
     fun `same inputs produce same uuid (determinism)`() {
-        val a = UuidGen.headerUuid("securityguard")
-        val b = UuidGen.headerUuid("securityguard")
+        val a = UuidGen.behaviorHeaderUuid("securityguard")
+        val b = UuidGen.behaviorHeaderUuid("securityguard")
         assertEquals(a, b)
 
         val ns1 = UuidGen.PROJECT_NAMESPACE
@@ -39,18 +39,27 @@ class UuidGenTest {
 
     @Test
     fun `different mods produce different header uuids`() {
-        val a = UuidGen.headerUuid("securityguard")
-        val b = UuidGen.headerUuid("thief")
+        val a = UuidGen.behaviorHeaderUuid("securityguard")
+        val b = UuidGen.behaviorHeaderUuid("thief")
         assert(a != b) { "Distinct mod ids must yield distinct header UUIDs (got $a == $b)" }
     }
 
     @Test
     fun `header behavior and resource module uuids are all distinct for the same mod`() {
-        val header = UuidGen.headerUuid("securityguard")
+        val header = UuidGen.behaviorHeaderUuid("securityguard")
         val behavior = UuidGen.behaviorModuleUuid("securityguard")
         val resource = UuidGen.resourceModuleUuid("securityguard")
         val set = setOf(header, behavior, resource)
         assertEquals(3, set.size, "All three role UUIDs must be distinct")
+    }
+
+    @Test
+    fun `behavior and resource header uuids are distinct for the same mod`() {
+        // Bedrock requires each pack (BP, RP) to have its own globally-unique
+        // header UUID, so the BP and RP header derivations must never collide.
+        val bp = UuidGen.behaviorHeaderUuid("securityguard")
+        val rp = UuidGen.resourceHeaderUuid("securityguard")
+        assert(bp != rp) { "BP and RP header UUIDs must differ (got $bp == $rp)" }
     }
 
     @Test
