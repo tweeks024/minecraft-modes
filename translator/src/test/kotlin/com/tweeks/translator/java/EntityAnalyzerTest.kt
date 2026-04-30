@@ -92,9 +92,11 @@ class EntityAnalyzerTest {
         val tex = clientDesc["textures"]!!.jsonObject["default"]!!.jsonPrimitive.content
         assertEquals("textures/entity/security_guard.png", tex)
 
-        // Untranslatable should record the deferred custom goals.
+        // Untranslatable should record the deferred custom goals. With no
+        // Phase 3 gate wired in this test, the goals land in the
+        // "deferred (Phase 3 LLM stage not run)" section.
         val report = unt.renderReport("securityguard")
-        assertTrue(report.contains("Entity goals deferred to Phase 3 LLM"))
+        assertTrue(report.contains("Entity goals deferred")) { report }
         assertTrue(report.contains("StunningMeleeGoal"))
         assertTrue(report.contains("GuardTargetHostilesGoal"))
     }

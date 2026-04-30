@@ -13,6 +13,9 @@ import com.github.javaparser.ast.expr.UnaryExpr
 import com.tweeks.translator.discover.ModDiscovery
 import com.tweeks.translator.emit.Untranslatable
 import com.tweeks.translator.java.goals.GoalMatcher
+import com.tweeks.translator.java.llm.ConfidenceGate
+import com.tweeks.translator.java.llm.RouteOutcome
+import com.tweeks.translator.java.llm.TranslationPrompt
 import com.tweeks.translator.json.JsonFormat
 import com.tweeks.translator.manifest.BedrockTarget
 import kotlinx.serialization.json.JsonElement
@@ -49,6 +52,14 @@ import kotlin.io.path.writeText
 internal class EntityAnalyzer(
     private val target: BedrockTarget,
     private val unt: Untranslatable,
+    /**
+     * Phase 3: optional LLM stage. Null means the analyzer behaves as in
+     * Phase 2b — Medium-bucket goals are logged on Untranslatable but no
+     * `behavior_pack/scripts/goals/<X>.ts` files are emitted. With a gate
+     * provided, every Medium-bucket goal is routed through it and either
+     * cache-hit JS or a TODO stub lands on disk.
+     */
+    private val gate: ConfidenceGate? = null,
 ) {
 
     /** Run analysis for one mod. */
@@ -85,6 +96,39 @@ internal class EntityAnalyzer(
     ) {
         val attrs = readAttributes(entityClass)
         val goals = GoalMatcher(unt).match(mod.modId, entityClass)
+
+        // Phase 3: route every Medium-bucket goal through the LLM gate. Each
+        // route call writes either cache-hit JS or a TODO stub to
+        // `behavior_pack/scripts/goals/<GoalSimpleName>.ts`. We sort the
+        // deferred list by simple name first so the order of disk writes is
+        // deterministic across runs.
+        if (gate != null) {
+            val deferred = goals.deferred.sortedBy { it.goalSimpleName }
+            for (d in deferred) {
+                val source = findGoalSource(mod, d.goalFqn) ?: d.callSiteSource
+                val ctx = TranslationPrompt.GoalContext(
+                    goalClassSimpleName = d.goalSimpleName,
+                    goalClassFqn = d.goalFqn,
+                    goalSource = source,
+                    parentClassFqn = inferParentClassFqn(d.goalFqn),
+                    resolvedMethodSignatures = emptyList(),
+                    resolvedFieldReferences = emptyList(),
+                    entityClassSummary = summarizeEntity(reg, entityClass),
+                    modManifestExcerpt = "modId: ${mod.modId}",
+                )
+                val outcome = gate.route(ctx, mod.modId)
+                val script = when (outcome) {
+                    is RouteOutcome.MediumJs -> outcome.script
+                    is RouteOutcome.TodoStub -> outcome.script
+                    is RouteOutcome.HighEmit -> continue // not produced by Phase 3
+                }
+                val scriptPath = outputRoot.resolve(
+                    "${mod.modId}/behavior_pack/scripts/goals/${d.goalSimpleName}.ts"
+                )
+                scriptPath.parent?.createDirectories()
+                scriptPath.writeText(script)
+            }
+        }
 
         val identifier = "${mod.modId}:${reg.entityId}"
         val components = buildEntityComponents(reg, attrs, goals)
@@ -447,4 +491,74 @@ internal class EntityAnalyzer(
 
     /** Round to 4 decimal places — strips float-to-double rounding noise. */
     private fun roundTo4(d: Double): Double = Math.round(d * 10000.0) / 10000.0
+
+    // ---------- Phase 3: goal-source lookup helpers ----------
+
+    /**
+     * Locate the Java source for [goalFqn] under the mod (or any sibling mod)
+     * and return the full file contents. Walks the FQN's package path under
+     * `src/main/java/`. Returns null if not found — the caller falls back to
+     * the `addGoal(...)` call-site source.
+     *
+     * Inner-class goals (`SecurityGuardEntity.GuardTargetHostilesGoal`) live
+     * inside their enclosing class's source, so we strip the trailing inner
+     * class segment until we find a file.
+     */
+    private fun findGoalSource(mod: ModDiscovery.DiscoveredMod, goalFqn: String): String? {
+        val candidates = mutableListOf<Path>()
+        var fqnTry: String? = goalFqn
+        while (fqnTry != null && fqnTry.contains('.')) {
+            val rel = fqnTry.replace('.', '/') + ".java"
+            // Try the mod itself first, then sibling mods discovered in the same
+            // repo. We don't have the full discovered list here, so check the
+            // immediate parent dir of `mod.rootDir` for siblings.
+            candidates.add(mod.rootDir.resolve("src/main/java/$rel"))
+            mod.rootDir.parent?.let { repoRoot ->
+                Files.list(repoRoot).use { stream ->
+                    stream.forEach { sibling ->
+                        if (sibling.isDirectory()) {
+                            candidates.add(sibling.resolve("src/main/java/$rel"))
+                        }
+                    }
+                }
+            }
+            for (c in candidates) {
+                if (c.isRegularFile()) {
+                    return Files.readString(c)
+                }
+            }
+            // Try the enclosing class — strip last segment.
+            val newFqn = fqnTry.substringBeforeLast('.')
+            if (newFqn == fqnTry) break
+            fqnTry = newFqn
+        }
+        return null
+    }
+
+    /**
+     * One-line guess at the goal's parent FQN. Custom goals in this repo
+     * extend `net.minecraft.world.entity.ai.goal.Goal`. Vanilla goals from
+     * Mojang's package extend their own siblings — for those we return the
+     * goal FQN's package + ".Goal" as a placeholder.
+     */
+    private fun inferParentClassFqn(goalFqn: String): String? {
+        return if (goalFqn.startsWith("net.minecraft.world.entity.ai.goal.")) {
+            "net.minecraft.world.entity.ai.goal.Goal"
+        } else {
+            "net.minecraft.world.entity.ai.goal.Goal"
+        }
+    }
+
+    /** Two-line summary of the owning entity for the LLM prompt. */
+    private fun summarizeEntity(
+        reg: EntityRegistration,
+        entityClass: ClassOrInterfaceDeclaration,
+    ): String {
+        return buildString {
+            append("entity id: `").append(reg.entityId).append("`\n")
+            append("class: `").append(entityClass.nameAsString).append("`\n")
+            append("category: `").append(reg.mobCategory).append("`\n")
+            append("size: ").append(reg.width).append(" × ").append(reg.height).append('\n')
+        }
+    }
 }

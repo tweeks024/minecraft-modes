@@ -51,10 +51,14 @@ class GoalMatcherTest {
         val unt = Untranslatable()
         val result = GoalMatcher(unt).match("test", cls)
         assertEquals(0, result.components.size, "catalog miss must not emit a component")
+        // Phase 3: a Medium-bucket goal also surfaces in the typed `deferred`
+        // list so EntityAnalyzer can route it through the gate.
+        assertEquals(1, result.deferred.size)
+        assertEquals("StunningMeleeGoal", result.deferred[0].goalSimpleName)
+
         val report = unt.renderReport("test")
-        assertTrue(report.contains("Entity goals deferred to Phase 3 LLM"))
+        assertTrue(report.contains("Entity goals deferred")) { report }
         assertTrue(report.contains("StunningMeleeGoal"))
-        assertTrue(report.contains("Medium bucket"))
     }
 
     @Test

@@ -34,6 +34,10 @@ class Untranslatable {
     private val bbmodelFlipYUnset = TreeMap<String, TreeSet<String>>()
     private val javaParseErrors = TreeMap<String, TreeMap<String, String>>()
     private val entityGoalsDeferred = TreeMap<String, TreeMap<String, TreeMap<String, GoalDeferral>>>()
+    // Phase 3: per-mod accumulators for the LLM-stage outcomes. The String
+    // key on the inner map is the goal class simple name (`StunningMeleeGoal`).
+    private val entityGoalsLlmTranslated = TreeMap<String, TreeMap<String, String>>()
+    private val entityGoalsLlmStubbed = TreeMap<String, TreeMap<String, String>>()
     private val itemCustomBehavior = TreeMap<String, TreeMap<String, String>>()
     private val spawnEggColorsHardcoded = TreeMap<String, TreeMap<String, String>>()
     private val renderControllerAmbiguous = TreeMap<String, TreeMap<String, String>>()
@@ -134,6 +138,23 @@ class Untranslatable {
     }
 
     /**
+     * Phase 3: record a goal whose JS came from an LLM cache hit.
+     * [cacheKey] is the SHA-256 hex digest used as the cache filename.
+     */
+    fun recordEntityGoalLlmTranslated(modId: String, goalSimpleName: String, cacheKey: String) {
+        entityGoalsLlmTranslated.getOrPut(modId) { TreeMap() }[goalSimpleName] = cacheKey
+    }
+
+    /**
+     * Phase 3: record a goal that produced a `// TODO LLM:` stub. [reason]
+     * is one of "cache miss; run :translate --with-llm", "cached refusal",
+     * "model self-rated 0.65 < 0.8", etc. — see [com.tweeks.translator.java.llm.ConfidenceGate].
+     */
+    fun recordEntityGoalLlmStub(modId: String, goalSimpleName: String, reason: String) {
+        entityGoalsLlmStubbed.getOrPut(modId) { TreeMap() }[goalSimpleName] = reason
+    }
+
+    /**
      * Record a custom item class whose behavior overrides (e.g.
      * `postHurtEnemy`, `useOn`) cannot be translated by Phase 2's
      * deterministic analyzer.
@@ -185,6 +206,8 @@ class Untranslatable {
         ids.addAll(bbmodelFlipYUnset.keys)
         ids.addAll(javaParseErrors.keys)
         ids.addAll(entityGoalsDeferred.keys)
+        ids.addAll(entityGoalsLlmTranslated.keys)
+        ids.addAll(entityGoalsLlmStubbed.keys)
         ids.addAll(itemCustomBehavior.keys)
         ids.addAll(spawnEggColorsHardcoded.keys)
         ids.addAll(renderControllerAmbiguous.keys)
@@ -309,28 +332,90 @@ class Untranslatable {
             for ((f, err) in items) sb.append("- `").append(f).append("`: ").append(err).append('\n')
             sb.append('\n')
         }
-        entityGoalsDeferred[modId]?.takeIf { it.isNotEmpty() }?.let { entities ->
+        // Phase 3: split the old "deferred" section into three outcome buckets.
+        // The deferred-records map is still populated by Phase 2b's GoalMatcher
+        // (it's how we discover goals to feed the LLM gate), but the rendered
+        // report reflects the Phase 3 outcome: cache-hit translation, TODO
+        // stub from the LLM stage, or pure-Low manual stub.
+        entityGoalsLlmTranslated[modId]?.takeIf { it.isNotEmpty() }?.let { goals ->
             any = true
-            sb.append("## Entity goals deferred to Phase 3 LLM\n\n")
-            sb.append("Phase 2 only emits Bedrock `minecraft:behavior.*` components for the **High** bucket — vanilla goals with simple-literal constructor args. Everything else is logged here for the Phase 3 LLM stage to pick up:\n\n")
-            for ((entityName, goals) in entities) {
-                sb.append("### `").append(entityName).append("`\n\n")
-                for ((goalKey, deferral) in goals) {
-                    val bucketLabel = when (deferral.bucket) {
-                        GoalBucket.MEDIUM -> "Medium bucket — Phase 3 LLM"
-                        GoalBucket.LOW -> "Low bucket — manual JS"
-                    }
-                    sb.append("- `").append(goalKey).append("` — ").append(bucketLabel)
-                    sb.append(": ").append(deferral.reason).append('\n')
-                    if (!deferral.sourceExcerpt.isNullOrBlank()) {
-                        sb.append("    ```java\n")
-                        for (line in deferral.sourceExcerpt.lines()) {
-                            sb.append("    ").append(line).append('\n')
-                        }
-                        sb.append("    ```\n")
-                    }
+            sb.append("## Entity goals translated by LLM (cache hit)\n\n")
+            sb.append("These goals were translated from Java to Bedrock JS via the Phase 3 LLM stage. The committed JS lives at `behavior_pack/scripts/goals/<GoalClass>.ts`. Cache key is shown for debugging — see `translator/.cache/llm/<key>.json`:\n\n")
+            for ((goalSimpleName, cacheKey) in goals) {
+                sb.append("- `").append(goalSimpleName).append("` — cache key `").append(cacheKey).append("`\n")
+            }
+            sb.append('\n')
+        }
+        entityGoalsLlmStubbed[modId]?.takeIf { it.isNotEmpty() }?.let { goals ->
+            any = true
+            sb.append("## Entity goals stubbed for LLM (cache miss; run :translate --with-llm to translate)\n\n")
+            sb.append("These goals produced a `// TODO LLM:` stub at `behavior_pack/scripts/goals/<GoalClass>.ts`. Either re-run with `--with-llm` (and `ANTHROPIC_API_KEY` set) to fill them in, or hand-translate them:\n\n")
+            for ((goalSimpleName, reason) in goals) {
+                sb.append("- `").append(goalSimpleName).append("` — ").append(reason).append('\n')
+            }
+            sb.append('\n')
+        }
+        // Render the raw Phase 2b deferred-records list only for goals NOT
+        // already covered above (i.e. Low-bucket goals that Phase 2b classified
+        // as manual-JS). Goals already in `entityGoalsLlmTranslated` or
+        // `entityGoalsLlmStubbed` would otherwise double-list.
+        entityGoalsDeferred[modId]?.takeIf { it.isNotEmpty() }?.let { entities ->
+            val lowOnlyEntities = entities.mapValues { (_, goals) ->
+                goals.filter { (_, deferral) -> deferral.bucket == GoalBucket.LOW }
+            }.filterValues { it.isNotEmpty() }
+            // Also include Medium-bucket goals that the Phase 3 stage didn't
+            // process (e.g. when EntityAnalyzer hasn't been wired to the gate
+            // yet, in older test fixtures).
+            val handledNames = (entityGoalsLlmTranslated[modId]?.keys ?: emptySet()) +
+                (entityGoalsLlmStubbed[modId]?.keys ?: emptySet())
+            val unhandled = entities.mapValues { (_, goals) ->
+                goals.filter { (key, deferral) ->
+                    deferral.bucket == GoalBucket.MEDIUM &&
+                        // The deferred key is `<priority>:<fqn>`; the simple
+                        // name is the substringAfterLast('.'), which ignores
+                        // the priority too thanks to the FQN dotted form.
+                        key.substringAfterLast('.') !in handledNames &&
+                        key.substringAfterLast(':').substringAfterLast('.') !in handledNames
                 }
-                sb.append('\n')
+            }.filterValues { it.isNotEmpty() }
+
+            if (lowOnlyEntities.isNotEmpty()) {
+                any = true
+                sb.append("## Entity goals stubbed for human (Low bucket)\n\n")
+                sb.append("These goals were classified Low — novel logic that Phase 3's LLM stage doesn't attempt to translate. Hand-write the Bedrock equivalent:\n\n")
+                for ((entityName, goals) in lowOnlyEntities) {
+                    sb.append("### `").append(entityName).append("`\n\n")
+                    for ((goalKey, deferral) in goals) {
+                        sb.append("- `").append(goalKey).append("` — ").append(deferral.reason).append('\n')
+                        if (!deferral.sourceExcerpt.isNullOrBlank()) {
+                            sb.append("    ```java\n")
+                            for (line in deferral.sourceExcerpt.lines()) {
+                                sb.append("    ").append(line).append('\n')
+                            }
+                            sb.append("    ```\n")
+                        }
+                    }
+                    sb.append('\n')
+                }
+            }
+            if (unhandled.isNotEmpty()) {
+                any = true
+                sb.append("## Entity goals deferred (Phase 3 LLM stage not run)\n\n")
+                sb.append("Phase 2b classified these as Medium bucket but the Phase 3 LLM stage didn't process them — typically the analyzer was invoked without a `ConfidenceGate`. Re-run `:translate` to pick them up:\n\n")
+                for ((entityName, goals) in unhandled) {
+                    sb.append("### `").append(entityName).append("`\n\n")
+                    for ((goalKey, deferral) in goals) {
+                        sb.append("- `").append(goalKey).append("` — ").append(deferral.reason).append('\n')
+                        if (!deferral.sourceExcerpt.isNullOrBlank()) {
+                            sb.append("    ```java\n")
+                            for (line in deferral.sourceExcerpt.lines()) {
+                                sb.append("    ").append(line).append('\n')
+                            }
+                            sb.append("    ```\n")
+                        }
+                    }
+                    sb.append('\n')
+                }
             }
         }
         itemCustomBehavior[modId]?.takeIf { it.isNotEmpty() }?.let { items ->

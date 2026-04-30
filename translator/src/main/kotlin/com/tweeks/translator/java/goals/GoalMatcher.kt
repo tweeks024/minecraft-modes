@@ -40,20 +40,49 @@ internal class GoalMatcher(private val unt: Untranslatable) {
         val body: JsonObject,
     )
 
+    /**
+     * One Medium-bucket goal that Phase 3's LLM stage should pick up. Carries
+     * the goal class name + FQN so EntityAnalyzer can find the matching
+     * source file and build a [com.tweeks.translator.java.llm.TranslationPrompt.GoalContext].
+     */
+    data class DeferredGoal(
+        val priority: Int,
+        val goalFqn: String,
+        val goalSimpleName: String,
+        /** The full `addGoal(...)` call site, for context. */
+        val callSiteSource: String,
+    )
+
     data class Result(
         val components: List<MatchedComponent>,
+        /**
+         * Phase 2b populated this only as a side-effect on Untranslatable.
+         * Phase 3 needs the typed list so EntityAnalyzer can route each one
+         * through the LLM confidence gate.
+         */
+        val deferred: List<DeferredGoal> = emptyList(),
     )
 
     fun match(modId: String, entity: ClassOrInterfaceDeclaration): Result {
         val components = mutableListOf<MatchedComponent>()
+        val deferred = mutableListOf<DeferredGoal>()
         val registerGoals = entity.methods.firstOrNull { it.nameAsString == "registerGoals" }
-            ?: return Result(emptyList())
+            ?: return Result(emptyList(), emptyList())
 
         for (call in registerGoals.findAll(MethodCallExpr::class.java)) {
-            val matched = processAddGoalCall(modId, entity, call) ?: continue
-            components.add(matched)
+            val outcome = processAddGoalCall(modId, entity, call) ?: continue
+            when (outcome) {
+                is Outcome.Component -> components.add(outcome.component)
+                is Outcome.Deferred -> deferred.add(outcome.goal)
+            }
         }
-        return Result(components)
+        return Result(components, deferred)
+    }
+
+    /** Distinguish "matched a vanilla goal" from "logged a Medium-bucket deferral". */
+    private sealed class Outcome {
+        data class Component(val component: MatchedComponent) : Outcome()
+        data class Deferred(val goal: DeferredGoal) : Outcome()
     }
 
     /**
@@ -67,7 +96,7 @@ internal class GoalMatcher(private val unt: Untranslatable) {
         modId: String,
         entity: ClassOrInterfaceDeclaration,
         call: MethodCallExpr,
-    ): MatchedComponent? {
+    ): Outcome? {
         if (call.nameAsString != "addGoal") return null
         // We only care about `this.goalSelector.addGoal(...)` and
         // `this.targetSelector.addGoal(...)`.
@@ -109,7 +138,9 @@ internal class GoalMatcher(private val unt: Untranslatable) {
                 fqnOverride = fqn,
                 priority = priority,
             )
-            return null
+            return if (bucket == Untranslatable.GoalBucket.MEDIUM) {
+                Outcome.Deferred(DeferredGoal(priority, fqn, fqn.substringAfterLast('.'), call.toString()))
+            } else null
         }
 
         val literals = ctor.arguments.map { argToLiteral(it) }
@@ -121,7 +152,7 @@ internal class GoalMatcher(private val unt: Untranslatable) {
                 fqnOverride = fqn,
                 priority = priority,
             )
-            return null
+            return Outcome.Deferred(DeferredGoal(priority, fqn, fqn.substringAfterLast('.'), call.toString()))
         }
 
         @Suppress("UNCHECKED_CAST")
@@ -134,13 +165,15 @@ internal class GoalMatcher(private val unt: Untranslatable) {
                 fqnOverride = fqn,
                 priority = priority,
             )
-            return null
+            return Outcome.Deferred(DeferredGoal(priority, fqn, fqn.substringAfterLast('.'), call.toString()))
         }
 
-        return MatchedComponent(
-            priority = priority,
-            componentName = mapping.bedrockComponent,
-            body = body,
+        return Outcome.Component(
+            MatchedComponent(
+                priority = priority,
+                componentName = mapping.bedrockComponent,
+                body = body,
+            )
         )
     }
 

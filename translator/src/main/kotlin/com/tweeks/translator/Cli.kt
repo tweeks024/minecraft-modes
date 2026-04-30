@@ -9,6 +9,12 @@ import com.tweeks.translator.java.ClasspathResolver
 import com.tweeks.translator.java.EntityAnalyzer
 import com.tweeks.translator.java.ItemAnalyzer
 import com.tweeks.translator.java.JavaSourceLoader
+import com.tweeks.translator.java.llm.ClaudeClient
+import com.tweeks.translator.java.llm.ConfidenceGate
+import com.tweeks.translator.java.llm.MockClaudeClient
+import com.tweeks.translator.java.llm.RealClaudeClient
+import com.tweeks.translator.java.llm.TranslationCache
+import com.tweeks.translator.java.llm.TranslationPrompt
 import com.tweeks.translator.json.AssetCopier
 import com.tweeks.translator.json.ItemAtlasBuilder
 import com.tweeks.translator.json.LangTransform
@@ -29,15 +35,17 @@ import kotlin.system.exitProcess
  *   ./gradlew :translator:translate
  *   ./gradlew :translator:translate --args="securityguard"
  *   ./gradlew :translator:translate --args="--diff"            # not yet implemented (exits 2)
- *   ./gradlew :translator:translate --args="--no-llm"          # not yet implemented (exits 2)
- *   ./gradlew :translator:translate --args="--clear-cache"     # not yet implemented (exits 2)
+ *   ./gradlew :translator:translate --args="--with-llm"        # Phase 3: enable live API calls
+ *   ./gradlew :translator:translate --args="--clear-cache"     # Phase 3: wipe translator/.cache/llm/ first
  *
- * Phase 0 implements only:
- *   - mod discovery + manifest emission to bedrock-out/.
- *   - flag recognition (--diff / --no-llm / --clear-cache exit 2 with a clear
- *     "implemented in Phase X" message — see [unimplementedFlagMessage]).
- *
- * Phases 1–3 land the real translation passes.
+ * Phase 3 status:
+ *   - `--with-llm` opts into live Anthropic API calls (requires `ANTHROPIC_API_KEY`).
+ *     Without it, Medium-bucket goals produce `// TODO LLM:` stubs except where a
+ *     pre-populated cache entry hits.
+ *   - `--clear-cache` deletes `translator/.cache/llm/` before running.
+ *   - `--no-llm` is recognized as the default and accepted as a no-op alias for
+ *     forward compatibility (CI configs that pass it explicitly should keep working).
+ *   - `--diff` is still unimplemented; see Phase 4.
  */
 fun main(args: Array<String>) {
     val opts = parseArgs(args)
@@ -57,6 +65,30 @@ fun main(args: Array<String>) {
         outputRoot = AddonWriter.defaultOutputRoot(repoRoot),
         manifestWriter = writer,
     )
+
+    // Phase 3: LLM stage wiring. The cache is on-disk at translator/.cache/llm/.
+    // `--clear-cache` wipes it before any translation runs. `--with-llm` flips
+    // liveCallsEnabled on the gate; without it, cache misses produce TODO stubs
+    // instead of calling the API.
+    val cacheRoot = repoRoot.resolve("translator/.cache/llm")
+    val cache = TranslationCache(cacheRoot)
+    if (opts.clearCache) {
+        cache.clear()
+        println("[translator] cleared LLM cache at $cacheRoot")
+    }
+    val claudeClient: ClaudeClient = if (opts.withLlm) {
+        // RealClaudeClient resolves the API key via the SDK's fromEnv() path
+        // (reads ANTHROPIC_API_KEY). If unset, the SDK throws on first call;
+        // ConfidenceGate catches and surfaces it as a TODO stub with a
+        // "model error" reason.
+        RealClaudeClient()
+    } else {
+        // Default: a mock with no canned responses. Every translate() returns
+        // an Error, which the gate maps to a TODO stub. Cache hits short-circuit
+        // before the client is consulted.
+        MockClaudeClient(emptyMap())
+    }
+    val translationPrompt = TranslationPrompt.load(target)
 
     val mods = if (opts.modId != null) {
         val one = discovery.findById(opts.modId)
@@ -134,7 +166,14 @@ fun main(args: Array<String>) {
                 val loader = JavaSourceLoader(classpathResolver, unt)
                 val resolved = loader.load(mod, allDiscovered)
                 System.err.println("[translator] ${mod.modId}: parsed ${resolved.units.size} java files")
-                EntityAnalyzer(target, unt).analyze(mod, resolved, outputRoot)
+                val gate = ConfidenceGate(
+                    client = claudeClient,
+                    cache = cache,
+                    prompt = translationPrompt,
+                    unt = unt,
+                    liveCallsEnabled = opts.withLlm,
+                )
+                EntityAnalyzer(target, unt, gate).analyze(mod, resolved, outputRoot)
                 ItemAnalyzer(target, unt).analyze(mod, resolved, outputRoot)
             }
         }
@@ -192,29 +231,32 @@ internal fun cleanModOutputDir(outputRoot: Path, modId: String) {
 internal data class CliOptions(
     val modId: String?,
     val diff: Boolean,
+    /**
+     * Phase 3: kept for backward-compatibility with CI configs that pass
+     * `--no-llm` explicitly; behavior is identical to omitting any LLM flag.
+     */
     val noLlm: Boolean,
+    /** Phase 3: enable real Anthropic API calls. Requires `ANTHROPIC_API_KEY`. */
+    val withLlm: Boolean,
+    /** Phase 3: wipe `translator/.cache/llm/` before running. */
     val clearCache: Boolean,
 )
 
 /**
  * Phase in which an unimplemented flag is scheduled to land. Surfaces in the
- * usage-error message when one of these flags is passed in Phase 0.
+ * usage-error message when one is passed before its phase ships.
  */
 internal enum class UnimplementedFlag(val flag: String, val plannedPhase: String) {
-    DIFF("--diff", "Phase 1+"),
-    NO_LLM("--no-llm", "Phase 3"),
-    CLEAR_CACHE("--clear-cache", "Phase 3"),
+    DIFF("--diff", "Phase 4+"),
 }
 
 /**
  * Returns every unimplemented flag the user asked for, in flag-declaration
- * order (DIFF, NO_LLM, CLEAR_CACHE) so error output is stable.
+ * order so error output is stable.
  */
 internal fun collectUnimplementedFlags(opts: CliOptions): List<UnimplementedFlag> {
     val out = mutableListOf<UnimplementedFlag>()
     if (opts.diff) out += UnimplementedFlag.DIFF
-    if (opts.noLlm) out += UnimplementedFlag.NO_LLM
-    if (opts.clearCache) out += UnimplementedFlag.CLEAR_CACHE
     return out
 }
 
@@ -238,12 +280,14 @@ internal fun parseArgs(args: Array<String>): CliOptions {
     var modId: String? = null
     var diff = false
     var noLlm = false
+    var withLlm = false
     var clearCache = false
 
     for (arg in args) {
         when {
             arg == "--diff" -> diff = true
             arg == "--no-llm" -> noLlm = true
+            arg == "--with-llm" -> withLlm = true
             arg == "--clear-cache" -> clearCache = true
             arg.startsWith("--") -> {
                 System.err.println("[translator] Unknown flag: $arg")
@@ -257,5 +301,16 @@ internal fun parseArgs(args: Array<String>): CliOptions {
         }
     }
 
-    return CliOptions(modId = modId, diff = diff, noLlm = noLlm, clearCache = clearCache)
+    if (noLlm && withLlm) {
+        System.err.println("[translator] --no-llm and --with-llm are mutually exclusive; pick one.")
+        exitProcess(2)
+    }
+
+    return CliOptions(
+        modId = modId,
+        diff = diff,
+        noLlm = noLlm,
+        withLlm = withLlm,
+        clearCache = clearCache,
+    )
 }
