@@ -66,4 +66,33 @@ public class RifleItem extends Item {
         float percent = cooldowns.getCooldownPercent(stack, 0F);
         return Math.round(percent * (float) COOLDOWN_TICKS);
     }
+
+    /**
+     * Mob-side firing path. Spawns a BulletEntity from shooter's eye position
+     * with Gaussian aim inaccuracy. No cooldown / durability tracking.
+     */
+    public static void fireFromMob(net.minecraft.world.entity.LivingEntity shooter,
+                                   net.minecraft.world.entity.LivingEntity target) {
+        net.minecraft.world.level.Level level = shooter.level();
+        if (level.isClientSide()) return;
+
+        com.tweeks.wildwest.entity.BulletEntity bullet =
+            new com.tweeks.wildwest.entity.BulletEntity(
+                com.tweeks.wildwest.ModEntities.BULLET.get(), level, shooter);
+        bullet.setPos(shooter.getEyePosition());
+
+        net.minecraft.world.phys.Vec3 aimAt = target.position()
+            .add(0, target.getBbHeight() * 0.5, 0);
+        net.minecraft.world.phys.Vec3 dir = aimAt.subtract(shooter.getEyePosition()).normalize();
+        var rand = shooter.getRandom();
+        double ax = rand.nextGaussian() * 0.05;
+        double ay = rand.nextGaussian() * 0.05;
+        double az = rand.nextGaussian() * 0.05;
+        bullet.shoot(dir.x + ax, dir.y + ay, dir.z + az, BULLET_VELOCITY, 0.0F);
+
+        level.addFreshEntity(bullet);
+        level.playSound(null, shooter.getX(), shooter.getY(), shooter.getZ(),
+            ModSounds.RIFLE_FIRE.get(),
+            net.minecraft.sounds.SoundSource.HOSTILE, 1.0F, 1.0F);
+    }
 }

@@ -1,6 +1,7 @@
 package com.tweeks.wildwest.item;
 
 import com.tweeks.wildwest.Hitscan;
+import com.tweeks.wildwest.ModSounds;
 import com.tweeks.wildwest.WildWestDamageTypes;
 import com.tweeks.wildwest.network.S2CTracerPacket;
 import net.minecraft.server.level.ServerLevel;
@@ -93,5 +94,70 @@ public class PistolItem extends Item {
         }
 
         return InteractionResult.CONSUME;
+    }
+
+    /**
+     * Mob-side firing path. Server-side hitscan from shooter's eye toward target,
+     * with Gaussian aim inaccuracy so mobs don't pixel-perfect snipe. Sends tracer
+     * packet to all players tracking the shooter (NOT including-self — mobs aren't
+     * ServerPlayers).
+     *
+     * No cooldown / durability tracking on the mob. The mob's own AI goal manages
+     * its fire-rate timing.
+     */
+    public static void fireFromMob(LivingEntity shooter, LivingEntity target) {
+        Level level = shooter.level();
+        if (level.isClientSide()) return;
+
+        Vec3 start = shooter.getEyePosition();
+        Vec3 aimAt = target.position().add(0, target.getBbHeight() * 0.5, 0);
+        Vec3 dir = aimAt.subtract(start).normalize();
+
+        var rand = shooter.getRandom();
+        double ax = rand.nextGaussian() * 0.05;
+        double ay = rand.nextGaussian() * 0.05;
+        double az = rand.nextGaussian() * 0.05;
+        dir = new Vec3(dir.x + ax, dir.y + ay, dir.z + az).normalize();
+
+        Vec3 end = start.add(dir.scale(MAX_RANGE));
+
+        BlockHitResult blockHit = level.clip(new ClipContext(
+            start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, shooter));
+        double blockDist = blockHit.getType() == HitResult.Type.MISS
+            ? MAX_RANGE
+            : start.distanceTo(blockHit.getLocation());
+
+        List<LivingEntity> nearby = level.getEntitiesOfClass(
+            LivingEntity.class,
+            new AABB(start, end).inflate(1.0),
+            e -> e != shooter && e.isAlive());
+
+        List<Hitscan.Candidate> candidates = new ArrayList<>();
+        Map<String, LivingEntity> byId = new HashMap<>();
+        for (LivingEntity e : nearby) {
+            var clip = e.getBoundingBox().inflate(0.3).clip(start, end);
+            if (clip.isPresent()) {
+                String id = e.getUUID().toString();
+                candidates.add(new Hitscan.Candidate(id, start.distanceTo(clip.get())));
+                byId.put(id, e);
+            }
+        }
+
+        var hit = Hitscan.firstHitWithinRange(blockDist, candidates);
+        Vec3 endPoint = blockHit.getType() == HitResult.Type.MISS ? end : blockHit.getLocation();
+        if (hit.isPresent()) {
+            LivingEntity hitTarget = byId.get(hit.get().id());
+            hitTarget.invulnerableTime = 0;
+            hitTarget.hurtServer((ServerLevel) level,
+                WildWestDamageTypes.gunshot(shooter), DAMAGE);
+            endPoint = hitTarget.position().add(0, hitTarget.getBbHeight() * 0.5, 0);
+        }
+
+        level.playSound(null, shooter.getX(), shooter.getY(), shooter.getZ(),
+            ModSounds.PISTOL_FIRE.get(),
+            SoundSource.HOSTILE, 1.0F, 1.0F);
+
+        PacketDistributor.sendToPlayersTrackingEntity(
+            shooter, new S2CTracerPacket(start, endPoint));
     }
 }
