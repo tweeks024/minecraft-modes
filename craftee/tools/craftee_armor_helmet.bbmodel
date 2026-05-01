@@ -1,0 +1,150 @@
+{
+	"meta": {
+		"format_version": "5.0",
+		"model_format": "modded_entity",
+		"box_uv": true
+	},
+	"name": "craftee_armor_helmet",
+	"model_identifier": "",
+	"modded_entity_entity_class": "",
+	"modded_entity_version": "1.21",
+	"modded_entity_flip_y": true,
+	"visible_box": [
+		1,
+		1,
+		0
+	],
+	"variable_placeholders": "",
+	"variable_placeholder_buttons": [],
+	"timeline_setups": [],
+	"unhandled_root_fields": {},
+	"resolution": {
+		"width": 64,
+		"height": 32
+	},
+	"elements": [
+		{
+			"name": "head",
+			"from": [
+				-4,
+				24,
+				-4
+			],
+			"to": [
+				4,
+				32,
+				4
+			],
+			"origin": [
+				0,
+				24,
+				0
+			],
+			"autouv": 0,
+			"box_uv": true,
+			"uv_offset": [
+				0,
+				0
+			],
+			"rotation": null,
+			"rescale": null,
+			"locked": false,
+			"render_order": "default",
+			"export": true,
+			"scope": 0,
+			"allow_mirror_modeling": true,
+			"color": 0,
+			"type": "cube",
+			"uuid": "6e6b93de-d7a5-4246-b249-e3b2772e59ed",
+			"faces": {
+				"north": {
+					"uv": [
+						8,
+						8,
+						16,
+						16
+					],
+					"texture": 0
+				},
+				"east": {
+					"uv": [
+						0,
+						8,
+						8,
+						16
+					],
+					"texture": 0
+				},
+				"south": {
+					"uv": [
+						24,
+						8,
+						32,
+						16
+					],
+					"texture": 0
+				},
+				"west": {
+					"uv": [
+						16,
+						8,
+						24,
+						16
+					],
+					"texture": 0
+				},
+				"up": {
+					"uv": [
+						16,
+						8,
+						8,
+						0
+					],
+					"texture": 0
+				},
+				"down": {
+					"uv": [
+						24,
+						8,
+						16,
+						0
+					],
+					"texture": 0
+				}
+			}
+		}
+	],
+	"groups": [],
+	"outliner": [
+		"6e6b93de-d7a5-4246-b249-e3b2772e59ed"
+	],
+	"textures": [
+		{
+			"path": null,
+			"name": "craftee.png",
+			"folder": "entity/equipment/humanoid",
+			"namespace": "craftee",
+			"id": "0",
+			"particle": false,
+			"render_mode": "default",
+			"render_sides": "auto",
+			"frame_time": 1,
+			"frame_order_type": "loop",
+			"frame_order": "",
+			"frame_interpolate": false,
+			"visible": true,
+			"internal": true,
+			"saved": true,
+			"uuid": "f0ecbe3f-62e8-4352-98c9-4166beb8250d",
+			"relative_path": "../src/main/resources/assets/craftee/textures/entity/equipment/humanoid/craftee.png",
+			"use_as_default": false,
+			"layers_enabled": false,
+			"sync_to_project": "",
+			"width": 64,
+			"height": 32,
+			"uv_width": 64,
+			"uv_height": 32,
+			"source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAgCAYAAACinX6EAAAAcUlEQVR4nO3WsQ3AIAxE0fMtQPbNtJkkkbIBhQvz70l0iAp/qLXWKzALzoKz4Cw4C86Cs+C8s/m5r3+dxIKr/AQ3ZAQOZMFVGgBvQOUGwFlwFpw7D58QTQuu8go0yggMYMFVGtAoDRjAgqs0QH0mNOADyMIcVmN1VpIAAAAASUVORK5CYII="
+		}
+	]
+}
