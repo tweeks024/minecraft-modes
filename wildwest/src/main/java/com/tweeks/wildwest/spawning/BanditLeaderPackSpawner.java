@@ -38,8 +38,18 @@ public final class BanditLeaderPackSpawner {
         // Pre-flight: skip if leader is already mounted (re-spawn / re-load case).
         if (leader.getVehicle() != null) return;
 
-        LeaderEntourageSpawner.spawnEntourage(
-            sl, leader, ModEntities.BANDIT.get(),
-            Variant.BLACK, Markings.NONE);
+        // FinalizeSpawnEvent fires BEFORE the spawn pipeline calls
+        // tryAddFreshEntityWithPassengers(leader). If we attach the entourage
+        // here, the leader hasn't been added to the level's entity tracker
+        // yet, and clients may transiently see it unmounted. Defer to the
+        // server thread's next polling cycle, by which time the leader is
+        // fully present. Re-check alive + no-vehicle in case state changed.
+        sl.getServer().execute(() -> {
+            if (!leader.isAlive()) return;
+            if (leader.getVehicle() != null) return;
+            LeaderEntourageSpawner.spawnEntourage(
+                sl, leader, ModEntities.BANDIT.get(),
+                Variant.BLACK, Markings.NONE);
+        });
     }
 }
