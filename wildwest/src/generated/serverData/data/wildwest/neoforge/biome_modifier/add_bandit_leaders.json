@@ -1,0 +1,15 @@
+{
+  "type": "neoforge:add_spawns",
+  "biomes": [
+    "minecraft:plains",
+    "minecraft:savanna",
+    "minecraft:savanna_plateau",
+    "minecraft:desert"
+  ],
+  "spawners": {
+    "type": "wildwest:bandit_leader",
+    "maxCount": 1,
+    "minCount": 1,
+    "weight": 1
+  }
+}

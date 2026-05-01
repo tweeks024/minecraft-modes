@@ -23,6 +23,18 @@ public class WildWestMod {
         Registration.register(modEventBus);
         ModSounds.register(modEventBus);
         modEventBus.addListener(WildWestMod::registerEntityAttributes);
+        modEventBus.addListener((net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent event) -> {
+            event.register(ModEntities.BANDIT.get(),
+                net.minecraft.world.entity.SpawnPlacementTypes.ON_GROUND,
+                net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                com.tweeks.wildwest.spawning.OutlawSpawnRules::checkSpawnRules,
+                net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
+            event.register(ModEntities.BANDIT_LEADER.get(),
+                net.minecraft.world.entity.SpawnPlacementTypes.ON_GROUND,
+                net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                com.tweeks.wildwest.spawning.OutlawSpawnRules::checkLeaderSpawnRules,
+                net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
+        });
     }
 
     private static void registerEntityAttributes(EntityAttributeCreationEvent event) {

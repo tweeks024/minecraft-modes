@@ -24,7 +24,9 @@ public class DataGenerators {
         CompletableFuture<HolderLookup.Provider> lookup = event.getLookupProvider();
 
         RegistrySetBuilder builder = new RegistrySetBuilder()
-            .add(Registries.DAMAGE_TYPE, ModDamageTypeProvider::bootstrap);
+            .add(Registries.DAMAGE_TYPE, ModDamageTypeProvider::bootstrap)
+            .add(net.neoforged.neoforge.registries.NeoForgeRegistries.Keys.BIOME_MODIFIERS,
+                 ModBiomeModifierProvider::bootstrap);
         gen.addProvider(true, new DatapackBuiltinEntriesProvider(
             output, lookup, builder, Set.of(WildWestMod.MOD_ID)));
 
