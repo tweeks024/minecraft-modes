@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "W": "minecraft:oak_planks"
+  },
+  "pattern": [
+    " I ",
+    " W ",
+    " W "
+  ],
+  "result": {
+    "id": "wildwest:billy_club"
+  }
+}

@@ -1,5 +1,9 @@
-// 26.1.2	2026-04-30T18:41:06.372904	Wild West Recipes
+// 26.1.2	2026-04-30T20:16:21.594883	Wild West Recipes
+fedb988b8f99affc9536362f0165462137c949e7 data/wildwest/advancement/recipes/combat/bandit_knife.json
+99fbeb9bcc197d6453798f89ba9751d4ec2e4af6 data/wildwest/advancement/recipes/combat/billy_club.json
 ca54455a8a74006e1c6d2a7e803320b9e1a7abe1 data/wildwest/advancement/recipes/combat/pistol.json
 2734b632559d39f975e755e268e9c5dc85b13e1f data/wildwest/advancement/recipes/combat/rifle.json
+6aee5221d10b1c00c87c2329bfcb9b036d75acd2 data/wildwest/recipe/bandit_knife.json
+e2cd4f7d5e6190d54d184f38166cb256aad3925f data/wildwest/recipe/billy_club.json
 059b7cce7e6166a11eff31df57bf8d9faf72d2db data/wildwest/recipe/pistol.json
 6a7c809d0b68bec0f2944133830cda6e94b63034 data/wildwest/recipe/rifle.json

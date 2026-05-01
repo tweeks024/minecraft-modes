@@ -40,6 +40,23 @@ public class ModRecipeProvider extends RecipeProvider {
             .define('W', Items.OAK_PLANKS)
             .unlockedBy("has_iron", this.has(Items.IRON_INGOT))
             .save(this.output);
+
+        ShapedRecipeBuilder.shaped(itemLookup, RecipeCategory.COMBAT, Registration.BILLY_CLUB.get())
+            .pattern(" I ")
+            .pattern(" W ")
+            .pattern(" W ")
+            .define('I', Items.IRON_INGOT)
+            .define('W', Items.OAK_PLANKS)
+            .unlockedBy("has_iron", this.has(Items.IRON_INGOT))
+            .save(this.output);
+
+        ShapedRecipeBuilder.shaped(itemLookup, RecipeCategory.COMBAT, Registration.BANDIT_KNIFE.get())
+            .pattern(" I")
+            .pattern("L ")
+            .define('I', Items.IRON_INGOT)
+            .define('L', Items.LEATHER)
+            .unlockedBy("has_iron", this.has(Items.IRON_INGOT))
+            .save(this.output);
     }
 
     public static class Runner extends RecipeProvider.Runner {
