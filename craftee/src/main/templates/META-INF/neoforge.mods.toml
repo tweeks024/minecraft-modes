@@ -1,0 +1,31 @@
+modLoader="javafml"
+loaderVersion="[1,)"
+license="${mod_license}"
+
+[[mods]]
+modId="${mod_id}"
+version="${mod_version}"
+displayName="${mod_name}"
+authors="Tom Weeks"
+description='''
+Craftee armor — netherite-tier 4-piece set with a content-creator
+filmstrip motif. Wear all four pieces for a mobility set bonus:
++20% movement speed, +0.30 jump strength, and +0.50 step height
+(auto-step over single-block obstacles).
+Crafted via a Craftee Upgrade Smithing Template (1 netherite scrap +
+8 paper → 2 templates) applied to diamond armor with a netherite ingot.
+'''
+
+[[dependencies.${mod_id}]]
+    modId="neoforge"
+    type="required"
+    versionRange="[${neo_version},)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="minecraft"
+    type="required"
+    versionRange="${minecraft_version_range}"
+    ordering="NONE"
+    side="BOTH"
