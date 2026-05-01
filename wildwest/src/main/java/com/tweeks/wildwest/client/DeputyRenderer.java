@@ -1,33 +1,26 @@
 package com.tweeks.wildwest.client;
 
 import com.tweeks.wildwest.WildWestMod;
+import com.tweeks.wildwest.client.model.DeputyModel;
 import com.tweeks.wildwest.entity.DeputyEntity;
-import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.resources.Identifier;
 
 /**
- * Renderer for {@link DeputyEntity}: vanilla {@link HumanoidModel} baked from
- * {@link ModelLayers#PLAYER}, deputy texture, plus {@link WildWestHeldItemLayer}
- * for future hand-item customisation. (The parent {@link HumanoidMobRenderer}
- * already adds vanilla {@code ItemInHandLayer} which renders the synced
- * MAINHAND item, so no override of {@code extractRenderState} is needed —
- * {@code rightHandItemStack} / {@code rightHandItemState} are populated by
- * the super-class.)
+ * Renderer for {@link DeputyEntity}: humanoid skeleton + {@link DeputyModel}'s
+ * cowboy-hat cubes. Texture: {@code textures/entity/deputy.png}. Held item
+ * comes from the parent {@link HumanoidMobRenderer}'s built-in ItemInHandLayer.
  */
 public class DeputyRenderer
-        extends HumanoidMobRenderer<DeputyEntity, HumanoidRenderState, HumanoidModel<HumanoidRenderState>> {
+        extends HumanoidMobRenderer<DeputyEntity, HumanoidRenderState, DeputyModel> {
 
     private static final Identifier TEXTURE =
         Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "textures/entity/deputy.png");
 
     public DeputyRenderer(EntityRendererProvider.Context context) {
-        super(context, new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER)), 0.5F);
-        // No custom held-item layer: HumanoidMobRenderer already adds vanilla
-        // ItemInHandLayer which renders the synced MAINHAND item.
+        super(context, new DeputyModel(context.bakeLayer(DeputyModel.LAYER_LOCATION)), 0.5F);
     }
 
     @Override

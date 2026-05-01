@@ -2,6 +2,10 @@ package com.tweeks.wildwest.client;
 
 import com.tweeks.wildwest.ModEntities;
 import com.tweeks.wildwest.WildWestMod;
+import com.tweeks.wildwest.client.model.BanditLeaderModel;
+import com.tweeks.wildwest.client.model.BanditModel;
+import com.tweeks.wildwest.client.model.DeputyModel;
+import com.tweeks.wildwest.client.model.SherrifModel;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -29,5 +33,13 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.SHERRIF.get(), SherrifRenderer::new);
         event.registerEntityRenderer(ModEntities.BANDIT.get(), BanditRenderer::new);
         event.registerEntityRenderer(ModEntities.BANDIT_LEADER.get(), BanditLeaderRenderer::new);
+    }
+
+    @SubscribeEvent
+    public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
+        event.registerLayerDefinition(DeputyModel.LAYER_LOCATION, DeputyModel::createBodyLayer);
+        event.registerLayerDefinition(SherrifModel.LAYER_LOCATION, SherrifModel::createBodyLayer);
+        event.registerLayerDefinition(BanditModel.LAYER_LOCATION, BanditModel::createBodyLayer);
+        event.registerLayerDefinition(BanditLeaderModel.LAYER_LOCATION, BanditLeaderModel::createBodyLayer);
     }
 }
