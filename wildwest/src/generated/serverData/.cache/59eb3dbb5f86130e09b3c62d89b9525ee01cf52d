@@ -1,5 +1,5 @@
-// 26.1.2	2026-04-30T20:15:09.94487	Loot Tables
-7c3ea5d0a6268b1753b7bd22700c6bceb7bb4dcf data/wildwest/loot_table/entities/bandit.json
-dbbead39cd632158e1e1b49b2660d786489d16bf data/wildwest/loot_table/entities/bandit_leader.json
-c45b56c5c1ebdadb7193ca443a0b19a8567fb2d4 data/wildwest/loot_table/entities/deputy.json
-4746d39ec5797fcf21ee1cf5690754dca64cd85a data/wildwest/loot_table/entities/sherrif.json
+// 26.1.2	2026-04-30T20:23:39.202246	Loot Tables
+fcffd0eb3adf9354dedc644e61da064b3e4153f8 data/wildwest/loot_table/entities/bandit.json
+e6ee1e48e25c555d68e727c31276f8aac4fed6dd data/wildwest/loot_table/entities/bandit_leader.json
+ae5a7e0f75e00cd339e316e8638e62ab2ff9923d data/wildwest/loot_table/entities/deputy.json
+eec338a1b288490b5b49896669e1c20989b8357b data/wildwest/loot_table/entities/sherrif.json

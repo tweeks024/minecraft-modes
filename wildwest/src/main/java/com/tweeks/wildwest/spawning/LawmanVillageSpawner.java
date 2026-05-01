@@ -49,6 +49,10 @@ public final class LawmanVillageSpawner {
     @SubscribeEvent
     public static void onServerLevelTick(LevelTickEvent.Post event) {
         if (!(event.getLevel() instanceof ServerLevel sl)) return;
+        // LevelTickEvent fires once per loaded dimension per tick. Villages
+        // live in the overworld; gating here keeps tickCounter incrementing
+        // at 1× per game tick instead of 3× when nether/end are also loaded.
+        if (sl.dimension() != net.minecraft.world.level.Level.OVERWORLD) return;
         if (++tickCounter < CHECK_INTERVAL_TICKS) return;
         tickCounter = 0;
 
