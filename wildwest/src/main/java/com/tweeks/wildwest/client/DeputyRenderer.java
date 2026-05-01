@@ -26,7 +26,8 @@ public class DeputyRenderer
 
     public DeputyRenderer(EntityRendererProvider.Context context) {
         super(context, new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER)), 0.5F);
-        this.addLayer(new WildWestHeldItemLayer(this));
+        // No custom held-item layer: HumanoidMobRenderer already adds vanilla
+        // ItemInHandLayer which renders the synced MAINHAND item.
     }
 
     @Override

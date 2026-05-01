@@ -24,7 +24,6 @@ public class BanditLeaderRenderer
 
     public BanditLeaderRenderer(EntityRendererProvider.Context context) {
         super(context, new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER)), 0.5F);
-        this.addLayer(new WildWestHeldItemLayer(this));
     }
 
     @Override
