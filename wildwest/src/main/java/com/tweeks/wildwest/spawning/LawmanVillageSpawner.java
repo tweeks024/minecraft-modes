@@ -82,18 +82,25 @@ public final class LawmanVillageSpawner {
                 spawn(sl, ModEntities.DEPUTY.get(), center);
             }
             if (sherrifCount < MAX_SHERRIFS_PER_VILLAGE && sl.getRandom().nextFloat() < SHERRIF_SPAWN_CHANCE) {
-                spawn(sl, ModEntities.SHERRIF.get(), center);
+                com.tweeks.wildwest.entity.SherrifEntity sherrif = spawn(sl, ModEntities.SHERRIF.get(), center);
+                if (sherrif != null) {
+                    com.tweeks.wildwest.spawning.LeaderEntourageSpawner.spawnEntourage(
+                        sl, sherrif, ModEntities.DEPUTY.get(),
+                        net.minecraft.world.entity.animal.equine.Variant.CHESTNUT,
+                        net.minecraft.world.entity.animal.equine.Markings.WHITE_FIELD);
+                }
             }
         }
     }
 
-    private static <T extends Entity> void spawn(ServerLevel sl, EntityType<T> type, BlockPos pos) {
+    private static <T extends Entity> T spawn(ServerLevel sl, EntityType<T> type, BlockPos pos) {
         int x = pos.getX() + sl.getRandom().nextInt(20) - 10;
         int z = pos.getZ() + sl.getRandom().nextInt(20) - 10;
         int y = sl.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
         T entity = type.create(sl, EntitySpawnReason.NATURAL);
-        if (entity == null) return;
+        if (entity == null) return null;
         entity.snapTo((double) x + 0.5, (double) y, (double) z + 0.5, 0.0f, 0.0f);
         sl.addFreshEntity(entity);
+        return entity;
     }
 }
