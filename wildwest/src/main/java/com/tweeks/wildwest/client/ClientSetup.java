@@ -25,5 +25,9 @@ public final class ClientSetup {
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(ModEntities.BULLET.get(), BulletRenderer::new);
+        event.registerEntityRenderer(ModEntities.DEPUTY.get(), DeputyRenderer::new);
+        event.registerEntityRenderer(ModEntities.SHERRIF.get(), SherrifRenderer::new);
+        event.registerEntityRenderer(ModEntities.BANDIT.get(), BanditRenderer::new);
+        event.registerEntityRenderer(ModEntities.BANDIT_LEADER.get(), BanditLeaderRenderer::new);
     }
 }
