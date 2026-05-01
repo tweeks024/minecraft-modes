@@ -55,6 +55,8 @@ public abstract class WildWestMob extends PathfinderMob {
     protected abstract ItemStack getHandWeaponStack();
     public abstract boolean usesRifle();
     public abstract boolean isLawman();
+    /** True if this mob is a leader (sherrif, bandit-leader). False for footsoldiers. */
+    public abstract boolean isLeader();
 
     @Override
     protected void registerGoals() {

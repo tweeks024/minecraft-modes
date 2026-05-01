@@ -34,4 +34,7 @@ public class BanditLeaderEntity extends WildWestMob implements Outlaw, Enemy {
 
     @Override
     public boolean isLawman() { return false; }
+
+    @Override
+    public boolean isLeader() { return true; }
 }

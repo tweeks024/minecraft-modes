@@ -33,4 +33,7 @@ public class DeputyEntity extends WildWestMob implements Lawman {
 
     @Override
     public boolean isLawman() { return true; }
+
+    @Override
+    public boolean isLeader() { return false; }
 }
