@@ -1,5 +1,6 @@
 package com.tweeks.wildwest.entity;
 
+import com.tweeks.wildwest.entity.ai.FollowDecision;
 import com.tweeks.wildwest.entity.ai.LawmanTargetGoal;
 import com.tweeks.wildwest.entity.ai.OutlawTargetGoal;
 import com.tweeks.wildwest.entity.ai.WildWestMeleeAttackGoal;
@@ -21,7 +22,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
-public abstract class WildWestMob extends PathfinderMob {
+public abstract class WildWestMob extends PathfinderMob implements FollowDecision.Candidate {
 
     private static final EntityDataAccessor<Byte> DATA_WEAPON_MODE =
         SynchedEntityData.defineId(WildWestMob.class, EntityDataSerializers.BYTE);
@@ -31,6 +32,17 @@ public abstract class WildWestMob extends PathfinderMob {
 
     private int hysteresisLockTicks = 0;
     private int tickCounter = 0;
+
+    /** The leader this follower is currently tracking, or null. Null for leaders themselves. */
+    private WildWestMob followingLeader = null;
+
+    public WildWestMob getFollowingLeader() {
+        return this.followingLeader;
+    }
+
+    public void setFollowingLeader(WildWestMob leader) {
+        this.followingLeader = leader;
+    }
 
     protected WildWestMob(EntityType<? extends WildWestMob> type, Level level) {
         super(type, level);
@@ -63,10 +75,12 @@ public abstract class WildWestMob extends PathfinderMob {
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(2, new WildWestRangedAttackGoal(this));
         this.goalSelector.addGoal(2, new WildWestMeleeAttackGoal(this, 1.0, true));
+        this.goalSelector.addGoal(4, new com.tweeks.wildwest.entity.ai.FollowLeaderGoal(this));
         this.goalSelector.addGoal(7, new WaterAvoidingRandomStrollGoal(this, 0.6));
         this.goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 8.0F));
         this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
 
+        this.targetSelector.addGoal(0, new com.tweeks.wildwest.entity.ai.LeaderTargetCopyGoal(this));
         this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
         if (this.isLawman()) {
             this.targetSelector.addGoal(2, new LawmanTargetGoal(this));
