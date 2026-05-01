@@ -1,10 +1,12 @@
 package com.tweeks.craftee;
 
 import com.tweeks.craftee.item.CrafteeArmorMaterials;
+import java.util.List;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.SmithingTemplateItem;
 import net.minecraft.world.item.equipment.ArmorType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -44,6 +46,18 @@ public final class Registration {
               .fireResistant()
               .stacksTo(1));
 
+    public static final DeferredItem<SmithingTemplateItem> CRAFTEE_UPGRADE_SMITHING_TEMPLATE =
+        ITEMS.registerItem("craftee_upgrade_smithing_template",
+            p -> new SmithingTemplateItem(
+                Component.translatable("item.craftee.smithing_template.craftee_upgrade.applies_to"),
+                Component.translatable("item.craftee.smithing_template.craftee_upgrade.ingredients"),
+                Component.translatable("item.craftee.smithing_template.craftee_upgrade.base_slot_description"),
+                Component.translatable("item.craftee.smithing_template.craftee_upgrade.additions_slot_description"),
+                List.of(),
+                List.of(),
+                p),
+            p -> p);
+
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> CRAFTEE_TAB =
         CREATIVE_TABS.register("main", () ->
             CreativeModeTab.builder()
@@ -54,6 +68,7 @@ public final class Registration {
                     output.accept(CRAFTEE_CHESTPLATE.get());
                     output.accept(CRAFTEE_LEGGINGS.get());
                     output.accept(CRAFTEE_BOOTS.get());
+                    output.accept(CRAFTEE_UPGRADE_SMITHING_TEMPLATE.get());
                 })
                 .build());
 
