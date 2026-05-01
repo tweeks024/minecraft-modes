@@ -58,6 +58,11 @@ public final class SetBonusHandler {
     @SubscribeEvent
     public static void onPlayerTick(PlayerTickEvent.Post event) {
         Player player = event.getEntity();
+        // Server-only: vanilla syncs attribute modifiers to clients via
+        // ClientboundUpdateAttributesPacket. Running this on the logical
+        // client too would double-add the modifier to the client-side
+        // entity (causing prediction jitter at high speed).
+        if (player.level().isClientSide()) return;
         boolean fullSet = isWearingFullSet(player);
         syncModifier(player, Attributes.MOVEMENT_SPEED, SPEED_MOD, fullSet);
         syncModifier(player, Attributes.JUMP_STRENGTH, JUMP_MOD, fullSet);

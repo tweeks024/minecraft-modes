@@ -8,6 +8,5 @@
   "item.craftee.smithing_template.craftee_upgrade.applies_to": "Diamond Armor",
   "item.craftee.smithing_template.craftee_upgrade.base_slot_description": "Add diamond armor",
   "item.craftee.smithing_template.craftee_upgrade.ingredients": "Netherite Ingot",
-  "itemGroup.craftee": "Craftee",
-  "upgrade.craftee.craftee_upgrade": "Craftee Upgrade"
+  "itemGroup.craftee": "Craftee"
 }
