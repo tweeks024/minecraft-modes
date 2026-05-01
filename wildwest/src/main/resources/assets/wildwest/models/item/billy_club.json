@@ -1,0 +1,25 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "0": "wildwest:item/billy_club",
+    "particle": "wildwest:item/billy_club"
+  },
+  "elements": [
+    {
+      "from": [7, 1, 6],
+      "to": [9, 13, 8],
+      "faces": {
+        "north": { "uv": [0, 0, 2, 12], "texture": "#0" },
+        "east":  { "uv": [2, 0, 4, 12], "texture": "#0" },
+        "south": { "uv": [4, 0, 6, 12], "texture": "#0" },
+        "west":  { "uv": [6, 0, 8, 12], "texture": "#0" },
+        "up":    { "uv": [8, 0, 10, 2], "texture": "#0" },
+        "down":  { "uv": [10, 0, 12, 2], "texture": "#0" }
+      }
+    }
+  ],
+  "display": {
+    "thirdperson_righthand": { "rotation": [0, 0, 0], "translation": [0, 3, 1], "scale": [1, 1, 1] },
+    "firstperson_righthand": { "rotation": [0, -10, 0], "translation": [1, 4.5, 2], "scale": [1.2, 1.2, 1.2] }
+  }
+}
