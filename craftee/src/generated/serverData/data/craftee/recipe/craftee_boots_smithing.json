@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smithing_transform",
+  "addition": "minecraft:netherite_ingot",
+  "base": "minecraft:diamond_boots",
+  "result": {
+    "id": "craftee:craftee_boots"
+  },
+  "template": "craftee:craftee_upgrade_smithing_template"
+}

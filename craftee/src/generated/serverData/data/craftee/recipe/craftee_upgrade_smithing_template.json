@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "N": "minecraft:netherite_scrap",
+    "P": "minecraft:paper"
+  },
+  "pattern": [
+    "PPP",
+    "PNP",
+    "PPP"
+  ],
+  "result": {
+    "count": 2,
+    "id": "craftee:craftee_upgrade_smithing_template"
+  }
+}
