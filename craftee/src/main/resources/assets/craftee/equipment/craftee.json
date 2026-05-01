@@ -1,0 +1,10 @@
+{
+  "layers": {
+    "humanoid": [
+      { "texture": "craftee:craftee" }
+    ],
+    "humanoid_leggings": [
+      { "texture": "craftee:craftee" }
+    ]
+  }
+}
