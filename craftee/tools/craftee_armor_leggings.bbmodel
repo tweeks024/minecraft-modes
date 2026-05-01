@@ -55,7 +55,7 @@
 			"allow_mirror_modeling": true,
 			"color": 0,
 			"type": "cube",
-			"uuid": "05b0e80a-6da7-4dba-96b9-062cf39379f3",
+			"uuid": "009f9e4b-64c8-4395-adfa-33f9306799b8",
 			"faces": {
 				"north": {
 					"uv": [
@@ -145,7 +145,7 @@
 			"allow_mirror_modeling": true,
 			"color": 0,
 			"type": "cube",
-			"uuid": "7d467b83-6936-440f-bc2e-2e2a0128e2f4",
+			"uuid": "877ab430-1f27-4d1c-a399-f2dfb73522fc",
 			"faces": {
 				"north": {
 					"uv": [
@@ -206,8 +206,8 @@
 	],
 	"groups": [],
 	"outliner": [
-		"05b0e80a-6da7-4dba-96b9-062cf39379f3",
-		"7d467b83-6936-440f-bc2e-2e2a0128e2f4"
+		"009f9e4b-64c8-4395-adfa-33f9306799b8",
+		"877ab430-1f27-4d1c-a399-f2dfb73522fc"
 	],
 	"textures": [
 		{
@@ -226,7 +226,7 @@
 			"visible": true,
 			"internal": true,
 			"saved": true,
-			"uuid": "eb6c4afc-6fea-4367-8356-e518b20b5e78",
+			"uuid": "0561bba9-b6e8-4db9-8fcb-4c8abdd640b7",
 			"relative_path": "../src/main/resources/assets/craftee/textures/entity/equipment/humanoid_leggings/craftee.png",
 			"use_as_default": false,
 			"layers_enabled": false,
@@ -235,7 +235,7 @@
 			"height": 32,
 			"uv_width": 64,
 			"uv_height": 32,
-			"source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAgCAYAAACinX6EAAAAYElEQVR4nOXOwQmAQAADwXUbOPu1Wis5wbcvBe+xA/kEAtnGGJMwiZM4iZM4iZM4iZM4iZM4iZM4iZM4iZM4iZM4ifOpPI/9zltf93+SOImTOImTOImTOImTOIlz9YHVLhSxBxzWB+50AAAAAElFTkSuQmCC"
+			"source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAgCAYAAACinX6EAAAAi0lEQVR4nO3UQQrCMBAF0N+foAu77z16ph7LS4j36GnspigpzcJFLGhXJf7/IJAZJjCBTAAzMzMzMzMzU9OUiftzStfX4x0PocUYUt6P84Tbufs4UzNuJfvTJS8FhLj4S9H69P9VLGf+24XL+tr/BG7N/N64ZoQ4QhwhjhBHiCPEEeIIcYQ4Ht3A0RbM1SFs+UBiqwAAAABJRU5ErkJggg=="
 		}
 	]
 }

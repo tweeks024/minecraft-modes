@@ -55,7 +55,7 @@
 			"allow_mirror_modeling": true,
 			"color": 0,
 			"type": "cube",
-			"uuid": "8b664504-8a0e-4d3c-a643-ffbf4c20a53f",
+			"uuid": "8ab99018-f7f1-4dea-80ed-37fd895478b2",
 			"faces": {
 				"north": {
 					"uv": [
@@ -145,7 +145,7 @@
 			"allow_mirror_modeling": true,
 			"color": 0,
 			"type": "cube",
-			"uuid": "e54ae728-bd15-413d-bf6c-0db8f83c224b",
+			"uuid": "daac7b79-4c09-4584-82c2-db0867760399",
 			"faces": {
 				"north": {
 					"uv": [
@@ -235,7 +235,7 @@
 			"allow_mirror_modeling": true,
 			"color": 0,
 			"type": "cube",
-			"uuid": "a763950d-b225-486b-910c-47a4d55a3382",
+			"uuid": "861489bf-bebf-4178-8dca-bbc4c1a227fa",
 			"faces": {
 				"north": {
 					"uv": [
@@ -296,9 +296,9 @@
 	],
 	"groups": [],
 	"outliner": [
-		"8b664504-8a0e-4d3c-a643-ffbf4c20a53f",
-		"e54ae728-bd15-413d-bf6c-0db8f83c224b",
-		"a763950d-b225-486b-910c-47a4d55a3382"
+		"8ab99018-f7f1-4dea-80ed-37fd895478b2",
+		"daac7b79-4c09-4584-82c2-db0867760399",
+		"861489bf-bebf-4178-8dca-bbc4c1a227fa"
 	],
 	"textures": [
 		{
@@ -317,7 +317,7 @@
 			"visible": true,
 			"internal": true,
 			"saved": true,
-			"uuid": "d87f18fc-b59e-44b4-b841-1dc366548634",
+			"uuid": "4a61d2aa-fa6a-433f-9a7b-a475709ba222",
 			"relative_path": "../src/main/resources/assets/craftee/textures/entity/equipment/humanoid/craftee.png",
 			"use_as_default": false,
 			"layers_enabled": false,
@@ -326,7 +326,7 @@
 			"height": 32,
 			"uv_width": 64,
 			"uv_height": 32,
-			"source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAgCAYAAACinX6EAAAAcUlEQVR4nO3WsQ3AIAxE0fMtQPbNtJkkkbIBhQvz70l0iAp/qLXWKzALzoKz4Cw4C86Cs+C8s/m5r3+dxIKr/AQ3ZAQOZMFVGgBvQOUGwFlwFpw7D58QTQuu8go0yggMYMFVGtAoDRjAgqs0QH0mNOADyMIcVmN1VpIAAAAASUVORK5CYII="
+			"source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAgCAYAAACinX6EAAABZUlEQVR4nGNkIAA2//n6f87fLzjlU5h5GM4x/8cqd+7XV4aN7OKMDIMYsBCjyIiNG6cHhzpgYhjhgIlhhAMmhhEOmBhGOGBiGOGAhRqGDOXagIVQPU+pBwmZP9DtBBZi6nlayw/6MqCekQeM0dkjqhBs/P8FK3vEBEA9UqwPpxTAMpJjn+R2wHDL/yAw4htCjITqbeT+PjH9e1qPH1DqPqLKACNovU1uPU3rep9S9yEDJoYRDliIUUTtFttgMo8FW57FZyC2PEiKfnSArt//50uUAoJU89HdR6hMYMGWp6jFRwfUVk8sf8DKgPoh0G5gopXBII+DWo0gPJgDgYkelgzm5jMTwwgHTPSwZDBnARZaGYyc9wdzFmChpeGD2eN0CQBqAM89rQz259eC2V+f3WQQ9a4iyD/nXgXmzygRZ9g41ANgu0s13EOghg2490eAz8AAaUxm9LxkYJgsjtd8Jpr7YJADAKSo9zLivlxhAAAAAElFTkSuQmCC"
 		}
 	]
 }

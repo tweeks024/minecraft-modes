@@ -55,7 +55,7 @@
 			"allow_mirror_modeling": true,
 			"color": 0,
 			"type": "cube",
-			"uuid": "6e6b93de-d7a5-4246-b249-e3b2772e59ed",
+			"uuid": "c4b760e2-080f-4af8-b7b4-e4b9c32b67af",
 			"faces": {
 				"north": {
 					"uv": [
@@ -116,7 +116,7 @@
 	],
 	"groups": [],
 	"outliner": [
-		"6e6b93de-d7a5-4246-b249-e3b2772e59ed"
+		"c4b760e2-080f-4af8-b7b4-e4b9c32b67af"
 	],
 	"textures": [
 		{
@@ -135,7 +135,7 @@
 			"visible": true,
 			"internal": true,
 			"saved": true,
-			"uuid": "f0ecbe3f-62e8-4352-98c9-4166beb8250d",
+			"uuid": "a0bdb1ed-d38e-4dd4-8960-e981dc5b447d",
 			"relative_path": "../src/main/resources/assets/craftee/textures/entity/equipment/humanoid/craftee.png",
 			"use_as_default": false,
 			"layers_enabled": false,
@@ -144,7 +144,7 @@
 			"height": 32,
 			"uv_width": 64,
 			"uv_height": 32,
-			"source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAgCAYAAACinX6EAAAAcUlEQVR4nO3WsQ3AIAxE0fMtQPbNtJkkkbIBhQvz70l0iAp/qLXWKzALzoKz4Cw4C86Cs+C8s/m5r3+dxIKr/AQ3ZAQOZMFVGgBvQOUGwFlwFpw7D58QTQuu8go0yggMYMFVGtAoDRjAgqs0QH0mNOADyMIcVmN1VpIAAAAASUVORK5CYII="
+			"source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAgCAYAAACinX6EAAABZUlEQVR4nGNkIAA2//n6f87fLzjlU5h5GM4x/8cqd+7XV4aN7OKMDIMYsBCjyIiNG6cHhzpgYhjhgIlhhAMmhhEOmBhGOGBiGOGAhRqGDOXagIVQPU+pBwmZP9DtBBZi6nlayw/6MqCekQeM0dkjqhBs/P8FK3vEBEA9UqwPpxTAMpJjn+R2wHDL/yAw4htCjITqbeT+PjH9e1qPH1DqPqLKACNovU1uPU3rep9S9yEDJoYRDliIUUTtFttgMo8FW57FZyC2PEiKfnSArt//50uUAoJU89HdR6hMYMGWp6jFRwfUVk8sf8DKgPoh0G5gopXBII+DWo0gPJgDgYkelgzm5jMTwwgHTPSwZDBnARZaGYyc9wdzFmChpeGD2eN0CQBqAM89rQz259eC2V+f3WQQ9a4iyD/nXgXmzygRZ9g41ANgu0s13EOghg2490eAz8AAaUxm9LxkYJgsjtd8Jpr7YJADAKSo9zLivlxhAAAAAElFTkSuQmCC"
 		}
 	]
 }
