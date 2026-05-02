@@ -16,7 +16,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
@@ -239,7 +238,4 @@ public final class ZombieVirusHandler {
         }
     }
 
-    // EntityJoinLevelEvent import is retained for Task 7 (idle behavior wiring).
-    @SuppressWarnings("unused")
-    private static final Class<?> RETAINED_FOR_TASK_7 = EntityJoinLevelEvent.class;
 }
