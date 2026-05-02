@@ -6,6 +6,7 @@ import com.tweeks.wildwest.entity.BanditEntity;
 import com.tweeks.wildwest.entity.BanditLeaderEntity;
 import com.tweeks.wildwest.entity.DeputyEntity;
 import com.tweeks.wildwest.entity.SherrifEntity;
+import com.tweeks.wildwest.entity.WalkerEntity;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -36,6 +37,11 @@ public class WildWestMod {
                 net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 com.tweeks.wildwest.spawning.OutlawSpawnRules::checkLeaderSpawnRules,
                 net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
+            event.register(ModEntities.WALKER.get(),
+                net.minecraft.world.entity.SpawnPlacementTypes.ON_GROUND,
+                net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                net.minecraft.world.entity.monster.Monster::checkMonsterSpawnRules,
+                net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
         });
     }
 
@@ -44,5 +50,6 @@ public class WildWestMod {
         event.put(ModEntities.SHERRIF.get(), SherrifEntity.createAttributes().build());
         event.put(ModEntities.BANDIT.get(), BanditEntity.createAttributes().build());
         event.put(ModEntities.BANDIT_LEADER.get(), BanditLeaderEntity.createAttributes().build());
+        event.put(ModEntities.WALKER.get(), WalkerEntity.createAttributes().build());
     }
 }

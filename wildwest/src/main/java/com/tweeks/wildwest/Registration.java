@@ -47,6 +47,9 @@ public final class Registration {
     public static final DeferredItem<SpawnEggItem> BANDIT_LEADER_SPAWN_EGG = ITEMS.registerItem(
         "bandit_leader_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.BANDIT_LEADER.get()));
 
+    public static final DeferredItem<SpawnEggItem> WALKER_SPAWN_EGG = ITEMS.registerItem(
+        "walker_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.WALKER.get()));
+
     public static final DeferredItem<TaintedVialItem> TAINTED_VIAL = ITEMS.registerItem(
         "tainted_vial", TaintedVialItem::new, p -> p);
 
@@ -64,6 +67,7 @@ public final class Registration {
                     output.accept(SHERRIF_SPAWN_EGG.get());
                     output.accept(BANDIT_SPAWN_EGG.get());
                     output.accept(BANDIT_LEADER_SPAWN_EGG.get());
+                    output.accept(WALKER_SPAWN_EGG.get());
                     output.accept(TAINTED_VIAL.get());
                 })
                 .build());
