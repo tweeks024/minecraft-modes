@@ -27,6 +27,12 @@
 - `MobEffectEvent.Added` / `MobEffectEvent.Remove` / `MobEffectEvent.Expired` exact class names in NeoForge 26.x — verify before Task 5.
 - `RenderLivingEvent.Pre/Post` generic signature in 26.x — verify before Task 13.
 - `Player.isCreative()` and `Player.isSpectator()` availability — both exist in 26.x but confirm.
+- `NearestAttackableTargetGoal` constructor signature in 26.x — used in Task 6.
+
+**Review-fix notes (post-plan-review):**
+- Task 6 was rewritten to extend `NearestAttackableTargetGoal` (vanilla-staggered scan + LOS cache) instead of running a custom `getEntitiesOfClass` scan every tick. Avoids TPS death during outbreaks.
+- Task 5 adds a `LivingDropsEvent` listener that drops snapshotted MAINHAND/OFFHAND items if a zombified mob dies before being cured. Without this, skeleton bows / picked-up player gear would be permanently deleted.
+- Task 5's golden-apple handler restructured to avoid client/server desync on the held item — both sides cancel the event with `SUCCESS`; only the server applies the effect mutation.
 
 ---
 
@@ -54,8 +60,9 @@ wildwest/src/main/java/com/tweeks/wildwest/
     WalkerRenderer.java                   NEW   uses WalkerModel (flat client/, mirrors DeputyRenderer)
     model/WalkerModel.java                NEW   humanoid layer
     ClientSetup.java                      MOD   add Walker renderer + layer entries
-  ZombieVirusHandler.java                 NEW   server event listeners (LivingDamageEvent, MobEffectEvent.Added/Remove,
-                                                EntityJoinLevelEvent, PlayerInteractEvent.EntityInteract)
+  ZombieVirusHandler.java                 NEW   server event listeners (LivingDamageEvent.Pre, MobEffectEvent.Added/
+                                                Remove/Expired, EntityJoinLevelEvent, PlayerInteractEvent.EntityInteract,
+                                                LivingDropsEvent)
   Registration.java                       MOD   register tainted_vial, walker_spawn_egg; creative-tab entries
   ModEntities.java                        MOD   register WALKER, TAINTED_VIAL_PROJECTILE
   WildWestMod.java                        MOD   register ModEffects; entity attributes for Walker; spawn placement;
@@ -677,41 +684,79 @@ The `LivingDamageEvent.Pre` listener for cure-interrupt is a separate `@Subscrib
 
 - [ ] **Step 4: Add the golden-apple cure handler**
 
+Avoid wrapping the entire method in `isClientSide()` — that causes a client-side desync where the ghost golden apple still appears in the player's hand. Instead, run the `hasEffect` checks on both sides (cheap), but apply mutations only on the server. Both sides return the same `InteractionResult.SUCCESS`, which keeps the client and server in agreement about the action being consumed.
+
 ```java
 @SubscribeEvent
 public static void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
-    if (event.getLevel().isClientSide()) return;
     if (event.getItemStack().getItem() != Items.GOLDEN_APPLE) return;
     if (!(event.getTarget() instanceof LivingEntity target)) return;
 
-    if (target.hasEffect(ModEffects.FESTERING_WOUND)) {
+    boolean willCureFestering = target.hasEffect(ModEffects.FESTERING_WOUND);
+    boolean willStartShake = !willCureFestering
+        && target.hasEffect(ModEffects.ZOMBIFIED)
+        && !target.hasEffect(ModEffects.CURING_SHAKE);
+
+    if (!willCureFestering && !willStartShake) return;
+
+    // Both sides cancel the event so the client doesn't try to right-click-eat the apple.
+    event.setCancellationResult(InteractionResult.SUCCESS);
+    event.setCanceled(true);
+
+    // Server-only mutations.
+    if (event.getLevel().isClientSide()) return;
+
+    if (willCureFestering) {
         target.removeEffect(ModEffects.FESTERING_WOUND);
-        if (!event.getEntity().getAbilities().instabuild) event.getItemStack().shrink(1);
-        event.setCancellationResult(InteractionResult.SUCCESS);
-        event.setCanceled(true);
-    } else if (target.hasEffect(ModEffects.ZOMBIFIED)
-            && !target.hasEffect(ModEffects.CURING_SHAKE)) {
+    } else {
         target.addEffect(new MobEffectInstance(ModEffects.CURING_SHAKE,
             CURING_SHAKE_DURATION_TICKS, 0, false, false));
-        if (!event.getEntity().getAbilities().instabuild) event.getItemStack().shrink(1);
-        event.setCancellationResult(InteractionResult.SUCCESS);
-        event.setCanceled(true);
+    }
+    if (!event.getEntity().getAbilities().instabuild) event.getItemStack().shrink(1);
+}
+```
+
+- [ ] **Step 5: Add the drop-recovery hook for snapshotted hand items**
+
+If a zombified mob dies before being cured, vanilla's death-drop logic only drops what's in `EquipmentSlot.MAINHAND`/`OFFHAND` — but those slots are empty because we cleared them in `HandSnapshot.snapshotAndClear`. The pre-zombification weapons are sitting in persistent NBT. Without a recovery hook those items vanish forever — a serious bug for skeletons (their bow) and any mob that picked up a player's dropped tool.
+
+Add to `ZombieVirusHandler`:
+
+```java
+@SubscribeEvent
+public static void onLivingDrops(net.neoforged.neoforge.event.entity.living.LivingDropsEvent event) {
+    if (!(event.getEntity() instanceof Mob mob)) return;
+    var pd = mob.getPersistentData();
+
+    String[] keys = { "wildwest:pre_zombified_mainhand", "wildwest:pre_zombified_offhand" };
+    for (String key : keys) {
+        if (!pd.contains(key)) continue;
+        var stackOpt = net.minecraft.world.item.ItemStack.parse(mob.registryAccess(), pd.get(key));
+        stackOpt.ifPresent(stack -> {
+            net.minecraft.world.entity.item.ItemEntity drop = new net.minecraft.world.entity.item.ItemEntity(
+                mob.level(), mob.getX(), mob.getY(), mob.getZ(), stack);
+            drop.setDefaultPickUpDelay();
+            event.getDrops().add(drop);
+        });
+        pd.remove(key);
     }
 }
 ```
 
-- [ ] **Step 5: Build**
+This drops the snapshotted items at the death position so they're recoverable. Keys are cleared after the drop so a respawn-via-revive doesn't double-restore.
+
+- [ ] **Step 6: Build**
 
 Run: `./gradlew :wildwest:compileJava`
 Expected: BUILD SUCCESSFUL.
 
 If `LivingDamageEvent.Pre` / `MobEffectEvent.Added` resolve to wrong names, look at the existing `BanditLeaderPackSpawner` for an event-class lookup pattern, then check the imported NeoForge classes.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 7: Commit**
 
 ```bash
 git add wildwest/src/main/java/com/tweeks/wildwest/ZombieVirusHandler.java
-git commit -m "feat(wildwest): bite spread, effect transitions, golden-apple cure"
+git commit -m "feat(wildwest): bite spread, effect transitions, golden-apple cure, drop recovery"
 ```
 
 ---
@@ -726,68 +771,51 @@ Two `Goal`s gated on `hasEffect(ZOMBIFIED)` that any `Mob` gets injected with on
 
 - [ ] **Step 1: Implement `ZombifiedHostileTargetGoal`**
 
+We extend vanilla's `NearestAttackableTargetGoal` rather than rolling our own scan loop. Vanilla `NearestAttackableTargetGoal` already implements **staggered target acquisition (every 10 ticks via `randomInterval`)**, line-of-sight caching, and reasonable defaults — building it from scratch would scan + raytrace every tick (a TPS killer if 20+ mobs are zombified). The override only adds the effect-gates on `canUse`/`canContinueToUse`.
+
 ```java
 package com.tweeks.wildwest.entity.ai.zombified;
 
 import com.tweeks.wildwest.effect.ModEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.phys.AABB;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 
-import java.util.Comparator;
-import java.util.EnumSet;
+public class ZombifiedHostileTargetGoal extends NearestAttackableTargetGoal<LivingEntity> {
 
-public class ZombifiedHostileTargetGoal extends Goal {
-    private static final double SCAN_RANGE = 16.0;
-
-    private final Mob self;
-    private LivingEntity chosen;
-
-    public ZombifiedHostileTargetGoal(Mob self) {
-        this.self = self;
-        this.setFlags(EnumSet.of(Flag.TARGET));
+    public ZombifiedHostileTargetGoal(Mob mob) {
+        super(
+            mob,
+            LivingEntity.class,
+            10,                          // randomInterval — only re-scan every ~10 ticks
+            true,                        // mustSee — uses cached line-of-sight check
+            false,                       // mustReach
+            target -> target != null
+                && target.isAlive()
+                && !target.hasEffect(ModEffects.ZOMBIFIED)
+                && !InfectionImmunity.isImmune(target)
+        );
     }
 
     @Override
     public boolean canUse() {
-        if (!self.hasEffect(ModEffects.ZOMBIFIED)) return false;
-        if (self.hasEffect(ModEffects.CURING_SHAKE)) return false;  // suppress while curing
-
-        AABB area = self.getBoundingBox().inflate(SCAN_RANGE);
-        chosen = self.level().getEntitiesOfClass(LivingEntity.class, area, e ->
-                e != self
-                && e.isAlive()
-                && !e.hasEffect(ModEffects.ZOMBIFIED)
-                && !InfectionImmunity.isImmune(e)
-                && self.hasLineOfSight(e))
-            .stream()
-            .min(Comparator.comparingDouble(self::distanceToSqr))
-            .orElse(null);
-        return chosen != null;
-    }
-
-    @Override
-    public void start() {
-        self.setTarget(chosen);
+        if (!this.mob.hasEffect(ModEffects.ZOMBIFIED)) return false;
+        if (this.mob.hasEffect(ModEffects.CURING_SHAKE)) return false;  // suppress during cure
+        return super.canUse();
     }
 
     @Override
     public boolean canContinueToUse() {
-        return self.hasEffect(ModEffects.ZOMBIFIED)
-            && !self.hasEffect(ModEffects.CURING_SHAKE)
-            && chosen != null
-            && chosen.isAlive()
-            && self.distanceToSqr(chosen) <= (SCAN_RANGE * 1.5) * (SCAN_RANGE * 1.5);
-    }
-
-    @Override
-    public void stop() {
-        self.setTarget(null);
-        chosen = null;
+        if (!this.mob.hasEffect(ModEffects.ZOMBIFIED)) return false;
+        if (this.mob.hasEffect(ModEffects.CURING_SHAKE)) return false;
+        return super.canContinueToUse();
     }
 }
 ```
+
+Performance note: the `randomInterval=10` parameter is a vanilla mechanism that gates the spatial scan to roughly twice per second (varies by `random.nextInt(reducedTickDelay(10)) != 0`). With 20 zombified mobs, this drops scan load from 400/s to ~40/s — comfortably tractable.
+
+The constructor signature `NearestAttackableTargetGoal(Mob, Class, int, boolean, boolean, Predicate)` is the standard 26.x form. If the parameter order has changed, the compiler will tell you; the canonical form lives in `NearestAttackableTargetGoal.java` in vanilla — open it from any IDE jump-to.
 
 - [ ] **Step 2: Implement `ZombifiedMeleeAttackGoal`**
 
@@ -1772,6 +1800,7 @@ If anything fails, file a follow-up issue with the specific symptom and continue
 | Cure: golden apple → festering instant | 5 |
 | Cure: golden apple → zombified shake → remove | 5 |
 | Cure interrupt only on player damage | 5 |
+| Lost-loot recovery (LivingDropsEvent) | 5 |
 | Tainted vial item + projectile + AABB-pre-filter sphere | 8, 9 |
 | Walker carrier mob | 10 |
 | Walker biome modifier (Frontier preset) | 11 |
