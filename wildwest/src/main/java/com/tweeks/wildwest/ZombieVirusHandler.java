@@ -3,6 +3,9 @@ package com.tweeks.wildwest;
 import com.tweeks.wildwest.effect.HandSnapshot;
 import com.tweeks.wildwest.effect.ModEffects;
 import com.tweeks.wildwest.entity.ai.zombified.InfectionImmunity;
+import com.tweeks.wildwest.entity.ai.zombified.ZombifiedHostileTargetGoal;
+import com.tweeks.wildwest.entity.ai.zombified.ZombifiedMeleeAttackGoal;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.world.InteractionResult;
@@ -202,6 +205,35 @@ public final class ZombieVirusHandler {
         }
         if (!event.getEntity().getAbilities().instabuild) {
             event.getItemStack().shrink(1);
+        }
+    }
+
+    /**
+     * On entity join, inject the zombified AI goals into every server-side Mob
+     * (excluding Players). The goals gate themselves on {@code hasEffect(ZOMBIFIED)}
+     * at runtime, so they are effectively dormant until a mob turns.
+     *
+     * <ul>
+     *   <li>{@link ZombifiedHostileTargetGoal} at priority 0 in
+     *       {@code targetSelector} — targets any non-immune, non-zombified
+     *       living entity when the mob is ZOMBIFIED and not curing.</li>
+     *   <li>{@link ZombifiedMeleeAttackGoal} at priority 1 in
+     *       {@code goalSelector} — PathfinderMob only (covers most mobs);
+     *       provides chase + swing logic while ZOMBIFIED.</li>
+     * </ul>
+     */
+    @SubscribeEvent
+    public static void onEntityJoin(EntityJoinLevelEvent event) {
+        if (event.getLevel().isClientSide()) return;
+        if (!(event.getEntity() instanceof Mob mob)) return;
+        // Player is not a Mob in this version, so the instanceof guard above already excludes players.
+
+        // Always-on target goal at high priority — gates on ZOMBIFIED at runtime.
+        mob.targetSelector.addGoal(0, new ZombifiedHostileTargetGoal(mob));
+
+        // Melee attack goal — only inject for PathfinderMob (which is most things).
+        if (mob instanceof net.minecraft.world.entity.PathfinderMob pm) {
+            mob.goalSelector.addGoal(1, new ZombifiedMeleeAttackGoal(pm));
         }
     }
 
