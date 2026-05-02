@@ -27,11 +27,11 @@ Java 25 / NeoForge 26.1.2.30-beta / Minecraft 26.1.2. Same module (`:wildwest`) 
    - Server tick: every 10 ticks, broadcast a green ambient particle around the entity.
    - Client render: green color multiplier (R 0.4, G 1.0, B 0.4) applied to the entity model.
    - AI override (see "AI" below) makes the entity hostile to nearest non-zombified `LivingEntity` within 16 blocks.
-   - Cure: golden apple held by a player and right-clicked on the infected mob starts a 30 s "shaking" timer, tracked via a third `MobEffect` named `curing_shake` (duration 600 ticks, hidden particles). When `curing_shake` expires while the entity has `zombified`, both effects are removed (and the speed modifier is cleared). If the entity takes damage during the shake, `curing_shake` is cleared and the cure attempt fails — player must use another golden apple.
+   - Cure: golden apple held by a player and right-clicked on the infected mob starts a 30 s "shaking" timer, tracked via a third `MobEffect` named `curing_shake` (duration 600 ticks, hidden particles). When `curing_shake` expires while the entity has `zombified`, both effects are removed (and the speed modifier is cleared). **Only player-inflicted damage** cancels the cure — ambient damage (fall, cactus, fire, other mobs) does not. The check is `damageSource.getEntity() instanceof Player`. Rationale: the mob is hostile and freely roaming during the shake; punishing the player for unrelated environmental hits would be frustrating and would make cures unreliable. The player chose to cure it, and the design protects that decision unless the player themselves attacks. Additionally, while `curing_shake` is active, the `ZombifiedHostileTargetGoal` is suppressed (the entity stops actively hunting), so the curing entity won't wander far seeking targets — but it remains vulnerable to attacks initiated by other mobs, which by design do not cancel the cure.
 
 **Bite / spread mechanic**
 
-- `LivingDamageEvent` listener: when `event.getSource().getEntity()` has the `zombified` effect AND the target is a non-immune `LivingEntity`:
+- `LivingDamageEvent` listener. **Direct-hit only** — projectiles, fall damage from a zombified parrot, llama spit, etc. must NOT spread the virus. Guard with: `source.getDirectEntity() == source.getEntity()` (i.e., the immediate damager is the same as the causing entity, which is true for melee but false for any projectile). When that holds AND the attacker has the `zombified` effect AND the target is a non-immune `LivingEntity`:
   - If target has neither `festering_wound` nor `zombified`: apply `festering_wound` (60 s).
   - If target already has `festering_wound`: refresh its duration to a full 60 s (extending exposure).
   - If target already has `zombified`: skip the festering apply (already turned).
@@ -47,10 +47,11 @@ Java 25 / NeoForge 26.1.2.30-beta / Minecraft 26.1.2. Same module (`:wildwest`) 
 
 The challenge: any `LivingEntity` can be zombified, but only `Mob` subclasses have goal selectors. We attach AI conditionally:
 
-- `EntityJoinLevelEvent` listener (server side): for any `Mob` joining the level, register two extra goals at low priority that gate on `hasEffect(ZOMBIFIED)`:
+- `EntityJoinLevelEvent` listener (server side): for any `Mob` joining the level, register two extra goals that gate on `hasEffect(ZOMBIFIED)`:
   - `ZombifiedHostileTargetGoal` (priority 0 in `targetSelector`) — finds nearest non-zombified, non-immune `LivingEntity` within 16 blocks; sets it as target. Only active when zombified.
   - `ZombifiedMeleeAttackGoal` (priority 1 in `goalSelector`) — basic 1.0 speed melee approach + attack. Only active when zombified.
-- For `LivingEntity` that are NOT `Mob` (e.g., `ArmorStand`): they cannot be zombified — they are not living in the gameplay sense. Add to immune set.
+- **Native-AI conflict avoidance (Mob only, NOT Player).** Zombified ranged mobs (skeleton, witch, llama, etc.) would otherwise stutter between their native ranged goal and our melee goal. Resolution: when zombification is applied to a `Mob` (not a `Player`), snapshot the entity's `MAINHAND` and `OFFHAND` `ItemStack`s to a custom NBT key (`wildwest:pre_zombified_mainhand` / `wildwest:pre_zombified_offhand`) on the entity itself, then replace both held slots with `ItemStack.EMPTY`. Most native ranged combat goals (`RangedBowAttackGoal`, `RangedAttackGoal`, witch's spell goals) have `canUse()` checks that require holding a specific item — empty hands neutralizes them without inspecting or surgically removing individual goals. On cure/effect-removal, the snapshot is read back and the items restored, then the NBT keys are cleared. Save persistence is automatic via vanilla entity NBT save. **Player is exempt** — players have no goal selector and disarming would be punishing; a zombified player keeps their gun and can keep fighting.
+- For `LivingEntity` that are NOT `Mob` and NOT `Player` (e.g., `ArmorStand`, `ItemFrame`): they cannot be zombified — they are not living in the gameplay sense. Add to immune set.
 - For the player: zombified player gets no AI changes; the player retains full control. The visual tint, particles, speed buff, and bite-with-wither still apply when the player melee-hits things.
 
 **Carrier mob — `WalkerEntity`**
@@ -72,13 +73,28 @@ A throwable splash-style item, the player-controlled vector.
 - Registration: `Item` with `useDuration` of 0; `releaseUsing` throws a custom `TaintedVialEntity` (extending `ThrowableProjectile`) in the look direction with similar physics to a splash potion.
 - On entity impact OR block impact:
   - Spawn glass-break particles + sound.
-  - For each `LivingEntity` within 3.0 block radius (sphere), apply `festering_wound` (60 s). Skips entities in the immune set above.
+  - Compute an `AABB` centered on the impact point inflated by 3.0 in each axis (`AABB.ofSize(impactPos, 6, 6, 6)`).
+  - Use `level.getEntitiesOfClass(LivingEntity.class, aabb, e -> impactPos.distanceTo(e.position()) <= 3.0)` — the AABB pre-filter avoids scanning every entity in the chunk; the predicate then bounds the result to a sphere.
+  - For each entity returned, apply `festering_wound` (60 s). Skips entities in the immune set above.
 - Stack size: 16. Recipe (shapeless): 1 rotten flesh + 1 glass bottle + 1 gunpowder → 1 tainted vial.
 - Creative tab: same wildwest tab as the other items.
 
 **Visual — client rendering**
 
-- `RenderLivingEvent.Pre<LivingEntity, EntityModel<?>>` listener (client only): if the entity has `zombified`, push a `Matrix4f` color modifier on the pose stack — actually NeoForge's correct mechanism is to set a tint via the `RenderType` or to override `getRenderType` is not feasible cross-mod. Instead, use `LivingEntityRenderer`'s `setColorModifier` analogue: NeoForge exposes `RenderLivingEvent` which lets us set a tint via `poseStack` color in the pre-event and reset in the post-event. Concrete: set `RenderSystem.setShaderColor(0.4f, 1.0f, 0.4f, 1.0f)` in pre, restore in post.
+- `RenderLivingEvent.Pre<LivingEntity, EntityModel<?>>` listener (client only): if the entity has `zombified`, save the current shader color (NOT hardcoded white — to avoid clobbering tints set by other mods or vanilla overlays), then multiply by the zombie tint `(0.4, 1.0, 0.4, 1.0)`. In `RenderLivingEvent.Post`, restore the saved color. Concrete pseudocode:
+  ```java
+  // Pre handler
+  float[] saved = RenderSystem.getShaderColor();  // 4 floats
+  STASH.set(saved);  // ThreadLocal<float[]>
+  RenderSystem.setShaderColor(saved[0] * 0.4f, saved[1] * 1.0f, saved[2] * 0.4f, saved[3]);
+  // Post handler (always fires even on render exception)
+  float[] restore = STASH.get();
+  if (restore != null) {
+      RenderSystem.setShaderColor(restore[0], restore[1], restore[2], restore[3]);
+      STASH.remove();
+  }
+  ```
+  This protects against shader-color bleed if a sub-renderer fails or another mod's `Pre` runs after ours. **Polish path** if NeoForge 26 exposes a `LivingEntityRenderState` color hook (similar to vanilla's `LivingEntityRenderer#getOverlayCoords`) — switch to that during implementation, since it composes properly with the renderer's own state.
 - Server-side particles: in `ZombifiedEffect.applyEffectTick(LivingEntity, int amplifier)` (called every tick by the engine), check `entity.tickCount % 10 == 0` — if true, call `ServerLevel.sendParticles(ParticleTypes.HAPPY_VILLAGER, x, y+0.5, z, 1, 0.3, 0.3, 0.3, 0.0)`. (Reusing vanilla `HAPPY_VILLAGER` particles re-tinted via shader is non-trivial; for v1 we ship `HAPPY_VILLAGER` as-is — they're green sparkles, which reads as "infected". A custom particle type can replace it later if needed.)
 
 **Save / load**
@@ -122,9 +138,12 @@ wildwest/src/main/java/com/tweeks/wildwest/
     model/WalkerModel.java              — humanoid variant for the Walker
     renderer/WalkerRenderer.java        — uses WalkerModel
   ZombieVirusHandler.java               — server-side event listener:
-                                            - LivingDamageEvent: bite spread + 10 % wither
+                                            - LivingDamageEvent: bite spread + 10 % wither (direct-hit only)
                                             - EntityJoinLevelEvent: attach gated zombified goals to all Mob entities
+                                            - MobEffectEvent.Added: when ZOMBIFIED is added to a Mob, snapshot+empty hand slots
+                                            - MobEffectEvent.Remove / Expired: when ZOMBIFIED is removed from a Mob, restore hand slots
                                             - PlayerInteractEvent.EntityInteract: golden apple → festering cure (instant) OR zombified cure (start curing_shake)
+                                            - LivingDamageEvent (target side): if a curing entity takes damage from a Player source, clear curing_shake
 ```
 
 Modified files:
@@ -202,6 +221,18 @@ Bite from carrier OR tainted_vial impact
   - Throw golden apple at zombified pig — 30 s shake, then cured.
   - Player gets infected, zombifies, hits a cow with bare fists — cow gets festering wound. Drink milk, all back to normal.
   - Save and reload world during festering and during zombified — state persists.
+
+## Review notes (2026-05-02)
+
+User review of the initial draft surfaced five technical concerns; all addressed inline above:
+
+1. **Direct-hit only spread** — guarded with `getDirectEntity() == getEntity()` check; projectiles, llama spit, falling parrots no longer spread infection.
+2. **Native AI conflict** — handled by clearing held items on zombify (snapshot to NBT, restore on cure). Native ranged-combat goals self-disable when their required item is absent. Player exempt.
+3. **Cure interruption** — only player-inflicted damage cancels; ambient damage (fall, fire, mobs) does not. `ZombifiedHostileTargetGoal` also suppressed during shake to keep the entity nearby.
+4. **Shader bleed** — saved/restore pattern using `RenderSystem.getShaderColor()` snapshot, multiplied (not overwritten). Polish path noted if NeoForge 26 exposes a typed render-state color hook.
+5. **AABB perf** — `getEntitiesOfClass` with inflated AABB pre-filter, then sphere predicate.
+
+Vanilla parity note: cure is golden-apple-only (no Potion of Weakness prerequisite, unlike vanilla zombie villager). Intentional simplification — the cure is already gated behind a high-value item; layering Weakness on top adds friction without strategic depth.
 
 ## Open questions / risks
 
