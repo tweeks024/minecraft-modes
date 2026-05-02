@@ -35,6 +35,7 @@ public final class InfectionImmunity {
                 return e.getType().builtInRegistryHolder().is(EntityTypeTags.UNDEAD);
             }
             @Override public boolean isBoss() {
+                // EntityTypeTags.BOSS not available in this MC version; class-check the two known bosses.
                 return e instanceof EnderDragon || e instanceof WitherBoss;
             }
             @Override public boolean isWalker() {

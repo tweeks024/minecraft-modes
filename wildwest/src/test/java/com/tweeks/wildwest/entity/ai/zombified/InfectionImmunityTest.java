@@ -9,11 +9,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class InfectionImmunityTest {
 
     static class TestSubject implements Subject {
-        boolean undead, boss, walker, creative, spectator, mobOrPlayer = true;
+        boolean undead, boss, walker, creativeOrSpectator, mobOrPlayer = true;
         @Override public boolean isUndead() { return undead; }
         @Override public boolean isBoss() { return boss; }
         @Override public boolean isWalker() { return walker; }
-        @Override public boolean isCreativeOrSpectatorPlayer() { return creative || spectator; }
+        @Override public boolean isCreativeOrSpectatorPlayer() { return creativeOrSpectator; }
         @Override public boolean isMobOrPlayer() { return mobOrPlayer; }
     }
 
@@ -42,13 +42,13 @@ class InfectionImmunityTest {
 
     @Test
     void creativePlayer_isImmune() {
-        TestSubject s = new TestSubject(); s.creative = true;
+        TestSubject s = new TestSubject(); s.creativeOrSpectator = true;
         assertTrue(InfectionImmunity.isImmune(s));
     }
 
     @Test
     void spectatorPlayer_isImmune() {
-        TestSubject s = new TestSubject(); s.spectator = true;
+        TestSubject s = new TestSubject(); s.creativeOrSpectator = true;
         assertTrue(InfectionImmunity.isImmune(s));
     }
 
