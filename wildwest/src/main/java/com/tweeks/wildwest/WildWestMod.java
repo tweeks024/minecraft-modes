@@ -1,6 +1,7 @@
 package com.tweeks.wildwest;
 
 import com.mojang.logging.LogUtils;
+import com.tweeks.wildwest.effect.ModEffects;
 import com.tweeks.wildwest.entity.BanditEntity;
 import com.tweeks.wildwest.entity.BanditLeaderEntity;
 import com.tweeks.wildwest.entity.DeputyEntity;
@@ -21,6 +22,7 @@ public class WildWestMod {
         // Entity types must register before items so SpawnEggItem can resolve ModEntities.*.get().
         ModEntities.register(modEventBus);
         Registration.register(modEventBus);
+        ModEffects.register(modEventBus);
         ModSounds.register(modEventBus);
         modEventBus.addListener(WildWestMod::registerEntityAttributes);
         modEventBus.addListener((net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent event) -> {
