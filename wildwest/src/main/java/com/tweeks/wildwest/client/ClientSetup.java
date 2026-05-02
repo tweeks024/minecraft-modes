@@ -10,6 +10,7 @@ import com.tweeks.wildwest.client.model.WalkerModel;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.renderstate.RegisterRenderStateModifiersEvent;
 
@@ -36,6 +37,7 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.BANDIT.get(), BanditRenderer::new);
         event.registerEntityRenderer(ModEntities.BANDIT_LEADER.get(), BanditLeaderRenderer::new);
         event.registerEntityRenderer(ModEntities.WALKER.get(), WalkerRenderer::new);
+        event.registerEntityRenderer(ModEntities.TAINTED_VIAL_PROJECTILE.get(), ThrownItemRenderer::new);
     }
 
     @SubscribeEvent
