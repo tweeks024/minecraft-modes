@@ -4,6 +4,7 @@ import com.tweeks.wildwest.item.BanditKnifeItem;
 import com.tweeks.wildwest.item.BillyClubItem;
 import com.tweeks.wildwest.item.PistolItem;
 import com.tweeks.wildwest.item.RifleItem;
+import com.tweeks.wildwest.item.TaintedVialItem;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
@@ -46,6 +47,9 @@ public final class Registration {
     public static final DeferredItem<SpawnEggItem> BANDIT_LEADER_SPAWN_EGG = ITEMS.registerItem(
         "bandit_leader_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.BANDIT_LEADER.get()));
 
+    public static final DeferredItem<TaintedVialItem> TAINTED_VIAL = ITEMS.registerItem(
+        "tainted_vial", TaintedVialItem::new, p -> p);
+
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> WILDWEST_TAB =
         CREATIVE_TABS.register("main", () ->
             CreativeModeTab.builder()
@@ -60,6 +64,7 @@ public final class Registration {
                     output.accept(SHERRIF_SPAWN_EGG.get());
                     output.accept(BANDIT_SPAWN_EGG.get());
                     output.accept(BANDIT_LEADER_SPAWN_EGG.get());
+                    output.accept(TAINTED_VIAL.get());
                 })
                 .build());
 
