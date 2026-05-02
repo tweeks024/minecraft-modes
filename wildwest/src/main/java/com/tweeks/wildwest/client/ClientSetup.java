@@ -6,10 +6,13 @@ import com.tweeks.wildwest.client.model.BanditLeaderModel;
 import com.tweeks.wildwest.client.model.BanditModel;
 import com.tweeks.wildwest.client.model.DeputyModel;
 import com.tweeks.wildwest.client.model.SherrifModel;
+import com.tweeks.wildwest.client.model.WalkerModel;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.renderstate.RegisterRenderStateModifiersEvent;
 
 /**
  * Client-only setup for the wildwest mod.
@@ -33,6 +36,13 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.SHERRIF.get(), SherrifRenderer::new);
         event.registerEntityRenderer(ModEntities.BANDIT.get(), BanditRenderer::new);
         event.registerEntityRenderer(ModEntities.BANDIT_LEADER.get(), BanditLeaderRenderer::new);
+        event.registerEntityRenderer(ModEntities.WALKER.get(), WalkerRenderer::new);
+        event.registerEntityRenderer(ModEntities.TAINTED_VIAL_PROJECTILE.get(), ThrownItemRenderer::new);
+    }
+
+    @SubscribeEvent
+    public static void registerRenderStateModifiers(RegisterRenderStateModifiersEvent event) {
+        ZombifiedRenderHandler.registerModifier(event);
     }
 
     @SubscribeEvent
@@ -41,5 +51,6 @@ public final class ClientSetup {
         event.registerLayerDefinition(SherrifModel.LAYER_LOCATION, SherrifModel::createBodyLayer);
         event.registerLayerDefinition(BanditModel.LAYER_LOCATION, BanditModel::createBodyLayer);
         event.registerLayerDefinition(BanditLeaderModel.LAYER_LOCATION, BanditLeaderModel::createBodyLayer);
+        event.registerLayerDefinition(WalkerModel.LAYER_LOCATION, WalkerModel::createBodyLayer);
     }
 }

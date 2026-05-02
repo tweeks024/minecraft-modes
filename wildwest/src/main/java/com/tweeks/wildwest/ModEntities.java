@@ -5,6 +5,8 @@ import com.tweeks.wildwest.entity.BanditLeaderEntity;
 import com.tweeks.wildwest.entity.BulletEntity;
 import com.tweeks.wildwest.entity.DeputyEntity;
 import com.tweeks.wildwest.entity.SherrifEntity;
+import com.tweeks.wildwest.entity.WalkerEntity;
+import com.tweeks.wildwest.entity.projectile.TaintedVialEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
@@ -60,6 +62,23 @@ public final class ModEntities {
             .clientTrackingRange(10)
             .build(ResourceKey.create(Registries.ENTITY_TYPE,
                 Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "bandit_leader"))));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<WalkerEntity>> WALKER =
+        ENTITY_TYPES.register("walker", () -> EntityType.Builder.<WalkerEntity>of(
+                WalkerEntity::new, MobCategory.MONSTER)
+            .sized(0.6f, 1.95f)
+            .clientTrackingRange(8)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "walker"))));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<TaintedVialEntity>> TAINTED_VIAL_PROJECTILE =
+        ENTITY_TYPES.register("tainted_vial_projectile", () -> EntityType.Builder.<TaintedVialEntity>of(
+                TaintedVialEntity::new, MobCategory.MISC)
+            .sized(0.25f, 0.25f)
+            .clientTrackingRange(4)
+            .updateInterval(10)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "tainted_vial_projectile"))));
 
     public static void register(IEventBus modEventBus) {
         ENTITY_TYPES.register(modEventBus);
