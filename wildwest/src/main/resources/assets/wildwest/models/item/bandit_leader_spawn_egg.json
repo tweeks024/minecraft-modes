@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "wildwest:item/bandit_leader_spawn_egg"
+  }
+}
