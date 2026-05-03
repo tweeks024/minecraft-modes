@@ -21,6 +21,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
+import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 
@@ -166,49 +167,64 @@ public final class ZombieVirusHandler {
     }
 
     /**
-     * Golden-apple right-click on an entity:
-     * <ul>
-     *   <li>Has FESTERING_WOUND -> instant cure (remove the effect).</li>
-     *   <li>Has ZOMBIFIED but not CURING_SHAKE -> start a 30s CURING_SHAKE.</li>
-     *   <li>Otherwise -> no-op, vanilla behavior.</li>
-     * </ul>
+     * Golden-apple or golden-carrot right-click on an infected entity instantly
+     * cures both FESTERING_WOUND and ZOMBIFIED — no curing-shake delay,
+     * regardless of how long the entity has been infected.
      *
      * <p>Both client and server cancel the event with {@code SUCCESS} so the
-     * client doesn't try to right-click-eat the apple and visual state stays
+     * client doesn't try to right-click-eat the item and visual state stays
      * synced. Only the server actually mutates effects and shrinks the stack.
      */
     @SubscribeEvent
     public static void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
-        if (event.getItemStack().getItem() != Items.GOLDEN_APPLE) return;
+        var item = event.getItemStack().getItem();
+        if (item != Items.GOLDEN_APPLE && item != Items.GOLDEN_CARROT) return;
         if (!(event.getTarget() instanceof LivingEntity target)) return;
 
-        boolean willCureFestering = target.hasEffect(ModEffects.FESTERING_WOUND);
-        boolean willStartShake = !willCureFestering
-            && target.hasEffect(ModEffects.ZOMBIFIED)
-            && !target.hasEffect(ModEffects.CURING_SHAKE);
-
-        if (!willCureFestering && !willStartShake) return;
+        if (!target.hasEffect(ModEffects.FESTERING_WOUND)
+                && !target.hasEffect(ModEffects.ZOMBIFIED)) {
+            return;
+        }
 
         // Both sides cancel the event so the client doesn't try to
-        // right-click-eat the apple and so client/server visual state stays
+        // right-click-eat the item and so client/server visual state stays
         // aligned. CRITICAL: do NOT gate this whole method on isClientSide() —
-        // doing so causes ghost-item desync where the client thinks it ate
-        // the apple but the server still has it.
+        // doing so causes ghost-item desync.
         event.setCancellationResult(InteractionResult.SUCCESS);
         event.setCanceled(true);
 
         // Server-only mutations.
         if (event.getLevel().isClientSide()) return;
 
-        if (willCureFestering) {
-            target.removeEffect(ModEffects.FESTERING_WOUND);
-        } else {
-            target.addEffect(new MobEffectInstance(ModEffects.CURING_SHAKE,
-                CURING_SHAKE_DURATION_TICKS, 0, false, false));
-        }
+        cureInfection(target);
         if (!event.getEntity().getAbilities().instabuild) {
             event.getItemStack().shrink(1);
         }
+    }
+
+    /**
+     * When a player finishes eating a golden apple or golden carrot, instantly
+     * cure their own infection. Vanilla still applies the regen/saturation
+     * effects from the consumable on top.
+     */
+    @SubscribeEvent
+    public static void onPlayerFinishUseItem(LivingEntityUseItemEvent.Finish event) {
+        if (!(event.getEntity() instanceof Player player)) return;
+        var item = event.getItem().getItem();
+        if (item != Items.GOLDEN_APPLE && item != Items.GOLDEN_CARROT) return;
+        if (player.level().isClientSide()) return;
+        if (!player.hasEffect(ModEffects.FESTERING_WOUND)
+                && !player.hasEffect(ModEffects.ZOMBIFIED)) {
+            return;
+        }
+        cureInfection(player);
+    }
+
+    /** Clear festering, zombified, and any in-progress curing-shake from an entity. */
+    private static void cureInfection(LivingEntity target) {
+        target.removeEffect(ModEffects.FESTERING_WOUND);
+        target.removeEffect(ModEffects.ZOMBIFIED);
+        target.removeEffect(ModEffects.CURING_SHAKE);
     }
 
     /**
