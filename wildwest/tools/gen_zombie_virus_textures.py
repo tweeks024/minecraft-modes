@@ -73,20 +73,124 @@ def make_spawn_egg():
     return w, h, rgba
 
 def make_walker_entity():
-    """64x64 placeholder humanoid skin. Dark cowboy palette."""
+    """64x64 humanoid skin, vanilla 1.8+ layout. Walker = decayed cowboy.
+
+    UV regions painted (front faces of each cube, plus sides where reachable):
+      head:      (0..32, 0..16)  — face front at (8..16, 8..16)
+      body:      (16..40, 16..32) — front at (20..28, 20..32)
+      right arm: (40..56, 16..32) — front at (44..48, 20..32)
+      right leg: (0..16, 16..32)  — front at (4..8, 20..32)
+      left leg:  (16..32, 48..64) — front at (20..24, 52..64)
+      left arm:  (32..48, 48..64) — front at (36..40, 52..64)
+    """
     w = h = 64
     rgba = bytearray(w * h * 4)
-    SKIN = (0x6B, 0x8E, 0x23, 0xFF)
-    SHIRT = (0x3A, 0x2A, 0x1A, 0xFF)
-    PANTS = (0x2A, 0x1A, 0x10, 0xFF)
-    HAT = (0x10, 0x10, 0x10, 0xFF)
+    SKIN  = (0x7A, 0xA0, 0x2E, 0xFF)   # sickly green
+    SKIN_D = (0x4E, 0x6A, 0x18, 0xFF)  # shadowed skin (jaw, decay patches)
+    HAIR   = (0x1A, 0x12, 0x0A, 0xFF)  # near-black matted hair
+    SHIRT  = (0x5C, 0x42, 0x28, 0xFF)  # mid-brown shirt
+    SLEEVE = (0x42, 0x2C, 0x18, 0xFF)  # darker arm color
+    PANTS  = (0x22, 0x18, 0x10, 0xFF)  # dark pants
+    BOOT   = (0x0E, 0x08, 0x06, 0xFF)  # near-black boots
+    EYE    = (0xC8, 0x10, 0x10, 0xFF)  # red eyes
+
+    # ---- Head box (full UV strip 0..32 x 0..16 around the cube) ----
+    # Top of head (up face, 8..16, 0..8) — hair
+    solid_rect(rgba, w, 8, 0, 16, 8, HAIR)
+    # Bottom of head (down face, 16..24, 0..8) — neck shadow
+    solid_rect(rgba, w, 16, 0, 24, 8, SKIN_D)
+    # Right side of head (0..8, 8..16) — skin
+    solid_rect(rgba, w, 0, 8, 8, 16, SKIN)
+    # Front face (8..16, 8..16) — skin
     solid_rect(rgba, w, 8, 8, 16, 16, SKIN)
-    solid_rect(rgba, w, 8, 8, 16, 10, HAT)
-    solid_rect(rgba, w, 16, 16, 24, 32, SHIRT)
-    solid_rect(rgba, w, 40, 16, 48, 32, SHIRT)
-    solid_rect(rgba, w, 0, 16, 8, 32, PANTS)
-    solid_rect(rgba, w, 16, 48, 24, 64, PANTS)
-    solid_rect(rgba, w, 32, 48, 40, 64, SHIRT)
+    # Left side (16..24, 8..16) — skin
+    solid_rect(rgba, w, 16, 8, 24, 16, SKIN)
+    # Back (24..32, 8..16) — hair
+    solid_rect(rgba, w, 24, 8, 32, 16, HAIR)
+    # Hairline strip across forehead
+    solid_rect(rgba, w, 8, 8, 16, 9, HAIR)
+    # Eyes — two red dots
+    solid_rect(rgba, w, 10, 11, 12, 12, EYE)
+    solid_rect(rgba, w, 13, 11, 15, 12, EYE)
+    # Mouth — short dark line
+    solid_rect(rgba, w, 11, 14, 14, 15, SKIN_D)
+    # Cheek decay smudges
+    solid_rect(rgba, w, 9, 13, 10, 14, SKIN_D)
+
+    # ---- Body box (16..40 x 16..32) ----
+    # Top (20..28, 16..20) — shirt
+    solid_rect(rgba, w, 20, 16, 28, 20, SHIRT)
+    # Bottom (28..36, 16..20) — pants band
+    solid_rect(rgba, w, 28, 16, 36, 20, PANTS)
+    # Right side (16..20, 20..32) — shirt
+    solid_rect(rgba, w, 16, 20, 20, 32, SHIRT)
+    # Front (20..28, 20..32) — shirt
+    solid_rect(rgba, w, 20, 20, 28, 32, SHIRT)
+    # Left (28..32, 20..32) — shirt
+    solid_rect(rgba, w, 28, 20, 32, 32, SHIRT)
+    # Back (32..40, 20..32) — shirt
+    solid_rect(rgba, w, 32, 20, 40, 32, SHIRT)
+    # Vest seam down center-front (visual interest)
+    solid_rect(rgba, w, 23, 21, 25, 31, SLEEVE)
+
+    # ---- Right arm (40..56 x 16..32, 4 wide front) ----
+    # Top cap (44..48, 16..20) — sleeve
+    solid_rect(rgba, w, 44, 16, 48, 20, SLEEVE)
+    # Bottom cap — bare hand (skin)
+    solid_rect(rgba, w, 48, 16, 52, 20, SKIN)
+    # Right side (40..44, 20..32) — sleeve
+    solid_rect(rgba, w, 40, 20, 44, 32, SLEEVE)
+    # Front (44..48, 20..32) — sleeve top, skin hand
+    solid_rect(rgba, w, 44, 20, 48, 28, SLEEVE)
+    solid_rect(rgba, w, 44, 28, 48, 32, SKIN)
+    # Left (48..52, 20..32) — sleeve top, skin hand
+    solid_rect(rgba, w, 48, 20, 52, 28, SLEEVE)
+    solid_rect(rgba, w, 48, 28, 52, 32, SKIN)
+    # Back (52..56, 20..32)
+    solid_rect(rgba, w, 52, 20, 56, 28, SLEEVE)
+    solid_rect(rgba, w, 52, 28, 56, 32, SKIN)
+
+    # ---- Right leg (0..16 x 16..32, 4 wide front) ----
+    # Top cap (4..8, 16..20)
+    solid_rect(rgba, w, 4, 16, 8, 20, PANTS)
+    # Bottom cap — boot
+    solid_rect(rgba, w, 8, 16, 12, 20, BOOT)
+    # Right side (0..4, 20..32) — pants then boot
+    solid_rect(rgba, w, 0, 20, 4, 30, PANTS)
+    solid_rect(rgba, w, 0, 30, 4, 32, BOOT)
+    # Front (4..8, 20..32)
+    solid_rect(rgba, w, 4, 20, 8, 30, PANTS)
+    solid_rect(rgba, w, 4, 30, 8, 32, BOOT)
+    # Left (8..12, 20..32)
+    solid_rect(rgba, w, 8, 20, 12, 30, PANTS)
+    solid_rect(rgba, w, 8, 30, 12, 32, BOOT)
+    # Back (12..16, 20..32)
+    solid_rect(rgba, w, 12, 20, 16, 30, PANTS)
+    solid_rect(rgba, w, 12, 30, 16, 32, BOOT)
+
+    # ---- Left leg (16..32 x 48..64) — mirror of right leg ----
+    solid_rect(rgba, w, 20, 48, 24, 52, PANTS)
+    solid_rect(rgba, w, 24, 48, 28, 52, BOOT)
+    solid_rect(rgba, w, 16, 52, 20, 62, PANTS)
+    solid_rect(rgba, w, 16, 62, 20, 64, BOOT)
+    solid_rect(rgba, w, 20, 52, 24, 62, PANTS)
+    solid_rect(rgba, w, 20, 62, 24, 64, BOOT)
+    solid_rect(rgba, w, 24, 52, 28, 62, PANTS)
+    solid_rect(rgba, w, 24, 62, 28, 64, BOOT)
+    solid_rect(rgba, w, 28, 52, 32, 62, PANTS)
+    solid_rect(rgba, w, 28, 62, 32, 64, BOOT)
+
+    # ---- Left arm (32..48 x 48..64) — mirror of right arm ----
+    solid_rect(rgba, w, 36, 48, 40, 52, SLEEVE)
+    solid_rect(rgba, w, 40, 48, 44, 52, SKIN)
+    solid_rect(rgba, w, 32, 52, 36, 64, SLEEVE)
+    solid_rect(rgba, w, 36, 52, 40, 60, SLEEVE)
+    solid_rect(rgba, w, 36, 60, 40, 64, SKIN)
+    solid_rect(rgba, w, 40, 52, 44, 60, SLEEVE)
+    solid_rect(rgba, w, 40, 60, 44, 64, SKIN)
+    solid_rect(rgba, w, 44, 52, 48, 60, SLEEVE)
+    solid_rect(rgba, w, 44, 60, 48, 64, SKIN)
+
     return w, h, rgba
 
 def make_effect_icon(primary, accent):

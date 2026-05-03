@@ -9,7 +9,7 @@ Usage: python3 extract_bbmodel_textures.py [out_dir]
 """
 import json, base64, os, sys
 
-NAMES = ['deputy', 'sherrif', 'bandit', 'bandit_leader']
+NAMES = ['deputy', 'sherrif', 'bandit', 'bandit_leader', 'walker']
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 def extract(bbmodel_path, out_path):
