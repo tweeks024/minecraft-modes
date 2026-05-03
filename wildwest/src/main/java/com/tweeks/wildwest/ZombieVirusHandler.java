@@ -119,6 +119,9 @@ public final class ZombieVirusHandler {
         if (entity instanceof Mob mob && !(entity instanceof Player)) {
             HandSnapshot.restore(mob);
         }
+        // Clear the glowing tag we set in ZombifiedEffect.applyEffectTick so the entity
+        // stops outlining once it's cured.
+        if (entity.hasGlowingTag()) entity.setGlowingTag(false);
     }
 
     /**

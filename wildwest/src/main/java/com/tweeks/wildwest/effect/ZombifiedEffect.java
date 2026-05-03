@@ -21,6 +21,12 @@ public class ZombifiedEffect extends MobEffect {
 
     @Override
     public boolean applyEffectTick(ServerLevel level, LivingEntity entity, int amplifier) {
+        // Force vanilla's outline pipeline to activate by flagging the entity as glowing.
+        // The render-state modifier in ZombifiedRenderHandler then overrides the team-color
+        // outline with our green. Without this, `haveGlowingEntities` never gets set true at
+        // extract time and the outline post-chain doesn't run.
+        if (!entity.hasGlowingTag()) entity.setGlowingTag(true);
+
         if (entity.tickCount % 10 == 0) {
             level.sendParticles(ParticleTypes.HAPPY_VILLAGER,
                 entity.getX(), entity.getY() + entity.getBbHeight() * 0.6, entity.getZ(),
