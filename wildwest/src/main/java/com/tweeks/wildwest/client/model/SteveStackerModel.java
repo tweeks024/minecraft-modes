@@ -45,6 +45,11 @@ public class SteveStackerModel extends EntityModel<SteveStackerRenderState> {
         this.steveBot = root.getChild("steve_bot");
         this.steveMid = root.getChild("steve_mid");
         this.steveTop = root.getChild("steve_top");
+        // Hat overlay disabled per spec — the vendored Steve skin's hat region is
+        // transparent, so this is also a tiny render-cost saver (3 hats × no quads).
+        this.steveBot.getChild("hat").visible = false;
+        this.steveMid.getChild("hat").visible = false;
+        this.steveTop.getChild("hat").visible = false;
     }
 
     public static LayerDefinition createBodyLayer() {
