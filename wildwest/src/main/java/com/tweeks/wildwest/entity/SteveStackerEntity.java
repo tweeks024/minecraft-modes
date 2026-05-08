@@ -8,10 +8,12 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.BossEvent;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Pose;
@@ -167,6 +169,26 @@ public class SteveStackerEntity extends Monster {
         if (STACK_HEIGHT.equals(key)) {
             this.refreshDimensions();
         }
+    }
+
+    @Override
+    protected SoundEvent getAmbientSound() {
+        return SoundEvents.PLAYER_BREATH;
+    }
+
+    @Override
+    protected SoundEvent getHurtSound(DamageSource damageSource) {
+        return SoundEvents.PLAYER_HURT;
+    }
+
+    @Override
+    protected SoundEvent getDeathSound() {
+        return SoundEvents.PLAYER_DEATH;
+    }
+
+    @Override
+    public int getBaseExperienceReward(ServerLevel level) {
+        return 50;
     }
 
     @Override
