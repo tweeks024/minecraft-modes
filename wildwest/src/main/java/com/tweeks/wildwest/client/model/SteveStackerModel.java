@@ -32,8 +32,13 @@ public class SteveStackerModel extends EntityModel<SteveStackerRenderState> {
     /** Vanilla humanoid is ~32 model-units tall feet-to-crown. */
     private static final float STEVE_PIXEL_HEIGHT = 32.0f;
 
+    /**
+     * Direct children of the humanoid root in {@link HumanoidModel#createMesh}.
+     * Note that {@code hat} is intentionally omitted — vanilla puts hat as a
+     * sub-child of {@code head}, not of root. It travels with head when grafted.
+     */
     private static final String[] HUMANOID_PARTS = {
-        "head", "hat", "body", "right_arm", "left_arm", "right_leg", "left_leg"
+        "head", "body", "right_arm", "left_arm", "right_leg", "left_leg"
     };
 
     private final ModelPart steveTop;
@@ -45,11 +50,11 @@ public class SteveStackerModel extends EntityModel<SteveStackerRenderState> {
         this.steveBot = root.getChild("steve_bot");
         this.steveMid = root.getChild("steve_mid");
         this.steveTop = root.getChild("steve_top");
-        // Hat overlay disabled per spec — the vendored Steve skin's hat region is
-        // transparent, so this is also a tiny render-cost saver (3 hats × no quads).
-        this.steveBot.getChild("hat").visible = false;
-        this.steveMid.getChild("hat").visible = false;
-        this.steveTop.getChild("hat").visible = false;
+        // Hat overlay disabled per spec. Vanilla humanoid puts hat under head,
+        // not under root, so we walk through head to find it.
+        this.steveBot.getChild("head").getChild("hat").visible = false;
+        this.steveMid.getChild("head").getChild("hat").visible = false;
+        this.steveTop.getChild("head").getChild("hat").visible = false;
     }
 
     public static LayerDefinition createBodyLayer() {
