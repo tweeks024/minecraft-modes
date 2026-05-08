@@ -5,6 +5,7 @@ import com.tweeks.wildwest.entity.BanditLeaderEntity;
 import com.tweeks.wildwest.entity.BulletEntity;
 import com.tweeks.wildwest.entity.DeputyEntity;
 import com.tweeks.wildwest.entity.SherrifEntity;
+import com.tweeks.wildwest.entity.SteveStackerEntity;
 import com.tweeks.wildwest.entity.WalkerEntity;
 import com.tweeks.wildwest.entity.projectile.TaintedVialEntity;
 import net.minecraft.core.registries.Registries;
@@ -70,6 +71,14 @@ public final class ModEntities {
             .clientTrackingRange(8)
             .build(ResourceKey.create(Registries.ENTITY_TYPE,
                 Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "walker"))));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<SteveStackerEntity>> STEVE_STACKER =
+        ENTITY_TYPES.register("steve_stacker", () -> EntityType.Builder.<SteveStackerEntity>of(
+                SteveStackerEntity::new, MobCategory.MONSTER)
+            .sized(0.6f, 5.85f)
+            .clientTrackingRange(10)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "steve_stacker"))));
 
     public static final DeferredHolder<EntityType<?>, EntityType<TaintedVialEntity>> TAINTED_VIAL_PROJECTILE =
         ENTITY_TYPES.register("tainted_vial_projectile", () -> EntityType.Builder.<TaintedVialEntity>of(
