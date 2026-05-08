@@ -19,7 +19,7 @@ Java 25 / NeoForge (the version is read from `gradle.properties` `neo_version`; 
 - New entity id: `wildwest:steve_stacker`.
 - New class `com.tweeks.wildwest.entity.SteveStackerEntity` extends `net.minecraft.world.entity.monster.Monster` (mirrors `WalkerEntity` pattern; not a `WildWestMob` subclass because it carries no gun/knife and is not an `Outlaw`).
 - `MobCategory.MONSTER`.
-- Hitbox: width `0.6f`, height `5.85f` (three vanilla humanoid heights, 3 × 1.95). The hitbox stays fixed across phases — only the **render** shrinks. Rationale: shrinking the hitbox mid-fight would let the player walk through the head of the stack mid-phase-transition or get stuck inside a previously occupied volume. Fixed bbox keeps collisions predictable.
+- Hitbox: width `0.6f`, **dynamic height** (`1.95 × STACK_HEIGHT` blocks → 5.85 / 3.90 / 1.95 across phases 1/2/3). The base entity-type registration uses `sized(0.6f, 5.85f)` for the phase-1 default. The entity overrides `getDimensions(Pose)` to return `EntityDimensions.scalable(0.6f, 1.95f * stackHeight)`, and the phase-transition logic calls `refreshDimensions()` after updating `STACK_HEIGHT`. Rationale: a phase-3 boss visually one Steve tall (1.95 blocks) but with a 5.85-block hitbox would (a) let players hit empty air three blocks above the visible stack and (b) prevent the boss from pathing under any 2-block ceiling. Shrinking the bbox is safe — the new volume is a strict subset of the old, so it cannot intersect newly-solid blocks.
 - `clientTrackingRange`: 10. `updateInterval`: default.
 - Knockback resistance: `0.6` (boss should not be punted around like a normal mob, but is not immune).
 - Follow range: `40.0`.
@@ -46,11 +46,12 @@ Transition logic:
 - The check fires **once per threshold**: compare the synced `STACK_HEIGHT` value against the band the current health falls into. If the new band is lower than the stored value, run the transition.
 - Transition steps (server-side):
   1. Update `STACK_HEIGHT` data accessor.
-  2. Set `Attributes.MOVEMENT_SPEED` base value to the new phase's speed.
-  3. Set `Attributes.ATTACK_DAMAGE` base value to the new phase's attack damage.
-  4. Spawn a `ParticleTypes.POOF` burst at the position of the Steve that just fell off (top of the current visible stack — y offset = phase-dependent).
-  5. Play `SoundEvents.GENERIC_EXPLODE` at low volume (`0.6f`) and slightly high pitch (`1.2f`) at the boss's position.
-  6. No new entity is spawned for the "fallen" Steve. The visual disappearance plus particle/sound is enough; spawning a corpse-Steve was considered and rejected (extra entity churn, no mechanical value).
+  2. Call `refreshDimensions()` so the hitbox shrinks to match (see "Hitbox" above).
+  3. Set `Attributes.MOVEMENT_SPEED` base value to the new phase's speed.
+  4. Set `Attributes.ATTACK_DAMAGE` base value to the new phase's attack damage.
+  5. Spawn a `ParticleTypes.POOF` burst at the position of the Steve that just fell off (top of the *previous* stack height — the y offset is computed from the pre-shrink height, since by step 5 the entity bbox has already contracted).
+  6. Play `SoundEvents.GENERIC_EXPLODE` at low volume (`0.6f`) and slightly high pitch (`1.2f`) at the boss's position.
+  7. No new entity is spawned for the "fallen" Steve. The visual disappearance plus particle/sound is enough; spawning a corpse-Steve was considered and rejected (extra entity churn, no mechanical value).
 
 Phase transitions are **monotonic**: if the boss is healed (e.g., regeneration potion via console), the stack does not grow back. Once a Steve has fallen off, it stays off. This avoids needing to re-trigger reverse transitions or worry about regeneration loopholes.
 
@@ -168,7 +169,7 @@ The following are explicitly **not** in this spec:
 
 **Modified files:**
 
-- `wildwest/src/main/java/com/tweeks/wildwest/ModEntities.java` — register `STEVE_STACKER` entity type with sized(0.6f, 5.85f).
+- `wildwest/src/main/java/com/tweeks/wildwest/ModEntities.java` — register `STEVE_STACKER` entity type with `sized(0.6f, 5.85f)` as the phase-1 default; runtime hitbox is recomputed via `getDimensions(Pose)` per phase.
 - `wildwest/src/main/java/com/tweeks/wildwest/Registration.java` — register `STEVE_STACKER_SPAWN_EGG` item; add to creative tab.
 - `wildwest/src/main/java/com/tweeks/wildwest/WildWestMod.java` — `registerEntityAttributes` adds `SteveStackerEntity.createAttributes().build()`; `RegisterSpawnPlacementsEvent` listener adds entry for `STEVE_STACKER`.
 - `wildwest/src/main/java/com/tweeks/wildwest/client/ClientSetup.java` — register renderer + layer definition.
@@ -198,6 +199,8 @@ No mocking-of-Minecraft tests for the AI goals or render pipeline — those are 
 
 ## Risks / open questions
 
-- **Tall hitbox + indoor spawning.** A 5.85-block-tall mob spawning under 2-block ceilings could glitch into terrain. Mitigation: `Monster::checkMonsterSpawnRules` already requires the spawn block + 2 above to be passable; we additionally rely on the biome modifier targeting open biomes (plains/savanna). If players still report clipping, future work could add a custom spawn predicate that checks 6 blocks of vertical clearance — flagged but not implemented here.
+- **Tall spawn-time hitbox + low ceilings.** At phase-1 spawn the boss is 5.85 blocks tall. `Monster::checkMonsterSpawnRules` only validates 2 blocks of vertical clearance, so a stacker can theoretically pick a spawn point with a 3-block-tall ceiling 4 blocks above and immediately suffocate. Mitigation: the biome modifier targets open biomes (plains/savanna/savanna_plateau), where this is unlikely. If players report it, a custom spawn predicate that requires 6 blocks of vertical clearance is the fix — not implemented here.
+- **Savanna acacia canopies snag the stack.** Acacia trees generate with low canopies that a 6-tall mob can get its head caught in, potentially making the boss easy to cheese while it's stuck. Vanilla `Ravager` solves the same class of problem by destroying `LeavesBlock`s on collision. The dynamic-hitbox change above mitigates this once the boss takes damage and shrinks, but phase-1 navigation in dense savanna is still rough. **Not** adding ravager-style leaf-breaking in this spec — flagged for follow-up if it actually becomes a play problem.
 - **Boss bar on natural spawn.** If a player wanders into a stacker's spawn radius unaware, the bar will pop in suddenly. Accepted; rarity makes this rare.
 - **Vendored Steve texture.** If Mojang updates the default Steve skin in a future MC version, the boss will look "old." Accepted as the cost of version-independence.
+- **Looting enchantment on diamond drop.** The drop is a fixed 3 diamonds (one per Steve), so `Looting III` does not increase yield. Players coming from vanilla bosses (which are also non-Looting-affected) shouldn't be surprised, but this is a player-facing call: if it becomes a complaint, a future tweak could add a Looting-bonus-eligible secondary drop (bones, rotten flesh, an emerald) — not implemented here.
