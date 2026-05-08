@@ -4,7 +4,7 @@
 
 **Goal:** Add a Steve Stacker boss mob: three vanilla Steves stacked vertically, single 90 HP pool with phase thresholds at 60 / 30 HP. Each phase shrinks the visible stack and the bbox (5.85 → 3.90 → 1.95) and ramps speed/damage. Melee-only. Spawn egg + rare night spawn in plains/savanna. Vendors a copy of the default Steve skin to insulate against vanilla path changes.
 
-**Architecture:** Single `SteveStackerEntity extends Monster` (mirrors `WalkerEntity`). Phase state lives in `SynchedEntityData<Byte> STACK_HEIGHT` (3/2/1) with NBT persistence. Phase logic extracted as a static pure function `computeStackHeight(health, maxHealth)` so it is unit-testable without booting Minecraft. Hitbox is dynamic: `getDimensions(Pose)` returns `EntityDimensions.scalable(0.6f, 1.95f * stackHeight)`, and the transition path calls `refreshDimensions()` after mutating the data accessor. Three identical humanoid sub-skeletons in a custom `EntityModel<SteveStackerRenderState>`; visibility flags shrink the visible stack from the top while the bottom Steve stays at ground level. Boss bar via vanilla `ServerBossEvent`.
+**Architecture:** Single `SteveStackerEntity extends Monster` (mirrors `WalkerEntity`). Phase state lives in `SynchedEntityData<Byte> STACK_HEIGHT` (3/2/1) with NBT persistence. Phase logic extracted as a static pure function `computeStackHeight(health, maxHealth)` so it is unit-testable without booting Minecraft. Hitbox is dynamic: `getDefaultDimensions(Pose)` returns `EntityDimensions.scalable(0.6f, 1.95f * stackHeight)`, and the transition path calls `refreshDimensions()` after mutating the data accessor. Three identical humanoid sub-skeletons in a custom `EntityModel<SteveStackerRenderState>`; visibility flags shrink the visible stack from the top while the bottom Steve stays at ground level. Boss bar via vanilla `ServerBossEvent`.
 
 **Tech Stack:** Java 25, NeoForge (version from `gradle.properties`'s `neo_version`), Minecraft 26.1.2 (the version that ships with that NeoForge), JUnit 5.
 
@@ -19,7 +19,7 @@
 - Spawn placements are registered in `WildWestMod.java`'s `RegisterSpawnPlacementsEvent` listener (already wired for other mobs).
 - Loot tables live at `src/main/resources/data/wildwest/loot_table/entities/<name>.json`.
 - Render state pattern uses `HumanoidRenderState` (or a subtype) and `extractRenderState` writes per-frame fields onto it.
-- Entity dimensions: `EntityDimensions.scalable(width, height)` for resizable mobs; `Entity#refreshDimensions()` recomputes after `getDimensions(Pose)` would return something new.
+- Entity dimensions: `EntityDimensions.scalable(width, height)` for resizable mobs; `Entity#refreshDimensions()` recomputes after `getDefaultDimensions(Pose)` would return something new.
 
 **API risks to validate during implementation:**
 - `Mob#getDimensions(Pose pose)` and `Entity#refreshDimensions()` — verify both compile in 26.x before Task 5 (extracted strings from `Entity.class` confirm both names exist; signature shape may need a tweak).
@@ -35,6 +35,7 @@
 wildwest/src/main/java/com/tweeks/wildwest/
   entity/
     SteveStackerEntity.java                 NEW   Monster subclass; phases, dynamic bbox, boss bar, sounds, XP
+    SteveStackerPhase.java                  NEW   pure phase-band helper (standalone — extends nothing — so JUnit can load it without an FML loader)
   client/
     SteveStackerRenderer.java               NEW   MobRenderer<SteveStackerEntity, SteveStackerRenderState, SteveStackerModel>
     SteveStackerRenderState.java            NEW   extends HumanoidRenderState; adds `byte stackHeight`
@@ -344,14 +345,14 @@ git commit -m "feat(wildwest): SteveStacker synced STACK_HEIGHT data accessor + 
 
 ---
 
-## Task 4: Dynamic hitbox via `getDimensions(Pose)`
+## Task 4: Dynamic hitbox via `getDefaultDimensions(Pose)`
 
 **Why now:** before the transition logic mutates `STACK_HEIGHT`, hook the dimensions function so a phase change (whatever causes it later) automatically narrows the hitbox. Doing this independently means the boss in phase 1 looks and behaves correctly even before transitions exist.
 
 **Files:**
 - Modify: `wildwest/src/main/java/com/tweeks/wildwest/entity/SteveStackerEntity.java`
 
-- [ ] **Step 1: Override `getDimensions(Pose)`**
+- [ ] **Step 1: Override `getDefaultDimensions(Pose)`**
 
 Add the imports:
 
@@ -1194,7 +1195,7 @@ If anything in steps 1–8 surfaced a regression, fix it task-by-task with TDD w
 | Entity skeleton (Monster subclass, attributes, goals) | Task 1 |
 | Phase logic (`computeStackHeight`) | Task 2 |
 | Synced `STACK_HEIGHT` + NBT persistence | Task 3 |
-| Dynamic hitbox via `getDimensions(Pose)` | Task 4 |
+| Dynamic hitbox via `getDefaultDimensions(Pose)` | Task 4 |
 | Phase transitions in `aiStep` (data set + refreshDimensions + attribute swap + particles + sound) | Task 5 |
 | Boss bar (ServerBossEvent, startSeenByPlayer, stopSeenByPlayer) | Task 6 |
 | Sounds + XP override | Task 7 |
