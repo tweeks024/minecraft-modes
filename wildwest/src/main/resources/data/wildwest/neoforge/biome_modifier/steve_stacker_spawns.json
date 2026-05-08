@@ -1,0 +1,14 @@
+{
+  "type": "neoforge:add_spawns",
+  "biomes": [
+    "minecraft:plains",
+    "minecraft:savanna",
+    "minecraft:savanna_plateau"
+  ],
+  "spawners": {
+    "type": "wildwest:steve_stacker",
+    "maxCount": 1,
+    "minCount": 1,
+    "weight": 1
+  }
+}
