@@ -1,8 +1,12 @@
 package com.tweeks.wildwest.entity;
 
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Pose;
@@ -84,5 +88,68 @@ public class SteveStackerEntity extends Monster {
     protected void readAdditionalSaveData(ValueInput input) {
         super.readAdditionalSaveData(input);
         this.setStackHeight(input.getByteOr("StackHeight", (byte) 3));
+    }
+
+    @Override
+    public void aiStep() {
+        super.aiStep();
+        if (this.level().isClientSide()) return;
+
+        byte previous = this.getStackHeight();
+        byte target = SteveStackerPhase.computeStackHeight(this.getHealth(), this.getMaxHealth());
+        if (target < previous) {
+            // Capture the y-position of the Steve that just fell off BEFORE we shrink.
+            // Each Steve occupies 1.95 blocks of vertical bbox; the "top" of the pre-shrink
+            // stack is at this.getY() + (previous * 1.95). Subtract 0.95 to land near the
+            // mid-chest of the falling Steve for a centered particle burst.
+            double poofY = this.getY() + (previous * 1.95) - 0.95;
+            double poofX = this.getX();
+            double poofZ = this.getZ();
+
+            this.entityData.set(STACK_HEIGHT, target);
+            this.refreshDimensions();
+            applyPhaseAttributes(target);
+
+            ServerLevel server = (ServerLevel) this.level();
+            for (int i = 0; i < 24; i++) {
+                server.sendParticles(ParticleTypes.POOF,
+                    poofX + (this.random.nextDouble() - 0.5) * 0.6,
+                    poofY + (this.random.nextDouble() - 0.5) * 0.4,
+                    poofZ + (this.random.nextDouble() - 0.5) * 0.6,
+                    1, 0.0, 0.0, 0.0, 0.02);
+            }
+            server.playSound(null, this.getX(), this.getY(), this.getZ(),
+                SoundEvents.GENERIC_EXPLODE.value(), SoundSource.HOSTILE, 0.6f, 1.2f);
+        }
+    }
+
+    private void applyPhaseAttributes(byte stackHeight) {
+        double speed;
+        double damage;
+        switch (stackHeight) {
+            case 3 -> { speed = 0.25; damage = 4.0; }
+            case 2 -> { speed = 0.30; damage = 6.0; }
+            default -> { speed = 0.38; damage = 8.0; } // stackHeight == 1 (or clamped)
+        }
+        var speedAttr = this.getAttribute(Attributes.MOVEMENT_SPEED);
+        if (speedAttr != null) speedAttr.setBaseValue(speed);
+        var damageAttr = this.getAttribute(Attributes.ATTACK_DAMAGE);
+        if (damageAttr != null) damageAttr.setBaseValue(damage);
+    }
+
+    @Override
+    public void onAddedToLevel() {
+        super.onAddedToLevel();
+        if (!this.level().isClientSide()) {
+            applyPhaseAttributes(this.getStackHeight());
+        }
+    }
+
+    @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
+        super.onSyncedDataUpdated(key);
+        if (STACK_HEIGHT.equals(key)) {
+            this.refreshDimensions();
+        }
     }
 }
