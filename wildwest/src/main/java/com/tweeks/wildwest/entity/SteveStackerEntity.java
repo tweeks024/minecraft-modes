@@ -1,12 +1,17 @@
 package com.tweeks.wildwest.entity;
 
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
+import net.minecraft.world.BossEvent;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Pose;
@@ -30,9 +35,18 @@ public class SteveStackerEntity extends Monster {
     private static final EntityDataAccessor<Byte> STACK_HEIGHT =
         SynchedEntityData.defineId(SteveStackerEntity.class, EntityDataSerializers.BYTE);
 
+    private final ServerBossEvent bossBar;
+
     public SteveStackerEntity(EntityType<? extends SteveStackerEntity> type, Level level) {
         super(type, level);
+        this.bossBar = new ServerBossEvent(
+            Mth.createInsecureUUID(this.random),
+            Component.translatable("entity.wildwest.steve_stacker"),
+            BossEvent.BossBarColor.PURPLE,
+            BossEvent.BossBarOverlay.PROGRESS);
         this.setPersistenceRequired();
+        this.setCustomName(Component.translatable("entity.wildwest.steve_stacker"));
+        this.setCustomNameVisible(false);
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -95,6 +109,8 @@ public class SteveStackerEntity extends Monster {
         super.aiStep();
         if (this.level().isClientSide()) return;
 
+        this.bossBar.setProgress(this.getHealth() / this.getMaxHealth());
+
         byte previous = this.getStackHeight();
         byte target = SteveStackerPhase.computeStackHeight(this.getHealth(), this.getMaxHealth());
         if (target < previous) {
@@ -151,5 +167,17 @@ public class SteveStackerEntity extends Monster {
         if (STACK_HEIGHT.equals(key)) {
             this.refreshDimensions();
         }
+    }
+
+    @Override
+    public void startSeenByPlayer(ServerPlayer player) {
+        super.startSeenByPlayer(player);
+        this.bossBar.addPlayer(player);
+    }
+
+    @Override
+    public void stopSeenByPlayer(ServerPlayer player) {
+        super.stopSeenByPlayer(player);
+        this.bossBar.removePlayer(player);
     }
 }
