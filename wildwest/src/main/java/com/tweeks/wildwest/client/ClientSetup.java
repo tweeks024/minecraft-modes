@@ -6,6 +6,7 @@ import com.tweeks.wildwest.client.model.BanditLeaderModel;
 import com.tweeks.wildwest.client.model.BanditModel;
 import com.tweeks.wildwest.client.model.DeputyModel;
 import com.tweeks.wildwest.client.model.SherrifModel;
+import com.tweeks.wildwest.client.model.SteveStackerModel;
 import com.tweeks.wildwest.client.model.WalkerModel;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -37,6 +38,7 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.BANDIT.get(), BanditRenderer::new);
         event.registerEntityRenderer(ModEntities.BANDIT_LEADER.get(), BanditLeaderRenderer::new);
         event.registerEntityRenderer(ModEntities.WALKER.get(), WalkerRenderer::new);
+        event.registerEntityRenderer(ModEntities.STEVE_STACKER.get(), SteveStackerRenderer::new);
         event.registerEntityRenderer(ModEntities.TAINTED_VIAL_PROJECTILE.get(), ThrownItemRenderer::new);
     }
 
@@ -52,5 +54,6 @@ public final class ClientSetup {
         event.registerLayerDefinition(BanditModel.LAYER_LOCATION, BanditModel::createBodyLayer);
         event.registerLayerDefinition(BanditLeaderModel.LAYER_LOCATION, BanditLeaderModel::createBodyLayer);
         event.registerLayerDefinition(WalkerModel.LAYER_LOCATION, WalkerModel::createBodyLayer);
+        event.registerLayerDefinition(SteveStackerModel.LAYER_LOCATION, SteveStackerModel::createBodyLayer);
     }
 }
