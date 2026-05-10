@@ -47,7 +47,9 @@ Lifecycle:
 
 1. **On spawn (entity construct, server-side, in `finalizeSpawn`):** if `alive == true` and the existing entity is not this one, discard self via `discard()`. If `alive == false` or already-this-entity, set `alive = true`, `currentId = this.getUUID()`, `dimension = level().dimension()`.
 2. **On death:** override `die(DamageSource)` to clear `alive = false` (and call `super.die(...)`).
-3. **On removal for any reason** (chunk unload counts as `RemovalReason.UNLOADED_TO_CHUNK` and must NOT clear the flag; `KILLED` and `DISCARDED` should). Override `remove(RemovalReason reason)`: if `reason == RemovalReason.KILLED || reason == RemovalReason.DISCARDED`, clear the flag. For `UNLOADED_*`, leave it alone.
+3. **On removal for any reason** (chunk unload counts as `RemovalReason.UNLOADED_TO_CHUNK` and must NOT clear the flag; `KILLED` and `DISCARDED` should). Override `remove(RemovalReason reason)`:
+   - If `reason == RemovalReason.KILLED || reason == RemovalReason.DISCARDED`, clear the singleton flag. For `UNLOADED_*`, leave it alone.
+   - **Always (regardless of reason)** call `bossBar.removeAllPlayers()` before delegating to `super.remove(reason)`. Otherwise a stuck-flag scenario or a forced discard can leave the boss bar visible to clients who were tracking the entity, even though the entity object is gone server-side. This also covers the case where a Herobrine in an unloaded chunk is forcibly removed via mod / admin tooling.
 4. **Recovery** (flag stuck `true` across crash where entity was never properly removed): accept the rare bug. A `/kill @e[type=wildwest:herobrine]` will resolve via the `KILLED` removal reason. Documented as a known edge case.
 
 ### Spawning
@@ -73,11 +75,13 @@ Two paths, both registered:
 - Egg colors: primary `0x3F0000` (dark red), secondary `0xFFFFFF` (white).
 - Override `useOn(UseOnContext context)`:
   - Server-side branch only (client returns `InteractionResult.PASS` so server runs the actual logic via the standard interaction flow).
+  - **Dimension gate (applies to BOTH spawn and teleport branches):** if `level.dimension() != Level.OVERWORLD`, refuse with feedback `Component.translatable("item.wildwest.herobrine_spawn_egg.overworld_only")` ("Herobrine belongs only to the surface…") via `player.displayClientMessage(message, true)`. Egg not consumed. Return `InteractionResult.FAIL`. This is required because vanilla `SpawnEggItem.useOn` does NOT enforce dimension restrictions; without this gate, the egg would happily spawn Herobrine in the Nether or End on first use, contradicting the natural-spawn biome restriction (`#minecraft:is_overworld`).
   - Read `HerobrineSavedData.get(server)`.
   - **If `alive == false`:** delegate to `super.useOn(context)` (vanilla spawn flow). The entity's construct logic sets the singleton flag during `finalizeSpawn`.
   - **If `alive == true`:** resolve existing entity via `server.getLevel(savedData.dimension).getEntity(savedData.currentId)`.
-    - **Entity loaded AND in same dimension as player:** call `herobrine.teleportTo(clickX + 0.5, clickY + 1, clickZ + 0.5)`. Spawn `ParticleTypes.PORTAL` burst at both source and destination. Play `SoundEvents.ENDERMAN_TELEPORT` at the destination. **Egg is not consumed.** Return `InteractionResult.SUCCESS`.
-    - **Entity unloaded (`getEntity` returns null) OR cross-dimension:** refuse with feedback message `Component.translatable("item.wildwest.herobrine_spawn_egg.away")` shown via `player.displayClientMessage(message, true)` (above hotbar). Egg is not consumed. Return `InteractionResult.FAIL`.
+    - **Entity loaded AND in overworld** (same dimension as player by virtue of the dimension gate above): call `herobrine.teleportTo(clickX + 0.5, clickY + 1, clickZ + 0.5)`. Spawn `ParticleTypes.PORTAL` burst at both source and destination. Play `SoundEvents.ENDERMAN_TELEPORT` at the destination. **Egg is not consumed.** Return `InteractionResult.SUCCESS`.
+    - **Entity unloaded** (`getEntity` returns null — Herobrine alive but in an unloaded chunk): refuse with feedback message `Component.translatable("item.wildwest.herobrine_spawn_egg.away")` via `player.displayClientMessage(message, true)`. Egg not consumed. Return `InteractionResult.FAIL`.
+    - **Entity in non-overworld dimension** (saved `dimension` != Overworld — only possible if the alive Herobrine drifted to another dimension somehow, e.g., a portal-teleport edge case): treat as unloaded and refuse with the "away" message.
 - Creative tab: `WILDWEST_TAB`, after `STEVE_STACKER_SPAWN_EGG`.
 
 ### Combat / AI
@@ -115,7 +119,11 @@ Vanilla `LightningBolt` damage: 5 dmg + lights fire on flammable adjacent blocks
 
 - Cooldown: 160 ticks (8 s). Independent of lightning. Tracked as `int meteorCooldown`.
 - `canUse()`: target alive, `meteorCooldown == 0`. (No range gate — meteors fall around Herobrine, not around the target.)
-- `start()`: spawn one `MeteorEntity` at a random point in a horizontal ring **6–14 blocks** around Herobrine's `position()`, **30 blocks** above the highest non-air block at that XZ. Random angle uniform in `[0, 2π)`, random radius uniform in `[6, 14]`. Reset cooldown to 160.
+- `start()`: pick a random point in a horizontal ring **6–14 blocks** around Herobrine's `position()` (random angle uniform in `[0, 2π)`, random radius uniform in `[6, 14]`). Compute spawn Y:
+  - Default: `groundY + 30`, where `groundY` is the highest non-air block at that XZ via `Heightmap.Types.MOTION_BLOCKING_NO_LEAVES`.
+  - **Cap at `level.getMaxY() - 1`** (or the equivalent build-limit accessor for the active NeoForge version) to avoid spawning outside world bounds.
+  - **Ceilinged dimensions** (`level.dimensionType().hasCeiling()` — Nether-style ceiling): the "highest non-air block" will be the bedrock ceiling, so the default Y would be capped to a position immediately below the ceiling and the meteor would have no fall distance. To handle this gracefully: if the dimension has a ceiling, downward-raycast from `level.getMaxY() - 1` at the chosen XZ to find the first air pocket of at least 4 blocks vertical clearance; spawn the meteor at the top of that pocket. If no such pocket is found within the column, **skip this meteor** (cooldown still resets to 160 to avoid stuck loops). Even though Herobrine is not expected to exist outside the overworld, this defensive logic prevents pathological behavior if the singleton ever ends up in a ceilinged dimension.
+  - Reset cooldown to 160.
 - `canContinueToUse()`: false.
 
 #### HerobrineTeleportGoal
@@ -157,7 +165,7 @@ All goal cooldowns decrement once per tick in their respective `tick()` callback
     - `discard()` self.
   - **`onHitEntity(EntityHitResult)`:**
     - Deal `directHitDamage` to the hit entity via `WildWestDamageTypes.METEOR`.
-    - Then trigger the same impact effects as `onHitBlock` (magma at the entity's block-position-below, adjacent fire, AoE damage to OTHER entities — exclude the directly-hit entity from AoE to avoid double-damage).
+    - Then trigger the same impact effects as `onHitBlock` (magma at the entity's block-position-below, adjacent fire, AoE damage to OTHER entities). The AoE iteration MUST explicitly filter `entity != directlyHitEntity` (and ideally `entity != this` projectile) — do NOT rely on invulnerability frames (`invulnerableTime`) to deduplicate, because custom damage sources can bypass i-frames in some edge cases (e.g., when the source is fire-typed and the entity has been recently fire-damaged). The explicit identity check is the only reliable guard against a 26-damage stacked hit.
     - `discard()` self.
 - No tick-time entity-collision sweep; rely on engine's projectile movement + `onHit` dispatch.
 
@@ -235,6 +243,7 @@ Add to `wildwest/src/main/resources/assets/wildwest/lang/en_us.json`:
 - `entity.wildwest.herobrine`: `"Herobrine"`
 - `item.wildwest.herobrine_spawn_egg`: `"Herobrine Spawn Egg"`
 - `item.wildwest.herobrine_spawn_egg.away`: `"Herobrine is far away…"`
+- `item.wildwest.herobrine_spawn_egg.overworld_only`: `"Herobrine belongs only to the surface…"`
 - `item.wildwest.meteor_staff`: `"Meteor Staff"`
 
 ### Out of scope
@@ -322,11 +331,11 @@ No mocking-of-Minecraft tests for goals or render pipeline — those are integra
 
 ## Risks / open questions
 
-- **Singleton flag stuck `true`** if entity is removed by an unhandled path (server crash mid-tick where neither `die` nor `remove(KILLED)` ran, or a mod removing the entity bypassing both). Mitigation: `/kill @e[type=wildwest:herobrine]` triggers `KILLED`. If the issue becomes a real complaint, a future tweak could add a "no Herobrine entity loaded anywhere AND no chunk loaded that contains the saved position for N minutes → clear flag" recovery — explicitly out of scope here.
+- **Singleton flag stuck `true`** if entity is removed by an unhandled path (server crash mid-tick where neither `die` nor `remove(KILLED)` ran, or a mod removing the entity bypassing both). Mitigation: `/kill @e[type=wildwest:herobrine]` triggers `KILLED`. The boss-bar leak that would otherwise accompany this stuck-flag is mitigated by always calling `bossBar.removeAllPlayers()` in `remove(RemovalReason)`. If the stuck flag itself becomes a real complaint, a future tweak could add a "no Herobrine entity loaded anywhere AND no chunk loaded that contains the saved position for N minutes → clear flag" recovery — explicitly out of scope here.
 - **Meteor + village collateral damage.** Meteors falling in a 6–14 block ring around Herobrine WILL set fire to villages, woods, and player builds if Herobrine wanders into them. Accepted; matches the legend's "burns the world" flavor.
 - **Lightning + raids / villager death cascades.** Vanilla lightning spawning near villagers can convert them to witches. Rare and on-flavor; accepted.
 - **Open-sky spawn predicate** prevents underground spawns. Intentional. Combined with weight 1, expected spawn rate is "rare across many in-game nights of play."
-- **Cross-dimension spawn egg refusal.** A player who has the egg in nether/end can't summon Herobrine there even if no Herobrine exists yet. Accepted limitation; the egg is a singleton-controller, not a free spawn.
+- **Cross-dimension spawn egg refusal.** The egg's `useOn` enforces an explicit `level.dimension() == Level.OVERWORLD` gate before either spawning or teleporting (vanilla `SpawnEggItem.useOn` does NOT check dimension). A player who has the egg in nether/end can't summon Herobrine there even if no Herobrine exists yet. Accepted limitation; the egg is a singleton-controller for an overworld-bound entity, not a universal spawn token.
 - **Vendored Herobrine texture.** If Mojang updates the default Steve skin in a future MC version, Herobrine's base layer will look "old" relative to the default Steve skin. Same trade-off as Steve-Stacker; accepted.
 - **Meteor Staff in PvP.** 20-damage direct hits + AoE fire is brutal in PvP. The staff is intended as a PvE trophy. Accepted; PvP balance is not a goal of this mod.
 - **Meteor entity trajectory + far-fall.** A Herobrine-summoned meteor falls 30 blocks; if a player walks under it, the player can be directly hit even though it was meant to be ambient hazard. The 6-radius minimum offset from Herobrine reduces the chance the player is also there but does not eliminate it. Accepted; hazard zones are dangerous.
