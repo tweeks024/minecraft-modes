@@ -1,6 +1,7 @@
 package com.tweeks.wildwest.entity;
 
 import javax.annotation.Nullable;
+import com.tweeks.wildwest.WildWestDamageTypes;
 import com.tweeks.wildwest.entity.ai.HerobrineLightningGoal;
 import com.tweeks.wildwest.entity.ai.HerobrineMeleeGoal;
 import com.tweeks.wildwest.entity.ai.HerobrineMeteorGoal;
@@ -74,6 +75,17 @@ public class HerobrineEntity extends Monster {
 
     @Override
     public boolean isInvulnerableTo(ServerLevel level, DamageSource source) {
+        // Meteor damage exception: a player wielding the dropped Meteor Staff must be able
+        // to hurt Herobrine. We tag wildwest:meteor as IS_FIRE so fire-resistance protects
+        // *players* from meteors, but Herobrine's blanket fire-immunity below would also
+        // make him invulnerable to player-fired meteors — defeating the staff's purpose.
+        // So: METEOR damage from a non-self attacker (player Meteor Staff) deals normal damage.
+        // METEOR damage from self / no attacker (his own AI summons + AoE) is ignored.
+        if (source.is(WildWestDamageTypes.METEOR)) {
+            Entity attacker = source.getEntity();
+            if (attacker == null || attacker == this) return true;
+            return super.isInvulnerableTo(level, source);
+        }
         if (source.is(DamageTypeTags.IS_FIRE)) return true;
         return super.isInvulnerableTo(level, source);
     }

@@ -4,6 +4,8 @@
   "death.attack.wildwest.gunshot.item": "%1$s was shot by %2$s using %3$s",
   "death.attack.wildwest.gunshot.player": "%1$s was shot by %2$s",
   "death.attack.wildwest.knife": "%1$s was knifed by %2$s",
+  "death.attack.wildwest.meteor": "%1$s was struck by a meteor",
+  "death.attack.wildwest.meteor.player": "%1$s was struck by a meteor summoned by %2$s",
   "effect.wildwest.curing_shake": "Curing",
   "effect.wildwest.festering_wound": "Festering Wound",
   "effect.wildwest.zombified": "Zombified",

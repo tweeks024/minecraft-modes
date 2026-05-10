@@ -99,10 +99,12 @@ public class HerobrineTeleportGoal extends Goal {
             return;
         }
 
-        // Source-side particles.
+        // Source-side particles + sound.
         sl.sendParticles(ParticleTypes.PORTAL,
             this.boss.getX(), this.boss.getY() + 1.0, this.boss.getZ(),
             16, 0.5, 1.0, 0.5, 0.0);
+        sl.playSound(null, this.boss.getX(), this.boss.getY(), this.boss.getZ(),
+            SoundEvents.ENDERMAN_TELEPORT, SoundSource.HOSTILE, 0.8f, 1.0f);
 
         // Move + zero fall distance.
         this.boss.teleportTo(destX, destY, destZ);
