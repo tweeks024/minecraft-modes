@@ -71,6 +71,11 @@ BANDIT_LEADER_ACCESSORIES = [
     ('cape',      BODY_BONE, (-4.5,  0.0,  2.1, 9, 12, 1), (40, 32)),
 ]
 
+# Herobrine reuses vanilla HumanoidModel via ModelLayers.PLAYER — same
+# skeleton as Steve, no accessory cubes. The bbmodel exists for visual
+# texture authoring (paint the white-eye Steve variant in Blockbench).
+HEROBRINE_ACCESSORIES = []
+
 
 def java_to_bbmodel(bone, java):
     """Convert Java HumanoidModel addBox args to bbmodel from/to world coords."""
@@ -237,4 +242,5 @@ if __name__ == '__main__':
     write_bbmodel(out_dir, 'sherrif',       SHERRIF_ACCESSORIES,       texture_dir)
     write_bbmodel(out_dir, 'bandit',        BANDIT_ACCESSORIES,        texture_dir)
     write_bbmodel(out_dir, 'bandit_leader', BANDIT_LEADER_ACCESSORIES, texture_dir)
+    write_bbmodel(out_dir, 'herobrine',     HEROBRINE_ACCESSORIES,     texture_dir)
     print('OK')

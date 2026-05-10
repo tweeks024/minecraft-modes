@@ -1,0 +1,335 @@
+{
+  "meta": {
+    "format_version": "4.5",
+    "model_format": "modded_entity",
+    "box_uv": true
+  },
+  "name": "herobrine",
+  "model_identifier": "",
+  "visible_box": [
+    4,
+    4,
+    0
+  ],
+  "variable_placeholders": "",
+  "variable_placeholder_buttons": [],
+  "unhandled_root_fields": {},
+  "resolution": {
+    "width": 64,
+    "height": 64
+  },
+  "elements": [
+    {
+      "name": "head",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -4,
+        24,
+        -4
+      ],
+      "to": [
+        4,
+        32,
+        4
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        0,
+        0
+      ],
+      "type": "cube",
+      "uuid": "d6e3f7f2-0216-57bc-93a8-5d395f751f67"
+    },
+    {
+      "name": "body",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -4,
+        12,
+        -2
+      ],
+      "to": [
+        4,
+        24,
+        2
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        16,
+        16
+      ],
+      "type": "cube",
+      "uuid": "636bcc73-0e2d-5f6a-877d-2b7762346e10"
+    },
+    {
+      "name": "right_arm",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -8,
+        12,
+        -2
+      ],
+      "to": [
+        -4,
+        24,
+        2
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        -5,
+        22,
+        0
+      ],
+      "uv_offset": [
+        40,
+        16
+      ],
+      "type": "cube",
+      "uuid": "41427557-e934-55aa-add3-5ead1add4157"
+    },
+    {
+      "name": "left_arm",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        4,
+        12,
+        -2
+      ],
+      "to": [
+        8,
+        24,
+        2
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        5,
+        22,
+        0
+      ],
+      "uv_offset": [
+        32,
+        48
+      ],
+      "type": "cube",
+      "uuid": "c5301155-2221-543b-bcf6-3097f728f28b"
+    },
+    {
+      "name": "right_leg",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -3.9,
+        0,
+        -2
+      ],
+      "to": [
+        0.10000000000000009,
+        12,
+        2
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        -1.9,
+        12,
+        0
+      ],
+      "uv_offset": [
+        0,
+        16
+      ],
+      "type": "cube",
+      "uuid": "54a004bd-4b55-54ff-b632-397d3d040aab"
+    },
+    {
+      "name": "left_leg",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -0.10000000000000009,
+        0,
+        -2
+      ],
+      "to": [
+        3.9,
+        12,
+        2
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        1.9,
+        12,
+        0
+      ],
+      "uv_offset": [
+        16,
+        48
+      ],
+      "type": "cube",
+      "uuid": "946e7fb1-472d-5148-b299-627c232e60e7"
+    }
+  ],
+  "outliner": [
+    {
+      "name": "head",
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "color": 0,
+      "uuid": "7f24f7a8-0c20-5ffb-aeaa-f5546125e711",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "d6e3f7f2-0216-57bc-93a8-5d395f751f67",
+        "636bcc73-0e2d-5f6a-877d-2b7762346e10"
+      ]
+    },
+    {
+      "name": "body",
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "color": 0,
+      "uuid": "79e3652a-0bc9-5e6c-9ccf-91049384eca2",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": []
+    },
+    {
+      "name": "right_arm",
+      "origin": [
+        -5,
+        22,
+        0
+      ],
+      "color": 0,
+      "uuid": "08e71d8d-f993-55c8-9dfc-3ebe176ebbe0",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "41427557-e934-55aa-add3-5ead1add4157"
+      ]
+    },
+    {
+      "name": "left_arm",
+      "origin": [
+        5,
+        22,
+        0
+      ],
+      "color": 0,
+      "uuid": "34dcd210-4aa8-58a4-b7bb-ea09bf537a47",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "c5301155-2221-543b-bcf6-3097f728f28b"
+      ]
+    },
+    {
+      "name": "right_leg",
+      "origin": [
+        -1.9,
+        12,
+        0
+      ],
+      "color": 0,
+      "uuid": "32253b4b-ef30-587e-81de-11f2d0107afa",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "54a004bd-4b55-54ff-b632-397d3d040aab"
+      ]
+    },
+    {
+      "name": "left_leg",
+      "origin": [
+        1.9,
+        12,
+        0
+      ],
+      "color": 0,
+      "uuid": "35b5d050-8aab-52c3-9f97-d366e2f3cf51",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "946e7fb1-472d-5148-b299-627c232e60e7"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "path": "/Users/tweeks/code/minecraft-mods/wildwest/src/main/resources/assets/wildwest/textures/entity/herobrine.png",
+      "name": "herobrine.png",
+      "folder": "entity",
+      "namespace": "wildwest",
+      "id": "0",
+      "particle": false,
+      "render_mode": "default",
+      "render_sides": "auto",
+      "frame_time": 1,
+      "frame_order_type": "loop",
+      "frame_order": "",
+      "frame_interpolate": false,
+      "visible": true,
+      "internal": true,
+      "saved": true,
+      "uuid": "186ec8b4-9d29-5976-b179-663d53239ded",
+      "relative_path": "../src/main/resources/assets/wildwest/textures/entity/herobrine.png",
+      "use_as_default": false,
+      "layers_enabled": false,
+      "sync_to_project": "",
+      "width": 64,
+      "height": 64,
+      "uv_width": 64,
+      "uv_height": 64,
+      "source": "data:image/png;base64,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"
+    }
+  ]
+}
