@@ -4,7 +4,10 @@ import com.tweeks.wildwest.item.BanditKnifeItem;
 import com.tweeks.wildwest.item.BillyClubItem;
 import com.tweeks.wildwest.item.PistolItem;
 import com.tweeks.wildwest.item.RifleItem;
+import com.tweeks.wildwest.item.HerobrineSpawnEggItem;
+import com.tweeks.wildwest.item.MeteorStaffItem;
 import com.tweeks.wildwest.item.TaintedVialItem;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
@@ -53,6 +56,16 @@ public final class Registration {
     public static final DeferredItem<SpawnEggItem> STEVE_STACKER_SPAWN_EGG = ITEMS.registerItem(
         "steve_stacker_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.STEVE_STACKER.get()));
 
+    public static final DeferredItem<HerobrineSpawnEggItem> HEROBRINE_SPAWN_EGG = ITEMS.registerItem(
+        "herobrine_spawn_egg",
+        HerobrineSpawnEggItem::new,
+        p -> p.spawnEgg(ModEntities.HEROBRINE.get()));
+
+    public static final DeferredItem<MeteorStaffItem> METEOR_STAFF = ITEMS.registerItem(
+        "meteor_staff",
+        MeteorStaffItem::new,
+        p -> p.stacksTo(1).rarity(Rarity.EPIC));
+
     public static final DeferredItem<TaintedVialItem> TAINTED_VIAL = ITEMS.registerItem(
         "tainted_vial", TaintedVialItem::new, p -> p);
 
@@ -72,6 +85,8 @@ public final class Registration {
                     output.accept(BANDIT_LEADER_SPAWN_EGG.get());
                     output.accept(WALKER_SPAWN_EGG.get());
                     output.accept(STEVE_STACKER_SPAWN_EGG.get());
+                    output.accept(HEROBRINE_SPAWN_EGG.get());
+                    output.accept(METEOR_STAFF.get());
                     output.accept(TAINTED_VIAL.get());
                 })
                 .build());

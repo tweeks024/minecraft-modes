@@ -14,5 +14,7 @@ public final class ModDamageTypeProvider {
             new DamageType("wildwest.club", 0.1f));
         ctx.register(WildWestDamageTypes.KNIFE,
             new DamageType("wildwest.knife", 0.1f));
+        ctx.register(WildWestDamageTypes.METEOR,
+            new DamageType("wildwest.meteor", 0.1f));
     }
 }

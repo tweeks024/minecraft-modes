@@ -17,5 +17,6 @@ public class ModDamageTypeTagsProvider extends DamageTypeTagsProvider {
     @Override
     protected void addTags(HolderLookup.Provider provider) {
         tag(DamageTypeTags.IS_PROJECTILE).add(WildWestDamageTypes.GUNSHOT);
+        tag(DamageTypeTags.IS_FIRE).add(WildWestDamageTypes.METEOR);
     }
 }

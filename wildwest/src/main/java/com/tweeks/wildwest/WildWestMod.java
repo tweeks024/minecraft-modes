@@ -5,6 +5,7 @@ import com.tweeks.wildwest.effect.ModEffects;
 import com.tweeks.wildwest.entity.BanditEntity;
 import com.tweeks.wildwest.entity.BanditLeaderEntity;
 import com.tweeks.wildwest.entity.DeputyEntity;
+import com.tweeks.wildwest.entity.HerobrineEntity;
 import com.tweeks.wildwest.entity.SherrifEntity;
 import com.tweeks.wildwest.entity.SteveStackerEntity;
 import com.tweeks.wildwest.entity.WalkerEntity;
@@ -48,6 +49,11 @@ public class WildWestMod {
                 net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 net.minecraft.world.entity.monster.Monster::checkMonsterSpawnRules,
                 net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
+            event.register(ModEntities.HEROBRINE.get(),
+                net.minecraft.world.entity.SpawnPlacementTypes.ON_GROUND,
+                net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                com.tweeks.wildwest.spawning.HerobrineSpawnRules::checkSpawnRules,
+                net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
         });
     }
 
@@ -58,5 +64,6 @@ public class WildWestMod {
         event.put(ModEntities.BANDIT_LEADER.get(), BanditLeaderEntity.createAttributes().build());
         event.put(ModEntities.WALKER.get(), WalkerEntity.createAttributes().build());
         event.put(ModEntities.STEVE_STACKER.get(), SteveStackerEntity.createAttributes().build());
+        event.put(ModEntities.HEROBRINE.get(), HerobrineEntity.createAttributes().build());
     }
 }
