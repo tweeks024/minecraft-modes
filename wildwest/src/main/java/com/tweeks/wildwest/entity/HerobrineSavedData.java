@@ -2,6 +2,7 @@ package com.tweeks.wildwest.entity;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.tweeks.wildwest.WildWestMod;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
@@ -30,7 +31,7 @@ import java.util.UUID;
  */
 public final class HerobrineSavedData extends SavedData {
 
-    public static final String FILE_ID = "wildwest_herobrine";
+    private static final String FILE_ID = "wildwest_herobrine";
 
     /** DFU codec — serialises the three logical fields. */
     public static final Codec<HerobrineSavedData> CODEC = RecordCodecBuilder.create(instance ->
@@ -44,7 +45,7 @@ public final class HerobrineSavedData extends SavedData {
     );
 
     public static final SavedDataType<HerobrineSavedData> TYPE = new SavedDataType<>(
-        Identifier.parse("wildwest:" + FILE_ID),
+        Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, FILE_ID),
         HerobrineSavedData::new,
         CODEC,
         DataFixTypes.SAVED_DATA_CUSTOM_BOSS_EVENTS
