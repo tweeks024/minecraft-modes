@@ -40,6 +40,7 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.WALKER.get(), WalkerRenderer::new);
         event.registerEntityRenderer(ModEntities.STEVE_STACKER.get(), SteveStackerRenderer::new);
         event.registerEntityRenderer(ModEntities.TAINTED_VIAL_PROJECTILE.get(), ThrownItemRenderer::new);
+        event.registerEntityRenderer(ModEntities.METEOR.get(), ThrownItemRenderer::new);
     }
 
     @SubscribeEvent
