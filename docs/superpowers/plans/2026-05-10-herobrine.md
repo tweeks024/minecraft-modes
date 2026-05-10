@@ -1413,6 +1413,17 @@ Add these methods to the class (anywhere, but conventionally after `populateDefa
         return result;
     }
 
+    /**
+     * Standard death path. Clears the singleton flag.
+     *
+     * <p><b>Intentional redundancy with {@link #remove(RemovalReason)}:</b>
+     * a normal kill triggers BOTH {@code die} and {@code remove(KILLED)}, so
+     * this clear() runs twice. That is fine — {@code clear()} is idempotent
+     * and the strict {@code uuid.equals(currentId)} guard means a no-op on
+     * the second call. We keep both paths so weird mod interactions (e.g.,
+     * an entity removed via {@code discard()} without a death tick) still
+     * release the singleton.
+     */
     @Override
     public void die(DamageSource damageSource) {
         super.die(damageSource);
@@ -1434,7 +1445,8 @@ Add these methods to the class (anywhere, but conventionally after `populateDefa
         this.bossBar.removeAllPlayers();
 
         // Only clear the singleton flag for "real" removals. Chunk unload is
-        // not a death.
+        // not a death. (See die() javadoc — this path is intentionally
+        // redundant with die() for non-standard kill paths.)
         if (reason == RemovalReason.KILLED || reason == RemovalReason.DISCARDED) {
             if (this.level() instanceof ServerLevel sl) {
                 var server = sl.getServer();
@@ -1589,7 +1601,10 @@ public class HerobrineTeleportGoal extends Goal {
             this.boss.getX(), this.boss.getZ(),
             target.getX(), target.getZ(), rng);
 
-        // Y-snap + clearance.
+        // Y-snap + clearance. NeoForge's getHeightmapPos for MOTION_BLOCKING_NO_LEAVES
+        // can return either "first air above surface" or "the surface block itself"
+        // depending on minor version; we try BOTH topPos and topPos.above() before
+        // perturbing, so a heightmap returning the solid surface block doesn't trap us.
         double destX = picked.x();
         double destZ = picked.z();
         double destY = -1;
@@ -1597,14 +1612,22 @@ public class HerobrineTeleportGoal extends Goal {
             BlockPos topPos = sl.getHeightmapPos(
                 Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 BlockPos.containing(destX, this.boss.getY(), destZ));
-            int candidateY = topPos.getY();
 
-            // Need 2 blocks of vertical air clearance for the entity bbox.
+            // Try topPos itself (heightmap returned the air block above ground).
             if (sl.getBlockState(topPos).isAir()
                 && sl.getBlockState(topPos.above()).isAir()) {
-                destY = candidateY;
+                destY = topPos.getY();
                 break;
             }
+
+            // Try topPos.above() (heightmap returned the solid surface block).
+            BlockPos above = topPos.above();
+            if (sl.getBlockState(above).isAir()
+                && sl.getBlockState(above.above()).isAir()) {
+                destY = above.getY();
+                break;
+            }
+
             // Retry with a small lateral perturbation.
             double angle = this.boss.getRandom().nextDouble() * 2.0 * Math.PI;
             destX += Math.cos(angle) * 1.5;
@@ -2333,6 +2356,14 @@ import net.minecraft.resources.Identifier;
 /**
  * Emissive overlay drawing the Herobrine eyes texture at full brightness.
  * Same pattern as vanilla {@code EyesLayer} but bound to a static texture.
+ *
+ * <p><b>Intentional:</b> the eyes do not red-flash when Herobrine takes damage.
+ * The hardcoded {@code 0xF000F0} packed-overlay UV bypasses the dynamic damage
+ * overlay that the parent renderer would otherwise pipe through. This is on
+ * purpose — stark unblinking white eyes match the Herobrine creepypasta flavor
+ * (the rest of his body still flashes red as normal). Do NOT "fix" this by
+ * routing the dynamic {@code packedOverlay} parameter through unless changing
+ * the design intent.
  */
 public class HerobrineEyesLayer
         extends RenderLayer<HumanoidRenderState, HumanoidModel<HumanoidRenderState>> {
@@ -2348,6 +2379,8 @@ public class HerobrineEyesLayer
     public void render(PoseStack pose, MultiBufferSource buffers, int packedLight,
                        HumanoidRenderState state, float yaw, float pitch) {
         var buffer = buffers.getBuffer(EYES);
+        // Hardcoded NO_OVERLAY (0xF000F0) — eyes stay stark white through hurt
+        // flashes (intentional — see class javadoc).
         this.getParentModel().renderToBuffer(pose, buffer, 0xF000F0, net.minecraft.client.renderer.LightTexture.FULL_BRIGHT);
     }
 }
