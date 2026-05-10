@@ -84,6 +84,8 @@ public class HerobrineSpawnEggItem extends SpawnEggItem {
         // Source-side particle burst.
         sl.sendParticles(ParticleTypes.PORTAL,
             hb.getX(), hb.getY() + 1.0, hb.getZ(), 16, 0.5, 1.0, 0.5, 0.0);
+        sl.playSound(null, hb.getX(), hb.getY(), hb.getZ(), SoundEvents.ENDERMAN_TELEPORT,
+            SoundSource.HOSTILE, 0.8f, 1.0f);
 
         hb.teleportTo(tx, ty, tz);
 
