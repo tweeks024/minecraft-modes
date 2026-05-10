@@ -19,7 +19,6 @@ public class HerobrineRenderer
         super(context,
             new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER)),
             0.5F);
-        this.addLayer(new HerobrineEyesLayer(this));
     }
 
     @Override
