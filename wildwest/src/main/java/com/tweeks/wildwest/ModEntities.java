@@ -4,6 +4,7 @@ import com.tweeks.wildwest.entity.BanditEntity;
 import com.tweeks.wildwest.entity.BanditLeaderEntity;
 import com.tweeks.wildwest.entity.BulletEntity;
 import com.tweeks.wildwest.entity.DeputyEntity;
+import com.tweeks.wildwest.entity.HerobrineEntity;
 import com.tweeks.wildwest.entity.SherrifEntity;
 import com.tweeks.wildwest.entity.SteveStackerEntity;
 import com.tweeks.wildwest.entity.WalkerEntity;
@@ -80,6 +81,14 @@ public final class ModEntities {
             .clientTrackingRange(10)
             .build(ResourceKey.create(Registries.ENTITY_TYPE,
                 Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "steve_stacker"))));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<HerobrineEntity>> HEROBRINE =
+        ENTITY_TYPES.register("herobrine", () -> EntityType.Builder.<HerobrineEntity>of(
+                HerobrineEntity::new, MobCategory.MONSTER)
+            .sized(0.6f, 1.95f)
+            .clientTrackingRange(10)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "herobrine"))));
 
     public static final DeferredHolder<EntityType<?>, EntityType<MeteorEntity>> METEOR =
         ENTITY_TYPES.register("meteor", () -> EntityType.Builder.<MeteorEntity>of(
