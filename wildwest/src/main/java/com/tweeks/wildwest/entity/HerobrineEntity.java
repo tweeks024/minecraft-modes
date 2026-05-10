@@ -1,6 +1,10 @@
 package com.tweeks.wildwest.entity;
 
 import javax.annotation.Nullable;
+import com.tweeks.wildwest.entity.ai.HerobrineLightningGoal;
+import com.tweeks.wildwest.entity.ai.HerobrineMeleeGoal;
+import com.tweeks.wildwest.entity.ai.HerobrineMeteorGoal;
+import com.tweeks.wildwest.entity.ai.HerobrineTeleportGoal;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -22,7 +26,13 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.FloatGoal;
+import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
+import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.item.Items;
@@ -180,6 +190,20 @@ public class HerobrineEntity extends Monster {
     @Override
     public int getBaseExperienceReward(ServerLevel level) {
         return 100;
+    }
+
+    @Override
+    protected void registerGoals() {
+        this.goalSelector.addGoal(0, new FloatGoal(this));
+        this.goalSelector.addGoal(1, new HerobrineMeleeGoal(this));
+        this.goalSelector.addGoal(2, new HerobrineLightningGoal(this));
+        this.goalSelector.addGoal(2, new HerobrineMeteorGoal(this));
+        this.goalSelector.addGoal(3, new HerobrineTeleportGoal(this));
+        this.goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 16.0F));
+        this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
+
+        this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
+        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
     }
 
     @Override
