@@ -10,6 +10,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.level.levelgen.Heightmap;
 
+import java.util.EnumSet;
+
 /**
  * Teleports Entity 303 every ~3 s. Distance-aware via the shared
  * {@link HerobrineTeleportTarget} math (close-gap / open-gap / random
@@ -22,18 +24,18 @@ public class Entity303TeleportGoal extends Goal {
     private static final int CLEARANCE_RETRIES = 5;
 
     private final Entity303Entity boss;
-    private int cooldown = 0;
 
     public Entity303TeleportGoal(Entity303Entity boss) {
         this.boss = boss;
+        // No movement/look claims — teleport doesn't path or aim; it warps.
+        // Letting other goals run concurrently means 303 can teleport mid-bow
+        // or mid-melee, which is the design intent.
+        this.setFlags(EnumSet.noneOf(Goal.Flag.class));
     }
 
     @Override
     public boolean canUse() {
-        if (this.cooldown > 0) {
-            this.cooldown--;
-            return false;
-        }
+        if (this.boss.getTeleportCooldown() > 0) return false;
         LivingEntity target = this.boss.getTarget();
         return target != null && target.isAlive();
     }
@@ -47,7 +49,7 @@ public class Entity303TeleportGoal extends Goal {
     public void start() {
         LivingEntity target = this.boss.getTarget();
         if (target == null) return;
-        this.cooldown = COOLDOWN_TICKS;
+        this.boss.setTeleportCooldown(COOLDOWN_TICKS);
 
         if (!(this.boss.level() instanceof ServerLevel sl)) return;
 

@@ -25,6 +25,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -62,6 +63,14 @@ public class Entity303Entity extends Monster {
     private static final int SWAP_CLEARANCE_RETRIES = 5;
 
     private int swapCooldown = 0;
+
+    // Goal cooldowns live on the entity (not inside individual Goals) so they
+    // decrement every tick in aiStep regardless of which Goal is currently
+    // running. Putting them inside each Goal's canUse() makes the cooldown
+    // stall when a higher-priority goal (e.g., melee) is active — leading to
+    // a "bow ready the instant you leave melee range" exploit.
+    private int bowCooldown = 0;
+    private int teleportCooldown = 0;
 
     public Entity303Entity(EntityType<? extends Entity303Entity> type, Level level) {
         super(type, level);
@@ -188,8 +197,15 @@ public class Entity303Entity extends Monster {
             Entity attacker = source.getEntity();
             if (tryPhantomSwap(level, attacker)) {
                 this.swapCooldown = SWAP_COOLDOWN_TICKS;
-                // Damage replaced by the swap — return true to indicate the hit
-                // was handled, but skip the actual hp deduction.
+                // Damage replaced by the swap — we return true to indicate the
+                // hit was handled, but skip the HP deduction by NOT delegating
+                // to super.hurtServer. Manually register the attacker as the
+                // last-hurt-by source so HurtByTargetGoal still aggros — otherwise
+                // a swapped arrow hit would never trigger 303 to target the
+                // shooter, which would feel like a bug to the player.
+                if (attacker instanceof LivingEntity livingAttacker) {
+                    this.setLastHurtByMob(livingAttacker);
+                }
                 return true;
             }
             // tryPhantomSwap returned false (no valid spot) — fall through to vanilla.
@@ -251,7 +267,9 @@ public class Entity303Entity extends Monster {
                 destY = above.getY();
                 break;
             }
-            // Perturb direction slightly and retry.
+            // Clearance miss — resample direction uniformly. This loses the
+            // "behind the attacker" intent on retry, but a graceful random
+            // fallback beats getting stuck mid-swap.
             double angle = this.getRandom().nextDouble() * 2.0 * Math.PI;
             dirX = Math.cos(angle);
             dirZ = Math.sin(angle);
@@ -317,8 +335,16 @@ public class Entity303Entity extends Monster {
         super.aiStep();
         if (this.level().isClientSide()) return;
         if (this.swapCooldown > 0) this.swapCooldown--;
+        if (this.bowCooldown > 0) this.bowCooldown--;
+        if (this.teleportCooldown > 0) this.teleportCooldown--;
         this.bossBar.setProgress(this.getHealth() / this.getMaxHealth());
     }
+
+    public int getBowCooldown() { return this.bowCooldown; }
+    public void setBowCooldown(int ticks) { this.bowCooldown = ticks; }
+
+    public int getTeleportCooldown() { return this.teleportCooldown; }
+    public void setTeleportCooldown(int ticks) { this.teleportCooldown = ticks; }
 
     @Override
     public void startSeenByPlayer(ServerPlayer player) {

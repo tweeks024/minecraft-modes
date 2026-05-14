@@ -39,7 +39,12 @@ public class CursedTomeItem extends Item {
     @Override
     public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack tome = player.getItemInHand(hand);
-        if (!(level instanceof ServerLevel sl)) return InteractionResult.CONSUME;
+        // Defer fully to the server's decision. The server-side branch below
+        // calls player.swing(hand) on a hit (which packets the animation back
+        // to the client). A speculative CONSUME here would show the swing
+        // animation on the client even when the server takes the no-op miss
+        // path, desyncing visuals from durability/cooldown.
+        if (!(level instanceof ServerLevel sl)) return InteractionResult.PASS;
 
         // Raycast for a LivingEntity along the look vector.
         Vec3 eye = player.getEyePosition();

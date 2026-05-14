@@ -21,7 +21,10 @@ public class Entity303CloneEntity extends Monster {
 
     public Entity303CloneEntity(EntityType<? extends Entity303CloneEntity> type, Level level) {
         super(type, level);
-        this.setPersistenceRequired();
+        // Intentionally NOT setPersistenceRequired: the clone is ephemeral
+        // (6 s timer in aiStep). Without persistence, vanilla despawns it if
+        // its chunk unloads with no player nearby, so a clone can't outlive
+        // the boss in some far-away unloaded chunk.
         this.setCustomName(Component.translatable("entity.wildwest.entity_303_clone"));
         this.setCustomNameVisible(false);
     }

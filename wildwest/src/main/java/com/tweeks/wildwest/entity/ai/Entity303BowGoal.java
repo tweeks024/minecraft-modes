@@ -11,6 +11,8 @@ import net.minecraft.world.entity.projectile.arrow.Arrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
+import java.util.EnumSet;
+
 /**
  * Primary attack: fires an enchanted Arrow at the target every 2.5 s when
  * the target is at distance 5–20 blocks with line-of-sight. Handles the
@@ -25,18 +27,18 @@ public class Entity303BowGoal extends Goal {
     private static final float ARROW_INACCURACY = 6.0f;
 
     private final Entity303Entity boss;
-    private int cooldown = 0;
 
     public Entity303BowGoal(Entity303Entity boss) {
         this.boss = boss;
+        // No movement/look claims — this is a one-shot fire-and-forget that
+        // runs during start() and immediately ends. Letting other goals
+        // (melee, teleport, look-at-player) run concurrently is the point.
+        this.setFlags(EnumSet.noneOf(Goal.Flag.class));
     }
 
     @Override
     public boolean canUse() {
-        if (this.cooldown > 0) {
-            this.cooldown--;
-            return false;
-        }
+        if (this.boss.getBowCooldown() > 0) return false;
         LivingEntity target = this.boss.getTarget();
         if (target == null || !target.isAlive()) return false;
         double dist = this.boss.distanceTo(target);
@@ -51,7 +53,7 @@ public class Entity303BowGoal extends Goal {
     public void start() {
         LivingEntity target = this.boss.getTarget();
         if (target == null) return;
-        this.cooldown = COOLDOWN_TICKS;
+        this.boss.setBowCooldown(COOLDOWN_TICKS);
 
         if (!(this.boss.level() instanceof ServerLevel sl)) return;
 
