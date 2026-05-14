@@ -4,6 +4,7 @@ import com.tweeks.wildwest.entity.BanditEntity;
 import com.tweeks.wildwest.entity.BanditLeaderEntity;
 import com.tweeks.wildwest.entity.BulletEntity;
 import com.tweeks.wildwest.entity.DeputyEntity;
+import com.tweeks.wildwest.entity.Entity303CloneEntity;
 import com.tweeks.wildwest.entity.Entity303Entity;
 import com.tweeks.wildwest.entity.HerobrineEntity;
 import com.tweeks.wildwest.entity.SherrifEntity;
@@ -98,6 +99,14 @@ public final class ModEntities {
             .clientTrackingRange(10)
             .build(ResourceKey.create(Registries.ENTITY_TYPE,
                 Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "entity_303"))));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<Entity303CloneEntity>> ENTITY_303_CLONE =
+        ENTITY_TYPES.register("entity_303_clone", () -> EntityType.Builder.<Entity303CloneEntity>of(
+                Entity303CloneEntity::new, MobCategory.MONSTER)
+            .sized(0.6f, 1.95f)
+            .clientTrackingRange(10)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "entity_303_clone"))));
 
     public static final DeferredHolder<EntityType<?>, EntityType<MeteorEntity>> METEOR =
         ENTITY_TYPES.register("meteor", () -> EntityType.Builder.<MeteorEntity>of(

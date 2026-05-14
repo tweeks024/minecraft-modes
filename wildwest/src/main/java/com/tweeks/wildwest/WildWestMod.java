@@ -5,6 +5,7 @@ import com.tweeks.wildwest.effect.ModEffects;
 import com.tweeks.wildwest.entity.BanditEntity;
 import com.tweeks.wildwest.entity.BanditLeaderEntity;
 import com.tweeks.wildwest.entity.DeputyEntity;
+import com.tweeks.wildwest.entity.Entity303CloneEntity;
 import com.tweeks.wildwest.entity.Entity303Entity;
 import com.tweeks.wildwest.entity.HerobrineEntity;
 import com.tweeks.wildwest.entity.SherrifEntity;
@@ -72,5 +73,6 @@ public class WildWestMod {
         event.put(ModEntities.STEVE_STACKER.get(), SteveStackerEntity.createAttributes().build());
         event.put(ModEntities.HEROBRINE.get(), HerobrineEntity.createAttributes().build());
         event.put(ModEntities.ENTITY_303.get(), Entity303Entity.createAttributes().build());
+        event.put(ModEntities.ENTITY_303_CLONE.get(), Entity303CloneEntity.createAttributes().build());
     }
 }
