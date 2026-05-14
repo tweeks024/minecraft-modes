@@ -1,0 +1,100 @@
+package com.tweeks.wildwest.entity.ai;
+
+import com.tweeks.wildwest.entity.Entity303Entity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.level.levelgen.Heightmap;
+
+/**
+ * Teleports Entity 303 every ~3 s. Distance-aware via the shared
+ * {@link HerobrineTeleportTarget} math (close-gap / open-gap / random
+ * reposition). Smoke particles + quieter/higher-pitched enderman sound
+ * distinguish 303 audibly+visually from Herobrine's teleport.
+ */
+public class Entity303TeleportGoal extends Goal {
+
+    private static final int COOLDOWN_TICKS = 60; // 3 s at 20 tps
+    private static final int CLEARANCE_RETRIES = 5;
+
+    private final Entity303Entity boss;
+    private int cooldown = 0;
+
+    public Entity303TeleportGoal(Entity303Entity boss) {
+        this.boss = boss;
+    }
+
+    @Override
+    public boolean canUse() {
+        if (this.cooldown > 0) {
+            this.cooldown--;
+            return false;
+        }
+        LivingEntity target = this.boss.getTarget();
+        return target != null && target.isAlive();
+    }
+
+    @Override
+    public boolean canContinueToUse() {
+        return false; // one-shot
+    }
+
+    @Override
+    public void start() {
+        LivingEntity target = this.boss.getTarget();
+        if (target == null) return;
+        this.cooldown = COOLDOWN_TICKS;
+
+        if (!(this.boss.level() instanceof ServerLevel sl)) return;
+
+        HerobrineTeleportTarget.Rng rng = this.boss.getRandom()::nextDouble;
+        HerobrineTeleportTarget.Result picked = HerobrineTeleportTarget.pick(
+            this.boss.getX(), this.boss.getZ(),
+            target.getX(), target.getZ(), rng);
+
+        double destX = picked.x();
+        double destZ = picked.z();
+        double destY = -1;
+        for (int retry = 0; retry < CLEARANCE_RETRIES; retry++) {
+            BlockPos topPos = sl.getHeightmapPos(
+                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                BlockPos.containing(destX, this.boss.getY(), destZ));
+
+            if (sl.getBlockState(topPos).isAir()
+                && sl.getBlockState(topPos.above()).isAir()) {
+                destY = topPos.getY();
+                break;
+            }
+
+            BlockPos above = topPos.above();
+            if (sl.getBlockState(above).isAir()
+                && sl.getBlockState(above.above()).isAir()) {
+                destY = above.getY();
+                break;
+            }
+
+            double angle = this.boss.getRandom().nextDouble() * 2.0 * Math.PI;
+            destX += Math.cos(angle) * 1.5;
+            destZ += Math.sin(angle) * 1.5;
+        }
+        if (destY < 0) return;
+
+        sl.sendParticles(ParticleTypes.SMOKE,
+            this.boss.getX(), this.boss.getY() + 1.0, this.boss.getZ(),
+            16, 0.5, 1.0, 0.5, 0.0);
+        sl.playSound(null, this.boss.getX(), this.boss.getY(), this.boss.getZ(),
+            SoundEvents.ENDERMAN_TELEPORT, SoundSource.HOSTILE, 0.6f, 1.2f);
+
+        this.boss.teleportTo(destX, destY, destZ);
+        this.boss.fallDistance = 0;
+
+        sl.sendParticles(ParticleTypes.SMOKE, destX, destY + 1.0, destZ,
+            16, 0.5, 1.0, 0.5, 0.0);
+        sl.playSound(null, destX, destY, destZ, SoundEvents.ENDERMAN_TELEPORT,
+            SoundSource.HOSTILE, 0.6f, 1.2f);
+    }
+}
