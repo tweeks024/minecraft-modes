@@ -66,6 +66,13 @@ public class Entity303BowGoal extends Goal {
         }
 
         ItemStack bowStack = this.boss.getItemBySlot(EquipmentSlot.MAINHAND);
+        // If the swap couldn't produce a bow (e.g., both slots somehow empty
+        // from a weird mod interaction), bail out. Arrow's constructor
+        // validates `firedFromWeapon` and crashes the server on an empty or
+        // non-projectile-weapon stack — much better to silently skip this
+        // shot than tick-crash the whole world.
+        if (!bowStack.is(Items.BOW)) return;
+
         ItemStack arrowStack = new ItemStack(Items.ARROW);
         Arrow arrow = new Arrow(sl, this.boss, arrowStack, bowStack);
 

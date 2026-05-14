@@ -139,6 +139,14 @@ public class Entity303Entity extends Monster {
                                         @Nullable SpawnGroupData spawnData) {
         SpawnGroupData result = super.finalizeSpawn(level, difficulty, reason, spawnData);
 
+        // Mob.finalizeSpawn does NOT populate equipment for all spawn reasons —
+        // notably, spawn-egg paths (and most non-NATURAL paths) skip it. We
+        // need the bow and sword to be present for Entity303BowGoal to spawn
+        // arrows (an empty mainhand stack makes Arrow's "Invalid weapon firing
+        // an arrow" validation crash the server). Call it explicitly so the
+        // boss is always equipped regardless of spawn path.
+        this.populateDefaultEquipmentSlots(level.getRandom(), difficulty);
+
         var server = level.getLevel().getServer();
         if (server != null) {
             Entity303SavedData saved = Entity303SavedData.get(server);
