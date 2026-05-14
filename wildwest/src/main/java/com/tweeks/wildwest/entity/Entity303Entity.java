@@ -1,5 +1,6 @@
 package com.tweeks.wildwest.entity;
 
+import javax.annotation.Nullable;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -12,8 +13,11 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Monster;
@@ -22,6 +26,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 
 /**
  * Apex boss mob, peer of Herobrine. Singleton across the whole server (see
@@ -78,6 +83,63 @@ public class Entity303Entity extends Monster {
         this.setItemSlot(EquipmentSlot.OFFHAND, sword);
         this.setDropChance(EquipmentSlot.MAINHAND, 0.10f);
         this.setDropChance(EquipmentSlot.OFFHAND, 0.10f);
+    }
+
+    @Override
+    @Nullable
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor level,
+                                        DifficultyInstance difficulty,
+                                        EntitySpawnReason reason,
+                                        @Nullable SpawnGroupData spawnData) {
+        SpawnGroupData result = super.finalizeSpawn(level, difficulty, reason, spawnData);
+
+        var server = level.getLevel().getServer();
+        if (server != null) {
+            Entity303SavedData saved = Entity303SavedData.get(server);
+            if (saved.isAlive() && !this.getUUID().equals(saved.getCurrentId())) {
+                // Another 303 already alive — discard this duplicate.
+                this.discard();
+                return result;
+            }
+            saved.setAlive(this.getUUID(), level.getLevel().dimension());
+        }
+        return result;
+    }
+
+    @Override
+    public void die(DamageSource damageSource) {
+        super.die(damageSource);
+        if (this.level() instanceof ServerLevel sl) {
+            var server = sl.getServer();
+            if (server != null) {
+                Entity303SavedData saved = Entity303SavedData.get(server);
+                if (this.getUUID().equals(saved.getCurrentId())) {
+                    saved.clear();
+                }
+            }
+        }
+    }
+
+    @Override
+    public void remove(Entity.RemovalReason reason) {
+        // Always clear the boss bar — a stuck-flag scenario or forced discard
+        // must not leave the bar visible to clients server-side.
+        this.bossBar.removeAllPlayers();
+
+        // Only clear the singleton flag for "real" removals. Chunk unload is
+        // not a death.
+        if (reason == Entity.RemovalReason.KILLED || reason == Entity.RemovalReason.DISCARDED) {
+            if (this.level() instanceof ServerLevel sl) {
+                var server = sl.getServer();
+                if (server != null) {
+                    Entity303SavedData saved = Entity303SavedData.get(server);
+                    if (this.getUUID().equals(saved.getCurrentId())) {
+                        saved.clear();
+                    }
+                }
+            }
+        }
+        super.remove(reason);
     }
 
     @Override
