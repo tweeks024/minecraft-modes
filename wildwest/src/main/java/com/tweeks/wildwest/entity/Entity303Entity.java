@@ -1,7 +1,10 @@
 package com.tweeks.wildwest.entity;
 
 import javax.annotation.Nullable;
+import com.tweeks.wildwest.ModEntities;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerBossEvent;
@@ -9,6 +12,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.BossEvent;
@@ -28,6 +32,8 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Apex boss mob, peer of Herobrine. Singleton across the whole server (see
@@ -39,6 +45,14 @@ import net.minecraft.world.level.ServerLevelAccessor;
 public class Entity303Entity extends Monster {
 
     private final ServerBossEvent bossBar;
+
+    private static final int SWAP_COOLDOWN_TICKS = 80; // 4 s
+    private static final float SWAP_PROBABILITY = 0.30f;
+    private static final double SWAP_BEHIND_MIN = 8.0;
+    private static final double SWAP_BEHIND_MAX = 12.0;
+    private static final int SWAP_CLEARANCE_RETRIES = 5;
+
+    private int swapCooldown = 0;
 
     public Entity303Entity(EntityType<? extends Entity303Entity> type, Level level) {
         super(type, level);
@@ -144,6 +158,114 @@ public class Entity303Entity extends Monster {
     }
 
     @Override
+    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
+        // Phantom swap: roll once per incoming non-zero damage when off cooldown.
+        if (amount > 0.0f && this.swapCooldown == 0
+                && this.getRandom().nextFloat() < SWAP_PROBABILITY) {
+
+            Entity attacker = source.getEntity();
+            if (tryPhantomSwap(level, attacker)) {
+                this.swapCooldown = SWAP_COOLDOWN_TICKS;
+                // Damage replaced by the swap — return true to indicate the hit
+                // was handled, but skip the actual hp deduction.
+                return true;
+            }
+            // tryPhantomSwap returned false (no valid spot) — fall through to vanilla.
+        }
+        return super.hurtServer(level, source, amount);
+    }
+
+    /**
+     * @return true if a clone was spawned and 303 teleported; false if no
+     *         valid destination was found and the caller should apply damage
+     *         normally.
+     */
+    private boolean tryPhantomSwap(ServerLevel level, @Nullable Entity attacker) {
+        // Pick the swap direction: behind the attacker if available, else random.
+        double dirX;
+        double dirZ;
+        if (attacker != null) {
+            Vec3 look = attacker.getLookAngle();
+            // "Behind" the attacker is along -look (the attacker is facing 303;
+            // we want 303 to land on the side away from the attacker's facing).
+            double mag = Math.sqrt(look.x * look.x + look.z * look.z);
+            if (mag < 1.0e-6) {
+                double angle = this.getRandom().nextDouble() * 2.0 * Math.PI;
+                dirX = Math.cos(angle);
+                dirZ = Math.sin(angle);
+            } else {
+                dirX = -look.x / mag;
+                dirZ = -look.z / mag;
+            }
+        } else {
+            double angle = this.getRandom().nextDouble() * 2.0 * Math.PI;
+            dirX = Math.cos(angle);
+            dirZ = Math.sin(angle);
+        }
+
+        double anchorX = attacker != null ? attacker.getX() : this.getX();
+        double anchorZ = attacker != null ? attacker.getZ() : this.getZ();
+
+        // Validate clearance with up to N retries (perturbing direction on miss).
+        double destX = 0, destZ = 0, destY = -1;
+        for (int retry = 0; retry < SWAP_CLEARANCE_RETRIES; retry++) {
+            double dist = SWAP_BEHIND_MIN
+                + this.getRandom().nextDouble() * (SWAP_BEHIND_MAX - SWAP_BEHIND_MIN);
+            destX = anchorX + dirX * dist;
+            destZ = anchorZ + dirZ * dist;
+
+            BlockPos topPos = level.getHeightmapPos(
+                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                BlockPos.containing(destX, this.getY(), destZ));
+
+            if (level.getBlockState(topPos).isAir()
+                && level.getBlockState(topPos.above()).isAir()) {
+                destY = topPos.getY();
+                break;
+            }
+            BlockPos above = topPos.above();
+            if (level.getBlockState(above).isAir()
+                && level.getBlockState(above.above()).isAir()) {
+                destY = above.getY();
+                break;
+            }
+            // Perturb direction slightly and retry.
+            double angle = this.getRandom().nextDouble() * 2.0 * Math.PI;
+            dirX = Math.cos(angle);
+            dirZ = Math.sin(angle);
+        }
+        if (destY < 0) return false;
+
+        // Spawn the clone at the current position before we teleport.
+        Entity303CloneEntity clone = ModEntities.ENTITY_303_CLONE.get().create(
+            level, EntitySpawnReason.MOB_SUMMONED);
+        if (clone != null) {
+            clone.setPos(this.getX(), this.getY(), this.getZ());
+            clone.setYRot(this.getYRot());
+            clone.setXRot(this.getXRot());
+            level.addFreshEntity(clone);
+        }
+
+        // Particles + sound at source.
+        level.sendParticles(ParticleTypes.SMOKE,
+            this.getX(), this.getY() + 1.0, this.getZ(), 16, 0.5, 1.0, 0.5, 0.0);
+        level.playSound(null, this.getX(), this.getY(), this.getZ(),
+            SoundEvents.ENDERMAN_TELEPORT, SoundSource.HOSTILE, 0.6f, 1.2f);
+
+        // Move.
+        this.teleportTo(destX, destY, destZ);
+        this.fallDistance = 0;
+
+        // Particles + sound at destination.
+        level.sendParticles(ParticleTypes.SMOKE,
+            destX, destY + 1.0, destZ, 16, 0.5, 1.0, 0.5, 0.0);
+        level.playSound(null, destX, destY, destZ,
+            SoundEvents.ENDERMAN_TELEPORT, SoundSource.HOSTILE, 0.6f, 1.2f);
+
+        return true;
+    }
+
+    @Override
     protected SoundEvent getAmbientSound() {
         return SoundEvents.ELDER_GUARDIAN_AMBIENT_LAND;
     }
@@ -172,6 +294,7 @@ public class Entity303Entity extends Monster {
     public void aiStep() {
         super.aiStep();
         if (this.level().isClientSide()) return;
+        if (this.swapCooldown > 0) this.swapCooldown--;
         this.bossBar.setProgress(this.getHealth() / this.getMaxHealth());
     }
 
