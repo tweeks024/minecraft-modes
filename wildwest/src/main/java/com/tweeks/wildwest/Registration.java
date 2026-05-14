@@ -4,6 +4,7 @@ import com.tweeks.wildwest.item.BanditKnifeItem;
 import com.tweeks.wildwest.item.BillyClubItem;
 import com.tweeks.wildwest.item.PistolItem;
 import com.tweeks.wildwest.item.RifleItem;
+import com.tweeks.wildwest.item.Entity303SpawnEggItem;
 import com.tweeks.wildwest.item.HerobrineSpawnEggItem;
 import com.tweeks.wildwest.item.MeteorStaffItem;
 import com.tweeks.wildwest.item.TaintedVialItem;
@@ -61,6 +62,11 @@ public final class Registration {
         HerobrineSpawnEggItem::new,
         p -> p.spawnEgg(ModEntities.HEROBRINE.get()));
 
+    public static final DeferredItem<Entity303SpawnEggItem> ENTITY_303_SPAWN_EGG = ITEMS.registerItem(
+        "entity_303_spawn_egg",
+        Entity303SpawnEggItem::new,
+        p -> p.spawnEgg(ModEntities.ENTITY_303.get()));
+
     public static final DeferredItem<MeteorStaffItem> METEOR_STAFF = ITEMS.registerItem(
         "meteor_staff",
         MeteorStaffItem::new,
@@ -86,6 +92,7 @@ public final class Registration {
                     output.accept(WALKER_SPAWN_EGG.get());
                     output.accept(STEVE_STACKER_SPAWN_EGG.get());
                     output.accept(HEROBRINE_SPAWN_EGG.get());
+                    output.accept(ENTITY_303_SPAWN_EGG.get());
                     output.accept(METEOR_STAFF.get());
                     output.accept(TAINTED_VIAL.get());
                 })
