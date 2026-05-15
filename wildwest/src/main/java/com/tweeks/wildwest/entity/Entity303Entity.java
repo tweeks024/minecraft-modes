@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 import com.tweeks.wildwest.ModEntities;
 import com.tweeks.wildwest.entity.ai.Entity303BowGoal;
 import com.tweeks.wildwest.entity.ai.Entity303MeleeGoal;
+import com.tweeks.wildwest.entity.ai.Entity303TargetGoal;
 import com.tweeks.wildwest.entity.ai.Entity303TeleportGoal;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -33,7 +34,6 @@ import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
-import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -90,7 +90,10 @@ public class Entity303Entity extends Monster {
             .add(Attributes.MOVEMENT_SPEED, 0.45)
             .add(Attributes.ATTACK_DAMAGE, 8.0)
             .add(Attributes.KNOCKBACK_RESISTANCE, 0.6)
-            .add(Attributes.FOLLOW_RANGE, 64.0);
+            // 96-block follow range gives the custom Entity303TargetGoal a
+            // wide cube to acquire players in. Higher than vanilla apex
+            // bosses (64) but matches the "you can't hide from him" feel.
+            .add(Attributes.FOLLOW_RANGE, 96.0);
     }
 
     @Override
@@ -103,7 +106,7 @@ public class Entity303Entity extends Monster {
         this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
 
         this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
-        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
+        this.targetSelector.addGoal(2, new Entity303TargetGoal(this));
     }
 
     @Override
