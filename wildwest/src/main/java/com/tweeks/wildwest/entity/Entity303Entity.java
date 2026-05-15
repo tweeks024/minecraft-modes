@@ -3,6 +3,7 @@ package com.tweeks.wildwest.entity;
 import javax.annotation.Nullable;
 import com.tweeks.wildwest.ModEntities;
 import com.tweeks.wildwest.entity.ai.Entity303BowGoal;
+import com.tweeks.wildwest.entity.ai.Entity303LavaPitGoal;
 import com.tweeks.wildwest.entity.ai.Entity303MeleeGoal;
 import com.tweeks.wildwest.entity.ai.Entity303TargetGoal;
 import com.tweeks.wildwest.entity.ai.Entity303TeleportGoal;
@@ -71,6 +72,7 @@ public class Entity303Entity extends Monster {
     // a "bow ready the instant you leave melee range" exploit.
     private int bowCooldown = 0;
     private int teleportCooldown = 0;
+    private int lavaPitCooldown = 0;
 
     public Entity303Entity(EntityType<? extends Entity303Entity> type, Level level) {
         super(type, level);
@@ -101,6 +103,7 @@ public class Entity303Entity extends Monster {
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(1, new Entity303MeleeGoal(this));
         this.goalSelector.addGoal(2, new Entity303BowGoal(this));
+        this.goalSelector.addGoal(2, new Entity303LavaPitGoal(this));
         this.goalSelector.addGoal(3, new Entity303TeleportGoal(this));
         this.goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 16.0F));
         this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
@@ -348,6 +351,7 @@ public class Entity303Entity extends Monster {
         if (this.swapCooldown > 0) this.swapCooldown--;
         if (this.bowCooldown > 0) this.bowCooldown--;
         if (this.teleportCooldown > 0) this.teleportCooldown--;
+        if (this.lavaPitCooldown > 0) this.lavaPitCooldown--;
         this.bossBar.setProgress(this.getHealth() / this.getMaxHealth());
     }
 
@@ -356,6 +360,9 @@ public class Entity303Entity extends Monster {
 
     public int getTeleportCooldown() { return this.teleportCooldown; }
     public void setTeleportCooldown(int ticks) { this.teleportCooldown = ticks; }
+
+    public int getLavaPitCooldown() { return this.lavaPitCooldown; }
+    public void setLavaPitCooldown(int ticks) { this.lavaPitCooldown = ticks; }
 
     @Override
     public void startSeenByPlayer(ServerPlayer player) {
