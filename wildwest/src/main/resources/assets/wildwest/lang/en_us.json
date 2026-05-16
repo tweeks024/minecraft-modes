@@ -1,5 +1,7 @@
 {
   "block.wildwest.cannon": "Cannon",
+  "block.wildwest.cannon.needs_gunpowder": "Hold gunpowder to load this cannon",
+  "block.wildwest.cannon.needs_iron_nugget": "Need an iron nugget in your inventory for the cannonball",
   "death.attack.wildwest.club": "%1$s was clubbed by %2$s",
   "death.attack.wildwest.gunshot": "%1$s was shot",
   "death.attack.wildwest.gunshot.item": "%1$s was shot by %2$s using %3$s",

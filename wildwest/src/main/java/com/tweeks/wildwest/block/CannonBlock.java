@@ -6,6 +6,7 @@ import com.tweeks.wildwest.entity.projectile.CannonballEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -87,10 +88,11 @@ public class CannonBlock extends HorizontalDirectionalBlock {
                                           BlockPos pos, Player player, InteractionHand hand,
                                           BlockHitResult hit) {
         boolean loaded = state.getValue(LOADED);
-        boolean canReload = !loaded && stack.is(Items.GUNPOWDER) && hasIronNugget(player);
 
         if (level.isClientSide()) {
-            return (loaded || canReload) ? InteractionResult.SUCCESS : InteractionResult.PASS;
+            // Always SUCCESS now: server-side either fires, reloads, or shows
+            // a hint message — every interaction is meaningful.
+            return InteractionResult.SUCCESS;
         }
         if (!(level instanceof ServerLevel sl)) return InteractionResult.PASS;
 
@@ -99,10 +101,19 @@ public class CannonBlock extends HorizontalDirectionalBlock {
             return InteractionResult.CONSUME;
         }
 
-        // Reload path. Require gunpowder in main hand (the held stack) + 1 iron nugget anywhere in inventory.
-        if (!stack.is(Items.GUNPOWDER)) return InteractionResult.PASS;
+        // Reload path. Show above-hotbar hint when ingredients are missing so
+        // players can discover the recipe without consulting docs.
+        if (!stack.is(Items.GUNPOWDER)) {
+            player.sendOverlayMessage(
+                Component.translatable("block.wildwest.cannon.needs_gunpowder"));
+            return InteractionResult.CONSUME;
+        }
         int ironSlot = findIronNuggetSlot(player);
-        if (ironSlot < 0) return InteractionResult.PASS;
+        if (ironSlot < 0) {
+            player.sendOverlayMessage(
+                Component.translatable("block.wildwest.cannon.needs_iron_nugget"));
+            return InteractionResult.CONSUME;
+        }
 
         if (!player.isCreative()) {
             stack.shrink(1);
@@ -113,10 +124,6 @@ public class CannonBlock extends HorizontalDirectionalBlock {
         sl.playSound(null, pos, SoundEvents.FIRECHARGE_USE,
             SoundSource.BLOCKS, 0.6f, 1.4f);
         return InteractionResult.CONSUME;
-    }
-
-    private static boolean hasIronNugget(Player player) {
-        return findIronNuggetSlot(player) >= 0;
     }
 
     private static int findIronNuggetSlot(Player player) {
