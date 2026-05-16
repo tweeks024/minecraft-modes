@@ -45,6 +45,9 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.TAINTED_VIAL_PROJECTILE.get(), ThrownItemRenderer::new);
         event.registerEntityRenderer(ModEntities.METEOR.get(), ThrownItemRenderer::new);
         event.registerEntityRenderer(ModEntities.CANNONBALL.get(), ThrownItemRenderer::new);
+        event.registerEntityRenderer(ModEntities.PIRATE.get(), PirateRenderer::new);
+        event.registerEntityRenderer(ModEntities.SKELETON_PIRATE.get(), SkeletonPirateRenderer::new);
+        event.registerEntityRenderer(ModEntities.PIRATE_CAPTAIN.get(), PirateCaptainRenderer::new);
     }
 
     @SubscribeEvent
