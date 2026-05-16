@@ -37,6 +37,15 @@ public class PistolItem extends Item {
         super(properties.stacksTo(1).durability(300));
     }
 
+    /**
+     * Override to give a subclass a different per-shot damage value while
+     * reusing all of the hitscan + tracer + sound logic. Default returns
+     * {@link #DAMAGE}.
+     */
+    public float getDamage() {
+        return DAMAGE;
+    }
+
     @Override
     public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
@@ -78,7 +87,7 @@ public class PistolItem extends Item {
         if (hit.isPresent()) {
             LivingEntity target = byId.get(hit.get().id());
             target.invulnerableTime = 0;
-            target.hurtServer((ServerLevel) level, WildWestDamageTypes.gunshot(player), DAMAGE);
+            target.hurtServer((ServerLevel) level, WildWestDamageTypes.gunshot(player), this.getDamage());
             endPoint = target.position().add(0, target.getBbHeight() * 0.5, 0);
         }
 
@@ -106,6 +115,10 @@ public class PistolItem extends Item {
      * its fire-rate timing.
      */
     public static void fireFromMob(LivingEntity shooter, LivingEntity target) {
+        fireFromMob(shooter, target, DAMAGE);
+    }
+
+    public static void fireFromMob(LivingEntity shooter, LivingEntity target, float damage) {
         Level level = shooter.level();
         if (level.isClientSide()) return;
 
@@ -149,7 +162,7 @@ public class PistolItem extends Item {
             LivingEntity hitTarget = byId.get(hit.get().id());
             hitTarget.invulnerableTime = 0;
             hitTarget.hurtServer((ServerLevel) level,
-                WildWestDamageTypes.gunshot(shooter), DAMAGE);
+                WildWestDamageTypes.gunshot(shooter), damage);
             endPoint = hitTarget.position().add(0, hitTarget.getBbHeight() * 0.5, 0);
         }
 

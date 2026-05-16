@@ -52,7 +52,12 @@ public class WildWestRangedAttackGoal extends Goal {
                 RifleItem.fireFromMob(mob, target);
                 this.cooldown = (int) (RifleItem.COOLDOWN_TICKS * 1.5);
             } else {
-                PistolItem.fireFromMob(mob, target);
+                float damage = PistolItem.DAMAGE;
+                var heldItem = mob.getMainHandItem().getItem();
+                if (heldItem instanceof PistolItem pistol) {
+                    damage = pistol.getDamage();
+                }
+                PistolItem.fireFromMob(mob, target, damage);
                 this.cooldown = (int) (PistolItem.COOLDOWN_TICKS * 1.5);
             }
         }
