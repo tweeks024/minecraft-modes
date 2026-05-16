@@ -94,6 +94,21 @@ internal class EntityAnalyzer(
         entityClass: ClassOrInterfaceDeclaration,
         outputRoot: Path,
     ) {
+        // Projectile entities (ThrowableItemProjectile, AbstractArrow, etc.)
+        // have no AI goals, no navigation, no health attribute — emitting them
+        // through the mob pipeline produces invalid Bedrock JSON. Log and
+        // skip: the addon ships without these entities, the report tells the
+        // user what's missing, and the rest of the mod still translates.
+        if (isProjectileClass(entityClass)) {
+            unt.recordPhase2Failure(
+                mod.modId,
+                "Entity ${reg.entityClassName} (${reg.entityId}) is a projectile " +
+                    "(extends ThrowableItemProjectile / AbstractArrow / Projectile) — " +
+                    "skipped; Bedrock has no automatic projectile-from-Java translation.",
+            )
+            return
+        }
+
         val attrs = readAttributes(entityClass)
         val goals = GoalMatcher(unt).match(mod.modId, entityClass)
         val securityFamilies = readSecurityFamilies(entityClass)
@@ -402,6 +417,28 @@ internal class EntityAnalyzer(
             }
             else -> null
         }
+    }
+
+    /**
+     * Identify projectile/throwable entity classes that should not flow
+     * through the mob pipeline. We check the simple name of the immediate
+     * extended type — symbol resolution may not be wired (test fixtures), so
+     * AST-only inspection is the safe path. Vanilla projectile parents we
+     * care about: ThrowableItemProjectile, ThrowableProjectile, AbstractArrow,
+     * AbstractHurtingProjectile, Projectile.
+     */
+    private fun isProjectileClass(entityClass: ClassOrInterfaceDeclaration): Boolean {
+        val projectileParents = setOf(
+            "ThrowableItemProjectile",
+            "ThrowableProjectile",
+            "AbstractArrow",
+            "AbstractHurtingProjectile",
+            "Projectile",
+        )
+        for (extended in entityClass.extendedTypes) {
+            if (extended.nameAsString in projectileParents) return true
+        }
+        return false
     }
 
     // ---------- Reading entity-type registrations ----------

@@ -126,6 +126,59 @@ class ItemAnalyzerTest {
         assertTrue(report.contains("hurtEnemy"))
     }
 
+    @Test
+    fun `spawn egg resolves entity id when registration lives in a separate file`(@TempDir outDir: Path) {
+        // Reproduces the wildwest layout: ModEntities.java registers entities,
+        // Registration.java registers items including spawn eggs that reference
+        // ModEntities.<CONSTANT>.get(). The two are in different
+        // CompilationUnits, so a per-unit entity-id map would fail to resolve
+        // the spawn egg's type_id.
+        val modEntitiesSrc = """
+            package com.example.themod;
+            class ModEntities {
+                public static final Object DEPUTY =
+                    ENTITY_TYPES.register("deputy", () -> null);
+                public static final Object PIRATE =
+                    ENTITY_TYPES.register("pirate", () -> null);
+            }
+        """.trimIndent()
+        val registrationSrc = """
+            package com.example.themod;
+            class Registration {
+                public static final Object DEPUTY_SPAWN_EGG = ITEMS.registerItem(
+                    "deputy_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.DEPUTY.get()));
+                public static final Object PIRATE_SPAWN_EGG = ITEMS.registerItem(
+                    "pirate_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.PIRATE.get()));
+            }
+        """.trimIndent()
+
+        val mod = ModDiscovery.DiscoveredMod(modId = "themod", rootDir = outDir.resolve("themodroot"))
+        java.nio.file.Files.createDirectories(mod.rootDir)
+        val parser = com.github.javaparser.JavaParser()
+        val units = listOf(modEntitiesSrc, registrationSrc).map {
+            parser.parse(it).result.orElseThrow()
+        }
+        val sources = JavaSourceLoader.ResolvedModSources(
+            mod = mod,
+            units = units,
+            typeSolver = com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver(),
+        )
+
+        val unt = Untranslatable()
+        ItemAnalyzer(target, unt).analyze(mod, sources, outDir)
+
+        val deputy = itemComponents(read(outDir, "themod/behavior_pack/items/deputy_spawn_egg.json"))
+        assertEquals(
+            "themod:deputy",
+            deputy["minecraft:spawn_egg"]!!.jsonObject["type_id"]!!.jsonPrimitive.content,
+        )
+        val pirate = itemComponents(read(outDir, "themod/behavior_pack/items/pirate_spawn_egg.json"))
+        assertEquals(
+            "themod:pirate",
+            pirate["minecraft:spawn_egg"]!!.jsonObject["type_id"]!!.jsonPrimitive.content,
+        )
+    }
+
     private fun read(outDir: Path, rel: String): JsonObject {
         val path = outDir.resolve(rel)
         assertTrue(path.toFile().exists()) { "expected $path to exist" }

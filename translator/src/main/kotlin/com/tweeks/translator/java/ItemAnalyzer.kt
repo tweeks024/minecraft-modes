@@ -254,24 +254,26 @@ internal class ItemAnalyzer(
     ): List<ItemRegistration> {
         val out = mutableListOf<ItemRegistration>()
 
+        // Build the entity-constant → entity-id map across ALL units so that
+        // items registered in Registration.java can resolve constants declared
+        // in ModEntities.java (the wildwest layout). Within-unit registration
+        // (the securityguard layout) is still covered.
+        val entityIdsByConstant = mutableMapOf<String, String>()
         for (unit in sources.units) {
-            // Find ENTITY id-name → constant-name mapping in the same unit so
-            // we can resolve `THIEF.get()` → entity id "thief".
-            val entityIdsByConstant = mutableMapOf<String, String>()
             for (call in unit.findAll(MethodCallExpr::class.java)) {
                 if (call.nameAsString != "register") continue
                 val scope = call.scope.orElse(null) ?: continue
                 if (scope.toString() != "ENTITY_TYPES") continue
                 if (call.arguments.size < 2) continue
                 val id = (call.arguments[0] as? StringLiteralExpr)?.asString() ?: continue
-                // Find the enclosing field declaration (e.g. `THIEF =`) to
-                // map constant name → id.
                 val fieldDecl = call.findAncestor(com.github.javaparser.ast.body.FieldDeclaration::class.java)
                 fieldDecl.ifPresent { fd ->
                     fd.variables.forEach { v -> entityIdsByConstant[v.nameAsString] = id }
                 }
             }
+        }
 
+        for (unit in sources.units) {
             for (call in unit.findAll(MethodCallExpr::class.java)) {
                 if (call.nameAsString != "registerItem") continue
                 val scope = call.scope.orElse(null) ?: continue
@@ -293,16 +295,21 @@ internal class ItemAnalyzer(
                 val durability = builderCalls.firstOrNull { it.nameAsString == "durability" }
                     ?.arguments?.firstOrNull()?.let { readIntLiteral(it) }
 
-                // Spawn egg: `.spawnEgg(SECURITY_GUARD.get())` — pull the
-                // qualifier name and look up its entity id.
+                // Spawn egg: `.spawnEgg(SECURITY_GUARD.get())` (securityguard
+                // layout — same file) or `.spawnEgg(ModEntities.DEPUTY.get())`
+                // (wildwest layout — qualified field). Take the rightmost
+                // identifier so both shapes resolve.
                 val spawnEggEntityId = builderCalls
                     .firstOrNull { it.nameAsString == "spawnEgg" }
                     ?.arguments?.firstOrNull()?.let { sgArg ->
-                        // sgArg is `SECURITY_GUARD.get()`. The scope of that
-                        // call is `SECURITY_GUARD`.
                         val mc = sgArg as? MethodCallExpr ?: return@let null
                         val sc = mc.scope.orElse(null) ?: return@let null
-                        entityIdsByConstant[sc.toString()]
+                        val constantName = when (sc) {
+                            is FieldAccessExpr -> sc.nameAsString
+                            is NameExpr -> sc.nameAsString
+                            else -> sc.toString().substringAfterLast('.')
+                        }
+                        entityIdsByConstant[constantName]
                     }
 
                 // Armor: `.humanoidArmor(<material>, ArmorType.HELMET)`

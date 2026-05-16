@@ -138,4 +138,52 @@ class EntityAnalyzerTest {
         val report = unt.renderReport("thief")
         assertTrue(report.contains("BlackjackStrikeGoal") || report.contains("FleeAndFireCrossbowGoal"))
     }
+
+    @Test
+    fun `projectile entity does not get mob navigation components`(@TempDir outDir: Path) {
+        // Synthetic wildwest-style projectile. Critical bug C4: previously
+        // every entity got minecraft:navigation.walk + jump.static + pushable
+        // regardless of whether it was a Monster or a ThrowableItemProjectile.
+        // Result was invalid Bedrock JSON for projectiles.
+        val registrationSrc = """
+            package com.example.themod;
+            import net.minecraft.world.entity.MobCategory;
+            class ModEntities {
+                public static final Object BULLET = ENTITY_TYPES.register("bullet",
+                    () -> EntityType.Builder.<BulletEntity>of(BulletEntity::new, MobCategory.MISC)
+                        .sized(0.25f, 0.25f)
+                        .build("themod:bullet"));
+            }
+        """.trimIndent()
+        val bulletEntitySrc = """
+            package com.example.themod;
+            import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
+            public class BulletEntity extends ThrowableItemProjectile {
+            }
+        """.trimIndent()
+        val mod = ModDiscovery.DiscoveredMod(modId = "themod", rootDir = outDir.resolve("themodroot"))
+        java.nio.file.Files.createDirectories(mod.rootDir)
+
+        val parser = com.github.javaparser.JavaParser()
+        val units = listOf(registrationSrc, bulletEntitySrc).map { parser.parse(it).result.orElseThrow() }
+        val sources = JavaSourceLoader.ResolvedModSources(
+            mod = mod,
+            units = units,
+            typeSolver = com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver(),
+        )
+
+        val unt = Untranslatable()
+        EntityAnalyzer(target, unt).analyze(mod, sources, outDir)
+
+        // Projectiles are skipped (not emitted as mob JSON) — better to ship
+        // nothing for the entity than invalid Bedrock JSON. The skip is
+        // surfaced via the untranslatable report so users see what's missing.
+        val behaviorPath = outDir.resolve("themod/behavior_pack/entities/bullet.json")
+        assertTrue(!behaviorPath.toFile().exists(), "projectile must not be emitted as mob JSON")
+
+        val report = unt.renderReport("themod")
+        assertTrue(report.contains("BulletEntity") || report.contains("bullet")) {
+            "Expected projectile reference in untranslatable report: $report"
+        }
+    }
 }
