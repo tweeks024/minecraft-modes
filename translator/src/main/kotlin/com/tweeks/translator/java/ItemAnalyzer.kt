@@ -60,13 +60,16 @@ internal class ItemAnalyzer(
         // Index item-class default attribute modifiers (e.g. BlackjackItem
         // configures its data components inside its own constructor).
         val classAttrs = classIndex.mapValues { (_, decl) -> readAttackDamageInClass(decl) }
-        // Also extract `properties.stacksTo(N)` from each item class's
-        // constructor so e.g. BlackjackItem's `stacksTo(1)` shows up.
+        // Also extract `properties.stacksTo(N)` / `.durability(N)` from each
+        // item class's constructor so e.g. BlackjackItem's `stacksTo(1)` or
+        // PistolItem's `durability(300)` show up even when the registration
+        // site passes a bare `p -> p` lambda.
         val classStackSize = classIndex.mapValues { (_, decl) -> readStackSizeInClass(decl) }
+        val classDurability = classIndex.mapValues { (_, decl) -> readDurabilityInClass(decl) }
 
         for (reg in registrations) {
             try {
-                writeItem(mod, reg, classIndex, classAttrs, classStackSize, outputRoot)
+                writeItem(mod, reg, classIndex, classAttrs, classStackSize, classDurability, outputRoot)
                 writeAttachableIfBbmodelExists(mod, reg, outputRoot)
             } catch (e: Throwable) {
                 unt.recordPhase2Failure(
@@ -140,6 +143,7 @@ internal class ItemAnalyzer(
         classIndex: Map<String, ClassOrInterfaceDeclaration>,
         classAttrs: Map<String, Double?>,
         classStackSize: Map<String, Int?>,
+        classDurability: Map<String, Int?>,
         outputRoot: Path,
     ) {
         val identifier = "${mod.modId}:${reg.itemId}"
@@ -151,9 +155,13 @@ internal class ItemAnalyzer(
         val stackSize = reg.stackSize ?: classStackSize[reg.itemClassName] ?: 64
         components["minecraft:max_stack_size"] = JsonPrimitive(stackSize)
 
-        if (reg.durability != null) {
+        // Durability resolution priority: registration `.durability(N)` →
+        // item-class constructor `.durability(N)` (wildwest Pistol/Rifle/etc.
+        // pattern where the registration lambda is `p -> p`).
+        val durability = reg.durability ?: classDurability[reg.itemClassName]
+        if (durability != null) {
             components["minecraft:durability"] = buildJsonObject {
-                put("max_durability", JsonPrimitive(reg.durability))
+                put("max_durability", JsonPrimitive(durability))
             }
             // Items with durability are conventionally hand-equipped tools
             // in Bedrock — emit hand_equipped so the held-pose works in Bedrock.
@@ -373,6 +381,19 @@ internal class ItemAnalyzer(
     private fun readStackSizeInClass(decl: ClassOrInterfaceDeclaration): Int? {
         for (call in decl.findAll(MethodCallExpr::class.java)) {
             if (call.nameAsString != "stacksTo") continue
+            val v = call.arguments.firstOrNull()?.let { readIntLiteral(it) }
+            if (v != null) return v
+        }
+        return null
+    }
+
+    /**
+     * Mirror of [readStackSizeInClass] for `properties.durability(N)` calls
+     * inside an item-class constructor (the wildwest weapon pattern).
+     */
+    private fun readDurabilityInClass(decl: ClassOrInterfaceDeclaration): Int? {
+        for (call in decl.findAll(MethodCallExpr::class.java)) {
+            if (call.nameAsString != "durability") continue
             val v = call.arguments.firstOrNull()?.let { readIntLiteral(it) }
             if (v != null) return v
         }

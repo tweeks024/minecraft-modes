@@ -41,21 +41,24 @@ data class ModMetadata(
 
             val displayName: String
             val description: String
+            val requiresSecurityCore: Boolean
             if (tomlPath.isRegularFile()) {
                 val toml = tomlPath.readText()
                 displayName = parseDisplayName(toml)
                     ?: gradleProps["mod_name"]
                     ?: defaultDisplayName(modId)
                 description = parseDescription(toml) ?: defaultDescription(modId)
+                requiresSecurityCore = parseSecurityCoreDep(toml, modId)
             } else {
                 displayName = gradleProps["mod_name"] ?: defaultDisplayName(modId)
                 description = defaultDescription(modId)
+                requiresSecurityCore = false
             }
             return ModMetadata(
                 modId = modId,
                 displayName = displayName,
                 description = description,
-                requiresSecurityCore = requiresSecurityCoreFor(modId),
+                requiresSecurityCore = requiresSecurityCore,
             )
         }
 
@@ -75,16 +78,22 @@ data class ModMetadata(
         }
 
         /**
-         * Hard-coded dependency map. Keep in sync with each mod's
-         * `neoforge.mods.toml`. This is the simple "data-driven" wiring the
-         * spec asks for — a single source of truth here, easy to update.
+         * Scan the toml for a `modId="securitycore"` line that belongs to a
+         * `[[dependencies.<this-mod>]]` block. The toml uses
+         * `${mod_id}` placeholders for the block header but literal mod ids
+         * inside, so a substring match is sufficient — securitycore is the
+         * one cross-mod dep we care about.
+         *
+         * A mod cannot depend on itself, so securitycore itself always
+         * returns false even though its toml mentions its own id elsewhere.
          */
-        fun requiresSecurityCoreFor(modId: String): Boolean = when (modId) {
-            "securityguard" -> true
-            "thief" -> true
-            "securitycore" -> false
-            "creeperskin" -> false
-            else -> false
+        internal fun parseSecurityCoreDep(toml: String, modId: String): Boolean {
+            if (modId == "securitycore") return false
+            // Look for `modId="securitycore"` (with optional whitespace
+            // around the `=`). Anything matching that pattern in the toml
+            // signals a declared dep.
+            val r = Regex("""modId\s*=\s*"securitycore"""")
+            return r.containsMatchIn(toml)
         }
 
         /** `displayName="..."` or `displayName='...'` — the value is plain (no `${...}`). */

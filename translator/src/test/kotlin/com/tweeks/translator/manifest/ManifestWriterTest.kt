@@ -50,6 +50,30 @@ class ManifestWriterTest {
     }
 
     @Test
+    fun `securitycore dependency version comes from inputs (not a hardcoded 1_0_0)`() {
+        // If securitycore ever bumps its pack version, sibling mods must
+        // declare that version in their BP dependency block so Bedrock's
+        // version-gate accepts the load.
+        val out = writer.build(
+            ManifestWriter.ModManifestInputs(
+                modId = "wildwest",
+                displayName = "Wild West",
+                description = "...",
+                requiresSecurityCore = true,
+                securityCoreVersion = listOf(2, 3, 0),
+            )
+        )
+        val parsed = kotlinx.serialization.json.Json
+            .parseToJsonElement(out.behaviorPackManifest)
+            .jsonObject
+        val deps = parsed["dependencies"]!!.jsonArray
+        val coreDep = deps.map { it.jsonObject }
+            .first { it["uuid"]!!.jsonPrimitive.content == UuidGen.coreDependencyUuid().toString() }
+        val version = coreDep["version"]!!.jsonArray.map { it.jsonPrimitive.content.toInt() }
+        assertEquals(listOf(2, 3, 0), version)
+    }
+
+    @Test
     fun `securityguard behavior pack lists securitycore as a dependency`() {
         val out = writer.build(
             ManifestWriter.ModManifestInputs(

@@ -43,6 +43,13 @@ class ManifestWriter(private val target: BedrockTarget) {
         val requiresSecurityCore: Boolean,
         /** Pack version, e.g. [1, 0, 0]. */
         val version: List<Int> = listOf(1, 0, 0),
+        /**
+         * The pack version of the securitycore add-on this mod depends on.
+         * Defaults to [1, 0, 0] (today's value for every mod in the repo),
+         * but plumbed through so a future securitycore version bump
+         * automatically updates every sibling's declared dependency.
+         */
+        val securityCoreVersion: List<Int> = listOf(1, 0, 0),
     )
 
     /** Result of generating both manifests for a mod. */
@@ -74,7 +81,7 @@ class ManifestWriter(private val target: BedrockTarget) {
             deps.add(
                 DependencyEntry(
                     uuid = UuidGen.coreDependencyUuid().toString(),
-                    version = listOf(1, 0, 0),
+                    version = inputs.securityCoreVersion,
                 )
             )
         }

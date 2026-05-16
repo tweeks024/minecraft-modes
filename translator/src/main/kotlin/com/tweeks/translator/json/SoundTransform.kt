@@ -113,19 +113,36 @@ class SoundTransform(
     }
 
     /**
-     * A Java sound entry can be a bare string ("minecraft:foo/bar") or an
-     * object ({"name": "minecraft:foo/bar", "stream": true, ...}).
-     * Bedrock entries are always objects.
+     * A Java sound entry can be:
+     *   - bare string `"minecraft:foo/bar"` — file path (default)
+     *   - object `{"name": "minecraft:foo/bar", "stream": true}` — file path
+     *   - object `{"name": "minecraft:item.crossbow.shoot", "type": "event"}`
+     *     — redirect to a vanilla event id (no file lookup). Wildwest uses
+     *     this for every gun sound.
+     * Bedrock entries are always objects; for type:event we emit the event
+     * id verbatim as the `name` (no `sounds/` prefix) so Bedrock's audio
+     * engine resolves it via its vanilla event table.
      */
     private fun translateSoundEntry(entry: JsonElement, modId: String): JsonObject {
-        val (rawName, stream) = when (entry) {
-            is JsonPrimitive -> entry.content to false
+        val (rawName, stream, isEventRef) = when (entry) {
+            is JsonPrimitive -> Triple(entry.content, false, false)
             is JsonObject -> {
                 val name = entry["name"]?.jsonPrimitive?.content ?: ""
                 val s = entry["stream"]?.jsonPrimitive?.booleanOrNull ?: false
-                name to s
+                val isEvent = entry["type"]?.jsonPrimitive?.content == "event"
+                Triple(name, s, isEvent)
             }
-            else -> "" to false
+            else -> Triple("", false, false)
+        }
+
+        if (isEventRef) {
+            // Strip the namespace and pass through as a Bedrock event id.
+            val eventId = rawName.substringAfter(':')
+            untranslatable.recordVanillaSoundPath(modId, rawName, eventId)
+            return buildJsonObject {
+                put("name", eventId)
+                put("stream", stream)
+            }
         }
 
         val translatedPath = translateSoundPath(rawName, modId)

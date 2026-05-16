@@ -127,6 +127,49 @@ class ItemAnalyzerTest {
     }
 
     @Test
+    fun `durability falls back to item class constructor when registration omits it`(@TempDir outDir: Path) {
+        // Wildwest pattern: `ITEMS.registerItem("pistol", PistolItem::new, p -> p)`
+        // with `super(properties.stacksTo(1).durability(300))` inside PistolItem.
+        // Previously the registration-site builder lambda was the only source
+        // for durability; class-constructor `.durability(N)` calls were ignored.
+        val registrationSrc = """
+            package com.example.themod;
+            class Registration {
+                public static final Object PISTOL = ITEMS.registerItem(
+                    "pistol", PistolItem::new, p -> p);
+            }
+        """.trimIndent()
+        val pistolItemSrc = """
+            package com.example.themod;
+            public class PistolItem {
+                public PistolItem(Properties properties) {
+                    super(properties.stacksTo(1).durability(300));
+                }
+            }
+        """.trimIndent()
+        val mod = ModDiscovery.DiscoveredMod(modId = "themod", rootDir = outDir.resolve("themodroot"))
+        java.nio.file.Files.createDirectories(mod.rootDir)
+        val parser = com.github.javaparser.JavaParser()
+        val units = listOf(registrationSrc, pistolItemSrc).map { parser.parse(it).result.orElseThrow() }
+        val sources = JavaSourceLoader.ResolvedModSources(
+            mod = mod,
+            units = units,
+            typeSolver = com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver(),
+        )
+
+        val unt = Untranslatable()
+        ItemAnalyzer(target, unt).analyze(mod, sources, outDir)
+
+        val pistol = itemComponents(read(outDir, "themod/behavior_pack/items/pistol.json"))
+        assertEquals(
+            300,
+            pistol["minecraft:durability"]!!.jsonObject["max_durability"]!!.jsonPrimitive.intOrNull,
+        )
+        // Items with durability are conventionally hand-equipped tools.
+        assertEquals(true, pistol["minecraft:hand_equipped"]!!.jsonPrimitive.content.toBoolean())
+    }
+
+    @Test
     fun `spawn egg resolves entity id when registration lives in a separate file`(@TempDir outDir: Path) {
         // Reproduces the wildwest layout: ModEntities.java registers entities,
         // Registration.java registers items including spawn eggs that reference
