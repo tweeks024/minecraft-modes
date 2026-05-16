@@ -103,15 +103,11 @@ Cosmetic + stat variant of Flintlock Pistol:
 - **Model only:** gold trim texture.
 - Functionally a separate `Item` registration so the gold-trim model and stat bump are independent of the loot-dropped Flintlock.
 
-### 2.2b Musket Ball (`MusketBallEntity`) — mob-fired projectile
+### 2.2b Mob-fired pistol shots
 
-Player pistols are hitscan, but **mob-fired** pistol shots need a visible, dodgeable projectile so the player can play around them (and the AI can have a believable wind-up). Implement `MusketBallEntity`:
+Mob-fired shots reuse `PistolItem.fireFromMob(LivingEntity shooter, LivingEntity target)` which already exists in the codebase. It performs hitscan with Gaussian aim inaccuracy (σ = 0.05 per axis) and sends a tracer packet to nearby players. Audible `ModSounds.PISTOL_FIRE` plays at shooter position so the player gets a fair audio warning.
 
-- `ThrowableItemProjectile` subclass.
-- Default item: `Items.IRON_NUGGET` (renders as small gray ball via `ThrownItemRenderer`).
-- Direct hit: 6 damage via `wildwest:cannonball` damage source (reuse the same damage type — both are gunpowder weapons). No AoE.
-- Gravity: default `ThrowableItemProjectile` (slight arc visible across ~15-block range).
-- Used by `SkeletonPirateRangedGoal` (§3.2) — never spawned by the player's pistol items.
+No new projectile entity is needed. Mob shot damage = the static `PistolItem.DAMAGE` (5). If the Skeleton Pirate or Captain need a different mob-damage value, parameterize `fireFromMob` (add an overload `fireFromMob(shooter, target, float damage)`) rather than creating a parallel projectile.
 
 ### 2.3 Cannon (block) (`wildwest:cannon`)
 
@@ -164,7 +160,7 @@ The "AI fires" branch shares the spawn logic with player-fired cannons. Extracte
 |---|---|
 | Cooldown | 30 ticks (1.5 s) |
 | Trigger | Target distance in [6.0, 15.0] AND line-of-sight AND mob NOT already in cannon-fire range. |
-| Action | Spawn `MusketBallEntity` (§2.2b) from the mob's eye position with velocity toward target (slight upward correction for ballistic arc — use `shootFromRotation` with `velocity=1.6`, `inaccuracy=1.0` like vanilla skeleton arrows). Spawn-time sound: `SoundEvents.FIRECHARGE_USE`. |
+| Action | Call `PistolItem.fireFromMob(this, target)` — reuses the existing hitscan + tracer + sound infrastructure (§2.2b). |
 
 ### 3.3 Melee (all three)
 
@@ -376,7 +372,6 @@ Following the `2026-05-10-herobrine.md` precedent — a single Task at the end o
 - `entity/SkeletonPirateEntity.java`
 - `entity/PirateCaptainEntity.java`
 - `entity/projectile/CannonballEntity.java`
-- `entity/projectile/MusketBallEntity.java`
 - `entity/ai/RapierMeleeGoal.java`
 - `entity/ai/CannonOperateGoal.java`
 - `entity/ai/SkeletonPirateRangedGoal.java`
@@ -401,12 +396,12 @@ Following the `2026-05-10-herobrine.md` precedent — a single Task at the end o
 
 ### Modified Java files
 
-- `ModEntities.java` (3 mob entity types + cannonball type + musket-ball type)
+- `ModEntities.java` (3 mob entity types + cannonball type)
 - `Registration.java` (rapier, flintlock pistol, captain pistol, cannon block + block-item, optional cannonball item)
 - `WildWestMod.java` (entity attribute registration for 3 new entities + spawn-placement entries for capture-during-structure-gen if needed)
 - `WildWestDamageTypes.java` (cannonball damage type)
 - `data/ModDamageTypeProvider.java` + `data/ModDamageTypeTagsProvider.java` (register + tag the cannonball type)
-- `client/ClientSetup.java` (5 renderer registrations — 3 mobs + cannonball + musket ball)
+- `client/ClientSetup.java` (4 renderer registrations — 3 mobs + cannonball)
 - `Registration.java`'s creative-tab `displayItems` block (add new items)
 
 ### New resource files
