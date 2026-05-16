@@ -26,6 +26,7 @@ public class WildWestMod {
         LOGGER.info("Wild West mod loading");
         // Entity types must register before items so SpawnEggItem can resolve ModEntities.*.get().
         ModEntities.register(modEventBus);
+        ModBlocks.register(modEventBus);
         Registration.register(modEventBus);
         ModEffects.register(modEventBus);
         ModSounds.register(modEventBus);
