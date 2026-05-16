@@ -1,18 +1,23 @@
 package com.tweeks.wildwest;
 
+import com.tweeks.wildwest.ModBlocks;
+import com.tweeks.wildwest.item.AgentSpawnEggItem;
 import com.tweeks.wildwest.item.BanditKnifeItem;
 import com.tweeks.wildwest.item.BillyClubItem;
-import com.tweeks.wildwest.item.PistolItem;
-import com.tweeks.wildwest.item.RifleItem;
-import com.tweeks.wildwest.item.AgentSpawnEggItem;
-import com.tweeks.wildwest.item.HerobrineSpawnEggItem;
+import com.tweeks.wildwest.item.CaptainPistolItem;
 import com.tweeks.wildwest.item.CursedTomeItem;
+import com.tweeks.wildwest.item.FlintlockPistolItem;
+import com.tweeks.wildwest.item.HerobrineSpawnEggItem;
 import com.tweeks.wildwest.item.MeteorStaffItem;
+import com.tweeks.wildwest.item.PistolItem;
+import com.tweeks.wildwest.item.RapierItem;
+import com.tweeks.wildwest.item.RifleItem;
 import com.tweeks.wildwest.item.TaintedVialItem;
-import net.minecraft.world.item.Rarity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.SpawnEggItem;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -81,6 +86,20 @@ public final class Registration {
     public static final DeferredItem<TaintedVialItem> TAINTED_VIAL = ITEMS.registerItem(
         "tainted_vial", TaintedVialItem::new, p -> p);
 
+    public static final DeferredItem<RapierItem> RAPIER = ITEMS.registerItem(
+        "rapier", RapierItem::new, p -> p);
+
+    public static final DeferredItem<FlintlockPistolItem> FLINTLOCK_PISTOL = ITEMS.registerItem(
+        "flintlock_pistol", FlintlockPistolItem::new, p -> p);
+
+    public static final DeferredItem<CaptainPistolItem> CAPTAIN_PISTOL = ITEMS.registerItem(
+        "captain_pistol", CaptainPistolItem::new, p -> p.rarity(Rarity.RARE));
+
+    public static final DeferredItem<BlockItem> CANNON = ITEMS.registerItem(
+        "cannon",
+        properties -> new BlockItem(ModBlocks.CANNON.get(), properties),
+        p -> p);
+
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> WILDWEST_TAB =
         CREATIVE_TABS.register("main", () ->
             CreativeModeTab.builder()
@@ -102,6 +121,10 @@ public final class Registration {
                     output.accept(CURSED_TOME.get());
                     output.accept(METEOR_STAFF.get());
                     output.accept(TAINTED_VIAL.get());
+                    output.accept(RAPIER.get());
+                    output.accept(FLINTLOCK_PISTOL.get());
+                    output.accept(CAPTAIN_PISTOL.get());
+                    output.accept(CANNON.get());
                 })
                 .build());
 
