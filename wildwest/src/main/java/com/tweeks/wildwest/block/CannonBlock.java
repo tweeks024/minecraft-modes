@@ -86,10 +86,13 @@ public class CannonBlock extends HorizontalDirectionalBlock {
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level,
                                           BlockPos pos, Player player, InteractionHand hand,
                                           BlockHitResult hit) {
-        if (level.isClientSide()) return InteractionResult.SUCCESS;
-        if (!(level instanceof ServerLevel sl)) return InteractionResult.PASS;
-
         boolean loaded = state.getValue(LOADED);
+        boolean canReload = !loaded && stack.is(Items.GUNPOWDER) && hasIronNugget(player);
+
+        if (level.isClientSide()) {
+            return (loaded || canReload) ? InteractionResult.SUCCESS : InteractionResult.PASS;
+        }
+        if (!(level instanceof ServerLevel sl)) return InteractionResult.PASS;
 
         if (loaded) {
             playerFire(sl, pos, state, player);
@@ -110,6 +113,10 @@ public class CannonBlock extends HorizontalDirectionalBlock {
         sl.playSound(null, pos, SoundEvents.FIRECHARGE_USE,
             SoundSource.BLOCKS, 0.6f, 1.4f);
         return InteractionResult.CONSUME;
+    }
+
+    private static boolean hasIronNugget(Player player) {
+        return findIronNuggetSlot(player) >= 0;
     }
 
     private static int findIronNuggetSlot(Player player) {
