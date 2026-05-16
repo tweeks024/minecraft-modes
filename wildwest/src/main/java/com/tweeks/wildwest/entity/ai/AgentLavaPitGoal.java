@@ -2,6 +2,7 @@ package com.tweeks.wildwest.entity.ai;
 
 import com.tweeks.wildwest.entity.AgentEntity;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -10,22 +11,28 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LadderBlock;
 import net.minecraft.world.level.levelgen.Heightmap;
 
 import java.util.EnumSet;
 
 /**
- * Carves a 3×3×3 lava pit near the target and teleports them to the rim so
+ * Carves a 3×3×2 lava pit near the target and teleports them to the rim so
  * they fall in. Long cooldown — this is the "punish" finisher, not constant
  * pressure. Skipped silently if any block in the carve volume is
  * {@link BlockTags#DRAGON_IMMUNE} (bedrock, end portal frame, etc.).
+ *
+ * <p>The east wall column gets a cobblestone "step" (replacing the lava
+ * there) plus a ladder above it as a guaranteed escape route — without
+ * this, getting teleported into a 1-deep lava pool with no climb-out
+ * routinely killed the player. Threat without being a death sentence.
  */
 public class AgentLavaPitGoal extends Goal {
 
     private static final int COOLDOWN_TICKS = 400; // 20 s
     private static final double MAX_DISTANCE = 32.0;
     private static final int PIT_HALF = 1;          // 3×3 footprint (half-width 1)
-    private static final int PIT_DEPTH = 3;         // total carve depth, bottom = lava
+    private static final int PIT_DEPTH = 2;         // 1 air layer over 1 lava layer
     private static final double ANCHOR_MIN_DIST = 5.0;
     private static final double ANCHOR_MAX_DIST = 8.0;
 
@@ -99,6 +106,24 @@ public class AgentLavaPitGoal extends Goal {
                 BlockPos lavaPos = new BlockPos(centerX + dx, floorY - (PIT_DEPTH - 1), centerZ + dz);
                 sl.setBlockAndUpdate(lavaPos, Blocks.LAVA.defaultBlockState());
             }
+        }
+
+        // Escape route on the east wall column: replace the bottom-layer
+        // lava with cobblestone (gives a safe step out of the burn) and
+        // place ladders in every air layer above. Cobble backing outside
+        // the carve keeps the ladder attached if the pit was dug on an
+        // open ledge with no native wall behind it.
+        int wallX = centerX + PIT_HALF;
+        sl.setBlockAndUpdate(new BlockPos(wallX, floorY - (PIT_DEPTH - 1), centerZ),
+            Blocks.COBBLESTONE.defaultBlockState());
+        for (int dy = 0; dy < PIT_DEPTH - 1; dy++) {
+            int y = floorY - dy;
+            BlockPos backingPos = new BlockPos(wallX + 1, y, centerZ);
+            if (!sl.getBlockState(backingPos).isFaceSturdy(sl, backingPos, Direction.WEST)) {
+                sl.setBlockAndUpdate(backingPos, Blocks.COBBLESTONE.defaultBlockState());
+            }
+            sl.setBlockAndUpdate(new BlockPos(wallX, y, centerZ),
+                Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING, Direction.EAST));
         }
 
         // Teleport target 1 block above the (now-carved) rim so they fall in.
