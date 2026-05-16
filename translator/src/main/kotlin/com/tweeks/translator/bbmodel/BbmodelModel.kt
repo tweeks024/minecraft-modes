@@ -21,11 +21,20 @@ internal data class Bbmodel(
     val resolution: BbResolution = BbResolution(),
     val elements: List<BbElement> = emptyList(),
     /**
+     * Blockbench 5.x stores group metadata (name, origin, rotation) in a
+     * sibling top-level array; 4.x embeds groups directly in [outliner].
+     * When present, [outliner] entries hold only `{uuid, children}` and the
+     * converter looks up the matching entry here by uuid for the metadata.
+     */
+    val groups: List<BbGroup> = emptyList(),
+    /**
      * Heterogeneous list. Each entry is either:
      *   - a [kotlinx.serialization.json.JsonPrimitive] string holding a
      *     UUID that references a top-level cube in [elements] (orphan cube,
      *     no parent group), or
-     *   - a [kotlinx.serialization.json.JsonObject] holding a [BbGroup].
+     *   - a [kotlinx.serialization.json.JsonObject] — in 4.x this is a full
+     *     [BbGroup]; in 5.x it's a UUID reference into [groups] whose own
+     *     `children` field carries the canonical child list.
      * The decoder leaves it as raw [JsonElement] and [BbmodelConverter]
      * dispatches on the runtime type.
      */
@@ -87,7 +96,13 @@ internal data class BbElement(
 
 @Serializable
 internal data class BbGroup(
-    val name: String,
+    /**
+     * The group's display name (used as the Bedrock bone name). Nullable
+     * because Blockbench 5.x outliner entries are stripped-down references
+     * `{uuid, children}` with the metadata living in [Bbmodel.groups]. The
+     * converter resolves missing names via that lookup.
+     */
+    val name: String? = null,
     val uuid: String,
     val origin: List<Double>? = null,
     val rotation: List<Double>? = null,

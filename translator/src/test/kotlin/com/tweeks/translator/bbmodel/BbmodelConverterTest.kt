@@ -269,6 +269,79 @@ class BbmodelConverterTest {
         assertFalse(unt.renderReport("testmod").contains("Bbmodel authored Y-down"))
     }
 
+    /**
+     * Blockbench 5.x bbmodel format: outliner entries are reference objects
+     * `{uuid, isOpen, children:[<element-uuids>]}` and the actual group
+     * metadata (name, origin, rotation) lives in a sibling top-level `groups`
+     * array. Wildwest's walker / herobrine / pirate bbmodels all use this
+     * shape.
+     */
+    private val groupsRefBbmodel = """
+        {
+          "name": "fivedotx",
+          "resolution": { "width": 64, "height": 32 },
+          "elements": [
+            { "uuid": "C1", "type": "cube", "name": "head",
+              "from": [-4, 24, -4], "to": [4, 32, 4], "origin": [0, 24, 0], "uv_offset": [0, 0] }
+          ],
+          "groups": [
+            { "name": "head", "uuid": "G1", "origin": [0, 24, 0], "rotation": [0, 0, 0], "children": [] }
+          ],
+          "outliner": [
+            { "uuid": "G1", "isOpen": true, "children": ["C1"] }
+          ]
+        }
+    """.trimIndent()
+
+    @Test
+    fun `blockbench 5x outliner references top-level groups entries`() {
+        // Previously: the converter tried to deserialize the outliner entry as
+        // a full BbGroup, which failed because the entry has no `name` field.
+        // After C1 the converter resolves the entry's uuid via the top-level
+        // `groups` array and uses the outliner entry's children.
+        val unt = Untranslatable()
+        val converter = BbmodelConverter(target, unt)
+        val bb = BbmodelConverter.JSON.decodeFromString(Bbmodel.serializer(), groupsRefBbmodel)
+        val geoText = converter.buildGeometryJson(bb, "testmod", "fivedotx")
+        val parsed = Json.parseToJsonElement(geoText)
+        val geo = parsed
+            .let { it as kotlinx.serialization.json.JsonObject }["minecraft:geometry"]
+            .let { it as kotlinx.serialization.json.JsonArray }[0]
+            .let { it as kotlinx.serialization.json.JsonObject }
+        val bones = geo["bones"] as kotlinx.serialization.json.JsonArray
+        val names = bones.map {
+            ((it as kotlinx.serialization.json.JsonObject)["name"] as kotlinx.serialization.json.JsonPrimitive).content
+        }
+        assertEquals(listOf("head"), names)
+
+        // The bone should carry the cube — children resolved via uuid against `elements`.
+        val headBone = bones[0] as kotlinx.serialization.json.JsonObject
+        assertTrue(headBone.containsKey("cubes"), "head bone must contain its cube child:\n$headBone")
+    }
+
+    @Test
+    fun `wildwest walker bbmodel parses and emits bones`() {
+        // Smoke test: walker.bbmodel uses Blockbench 5.x layout with the
+        // top-level `groups` array and outliner-as-ref entries. C1 added
+        // support for that shape — this test ensures it works on a real
+        // wildwest fixture, not just synthetic JSON.
+        val (bb, geoText) = renderGeometry("wildwest", "wildwest/tools/walker.bbmodel", "walker")
+        assertTrue(bb.elements.isNotEmpty())
+        val parsed = Json.parseToJsonElement(geoText)
+        val geo = parsed
+            .let { it as kotlinx.serialization.json.JsonObject }["minecraft:geometry"]
+            .let { it as kotlinx.serialization.json.JsonArray }[0]
+            .let { it as kotlinx.serialization.json.JsonObject }
+        val bones = geo["bones"] as kotlinx.serialization.json.JsonArray
+        val names = bones.map {
+            ((it as kotlinx.serialization.json.JsonObject)["name"] as kotlinx.serialization.json.JsonPrimitive).content
+        }
+        // Walker is humanoid — expect the standard six bones (head, body,
+        // 2× arm, 2× leg) plus possibly a synthetic root.
+        assertTrue(names.contains("head"), "Expected head bone, got $names")
+        assertTrue(names.contains("body"), "Expected body bone, got $names")
+    }
+
     // ---- helpers ----
 
     private fun renderGeometry(modId: String, bbmodelPath: String, modelName: String): Pair<Bbmodel, String> {

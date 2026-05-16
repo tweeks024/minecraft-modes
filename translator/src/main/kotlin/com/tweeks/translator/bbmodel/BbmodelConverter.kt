@@ -107,6 +107,8 @@ class BbmodelConverter(
     internal fun buildGeometryJson(bb: Bbmodel, modId: String, modelName: String): String {
         val identifier = "geometry.$modId.$modelName"
         val elementsByUuid = bb.elements.associateBy { it.uuid }
+        // Blockbench 5.x stores group metadata here; outliner entries are refs.
+        val groupsByUuid = bb.groups.associateBy { it.uuid }
 
         // Walk the outliner to produce bones, in traversal order. Bedrock's
         // `bones` is an ordered array — parents must come before children, so
@@ -118,6 +120,7 @@ class BbmodelConverter(
                 entry = entry,
                 parentName = null,
                 elementsByUuid = elementsByUuid,
+                groupsByUuid = groupsByUuid,
                 bones = bones,
                 orphanUuids = orphanUuids,
                 modId = modId,
@@ -187,6 +190,7 @@ class BbmodelConverter(
         entry: JsonElement,
         parentName: String?,
         elementsByUuid: Map<String, BbElement>,
+        groupsByUuid: Map<String, BbGroup>,
         bones: MutableList<JsonObject>,
         orphanUuids: MutableList<String>,
         modId: String,
@@ -205,20 +209,42 @@ class BbmodelConverter(
                 }
             }
             is JsonObject -> {
-                val group = JSON.decodeFromJsonElement(BbGroup.serializer(), entry)
+                // 4.x: the outliner entry IS the BbGroup. 5.x: the entry is a
+                // `{uuid, isOpen, children}` reference; metadata (name,
+                // origin, rotation) lives in the top-level `groups` array.
+                // Reconcile by merging the reference's children with the
+                // metadata's fields, preferring entry-level for children
+                // and groups[uuid] for name/origin/rotation.
+                val parsed = JSON.decodeFromJsonElement(BbGroup.serializer(), entry)
+                val meta = groupsByUuid[parsed.uuid]
+                val group = parsed.copy(
+                    name = parsed.name ?: meta?.name,
+                    origin = parsed.origin ?: meta?.origin,
+                    rotation = parsed.rotation ?: meta?.rotation,
+                )
                 if (group.locator != null) {
-                    unt.recordBbmodelLocatorSkipped(modId, "$modelName/${group.name}")
+                    unt.recordBbmodelLocatorSkipped(modId, "$modelName/${group.name ?: group.uuid}")
                     return
                 }
-                val bone = buildBone(group, parentName, elementsByUuid, modId, modelName)
+                val boneName = group.name
+                if (boneName == null) {
+                    // Outliner referenced a uuid that isn't in `groups` and
+                    // didn't carry an inline name — nothing we can hang
+                    // children off. Best-effort: skip and let the reviewer
+                    // know the bbmodel is malformed.
+                    unt.recordBbmodelLocatorSkipped(modId, "$modelName/<unnamed-${group.uuid}>")
+                    return
+                }
+                val bone = buildBone(group, boneName, parentName, elementsByUuid, modId, modelName)
                 bones.add(bone)
                 // Recurse into nested groups (subgroups become child bones).
                 for (child in group.children) {
                     if (child is JsonObject) {
                         walkOutlinerEntry(
                             entry = child,
-                            parentName = group.name,
+                            parentName = boneName,
                             elementsByUuid = elementsByUuid,
+                            groupsByUuid = groupsByUuid,
                             bones = bones,
                             orphanUuids = orphanUuids,
                             modId = modId,
@@ -233,6 +259,7 @@ class BbmodelConverter(
 
     private fun buildBone(
         group: BbGroup,
+        boneName: String,
         parentName: String?,
         elementsByUuid: Map<String, BbElement>,
         modId: String,
@@ -246,7 +273,7 @@ class BbmodelConverter(
             .mapNotNull { elementToCube(it, modId, modelName) }
 
         return buildJsonObject {
-            put("name", group.name)
+            put("name", boneName)
             if (parentName != null) put("parent", parentName)
             put("pivot", jsonArrayOfDoubles(group.origin ?: listOf(0.0, 0.0, 0.0)))
             val rot = group.rotation
@@ -352,10 +379,13 @@ class BbmodelConverter(
     // ---------- Animations ----------
 
     internal fun buildAnimationJson(bb: Bbmodel, modId: String, modelName: String): String {
-        // Resolve animator-uuid → bone-name once, walking the outliner. We
-        // need this because Blockbench keys animators by group uuid, but
-        // Bedrock animations target bones by name.
+        // Resolve animator-uuid → bone-name once. Seed from the top-level
+        // `groups` array (5.x metadata source), then layer the outliner walk
+        // on top so 4.x inline-group names win where present.
         val boneNamesByUuid = mutableMapOf<String, String>()
+        for (g in bb.groups) {
+            g.name?.let { boneNamesByUuid[g.uuid] = it }
+        }
         collectGroupNames(bb.outliner, boneNamesByUuid)
 
         val animations = buildJsonObject {
@@ -382,7 +412,7 @@ class BbmodelConverter(
         for (entry in outliner) {
             if (entry is JsonObject) {
                 val group = JSON.decodeFromJsonElement(BbGroup.serializer(), entry)
-                out[group.uuid] = group.name
+                group.name?.let { out[group.uuid] = it }
                 collectGroupNames(group.children, out)
             }
         }
