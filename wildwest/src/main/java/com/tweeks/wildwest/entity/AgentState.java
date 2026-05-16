@@ -7,16 +7,16 @@ import java.util.UUID;
  * Minecraft class so it can be unit-tested without booting the FML loader
  * (same constraint as {@link SteveStackerPhase}).
  *
- * <p>The persistent backing is {@link Entity303SavedData}, which translates
+ * <p>The persistent backing is {@link AgentSavedData}, which translates
  * between this state and Minecraft NBT.
  */
-public final class Entity303State {
+public final class AgentState {
 
     private boolean alive;
     private UUID currentId;
     private String dimensionId;
 
-    public Entity303State() {}
+    public AgentState() {}
 
     public boolean isAlive() { return this.alive; }
     public UUID getCurrentId() { return this.currentId; }
@@ -34,8 +34,8 @@ public final class Entity303State {
         this.dimensionId = null;
     }
 
-    public static Entity303State copyOf(Entity303State other) {
-        Entity303State copy = new Entity303State();
+    public static AgentState copyOf(AgentState other) {
+        AgentState copy = new AgentState();
         if (other.alive) {
             copy.setAlive(other.currentId, other.dimensionId);
         }

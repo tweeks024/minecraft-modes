@@ -1,6 +1,6 @@
 package com.tweeks.wildwest.spawning;
 
-import com.tweeks.wildwest.entity.Entity303SavedData;
+import com.tweeks.wildwest.entity.AgentSavedData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.RandomSource;
@@ -17,11 +17,11 @@ import net.minecraft.world.level.ServerLevelAccessor;
  *      <li>Overworld branch: requires open sky (mythic night-sky flavor)</li>
  *      <li>End branch: no sky requirement (End is partial-sky / no day cycle)</li>
  *      <li>Reject all other dimensions defensively</li>
- *      <li>Singleton gate from {@link Entity303SavedData}</li>
+ *      <li>Singleton gate from {@link AgentSavedData}</li>
  *  </ol>
  */
-public final class Entity303SpawnRules {
-    private Entity303SpawnRules() {}
+public final class AgentSpawnRules {
+    private AgentSpawnRules() {}
 
     public static boolean checkSpawnRules(EntityType<? extends Monster> type,
                                           ServerLevelAccessor level,
@@ -44,7 +44,7 @@ public final class Entity303SpawnRules {
 
         MinecraftServer server = level.getLevel().getServer();
         if (server == null) return false;
-        if (Entity303SavedData.get(server).isAlive()) return false;
+        if (AgentSavedData.get(server).isAlive()) return false;
         return true;
     }
 }

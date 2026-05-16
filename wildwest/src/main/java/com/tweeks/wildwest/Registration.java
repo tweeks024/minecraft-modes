@@ -4,7 +4,7 @@ import com.tweeks.wildwest.item.BanditKnifeItem;
 import com.tweeks.wildwest.item.BillyClubItem;
 import com.tweeks.wildwest.item.PistolItem;
 import com.tweeks.wildwest.item.RifleItem;
-import com.tweeks.wildwest.item.Entity303SpawnEggItem;
+import com.tweeks.wildwest.item.AgentSpawnEggItem;
 import com.tweeks.wildwest.item.HerobrineSpawnEggItem;
 import com.tweeks.wildwest.item.CursedTomeItem;
 import com.tweeks.wildwest.item.MeteorStaffItem;
@@ -63,10 +63,10 @@ public final class Registration {
         HerobrineSpawnEggItem::new,
         p -> p.spawnEgg(ModEntities.HEROBRINE.get()));
 
-    public static final DeferredItem<Entity303SpawnEggItem> ENTITY_303_SPAWN_EGG = ITEMS.registerItem(
-        "entity_303_spawn_egg",
-        Entity303SpawnEggItem::new,
-        p -> p.spawnEgg(ModEntities.ENTITY_303.get()));
+    public static final DeferredItem<AgentSpawnEggItem> AGENT_SPAWN_EGG = ITEMS.registerItem(
+        "the_agent_spawn_egg",
+        AgentSpawnEggItem::new,
+        p -> p.spawnEgg(ModEntities.AGENT.get()));
 
     public static final DeferredItem<CursedTomeItem> CURSED_TOME = ITEMS.registerItem(
         "cursed_tome",
@@ -98,7 +98,7 @@ public final class Registration {
                     output.accept(WALKER_SPAWN_EGG.get());
                     output.accept(STEVE_STACKER_SPAWN_EGG.get());
                     output.accept(HEROBRINE_SPAWN_EGG.get());
-                    output.accept(ENTITY_303_SPAWN_EGG.get());
+                    output.accept(AGENT_SPAWN_EGG.get());
                     output.accept(CURSED_TOME.get());
                     output.accept(METEOR_STAFF.get());
                     output.accept(TAINTED_VIAL.get());

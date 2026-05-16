@@ -1,7 +1,6 @@
 package com.tweeks.wildwest.client;
 
-import com.tweeks.wildwest.WildWestMod;
-import com.tweeks.wildwest.entity.Entity303Entity;
+import com.tweeks.wildwest.entity.AgentCloneEntity;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -9,17 +8,19 @@ import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.resources.Identifier;
 
-public class Entity303Renderer
-        extends HumanoidMobRenderer<Entity303Entity, HumanoidRenderState, HumanoidModel<HumanoidRenderState>> {
+/**
+ * Visually identical to {@link AgentRenderer}. Separate class only so the
+ * generic parameter binds to {@link AgentCloneEntity}; reuses the same
+ * texture and eyes layer for pixel-perfect mimicry.
+ */
+public class AgentCloneRenderer
+        extends HumanoidMobRenderer<AgentCloneEntity, HumanoidRenderState, HumanoidModel<HumanoidRenderState>> {
 
-    static final Identifier TEXTURE =
-        Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "textures/entity/entity_303.png");
-
-    public Entity303Renderer(EntityRendererProvider.Context context) {
+    public AgentCloneRenderer(EntityRendererProvider.Context context) {
         super(context,
             new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER)),
             0.5F);
-        this.addLayer(new Entity303EyesLayer(this));
+        this.addLayer(new AgentEyesLayer(this));
     }
 
     @Override
@@ -29,6 +30,6 @@ public class Entity303Renderer
 
     @Override
     public Identifier getTextureLocation(HumanoidRenderState state) {
-        return TEXTURE;
+        return AgentRenderer.TEXTURE;
     }
 }

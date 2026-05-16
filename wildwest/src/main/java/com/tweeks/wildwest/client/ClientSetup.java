@@ -40,8 +40,8 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.WALKER.get(), WalkerRenderer::new);
         event.registerEntityRenderer(ModEntities.STEVE_STACKER.get(), SteveStackerRenderer::new);
         event.registerEntityRenderer(ModEntities.HEROBRINE.get(), HerobrineRenderer::new);
-        event.registerEntityRenderer(ModEntities.ENTITY_303.get(), Entity303Renderer::new);
-        event.registerEntityRenderer(ModEntities.ENTITY_303_CLONE.get(), Entity303CloneRenderer::new);
+        event.registerEntityRenderer(ModEntities.AGENT.get(), AgentRenderer::new);
+        event.registerEntityRenderer(ModEntities.AGENT_CLONE.get(), AgentCloneRenderer::new);
         event.registerEntityRenderer(ModEntities.TAINTED_VIAL_PROJECTILE.get(), ThrownItemRenderer::new);
         event.registerEntityRenderer(ModEntities.METEOR.get(), ThrownItemRenderer::new);
     }

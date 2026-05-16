@@ -4,8 +4,8 @@ import com.tweeks.wildwest.entity.BanditEntity;
 import com.tweeks.wildwest.entity.BanditLeaderEntity;
 import com.tweeks.wildwest.entity.BulletEntity;
 import com.tweeks.wildwest.entity.DeputyEntity;
-import com.tweeks.wildwest.entity.Entity303CloneEntity;
-import com.tweeks.wildwest.entity.Entity303Entity;
+import com.tweeks.wildwest.entity.AgentCloneEntity;
+import com.tweeks.wildwest.entity.AgentEntity;
 import com.tweeks.wildwest.entity.HerobrineEntity;
 import com.tweeks.wildwest.entity.SherrifEntity;
 import com.tweeks.wildwest.entity.SteveStackerEntity;
@@ -92,21 +92,21 @@ public final class ModEntities {
             .build(ResourceKey.create(Registries.ENTITY_TYPE,
                 Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "herobrine"))));
 
-    public static final DeferredHolder<EntityType<?>, EntityType<Entity303Entity>> ENTITY_303 =
-        ENTITY_TYPES.register("entity_303", () -> EntityType.Builder.<Entity303Entity>of(
-                Entity303Entity::new, MobCategory.MONSTER)
+    public static final DeferredHolder<EntityType<?>, EntityType<AgentEntity>> AGENT =
+        ENTITY_TYPES.register("the_agent", () -> EntityType.Builder.<AgentEntity>of(
+                AgentEntity::new, MobCategory.MONSTER)
             .sized(0.6f, 1.95f)
             .clientTrackingRange(10)
             .build(ResourceKey.create(Registries.ENTITY_TYPE,
-                Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "entity_303"))));
+                Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "the_agent"))));
 
-    public static final DeferredHolder<EntityType<?>, EntityType<Entity303CloneEntity>> ENTITY_303_CLONE =
-        ENTITY_TYPES.register("entity_303_clone", () -> EntityType.Builder.<Entity303CloneEntity>of(
-                Entity303CloneEntity::new, MobCategory.MONSTER)
+    public static final DeferredHolder<EntityType<?>, EntityType<AgentCloneEntity>> AGENT_CLONE =
+        ENTITY_TYPES.register("the_agent_clone", () -> EntityType.Builder.<AgentCloneEntity>of(
+                AgentCloneEntity::new, MobCategory.MONSTER)
             .sized(0.6f, 1.95f)
             .clientTrackingRange(10)
             .build(ResourceKey.create(Registries.ENTITY_TYPE,
-                Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "entity_303_clone"))));
+                Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "the_agent_clone"))));
 
     public static final DeferredHolder<EntityType<?>, EntityType<MeteorEntity>> METEOR =
         ENTITY_TYPES.register("meteor", () -> EntityType.Builder.<MeteorEntity>of(

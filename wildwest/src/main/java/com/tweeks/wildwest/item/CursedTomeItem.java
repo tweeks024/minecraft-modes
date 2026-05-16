@@ -19,7 +19,7 @@ import net.minecraft.world.phys.Vec3;
 import java.util.EnumSet;
 
 /**
- * Right-click ranged tool-wrecker dropped by Entity 303. Raycasts up to
+ * Right-click ranged tool-wrecker dropped by The Agent. Raycasts up to
  * 8 blocks for a {@link LivingEntity}; on hit, damages a random non-empty
  * equipment slot's item by 50 durability. 16 uses before crumbling.
  *

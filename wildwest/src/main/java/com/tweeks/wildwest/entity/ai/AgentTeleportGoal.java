@@ -1,6 +1,6 @@
 package com.tweeks.wildwest.entity.ai;
 
-import com.tweeks.wildwest.entity.Entity303Entity;
+import com.tweeks.wildwest.entity.AgentEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -13,19 +13,19 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import java.util.EnumSet;
 
 /**
- * Teleports Entity 303 every ~3 s. Distance-aware via the shared
+ * Teleports The Agent every ~3 s. Distance-aware via the shared
  * {@link HerobrineTeleportTarget} math (close-gap / open-gap / random
  * reposition). Smoke particles + quieter/higher-pitched enderman sound
  * distinguish 303 audibly+visually from Herobrine's teleport.
  */
-public class Entity303TeleportGoal extends Goal {
+public class AgentTeleportGoal extends Goal {
 
     private static final int COOLDOWN_TICKS = 60; // 3 s at 20 tps
     private static final int CLEARANCE_RETRIES = 5;
 
-    private final Entity303Entity boss;
+    private final AgentEntity boss;
 
-    public Entity303TeleportGoal(Entity303Entity boss) {
+    public AgentTeleportGoal(AgentEntity boss) {
         this.boss = boss;
         // No movement/look claims — teleport doesn't path or aim; it warps.
         // Letting other goals run concurrently means 303 can teleport mid-bow

@@ -1,7 +1,7 @@
 package com.tweeks.wildwest.item;
 
-import com.tweeks.wildwest.entity.Entity303Entity;
-import com.tweeks.wildwest.entity.Entity303SavedData;
+import com.tweeks.wildwest.entity.AgentEntity;
+import com.tweeks.wildwest.entity.AgentSavedData;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
@@ -16,7 +16,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 
 /**
- * Singleton-aware spawn egg for Entity 303. Allowed in Overworld and End only.
+ * Singleton-aware spawn egg for The Agent. Allowed in Overworld and End only.
  *
  * <p><b>Spawn branch:</b> if no 303 alive, delegates to vanilla {@code SpawnEggItem.useOn}.
  * The entity's {@code finalizeSpawn} (Task 10) claims the singleton flag.
@@ -30,9 +30,9 @@ import net.minecraft.world.level.Level;
  * <p><b>Wrong-dimension refusal:</b> if used outside Overworld/End (e.g.,
  * Nether), refuse with a different feedback message. Egg not consumed.
  */
-public class Entity303SpawnEggItem extends SpawnEggItem {
+public class AgentSpawnEggItem extends SpawnEggItem {
 
-    public Entity303SpawnEggItem(Properties properties) {
+    public AgentSpawnEggItem(Properties properties) {
         super(properties);
     }
 
@@ -50,12 +50,12 @@ public class Entity303SpawnEggItem extends SpawnEggItem {
         if (level.dimension() != Level.OVERWORLD && level.dimension() != Level.END) {
             if (player != null) {
                 player.sendOverlayMessage(
-                    Component.translatable("item.wildwest.entity_303_spawn_egg.wrong_dimension"));
+                    Component.translatable("item.wildwest.the_agent_spawn_egg.wrong_dimension"));
             }
             return InteractionResult.FAIL;
         }
 
-        Entity303SavedData saved = Entity303SavedData.get(server);
+        AgentSavedData saved = AgentSavedData.get(server);
 
         if (!saved.isAlive()) {
             // Spawn branch — delegate to vanilla.
@@ -70,7 +70,7 @@ public class Entity303SpawnEggItem extends SpawnEggItem {
         if (savedDim != level.dimension()) {
             if (player != null) {
                 player.sendOverlayMessage(
-                    Component.translatable("item.wildwest.entity_303_spawn_egg.different_dimension"));
+                    Component.translatable("item.wildwest.the_agent_spawn_egg.different_dimension"));
             }
             return InteractionResult.FAIL;
         }
@@ -79,7 +79,7 @@ public class Entity303SpawnEggItem extends SpawnEggItem {
         if (target == null) return refuseAway(player);
 
         Entity existing = target.getEntity(saved.getCurrentId());
-        if (!(existing instanceof Entity303Entity e303)) {
+        if (!(existing instanceof AgentEntity agent)) {
             return refuseAway(player);
         }
 
@@ -88,11 +88,11 @@ public class Entity303SpawnEggItem extends SpawnEggItem {
         double tz = context.getClickedPos().getZ() + 0.5;
 
         sl.sendParticles(ParticleTypes.SMOKE,
-            e303.getX(), e303.getY() + 1.0, e303.getZ(), 16, 0.5, 1.0, 0.5, 0.0);
-        sl.playSound(null, e303.getX(), e303.getY(), e303.getZ(),
+            agent.getX(), agent.getY() + 1.0, agent.getZ(), 16, 0.5, 1.0, 0.5, 0.0);
+        sl.playSound(null, agent.getX(), agent.getY(), agent.getZ(),
             SoundEvents.ENDERMAN_TELEPORT, SoundSource.HOSTILE, 0.6f, 1.2f);
 
-        e303.teleportTo(tx, ty, tz);
+        agent.teleportTo(tx, ty, tz);
 
         sl.sendParticles(ParticleTypes.SMOKE, tx, ty + 1.0, tz, 16, 0.5, 1.0, 0.5, 0.0);
         sl.playSound(null, tx, ty, tz, SoundEvents.ENDERMAN_TELEPORT,
@@ -104,7 +104,7 @@ public class Entity303SpawnEggItem extends SpawnEggItem {
     private static InteractionResult refuseAway(Player player) {
         if (player != null) {
             player.sendOverlayMessage(
-                Component.translatable("item.wildwest.entity_303_spawn_egg.away"));
+                Component.translatable("item.wildwest.the_agent_spawn_egg.away"));
         }
         return InteractionResult.FAIL;
     }

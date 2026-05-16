@@ -1,6 +1,6 @@
 package com.tweeks.wildwest.entity.ai;
 
-import com.tweeks.wildwest.entity.Entity303Entity;
+import com.tweeks.wildwest.entity.AgentEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -20,7 +20,7 @@ import java.util.EnumSet;
  * pressure. Skipped silently if any block in the carve volume is
  * {@link BlockTags#DRAGON_IMMUNE} (bedrock, end portal frame, etc.).
  */
-public class Entity303LavaPitGoal extends Goal {
+public class AgentLavaPitGoal extends Goal {
 
     private static final int COOLDOWN_TICKS = 400; // 20 s
     private static final double MAX_DISTANCE = 32.0;
@@ -29,9 +29,9 @@ public class Entity303LavaPitGoal extends Goal {
     private static final double ANCHOR_MIN_DIST = 5.0;
     private static final double ANCHOR_MAX_DIST = 8.0;
 
-    private final Entity303Entity boss;
+    private final AgentEntity boss;
 
-    public Entity303LavaPitGoal(Entity303Entity boss) {
+    public AgentLavaPitGoal(AgentEntity boss) {
         this.boss = boss;
         this.setFlags(EnumSet.noneOf(Goal.Flag.class));
     }

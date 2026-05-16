@@ -1,6 +1,6 @@
 package com.tweeks.wildwest.entity.ai;
 
-import com.tweeks.wildwest.entity.Entity303Entity;
+import com.tweeks.wildwest.entity.AgentEntity;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -18,7 +18,7 @@ import java.util.EnumSet;
  * the target is at distance 5–20 blocks with line-of-sight. Handles the
  * bow-side of the equipment swap (bow in mainhand, sword in offhand).
  */
-public class Entity303BowGoal extends Goal {
+public class AgentBowGoal extends Goal {
 
     private static final int COOLDOWN_TICKS = 50; // 2.5 s
     private static final double MIN_RANGE = 5.0;
@@ -26,9 +26,9 @@ public class Entity303BowGoal extends Goal {
     private static final float ARROW_VELOCITY = 1.6f;
     private static final float ARROW_INACCURACY = 6.0f;
 
-    private final Entity303Entity boss;
+    private final AgentEntity boss;
 
-    public Entity303BowGoal(Entity303Entity boss) {
+    public AgentBowGoal(AgentEntity boss) {
         this.boss = boss;
         // No movement/look claims — this is a one-shot fire-and-forget that
         // runs during start() and immediately ends. Letting other goals

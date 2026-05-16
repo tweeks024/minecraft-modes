@@ -9,11 +9,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class Entity303StateTest {
+class AgentStateTest {
 
     @Test
     void defaultState_isCleared() {
-        Entity303State s = new Entity303State();
+        AgentState s = new AgentState();
         assertFalse(s.isAlive());
         assertNull(s.getCurrentId());
         assertNull(s.getDimensionId());
@@ -21,7 +21,7 @@ class Entity303StateTest {
 
     @Test
     void setAlive_storesAllFields() {
-        Entity303State s = new Entity303State();
+        AgentState s = new AgentState();
         UUID id = UUID.fromString("00000000-0000-0000-0000-000000000001");
         s.setAlive(id, "minecraft:the_end");
 
@@ -32,7 +32,7 @@ class Entity303StateTest {
 
     @Test
     void clear_resetsToDefault() {
-        Entity303State s = new Entity303State();
+        AgentState s = new AgentState();
         s.setAlive(UUID.randomUUID(), "minecraft:overworld");
         s.clear();
 
@@ -43,11 +43,11 @@ class Entity303StateTest {
 
     @Test
     void copyOf_returnsEqualSnapshot() {
-        Entity303State s = new Entity303State();
+        AgentState s = new AgentState();
         UUID id = UUID.randomUUID();
         s.setAlive(id, "minecraft:the_end");
 
-        Entity303State copy = Entity303State.copyOf(s);
+        AgentState copy = AgentState.copyOf(s);
         assertTrue(copy.isAlive());
         assertEquals(id, copy.getCurrentId());
         assertEquals("minecraft:the_end", copy.getDimensionId());
@@ -55,10 +55,10 @@ class Entity303StateTest {
 
     @Test
     void copyOf_isIndependent() {
-        Entity303State s = new Entity303State();
+        AgentState s = new AgentState();
         s.setAlive(UUID.randomUUID(), "minecraft:overworld");
 
-        Entity303State copy = Entity303State.copyOf(s);
+        AgentState copy = AgentState.copyOf(s);
         s.clear();
 
         assertTrue(copy.isAlive());

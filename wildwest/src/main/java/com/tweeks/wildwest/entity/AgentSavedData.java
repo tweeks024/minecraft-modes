@@ -20,46 +20,46 @@ import java.util.UUID;
  * Per-server singleton record for Entity 303. Anchored to the overworld's
  * data storage so reads/writes from any dimension consult the same data.
  *
- * <p>Wraps {@link Entity303State} (pure POJO; unit-tested). Mirrors
+ * <p>Wraps {@link AgentState} (pure POJO; unit-tested). Mirrors
  * {@link HerobrineSavedData} — both bosses can be alive simultaneously, but
  * each is independently singleton.
  */
-public final class Entity303SavedData extends SavedData {
+public final class AgentSavedData extends SavedData {
 
-    private static final String FILE_ID = "wildwest_entity_303";
+    private static final String FILE_ID = "wildwest_the_agent";
 
-    public static final Codec<Entity303SavedData> CODEC = RecordCodecBuilder.create(instance ->
+    public static final Codec<AgentSavedData> CODEC = RecordCodecBuilder.create(instance ->
         instance.group(
             Codec.BOOL.fieldOf("Alive").forGetter(sd -> sd.state.isAlive()),
             UUIDUtil.STRING_CODEC.optionalFieldOf("CurrentId")
                 .forGetter(sd -> Optional.ofNullable(sd.state.getCurrentId())),
             Codec.STRING.optionalFieldOf("Dimension")
                 .forGetter(sd -> Optional.ofNullable(sd.state.getDimensionId()))
-        ).apply(instance, Entity303SavedData::fromCodec)
+        ).apply(instance, AgentSavedData::fromCodec)
     );
 
-    public static final SavedDataType<Entity303SavedData> TYPE = new SavedDataType<>(
+    public static final SavedDataType<AgentSavedData> TYPE = new SavedDataType<>(
         Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, FILE_ID),
-        Entity303SavedData::new,
+        AgentSavedData::new,
         CODEC,
         DataFixTypes.SAVED_DATA_CUSTOM_BOSS_EVENTS
     );
 
-    private final Entity303State state = new Entity303State();
+    private final AgentState state = new AgentState();
 
-    public Entity303SavedData() {}
+    public AgentSavedData() {}
 
-    private static Entity303SavedData fromCodec(boolean alive,
+    private static AgentSavedData fromCodec(boolean alive,
                                                 Optional<UUID> currentId,
                                                 Optional<String> dimensionId) {
-        Entity303SavedData sd = new Entity303SavedData();
+        AgentSavedData sd = new AgentSavedData();
         if (alive && currentId.isPresent() && dimensionId.isPresent()) {
             sd.state.setAlive(currentId.get(), dimensionId.get());
         }
         return sd;
     }
 
-    public static Entity303SavedData get(MinecraftServer server) {
+    public static AgentSavedData get(MinecraftServer server) {
         return server.overworld().getDataStorage().computeIfAbsent(TYPE);
     }
 

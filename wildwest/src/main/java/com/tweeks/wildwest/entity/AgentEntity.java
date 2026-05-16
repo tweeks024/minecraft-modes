@@ -2,11 +2,11 @@ package com.tweeks.wildwest.entity;
 
 import javax.annotation.Nullable;
 import com.tweeks.wildwest.ModEntities;
-import com.tweeks.wildwest.entity.ai.Entity303BowGoal;
-import com.tweeks.wildwest.entity.ai.Entity303LavaPitGoal;
-import com.tweeks.wildwest.entity.ai.Entity303MeleeGoal;
-import com.tweeks.wildwest.entity.ai.Entity303TargetGoal;
-import com.tweeks.wildwest.entity.ai.Entity303TeleportGoal;
+import com.tweeks.wildwest.entity.ai.AgentBowGoal;
+import com.tweeks.wildwest.entity.ai.AgentLavaPitGoal;
+import com.tweeks.wildwest.entity.ai.AgentMeleeGoal;
+import com.tweeks.wildwest.entity.ai.AgentTargetGoal;
+import com.tweeks.wildwest.entity.ai.AgentTeleportGoal;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
@@ -48,12 +48,12 @@ import net.minecraft.world.phys.Vec3;
 
 /**
  * Apex boss mob, peer of Herobrine. Singleton across the whole server (see
- * {@link Entity303SavedData}). Spawns at night in the overworld or any time
+ * {@link AgentSavedData}). Spawns at night in the overworld or any time
  * in The End; fires an enchanted bow at range, swaps to an iron sword in
  * melee, teleports every ~3 s. On damage occasionally spawns a 1-HP visual
- * decoy ({@code Entity303CloneEntity}) and warps behind the attacker.
+ * decoy ({@code AgentCloneEntity}) and warps behind the attacker.
  */
-public class Entity303Entity extends Monster {
+public class AgentEntity extends Monster {
 
     private final ServerBossEvent bossBar;
 
@@ -74,15 +74,15 @@ public class Entity303Entity extends Monster {
     private int teleportCooldown = 0;
     private int lavaPitCooldown = 0;
 
-    public Entity303Entity(EntityType<? extends Entity303Entity> type, Level level) {
+    public AgentEntity(EntityType<? extends AgentEntity> type, Level level) {
         super(type, level);
         this.bossBar = new ServerBossEvent(
             Mth.createInsecureUUID(this.random),
-            Component.translatable("entity.wildwest.entity_303"),
+            Component.translatable("entity.wildwest.the_agent"),
             BossEvent.BossBarColor.PURPLE,
             BossEvent.BossBarOverlay.PROGRESS);
         this.setPersistenceRequired();
-        this.setCustomName(Component.translatable("entity.wildwest.entity_303"));
+        this.setCustomName(Component.translatable("entity.wildwest.the_agent"));
         this.setCustomNameVisible(false);
     }
 
@@ -92,7 +92,7 @@ public class Entity303Entity extends Monster {
             .add(Attributes.MOVEMENT_SPEED, 0.45)
             .add(Attributes.ATTACK_DAMAGE, 8.0)
             .add(Attributes.KNOCKBACK_RESISTANCE, 0.6)
-            // 96-block follow range gives the custom Entity303TargetGoal a
+            // 96-block follow range gives the custom AgentTargetGoal a
             // wide cube to acquire players in. Higher than vanilla apex
             // bosses (64) but matches the "you can't hide from him" feel.
             .add(Attributes.FOLLOW_RANGE, 96.0);
@@ -101,15 +101,15 @@ public class Entity303Entity extends Monster {
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
-        this.goalSelector.addGoal(1, new Entity303MeleeGoal(this));
-        this.goalSelector.addGoal(2, new Entity303BowGoal(this));
-        this.goalSelector.addGoal(2, new Entity303LavaPitGoal(this));
-        this.goalSelector.addGoal(3, new Entity303TeleportGoal(this));
+        this.goalSelector.addGoal(1, new AgentMeleeGoal(this));
+        this.goalSelector.addGoal(2, new AgentBowGoal(this));
+        this.goalSelector.addGoal(2, new AgentLavaPitGoal(this));
+        this.goalSelector.addGoal(3, new AgentTeleportGoal(this));
         this.goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 16.0F));
         this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
 
         this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
-        this.targetSelector.addGoal(2, new Entity303TargetGoal(this));
+        this.targetSelector.addGoal(2, new AgentTargetGoal(this));
     }
 
     @Override
@@ -130,7 +130,7 @@ public class Entity303Entity extends Monster {
         sword.enchant(sharpness, 4);
 
         // Default stance: bow in mainhand, sword in offhand. Goals swap as
-        // combat distance changes (see Entity303MeleeGoal / Entity303BowGoal).
+        // combat distance changes (see AgentMeleeGoal / AgentBowGoal).
         this.setItemSlot(EquipmentSlot.MAINHAND, bow);
         this.setItemSlot(EquipmentSlot.OFFHAND, sword);
         this.setDropChance(EquipmentSlot.MAINHAND, 0.10f);
@@ -147,7 +147,7 @@ public class Entity303Entity extends Monster {
 
         // Mob.finalizeSpawn does NOT populate equipment for all spawn reasons —
         // notably, spawn-egg paths (and most non-NATURAL paths) skip it. We
-        // need the bow and sword to be present for Entity303BowGoal to spawn
+        // need the bow and sword to be present for AgentBowGoal to spawn
         // arrows (an empty mainhand stack makes Arrow's "Invalid weapon firing
         // an arrow" validation crash the server). Call it explicitly so the
         // boss is always equipped regardless of spawn path.
@@ -155,7 +155,7 @@ public class Entity303Entity extends Monster {
 
         var server = level.getLevel().getServer();
         if (server != null) {
-            Entity303SavedData saved = Entity303SavedData.get(server);
+            AgentSavedData saved = AgentSavedData.get(server);
             if (saved.isAlive() && !this.getUUID().equals(saved.getCurrentId())) {
                 // Another 303 already alive — discard this duplicate.
                 this.discard();
@@ -172,7 +172,7 @@ public class Entity303Entity extends Monster {
         if (this.level() instanceof ServerLevel sl) {
             var server = sl.getServer();
             if (server != null) {
-                Entity303SavedData saved = Entity303SavedData.get(server);
+                AgentSavedData saved = AgentSavedData.get(server);
                 if (this.getUUID().equals(saved.getCurrentId())) {
                     saved.clear();
                 }
@@ -192,7 +192,7 @@ public class Entity303Entity extends Monster {
             if (this.level() instanceof ServerLevel sl) {
                 var server = sl.getServer();
                 if (server != null) {
-                    Entity303SavedData saved = Entity303SavedData.get(server);
+                    AgentSavedData saved = AgentSavedData.get(server);
                     if (this.getUUID().equals(saved.getCurrentId())) {
                         saved.clear();
                     }
@@ -291,7 +291,7 @@ public class Entity303Entity extends Monster {
         if (destY < 0) return false;
 
         // Spawn the clone at the current position before we teleport.
-        Entity303CloneEntity clone = ModEntities.ENTITY_303_CLONE.get().create(
+        AgentCloneEntity clone = ModEntities.AGENT_CLONE.get().create(
             level, EntitySpawnReason.MOB_SUMMONED);
         if (clone != null) {
             clone.setPos(this.getX(), this.getY(), this.getZ());
