@@ -100,6 +100,15 @@ public final class Registration {
         properties -> new BlockItem(ModBlocks.CANNON.get(), properties),
         p -> p);
 
+    public static final DeferredItem<SpawnEggItem> PIRATE_SPAWN_EGG = ITEMS.registerItem(
+        "pirate_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.PIRATE.get()));
+
+    public static final DeferredItem<SpawnEggItem> SKELETON_PIRATE_SPAWN_EGG = ITEMS.registerItem(
+        "skeleton_pirate_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.SKELETON_PIRATE.get()));
+
+    public static final DeferredItem<SpawnEggItem> PIRATE_CAPTAIN_SPAWN_EGG = ITEMS.registerItem(
+        "pirate_captain_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.PIRATE_CAPTAIN.get()));
+
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> WILDWEST_TAB =
         CREATIVE_TABS.register("main", () ->
             CreativeModeTab.builder()
@@ -125,6 +134,9 @@ public final class Registration {
                     output.accept(FLINTLOCK_PISTOL.get());
                     output.accept(CAPTAIN_PISTOL.get());
                     output.accept(CANNON.get());
+                    output.accept(PIRATE_SPAWN_EGG.get());
+                    output.accept(SKELETON_PIRATE_SPAWN_EGG.get());
+                    output.accept(PIRATE_CAPTAIN_SPAWN_EGG.get());
                 })
                 .build());
 

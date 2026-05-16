@@ -7,7 +7,10 @@ import com.tweeks.wildwest.entity.DeputyEntity;
 import com.tweeks.wildwest.entity.AgentCloneEntity;
 import com.tweeks.wildwest.entity.AgentEntity;
 import com.tweeks.wildwest.entity.HerobrineEntity;
+import com.tweeks.wildwest.entity.PirateCaptainEntity;
+import com.tweeks.wildwest.entity.PirateEntity;
 import com.tweeks.wildwest.entity.SherrifEntity;
+import com.tweeks.wildwest.entity.SkeletonPirateEntity;
 import com.tweeks.wildwest.entity.SteveStackerEntity;
 import com.tweeks.wildwest.entity.WalkerEntity;
 import com.tweeks.wildwest.entity.projectile.CannonballEntity;
@@ -108,6 +111,30 @@ public final class ModEntities {
             .clientTrackingRange(10)
             .build(ResourceKey.create(Registries.ENTITY_TYPE,
                 Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "the_agent_clone"))));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<PirateEntity>> PIRATE =
+        ENTITY_TYPES.register("pirate", () -> EntityType.Builder.<PirateEntity>of(
+                PirateEntity::new, MobCategory.MONSTER)
+            .sized(0.6f, 1.95f)
+            .clientTrackingRange(10)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "pirate"))));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<SkeletonPirateEntity>> SKELETON_PIRATE =
+        ENTITY_TYPES.register("skeleton_pirate", () -> EntityType.Builder.<SkeletonPirateEntity>of(
+                SkeletonPirateEntity::new, MobCategory.MONSTER)
+            .sized(0.6f, 1.95f)
+            .clientTrackingRange(10)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "skeleton_pirate"))));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<PirateCaptainEntity>> PIRATE_CAPTAIN =
+        ENTITY_TYPES.register("pirate_captain", () -> EntityType.Builder.<PirateCaptainEntity>of(
+                PirateCaptainEntity::new, MobCategory.MONSTER)
+            .sized(0.6f, 1.95f)
+            .clientTrackingRange(12)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "pirate_captain"))));
 
     public static final DeferredHolder<EntityType<?>, EntityType<MeteorEntity>> METEOR =
         ENTITY_TYPES.register("meteor", () -> EntityType.Builder.<MeteorEntity>of(
