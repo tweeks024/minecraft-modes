@@ -313,8 +313,8 @@ None beyond standard entity NBT (vanilla `Mob` serialization). No `SavedData` fi
 "item.wildwest.pirate_captain_spawn_egg": "Pirate Captain Spawn Egg",
 "item.wildwest.rapier": "Rapier",
 "item.wildwest.skeleton_pirate_spawn_egg": "Skeleton Pirate Spawn Egg",
-"subtitles.wildwest.cannon_fire": "Cannon fires",
-"subtitles.wildwest.cannon_reload": "Cannon reloads",
+"subtitle.wildwest.cannon_fire": "Cannon fires",
+"subtitle.wildwest.cannon_reload": "Cannon reloads",
 ```
 
 ---
