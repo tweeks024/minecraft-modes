@@ -27,6 +27,10 @@ public final class WildWestDamageTypes {
         Registries.DAMAGE_TYPE,
         Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "meteor"));
 
+    public static final ResourceKey<DamageType> CANNONBALL = ResourceKey.create(
+        Registries.DAMAGE_TYPE,
+        Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "cannonball"));
+
     public static DamageSource gunshot(Entity attacker) {
         return new DamageSource(
             attacker.level().registryAccess()
@@ -64,5 +68,20 @@ public final class WildWestDamageTypes {
             level.registryAccess()
                 .lookupOrThrow(Registries.DAMAGE_TYPE)
                 .getOrThrow(METEOR));
+    }
+
+    public static DamageSource cannonball(Entity attacker) {
+        return new DamageSource(
+            attacker.level().registryAccess()
+                .lookupOrThrow(Registries.DAMAGE_TYPE)
+                .getOrThrow(CANNONBALL),
+            attacker);
+    }
+
+    public static DamageSource cannonballAoe(Level level) {
+        return new DamageSource(
+            level.registryAccess()
+                .lookupOrThrow(Registries.DAMAGE_TYPE)
+                .getOrThrow(CANNONBALL));
     }
 }
