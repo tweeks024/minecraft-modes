@@ -10,6 +10,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LadderBlock;
 import net.minecraft.world.level.levelgen.Heightmap;
@@ -61,6 +62,14 @@ public class AgentLavaPitGoal extends Goal {
         this.boss.setLavaPitCooldown(COOLDOWN_TICKS);
 
         if (!(this.boss.level() instanceof ServerLevel sl)) return;
+
+        // Skip in dimensions where the carve assumptions don't hold:
+        //   - End: small floating end-stone platforms can put the heightmap
+        //     atop a 1-deep island over the void; the carve would leak lava
+        //     into the void and a teleported target falls forever.
+        //   - Nether: the ceiling makes upward-escape via the ladder column
+        //     unreliable.
+        if (sl.dimension() == Level.END || sl.dimension() == Level.NETHER) return;
 
         // Pick a horizontal anchor 5–8 blocks from the target in a random
         // direction. Anchored on target XZ for surprise factor.

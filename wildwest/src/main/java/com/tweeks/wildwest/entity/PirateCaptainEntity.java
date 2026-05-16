@@ -19,6 +19,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 /**
  * Flagship boss. Extends {@link WildWestMob} so pistol-vs-melee mode switching
@@ -28,6 +30,10 @@ import net.minecraft.world.level.Level;
 public class PirateCaptainEntity extends WildWestMob implements Outlaw, Enemy {
 
     private final ServerBossEvent bossBar;
+    // Persisted flag so we only auto-equip a captain that has never been
+    // armed. Without it, a captain disarmed mid-fight (mod, /replaceitem,
+    // looting tweak) would re-spawn its weapons every tick.
+    private boolean equipmentInitialized = false;
 
     public PirateCaptainEntity(EntityType<? extends PirateCaptainEntity> type, Level level) {
         super(type, level);
@@ -86,16 +92,28 @@ public class PirateCaptainEntity extends WildWestMob implements Outlaw, Enemy {
         super.tick();
         // The weapon-mode tick in WildWestMob calls getHandWeaponStack() lazily,
         // so the enchanted rapier appears whenever the captain switches to MELEE.
-        // Force-equip a freshly-spawned captain — but only when both hands are
-        // empty, so reloaded captains keep whatever they were holding at save.
-        if (!this.level().isClientSide()
-                && this.getMainHandItem().isEmpty()
-                && this.getOffhandItem().isEmpty()) {
+        // Force-equip a freshly-spawned captain exactly once; the flag is
+        // persisted, so reloaded captains keep their saved gear and disarmed
+        // captains don't re-grow weapons every tick.
+        if (!this.equipmentInitialized && !this.level().isClientSide()) {
             this.setItemSlot(EquipmentSlot.MAINHAND, this.getGunStack());
             this.setItemSlot(EquipmentSlot.OFFHAND, this.buildEnchantedRapier());
             this.setDropChance(EquipmentSlot.MAINHAND, 1.0f);
             this.setDropChance(EquipmentSlot.OFFHAND, 1.0f);
+            this.equipmentInitialized = true;
         }
+    }
+
+    @Override
+    protected void addAdditionalSaveData(ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        output.putBoolean("EquipmentInitialized", this.equipmentInitialized);
+    }
+
+    @Override
+    protected void readAdditionalSaveData(ValueInput input) {
+        super.readAdditionalSaveData(input);
+        this.equipmentInitialized = input.getBooleanOr("EquipmentInitialized", false);
     }
 
     @Override

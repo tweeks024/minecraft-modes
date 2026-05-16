@@ -57,8 +57,11 @@ public class AgentBowGoal extends Goal {
 
         if (!(this.boss.level() instanceof ServerLevel sl)) return;
 
-        // Ensure bow is in mainhand. Swap with offhand if needed.
-        if (!this.boss.getItemBySlot(EquipmentSlot.MAINHAND).is(Items.BOW)) {
+        // Ensure bow is in mainhand. Only swap if the offhand actually holds
+        // a bow — otherwise we'd shuffle empty/sword/etc. into mainhand and
+        // leave both slots in a broken state.
+        if (!this.boss.getItemBySlot(EquipmentSlot.MAINHAND).is(Items.BOW)
+                && this.boss.getItemBySlot(EquipmentSlot.OFFHAND).is(Items.BOW)) {
             ItemStack main = this.boss.getItemBySlot(EquipmentSlot.MAINHAND);
             ItemStack off = this.boss.getItemBySlot(EquipmentSlot.OFFHAND);
             this.boss.setItemSlot(EquipmentSlot.MAINHAND, off);

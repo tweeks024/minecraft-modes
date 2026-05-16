@@ -19,6 +19,9 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Periodic-tick spawner for lawmen (Deputy/Sherrif) inside villages.
  *
@@ -56,6 +59,10 @@ public final class LawmanVillageSpawner {
         if (++tickCounter < CHECK_INTERVAL_TICKS) return;
         tickCounter = 0;
 
+        // Dedup villages across players: two players standing in the same
+        // village shouldn't trigger two independent spawn rolls per interval
+        // (would silently exceed the per-village caps).
+        Set<Long> seenVillages = new HashSet<>();
         for (ServerPlayer player : sl.players()) {
             BlockPos playerPos = player.blockPosition();
             StructureStart village = sl.structureManager()
@@ -66,6 +73,8 @@ public final class LawmanVillageSpawner {
             // is acceptable — bandits spawn in plains/savanna/desert via biome modifier, and
             // lawmen show up wherever there's a village along the way.
             BoundingBox bb = village.getBoundingBox();
+            long key = (((long) bb.minX()) << 32) ^ (bb.minZ() & 0xFFFFFFFFL);
+            if (!seenVillages.add(key)) continue;
             AABB villageArea = new AABB(
                 bb.minX(), bb.minY(), bb.minZ(),
                 bb.maxX() + 1, bb.maxY() + 1, bb.maxZ() + 1);

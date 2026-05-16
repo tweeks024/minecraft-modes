@@ -43,8 +43,12 @@ public class AgentMeleeGoal extends MeleeAttackGoal {
     @Override
     public void start() {
         super.start();
-        // Swap iron sword into mainhand if not already there.
-        if (!this.agent.getItemBySlot(EquipmentSlot.MAINHAND).is(Items.IRON_SWORD)) {
+        // Swap iron sword into mainhand if not already there. Only swap when
+        // the offhand actually holds an iron sword — otherwise we'd end up
+        // putting an empty stack or a bow into the mainhand and the boss
+        // swings with nothing.
+        if (!this.agent.getItemBySlot(EquipmentSlot.MAINHAND).is(Items.IRON_SWORD)
+                && this.agent.getItemBySlot(EquipmentSlot.OFFHAND).is(Items.IRON_SWORD)) {
             ItemStack main = this.agent.getItemBySlot(EquipmentSlot.MAINHAND);
             ItemStack off = this.agent.getItemBySlot(EquipmentSlot.OFFHAND);
             this.agent.setItemSlot(EquipmentSlot.MAINHAND, off);

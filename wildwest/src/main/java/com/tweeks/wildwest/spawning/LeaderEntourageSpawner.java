@@ -14,6 +14,7 @@ import net.minecraft.world.entity.animal.equine.Markings;
 import net.minecraft.world.entity.animal.equine.Variant;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.levelgen.Heightmap;
 
 /**
  * Helper that spawns a leader's mount + footsoldier entourage in one shot.
@@ -80,10 +81,14 @@ public final class LeaderEntourageSpawner {
         for (int i = 0; i < FOLLOWER_COUNT; i++) {
             int dx = random.nextInt(FOLLOWER_RADIUS * 2 + 1) - FOLLOWER_RADIUS;
             int dz = random.nextInt(FOLLOWER_RADIUS * 2 + 1) - FOLLOWER_RADIUS;
-            BlockPos pos = leaderPos.offset(dx, 0, dz);
+            int x = leaderPos.getX() + dx;
+            int z = leaderPos.getZ() + dz;
+            // Snap Y to the local heightmap so followers don't spawn embedded
+            // in terrain when the leader spawned on uneven ground (hill, cliff).
+            int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
             T follower = followerType.create(level, EntitySpawnReason.NATURAL);
             if (follower == null) continue;
-            follower.setPos(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
+            follower.setPos(x + 0.5, y, z + 0.5);
             follower.setPersistenceRequired();
             level.addFreshEntity(follower);
         }
