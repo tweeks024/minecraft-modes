@@ -96,13 +96,21 @@ data class ModMetadata(
             return r.containsMatchIn(toml)
         }
 
-        /** `displayName="..."` or `displayName='...'` — the value is plain (no `${...}`). */
+        /**
+         * Match `displayName="..."` (basic string) or `displayName='...'`
+         * (literal string). TOML also allows triple-quoted forms (`"""..."""`
+         * and `'''...'''`); those are valid in spec but unused in this repo's
+         * tomls for displayName, so the simple form is sufficient.
+         *
+         * Returns null when the value is a NeoForge `${...}` placeholder
+         * (we have no expansion context at translator time).
+         */
         private fun parseDisplayName(toml: String): String? {
-            val r = Regex("""displayName\s*=\s*"([^"]*)"""")
-            val match = r.find(toml) ?: return null
-            val value = match.groupValues[1]
-            // The TOML file uses `${mod_name}` as a placeholder; we have no
-            // expansion context here, so reject placeholder values.
+            val doubleQ = Regex("""displayName\s*=\s*"([^"]*)"""")
+            val singleQ = Regex("""displayName\s*=\s*'([^']*)'""")
+            val value = doubleQ.find(toml)?.groupValues?.get(1)
+                ?: singleQ.find(toml)?.groupValues?.get(1)
+                ?: return null
             if (value.contains("\${")) return null
             return value.takeIf { it.isNotBlank() }
         }

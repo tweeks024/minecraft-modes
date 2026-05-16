@@ -102,7 +102,26 @@ class LootTableTransform(
     private fun translatePool(pool: JsonObject): JsonObject = buildJsonObject {
         // `rolls` is required in Bedrock; carry through whatever Java had.
         pool["rolls"]?.let { put("rolls", it) }
-        pool["bonus_rolls"]?.let { put("bonus_rolls", it) }
+        // bonus_rolls: Bedrock prefers an integer; some loot tables emit
+        // `0.0` which can warn or be rejected. Drop the field entirely when
+        // it's a zero (most common shape for entity drops) and normalise
+        // whole-number floats to ints.
+        pool["bonus_rolls"]?.let { br ->
+            if (br is JsonPrimitive) {
+                val d = br.contentOrNull?.toDoubleOrNull()
+                if (d != null) {
+                    if (d == 0.0) {
+                        // Skip — Bedrock default of 0 is implicit.
+                    } else if (d == d.toLong().toDouble()) {
+                        put("bonus_rolls", JsonPrimitive(d.toLong()))
+                    } else {
+                        put("bonus_rolls", br)
+                    }
+                    return@let
+                }
+            }
+            put("bonus_rolls", br)
+        }
         pool["conditions"]?.let { put("conditions", stripMinecraftNamespaces(it)) }
 
         val entries = pool["entries"]?.jsonArray ?: JsonArray(emptyList())

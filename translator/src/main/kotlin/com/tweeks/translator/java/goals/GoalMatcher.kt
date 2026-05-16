@@ -245,10 +245,15 @@ internal class GoalMatcher(private val unt: Untranslatable) {
     }
 
     /**
-     * Resolve the FQN of a constructor expression. Tries JavaParser's
-     * symbol-resolver first (gives a fully-qualified name); falls back to
-     * the source-text package-qualifier when resolution fails (e.g.
-     * sibling-mod classes whose source isn't on the type-solver chain).
+     * Resolve the FQN of a constructor expression. Tries (in order):
+     *   1. JavaParser's symbol-resolver (gives a fully-qualified name).
+     *   2. The source-text package-qualifier on the `new` expression itself
+     *      (`new com.tweeks.foo.MyGoal(...)`).
+     *   3. The compilation unit's imports — if `MyGoal` is imported, return
+     *      that import's FQN. Wildwest uses `import …NearestAttackableTargetGoal;`
+     *      and constructs `new NearestAttackableTargetGoal<>(...)` with the
+     *      diamond; without this fallback resolveFqn returns null and the
+     *      goal is logged as `<unknown>`.
      */
     private fun resolveFqn(ctor: ObjectCreationExpr): String? {
         val resolved = try {
@@ -258,12 +263,21 @@ internal class GoalMatcher(private val unt: Untranslatable) {
         }
         if (resolved != null) return resolved
 
-        // Fallback: if the source uses an FQN-qualified `new` expression
-        // (which is how the four mods invoke vanilla goals), pull the
-        // qualifier directly from the AST.
         val typeName = ctor.type
         val qualifier = typeName.scope.orElse(null)
-        return if (qualifier != null) "${qualifier}.${typeName.nameAsString}" else null
+        if (qualifier != null) return "${qualifier}.${typeName.nameAsString}"
+
+        // Fallback: walk the compilation unit's imports for one whose simple
+        // name matches. Java forbids two type imports with the same simple
+        // name, so the first match (if any) is unambiguous.
+        val simple = typeName.nameAsString
+        val cu = ctor.findCompilationUnit().orElse(null) ?: return null
+        for (imp in cu.imports) {
+            if (imp.isAsterisk) continue
+            val importName = imp.nameAsString
+            if (importName.substringAfterLast('.') == simple) return importName
+        }
+        return null
     }
 
     private fun argToLiteral(expr: Expression): VanillaGoalCatalog.LiteralArg? {

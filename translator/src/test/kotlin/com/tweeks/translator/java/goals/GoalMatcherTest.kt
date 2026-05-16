@@ -119,6 +119,34 @@ class GoalMatcherTest {
         )
     }
 
+    @Test
+    fun `imported simple-name goal resolves to the imported FQN`() {
+        // Wildwest pattern: import the goal class, then `new <Goal>(...)`
+        // without qualifying or via the diamond `<>`. With no symbol solver,
+        // resolveFqn used to fail and the goal landed in the report keyed
+        // by `<unknown>`. The imports fallback fixes it.
+        val src = """
+            package com.example;
+            import net.minecraft.world.entity.ai.goal.FloatGoal;
+            public class Test {
+                protected void registerGoals() {
+                    this.goalSelector.addGoal(0, new FloatGoal(this));
+                }
+            }
+        """.trimIndent()
+        val cls = parseClass(src)
+        val unt = Untranslatable()
+        val result = GoalMatcher(unt).match("test", cls)
+        // FloatGoal is in the catalog and emits a component when resolved.
+        // Without the imports fallback it'd be logged as `<unknown>` and no
+        // component would be produced.
+        assertEquals(1, result.components.size)
+        assertEquals("minecraft:behavior.float", result.components[0].componentName)
+        assertTrue(!unt.renderReport("test").contains("<unknown>")) {
+            "Imported goal must not surface as <unknown>: ${unt.renderReport("test")}"
+        }
+    }
+
     private fun parseClass(src: String): ClassOrInterfaceDeclaration {
         val parser = JavaParser()
         val unit = parser.parse(src).result.orElseThrow { IllegalStateException("parse failed") }

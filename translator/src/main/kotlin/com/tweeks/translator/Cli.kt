@@ -177,11 +177,9 @@ private fun runPipeline(repoRoot: Path, opts: CliOptions, outputRoot: Path) {
     }
 
     for (mod in modsToWrite) {
-        // Clean the per-mod output dir so stale files (e.g. removed/renamed
-        // recipes) don't survive across runs. Sibling-mod subdirs are
-        // untouched.
-        cleanModOutputDir(outputRoot, mod.modId)
-
+        // Read metadata FIRST so a malformed toml doesn't leave the user
+        // with an empty output dir and no UNTRANSLATABLE.md explaining why.
+        // The clean happens after, immediately before addon write.
         val metadata = ModMetadata.read(mod.rootDir, mod.modId)
         val inputs = ManifestWriter.ModManifestInputs(
             modId = metadata.modId,
@@ -189,6 +187,12 @@ private fun runPipeline(repoRoot: Path, opts: CliOptions, outputRoot: Path) {
             description = metadata.description,
             requiresSecurityCore = metadata.requiresSecurityCore,
         )
+
+        // Clean the per-mod output dir so stale files (e.g. removed/renamed
+        // recipes) don't survive across runs. Sibling-mod subdirs are
+        // untouched.
+        cleanModOutputDir(outputRoot, mod.modId)
+
         val result = addonWriter.write(mod, inputs)
 
         // JSON pipeline: each transform shares one Untranslatable so the

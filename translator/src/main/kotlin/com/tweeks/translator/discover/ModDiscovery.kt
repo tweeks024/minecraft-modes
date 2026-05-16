@@ -41,16 +41,22 @@ class ModDiscovery(private val repoRoot: Path) {
     fun findById(modId: String): DiscoveredMod? = discover().firstOrNull { it.modId == modId }
 
     /**
-     * Parse `include 'foo'` / `include "foo"` lines out of settings.gradle.
-     * Only top-level includes are matched; nested project paths (`:foo:bar`)
-     * are unsupported because this repo doesn't use them.
+     * Parse `include 'foo'` / `include "foo"` / `include 'foo', 'bar'`
+     * lines out of settings.gradle. Only top-level includes are matched;
+     * nested project paths (`:foo:bar`) are unsupported because this repo
+     * doesn't use them.
      */
     private fun parseIncludes(settings: Path): List<String> {
-        val pattern = Regex("""^\s*include\s+['"]([^'"]+)['"]\s*$""")
-        return settings.readLines()
-            .mapNotNull { pattern.matchEntire(it)?.groupValues?.get(1) }
-            // Strip leading colon if someone writes `include ':foo'`.
-            .map { it.removePrefix(":") }
+        val lineStart = Regex("""^\s*include\s+""")
+        val quoted = Regex("""['"]([^'"]+)['"]""")
+        val out = mutableListOf<String>()
+        for (line in settings.readLines()) {
+            if (!lineStart.containsMatchIn(line)) continue
+            for (m in quoted.findAll(line)) {
+                out.add(m.groupValues[1].removePrefix(":"))
+            }
+        }
+        return out
     }
 
     /**

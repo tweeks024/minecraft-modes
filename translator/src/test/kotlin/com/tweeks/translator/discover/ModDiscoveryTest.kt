@@ -38,4 +38,25 @@ class ModDiscoveryTest {
         // discovery must filter it out.
         assertEquals(null, discovery.findById("translator"))
     }
+
+    @Test
+    fun `parses multi-arg include lines`(@org.junit.jupiter.api.io.TempDir tmp: Path) {
+        // Groovy supports `include 'foo', 'bar'`; the original regex required
+        // a line to end after the first quoted token and would silently drop
+        // 'bar'. New shape: scan all quoted tokens on each include line.
+        val sg = tmp.resolve("settings.gradle")
+        sg.toFile().writeText(
+            """
+            rootProject.name = 'test'
+            include 'foo', 'bar', 'baz'
+            include 'solo'
+            """.trimIndent()
+        )
+        // Create stub mod dirs so isModModule passes for each.
+        for (m in listOf("foo", "bar", "baz", "solo")) {
+            tmp.resolve("$m/src/main/java").toFile().mkdirs()
+        }
+        val ids = ModDiscovery(tmp).discover().map { it.modId }
+        assertEquals(listOf("foo", "bar", "baz", "solo"), ids)
+    }
 }
