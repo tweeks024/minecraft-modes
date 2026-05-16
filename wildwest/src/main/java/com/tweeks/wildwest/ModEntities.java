@@ -10,6 +10,7 @@ import com.tweeks.wildwest.entity.HerobrineEntity;
 import com.tweeks.wildwest.entity.SherrifEntity;
 import com.tweeks.wildwest.entity.SteveStackerEntity;
 import com.tweeks.wildwest.entity.WalkerEntity;
+import com.tweeks.wildwest.entity.projectile.CannonballEntity;
 import com.tweeks.wildwest.entity.projectile.MeteorEntity;
 import com.tweeks.wildwest.entity.projectile.TaintedVialEntity;
 import net.minecraft.core.registries.Registries;
@@ -116,6 +117,15 @@ public final class ModEntities {
             .updateInterval(2)
             .build(ResourceKey.create(Registries.ENTITY_TYPE,
                 Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "meteor"))));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<CannonballEntity>> CANNONBALL =
+        ENTITY_TYPES.register("cannonball", () -> EntityType.Builder.<CannonballEntity>of(
+                CannonballEntity::new, MobCategory.MISC)
+            .sized(0.4f, 0.4f)
+            .clientTrackingRange(64)
+            .updateInterval(2)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "cannonball"))));
 
     public static final DeferredHolder<EntityType<?>, EntityType<TaintedVialEntity>> TAINTED_VIAL_PROJECTILE =
         ENTITY_TYPES.register("tainted_vial_projectile", () -> EntityType.Builder.<TaintedVialEntity>of(

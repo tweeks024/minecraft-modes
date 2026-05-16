@@ -44,6 +44,7 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.AGENT_CLONE.get(), AgentCloneRenderer::new);
         event.registerEntityRenderer(ModEntities.TAINTED_VIAL_PROJECTILE.get(), ThrownItemRenderer::new);
         event.registerEntityRenderer(ModEntities.METEOR.get(), ThrownItemRenderer::new);
+        event.registerEntityRenderer(ModEntities.CANNONBALL.get(), ThrownItemRenderer::new);
     }
 
     @SubscribeEvent
