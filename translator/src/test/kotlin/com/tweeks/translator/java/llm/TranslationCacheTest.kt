@@ -89,4 +89,29 @@ class TranslationCacheTest {
         file.writeText("{ this isn't valid JSON")
         assertNull(cache.get(sampleKey))
     }
+
+    @Test
+    fun `put writes atomically (no leftover temp files)`(@TempDir dir: Path) {
+        val cache = TranslationCache(dir)
+        cache.put(sampleKey, ClaudeClient.TranslationResult.Ok("// x\n", 0.9))
+        // The final file should exist and there should be no `.tmp` siblings
+        // — if a write was interrupted halfway, that's what we'd see.
+        val files = dir.toFile().listFiles()?.map { it.name } ?: emptyList()
+        assertTrue(files.contains("$sampleKey.json")) { "missing committed cache file: $files" }
+        assertTrue(files.none { it.endsWith(".tmp") }) {
+            "unexpected leftover temp file: $files"
+        }
+    }
+
+    @Test
+    fun `entry from a future schema version is treated as a miss`(@TempDir dir: Path) {
+        // Write a cache file with a higher schemaVersion than the current
+        // code knows. The cache must reject it (return null) rather than
+        // returning a stale result built from fields the writer hadn't yet
+        // populated, otherwise schema additions silently desync.
+        val file = dir.resolve("$sampleKey.json").toFile()
+        file.parentFile.mkdirs()
+        file.writeText("""{"schemaVersion":9999,"kind":"ok","js":"x","confidence":0.9}""")
+        assertNull(TranslationCache(dir).get(sampleKey))
+    }
 }

@@ -165,6 +165,37 @@ class ConfidenceGateTest {
     }
 
     @Test
+    fun `transient API error is NOT cached (so a retry can succeed)`(@TempDir dir: Path) {
+        // First-run scenario: 10+ wildwest goals all miss cache, hit a 429
+        // rate-limit. If we cached the error, every subsequent run would hit
+        // the cached stub permanently until --clear-cache. Errors must stay
+        // out of the cache so the next attempt is a fresh API call.
+        val unt = Untranslatable()
+        val cache = TranslationCache(dir)
+
+        val goal = sampleGoal()
+        val req = ClaudeClient.TranslationRequest(
+            systemPrompt = prompt.systemBlocks(),
+            userMessage = prompt.userMessageFor(goal),
+            modelId = TranslationPrompt.DEFAULT_MODEL_ID,
+        )
+        val mockKey = MockClaudeClient.keyOf(req)
+        val client = MockClaudeClient(
+            mapOf(mockKey to ClaudeClient.TranslationResult.Error("429 rate limit")),
+        )
+        val gate = ConfidenceGate(client, cache, prompt, unt, liveCallsEnabled = true)
+
+        val outcome = gate.route(goal, modId = "securityguard")
+        assertTrue(outcome is RouteOutcome.TodoStub)
+
+        // The transient error MUST NOT have been cached.
+        assertNull(cache.get(gate.computeKey(goal))) {
+            "transient errors must not be cached — a re-run with the same key " +
+                "should retry the API call, not return a stale stub"
+        }
+    }
+
+    @Test
     fun `cache key changes with model id`(@TempDir dir: Path) {
         val unt = Untranslatable()
         val cache = TranslationCache(dir)

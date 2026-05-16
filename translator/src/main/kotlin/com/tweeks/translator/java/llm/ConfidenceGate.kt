@@ -68,7 +68,11 @@ class ConfidenceGate(
                     return todoStub(goal, modId, "cached refusal: ${hit.reason}")
                 }
                 is ClaudeClient.TranslationResult.Error -> {
-                    return todoStub(goal, modId, "cached error: ${hit.message}")
+                    // Stale entry from a prior version that cached errors.
+                    // Treat as a miss so a re-run can retry the API call.
+                    // Deletion would be cleaner but the cache file will be
+                    // overwritten by the next successful translation.
+                    // Fall through to the cache-miss path below.
                 }
             }
         }
@@ -109,9 +113,11 @@ class ConfidenceGate(
                 return todoStub(goal, modId, "model refused: ${result.reason}")
             }
             is ClaudeClient.TranslationResult.Error -> {
-                // Cache errors too so we don't repeatedly hit the API on a
-                // persistent failure (rate limit, malformed response, ...).
-                cache.put(key, result)
+                // Do NOT cache transient API errors (429s, 5xx, network
+                // timeouts). A first-run rate-limit spike on a fresh mod
+                // would otherwise permanently stub every affected goal until
+                // someone runs --clear-cache. Re-running on a clean network
+                // condition should be a fresh attempt.
                 return todoStub(goal, modId, "model error: ${result.message}")
             }
         }

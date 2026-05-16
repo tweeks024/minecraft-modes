@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.StandardCopyOption
 import kotlin.io.path.createDirectories
 import kotlin.io.path.exists
 import kotlin.io.path.isDirectory
@@ -29,15 +30,23 @@ import kotlin.io.path.writeText
  */
 class TranslationCache(private val rootDir: Path) {
 
-    /** Wraps a [TranslationResult] with a discriminator for serialization. */
+    /**
+     * On-disk cache entry. Bump [CURRENT_SCHEMA_VERSION] whenever the wire
+     * format changes in a way that would silently degrade older entries (new
+     * fields, renamed fields, changed defaults). Older entries are treated as
+     * misses and re-translated on the next `--with-llm` run.
+     */
     @Serializable
     internal data class CachedEntry(
+        val schemaVersion: Int = CURRENT_SCHEMA_VERSION,
         val kind: String,
         val js: String? = null,
         val confidence: Double? = null,
         val message: String? = null,
     ) {
         companion object {
+            const val CURRENT_SCHEMA_VERSION = 1
+
             fun of(result: ClaudeClient.TranslationResult): CachedEntry = when (result) {
                 is ClaudeClient.TranslationResult.Ok -> CachedEntry(
                     kind = "ok",
@@ -65,33 +74,47 @@ class TranslationCache(private val rootDir: Path) {
         }
     }
 
-    /** Compact JSON config for cache files. */
+    /** Compact JSON config for cache files. Always emit schemaVersion. */
     private val compact = Json {
         prettyPrint = false
-        encodeDefaults = false
+        encodeDefaults = true
     }
 
     /**
-     * Read the cached result for [key]. Returns null on miss or on any I/O /
-     * parse error — the gate treats those as misses, which means the next
-     * `--with-llm` run rewrites the entry.
+     * Read the cached result for [key]. Returns null on miss, on parse error,
+     * OR on a schema-version mismatch (the entry was written by a future or
+     * incompatible version of the cache). Any of those triggers a re-translate
+     * on the next `--with-llm` run.
      */
     fun get(key: String): ClaudeClient.TranslationResult? {
         val file = pathFor(key)
         if (!file.exists()) return null
         return try {
             val entry = compact.decodeFromString(CachedEntry.serializer(), file.readText())
+            if (entry.schemaVersion != CachedEntry.CURRENT_SCHEMA_VERSION) return null
             entry.toResult()
         } catch (e: Throwable) {
             null
         }
     }
 
-    /** Write [value] to disk under [key]. Creates the cache root if needed. */
+    /**
+     * Write [value] to disk under [key]. Writes to a sibling `.tmp` file and
+     * atomically renames into place so a Ctrl-C / kill mid-write can't leave
+     * a half-written cache file that future runs would treat as corrupt
+     * (effectively losing the entry until `--clear-cache`).
+     */
     fun put(key: String, value: ClaudeClient.TranslationResult) {
         rootDir.createDirectories()
         val file = pathFor(key)
-        file.writeText(compact.encodeToString(CachedEntry.serializer(), CachedEntry.of(value)))
+        val tmp = rootDir.resolve("$key.json.tmp")
+        tmp.writeText(compact.encodeToString(CachedEntry.serializer(), CachedEntry.of(value)))
+        Files.move(
+            tmp,
+            file,
+            StandardCopyOption.ATOMIC_MOVE,
+            StandardCopyOption.REPLACE_EXISTING,
+        )
     }
 
     /**
