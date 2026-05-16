@@ -1,5 +1,6 @@
 package com.tweeks.wildwest.entity;
 
+import com.tweeks.wildwest.entity.ai.CannonOperateGoal;
 import com.tweeks.wildwest.entity.ai.FollowDecision;
 import com.tweeks.wildwest.entity.ai.LawmanTargetGoal;
 import com.tweeks.wildwest.entity.ai.OutlawTargetGoal;
@@ -73,6 +74,7 @@ public abstract class WildWestMob extends PathfinderMob implements FollowDecisio
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
+        this.goalSelector.addGoal(1, new CannonOperateGoal(this));
         this.goalSelector.addGoal(2, new WildWestRangedAttackGoal(this));
         this.goalSelector.addGoal(2, new WildWestMeleeAttackGoal(this, 1.0, true));
         this.goalSelector.addGoal(4, new com.tweeks.wildwest.entity.ai.FollowLeaderGoal(this));

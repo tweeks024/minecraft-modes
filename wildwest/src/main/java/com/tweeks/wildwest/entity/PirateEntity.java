@@ -1,5 +1,6 @@
 package com.tweeks.wildwest.entity;
 
+import com.tweeks.wildwest.entity.ai.CannonOperateGoal;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.EntityType;
@@ -41,7 +42,7 @@ public class PirateEntity extends Monster {
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
-        // Cannon-operate goal added in Task 15.
+        this.goalSelector.addGoal(1, new CannonOperateGoal(this));
         this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.0, true));
         this.goalSelector.addGoal(7, new WaterAvoidingRandomStrollGoal(this, 0.6));
         this.goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 8.0F));
