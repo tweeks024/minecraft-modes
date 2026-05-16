@@ -119,11 +119,22 @@ public class AgentLavaPitGoal extends Goal {
         for (int dy = 0; dy < PIT_DEPTH - 1; dy++) {
             int y = floorY - dy;
             BlockPos backingPos = new BlockPos(wallX + 1, y, centerZ);
-            if (!sl.getBlockState(backingPos).isFaceSturdy(sl, backingPos, Direction.WEST)) {
+            var backingState = sl.getBlockState(backingPos);
+            // Only overwrite if the existing block isn't already a sturdy
+            // attachment surface, and never overwrite dragon-immune blocks
+            // (bedrock / end portal frames / etc.) — setBlockAndUpdate
+            // silently fails on those and would leave the ladder unsupported.
+            if (!backingState.isFaceSturdy(sl, backingPos, Direction.WEST)
+                && !backingState.is(BlockTags.DRAGON_IMMUNE)) {
                 sl.setBlockAndUpdate(backingPos, Blocks.COBBLESTONE.defaultBlockState());
             }
+            // FACING points toward the side the ladder graphic shows — i.e.,
+            // toward the pit interior. The attached wall is on the OPPOSITE
+            // side (east, at backingPos). Placing this with FACING=EAST
+            // would try to attach to the air column to the west and the
+            // ladder pops off on the next neighbor update.
             sl.setBlockAndUpdate(new BlockPos(wallX, y, centerZ),
-                Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING, Direction.EAST));
+                Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING, Direction.WEST));
         }
 
         // Teleport target 1 block above the (now-carved) rim so they fall in.

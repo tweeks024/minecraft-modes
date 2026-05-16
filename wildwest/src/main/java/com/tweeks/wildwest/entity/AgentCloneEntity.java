@@ -50,7 +50,11 @@ public class AgentCloneEntity extends Monster {
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
-        this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.0, true));
+        // followingTargetEvenIfNotSeen=false: clones disengage when the
+        // player breaks line of sight. Ditching the chase keeps the clone
+        // feeling like a confusion decoy rather than a 6-second wall-hack
+        // pursuer.
+        this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.0, false));
         this.goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 8.0F));
         this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
 

@@ -60,7 +60,11 @@ public class AgentTeleportGoal extends Goal {
 
         double destX = picked.x();
         double destZ = picked.z();
-        double destY = -1;
+        // Explicit found-flag rather than a negative-Y sentinel — overworld
+        // terrain Y can be negative (down to -64), so `destY < 0` would
+        // misfire on valid below-sea-level destinations.
+        double destY = 0;
+        boolean destFound = false;
         for (int retry = 0; retry < CLEARANCE_RETRIES; retry++) {
             BlockPos topPos = sl.getHeightmapPos(
                 Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
@@ -69,6 +73,7 @@ public class AgentTeleportGoal extends Goal {
             if (sl.getBlockState(topPos).isAir()
                 && sl.getBlockState(topPos.above()).isAir()) {
                 destY = topPos.getY();
+                destFound = true;
                 break;
             }
 
@@ -76,6 +81,7 @@ public class AgentTeleportGoal extends Goal {
             if (sl.getBlockState(above).isAir()
                 && sl.getBlockState(above.above()).isAir()) {
                 destY = above.getY();
+                destFound = true;
                 break;
             }
 
@@ -83,7 +89,7 @@ public class AgentTeleportGoal extends Goal {
             destX += Math.cos(angle) * 1.5;
             destZ += Math.sin(angle) * 1.5;
         }
-        if (destY < 0) return;
+        if (!destFound) return;
 
         sl.sendParticles(ParticleTypes.SMOKE,
             this.boss.getX(), this.boss.getY() + 1.0, this.boss.getZ(),

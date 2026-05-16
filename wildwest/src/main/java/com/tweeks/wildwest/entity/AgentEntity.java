@@ -205,7 +205,10 @@ public class AgentEntity extends Monster {
     @Override
     public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
         // Phantom swap: roll once per incoming non-zero damage when off cooldown.
+        // Skip swap on the lethal blow — otherwise the boss "saves" itself from
+        // every killing hit and the player can never close out the fight cleanly.
         if (amount > 0.0f && this.swapCooldown == 0
+                && amount < this.getHealth()
                 && this.getRandom().nextFloat() < SWAP_PROBABILITY) {
 
             Entity attacker = source.getEntity();
@@ -259,7 +262,11 @@ public class AgentEntity extends Monster {
         double anchorZ = attacker != null ? attacker.getZ() : this.getZ();
 
         // Validate clearance with up to N retries (perturbing direction on miss).
-        double destX = 0, destZ = 0, destY = -1;
+        // Use an explicit found-flag rather than a negative-Y sentinel — overworld
+        // terrain Y is legitimately negative (down to -64), so `destY < 0` would
+        // misfire on valid below-sea-level destinations.
+        double destX = 0, destZ = 0, destY = 0;
+        boolean destFound = false;
         for (int retry = 0; retry < SWAP_CLEARANCE_RETRIES; retry++) {
             double dist = SWAP_BEHIND_MIN
                 + this.getRandom().nextDouble() * (SWAP_BEHIND_MAX - SWAP_BEHIND_MIN);
@@ -273,12 +280,14 @@ public class AgentEntity extends Monster {
             if (level.getBlockState(topPos).isAir()
                 && level.getBlockState(topPos.above()).isAir()) {
                 destY = topPos.getY();
+                destFound = true;
                 break;
             }
             BlockPos above = topPos.above();
             if (level.getBlockState(above).isAir()
                 && level.getBlockState(above.above()).isAir()) {
                 destY = above.getY();
+                destFound = true;
                 break;
             }
             // Clearance miss — resample direction uniformly. This loses the
@@ -288,7 +297,7 @@ public class AgentEntity extends Monster {
             dirX = Math.cos(angle);
             dirZ = Math.sin(angle);
         }
-        if (destY < 0) return false;
+        if (!destFound) return false;
 
         // Spawn the clone at the current position before we teleport.
         AgentCloneEntity clone = ModEntities.AGENT_CLONE.get().create(
