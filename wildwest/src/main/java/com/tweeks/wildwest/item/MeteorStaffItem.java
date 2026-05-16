@@ -33,22 +33,36 @@ public class MeteorStaffItem extends Item {
     public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
 
-        if (level instanceof ServerLevel sl) {
-            MeteorEntity meteor = ModEntities.METEOR.get().create(sl,
-                EntitySpawnReason.MOB_SUMMONED);
-            if (meteor != null) {
-                Vec3 eye = player.getEyePosition();
-                meteor.setPos(eye.x, eye.y, eye.z);
-                Vec3 look = player.getLookAngle().scale(FIRE_VELOCITY);
-                meteor.setDeltaMovement(look);
-                meteor.setOwner(player);
-                meteor.setDirectHitDamage(DIRECT_HIT_DAMAGE);
-                sl.addFreshEntity(meteor);
-
-                sl.playSound(null, eye.x, eye.y, eye.z,
-                    SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 1.0f, 1.0f);
-            }
+        // Server-side cooldown is authoritative; the client gate at the call
+        // site can lag a tick. Reject on cooldown so a double-click can't
+        // spawn two meteors before the cooldown packet propagates.
+        if (player.getCooldowns().isOnCooldown(stack)) {
+            return InteractionResult.FAIL;
         }
+
+        if (!(level instanceof ServerLevel sl)) {
+            // Client side: nothing to do (server is authoritative for spawning
+            // the projectile and stamping cooldown / swing).
+            return InteractionResult.CONSUME;
+        }
+
+        MeteorEntity meteor = ModEntities.METEOR.get().create(sl,
+            EntitySpawnReason.MOB_SUMMONED);
+        if (meteor == null) {
+            // Entity factory failed; do not consume a charge.
+            return InteractionResult.FAIL;
+        }
+
+        Vec3 eye = player.getEyePosition();
+        meteor.setPos(eye.x, eye.y, eye.z);
+        Vec3 look = player.getLookAngle().scale(FIRE_VELOCITY);
+        meteor.setDeltaMovement(look);
+        meteor.setOwner(player);
+        meteor.setDirectHitDamage(DIRECT_HIT_DAMAGE);
+        sl.addFreshEntity(meteor);
+
+        sl.playSound(null, eye.x, eye.y, eye.z,
+            SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 1.0f, 1.0f);
 
         player.getCooldowns().addCooldown(stack, COOLDOWN_TICKS);
         player.swing(hand);

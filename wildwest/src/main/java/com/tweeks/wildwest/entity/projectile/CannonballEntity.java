@@ -52,10 +52,12 @@ public class CannonballEntity extends ThrowableItemProjectile {
 
         Entity directlyHit = result.getEntity();
         if (directlyHit instanceof LivingEntity living) {
-            Entity attributedAttacker = (this.getOwner() == null) ? this : this.getOwner();
+            Entity owner = this.getOwner();
             living.invulnerableTime = 0;
             living.hurtServer(sl,
-                WildWestDamageTypes.cannonball(attributedAttacker),
+                owner != null
+                    ? WildWestDamageTypes.cannonball(owner)
+                    : WildWestDamageTypes.cannonballAoe(sl),
                 DIRECT_DAMAGE);
         }
 
@@ -95,6 +97,10 @@ public class CannonballEntity extends ThrowableItemProjectile {
         for (String vid : victimIds) {
             LivingEntity v = byId.get(vid);
             if (v != null) {
+                // Clear i-frames so AoE lands even if the victim was recently
+                // hit by another source. Direct-hit branch already does this;
+                // class doc explicitly says we should not rely on invulnerableTime.
+                v.invulnerableTime = 0;
                 v.hurtServer(sl, WildWestDamageTypes.cannonballAoe(sl), AOE_DAMAGE);
             }
         }

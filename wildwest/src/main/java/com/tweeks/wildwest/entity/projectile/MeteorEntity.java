@@ -78,8 +78,14 @@ public class MeteorEntity extends ThrowableItemProjectile {
         Entity directlyHit = result.getEntity();
         if (directlyHit instanceof LivingEntity living) {
             living.invulnerableTime = 0;
+            // Use attacker-attributed source only when the owner (boss / player) is
+            // still loaded. Falling back to `this` (the projectile) breaks kill
+            // credit — projectiles aren't valid attackers for XP/loot. The AoE
+            // factory produces a meteor-typed source with no attacker, which is
+            // the correct "killed by the environment" representation.
+            Entity owner = this.getOwner();
             living.hurtServer(sl,
-                WildWestDamageTypes.meteor(this.getOwner() == null ? this : this.getOwner()),
+                owner != null ? WildWestDamageTypes.meteor(owner) : WildWestDamageTypes.meteorAoe(sl),
                 (float) this.directHitDamage);
         }
 
@@ -108,7 +114,8 @@ public class MeteorEntity extends ThrowableItemProjectile {
 
         boolean replace = MeteorImpactLogic.shouldReplaceWithMagma(
             impactState.isAir(),
-            impactState.is(BlockTags.DRAGON_IMMUNE));
+            impactState.is(BlockTags.DRAGON_IMMUNE),
+            !impactState.getFluidState().isEmpty());
 
         if (replace) {
             sl.setBlockAndUpdate(impactPos, Blocks.MAGMA_BLOCK.defaultBlockState());

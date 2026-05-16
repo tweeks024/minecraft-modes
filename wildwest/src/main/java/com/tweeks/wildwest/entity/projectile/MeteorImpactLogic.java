@@ -15,11 +15,16 @@ public final class MeteorImpactLogic {
     /**
      * @param isAir          whether the impact block's state is air
      * @param isDragonImmune whether the impact block is in {@code #minecraft:dragon_immune}
+     * @param isLiquid       whether the impact block has a non-empty fluid state
+     *                       (e.g. water/lava source or waterlogged); skipping
+     *                       these avoids draining rivers and turning lava
+     *                       sources into magma blocks
      * @return {@code true} if the impact block should be replaced with magma
      */
-    public static boolean shouldReplaceWithMagma(boolean isAir, boolean isDragonImmune) {
+    public static boolean shouldReplaceWithMagma(boolean isAir, boolean isDragonImmune, boolean isLiquid) {
         if (isAir) return false;
         if (isDragonImmune) return false;
+        if (isLiquid) return false;
         return true;
     }
 }

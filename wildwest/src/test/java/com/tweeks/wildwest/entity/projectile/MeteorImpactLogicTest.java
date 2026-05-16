@@ -9,23 +9,34 @@ class MeteorImpactLogicTest {
 
     @Test
     void airBlock_isNotReplaceable() {
-        assertFalse(MeteorImpactLogic.shouldReplaceWithMagma(true, false));
+        assertFalse(MeteorImpactLogic.shouldReplaceWithMagma(true, false, false));
     }
 
     @Test
     void solidNonImmune_isReplaceable() {
-        assertTrue(MeteorImpactLogic.shouldReplaceWithMagma(false, false));
+        assertTrue(MeteorImpactLogic.shouldReplaceWithMagma(false, false, false));
     }
 
     @Test
     void dragonImmune_isNotReplaceable() {
         // Bedrock, end portal frame, etc.
-        assertFalse(MeteorImpactLogic.shouldReplaceWithMagma(false, true));
+        assertFalse(MeteorImpactLogic.shouldReplaceWithMagma(false, true, false));
     }
 
     @Test
     void airAndImmune_returnsFalse() {
         // Pathological combination — air shouldn't be replaced regardless.
-        assertFalse(MeteorImpactLogic.shouldReplaceWithMagma(true, true));
+        assertFalse(MeteorImpactLogic.shouldReplaceWithMagma(true, true, false));
+    }
+
+    @Test
+    void liquidBlock_isNotReplaceable() {
+        // Water / lava source blocks must not be silently overwritten.
+        assertFalse(MeteorImpactLogic.shouldReplaceWithMagma(false, false, true));
+    }
+
+    @Test
+    void waterloggedDragonImmuneNeverReplaced() {
+        assertFalse(MeteorImpactLogic.shouldReplaceWithMagma(false, true, true));
     }
 }

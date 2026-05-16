@@ -127,8 +127,12 @@ public class CannonBlock extends HorizontalDirectionalBlock {
     }
 
     private static int findIronNuggetSlot(Player player) {
+        // Only scan the main inventory + hotbar (slots 0..35). getContainerSize()
+        // returns 41 (includes armor + offhand); pulling the nugget from a
+        // helmet slot would be unexpected behavior.
         var inv = player.getInventory();
-        for (int i = 0; i < inv.getContainerSize(); i++) {
+        int mainSize = Math.min(inv.getContainerSize(), 36);
+        for (int i = 0; i < mainSize; i++) {
             if (inv.getItem(i).is(Items.IRON_NUGGET)) return i;
         }
         return -1;

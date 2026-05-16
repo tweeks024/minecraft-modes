@@ -1,10 +1,8 @@
 package com.tweeks.wildwest.item;
 
-import com.tweeks.wildwest.WildWestDamageTypes;
 import com.tweeks.wildwest.WildWestMod;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.Identifier;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlotGroup;
@@ -40,8 +38,5 @@ public class BanditKnifeItem extends Item {
     public void hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
         super.hurtEnemy(stack, target, attacker);
         target.addEffect(new MobEffectInstance(MobEffects.WITHER, 40, 0));
-        if (!target.isAlive() && target.level() instanceof ServerLevel sl) {
-            target.hurtServer(sl, WildWestDamageTypes.knife(attacker), 0.0F);
-        }
     }
 }

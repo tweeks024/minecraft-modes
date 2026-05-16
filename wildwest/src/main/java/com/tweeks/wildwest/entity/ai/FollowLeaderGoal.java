@@ -61,7 +61,14 @@ public class FollowLeaderGoal extends Goal {
 
     @Override
     public void stop() {
-        self.setFollowingLeader(null);
+        // Only clear the leader reference when the leader is actually gone
+        // (dead or out of range). If the goal merely got preempted by a higher
+        // priority MOVE-flag goal (e.g. melee), keep the leader so
+        // LeaderTargetCopyGoal continues to coordinate targets mid-fight.
+        WildWestMob leader = self.getFollowingLeader();
+        if (leader == null || !leader.isAlive() || self.distanceTo(leader) > LOSE_INTEREST_RANGE) {
+            self.setFollowingLeader(null);
+        }
         self.getNavigation().stop();
     }
 }

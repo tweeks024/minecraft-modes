@@ -68,7 +68,8 @@ public class HerobrineTeleportGoal extends Goal {
         // perturbing, so a heightmap returning the solid surface block doesn't trap us.
         double destX = picked.x();
         double destZ = picked.z();
-        double destY = -1;
+        double destY = 0;
+        boolean destFound = false;
         for (int retry = 0; retry < CLEARANCE_RETRIES; retry++) {
             BlockPos topPos = sl.getHeightmapPos(
                 Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
@@ -78,6 +79,7 @@ public class HerobrineTeleportGoal extends Goal {
             if (sl.getBlockState(topPos).isAir()
                 && sl.getBlockState(topPos.above()).isAir()) {
                 destY = topPos.getY();
+                destFound = true;
                 break;
             }
 
@@ -86,6 +88,7 @@ public class HerobrineTeleportGoal extends Goal {
             if (sl.getBlockState(above).isAir()
                 && sl.getBlockState(above.above()).isAir()) {
                 destY = above.getY();
+                destFound = true;
                 break;
             }
 
@@ -94,8 +97,10 @@ public class HerobrineTeleportGoal extends Goal {
             destX += Math.cos(angle) * 1.5;
             destZ += Math.sin(angle) * 1.5;
         }
-        if (destY < 0) {
+        if (!destFound) {
             // Couldn't find a valid spot — skip this teleport, cooldown stays reset.
+            // Bool flag instead of Y < 0 sentinel: overworld Y can be negative
+            // (deep-slate / ancient cities at Y -30 to -50).
             return;
         }
 

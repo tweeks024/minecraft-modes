@@ -79,13 +79,16 @@ public class HerobrineMeteorGoal extends Goal {
 
         if (sl.dimensionType().hasCeiling()) {
             // Scan down for first run of CEILING_MIN_POCKET air blocks above a non-air block.
+            // Return the TOP of the pocket so the meteor has the full pocket height to fall.
             int pocketRun = 0;
+            int pocketTop = 0;
             for (int y = maxY; y > sl.getMinY() + 1; y--) {
                 BlockPos p = new BlockPos(seed.getX(), y, seed.getZ());
                 if (sl.getBlockState(p).isAir()) {
+                    if (pocketRun == 0) pocketTop = y;
                     pocketRun++;
                     if (pocketRun >= CEILING_MIN_POCKET) {
-                        return new Vec3(xzX, y, xzZ);
+                        return new Vec3(xzX, pocketTop, xzZ);
                     }
                 } else {
                     pocketRun = 0;

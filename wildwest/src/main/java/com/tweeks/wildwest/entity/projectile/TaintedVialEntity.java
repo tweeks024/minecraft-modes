@@ -41,9 +41,12 @@ public class TaintedVialEntity extends ThrowableItemProjectile {
         sl.playSound(null, this.blockPosition(), SoundEvents.GLASS_BREAK,
             SoundSource.NEUTRAL, 1.0F, 1.0F);
 
+        // Exclude the thrower so a player can't self-infect by throwing at
+        // their own feet. The thrower might still be in the splash AABB.
+        net.minecraft.world.entity.Entity owner = this.getOwner();
         AABB box = AABB.ofSize(center, SPLASH_RADIUS * 2, SPLASH_RADIUS * 2, SPLASH_RADIUS * 2);
         sl.getEntitiesOfClass(LivingEntity.class, box,
-                e -> e.position().distanceTo(center) <= SPLASH_RADIUS)
+                e -> e != owner && e.position().distanceTo(center) <= SPLASH_RADIUS)
             .forEach(e -> {
                 if (InfectionImmunity.isImmune(e)) return;
                 if (e.hasEffect(ModEffects.ZOMBIFIED)) return;
