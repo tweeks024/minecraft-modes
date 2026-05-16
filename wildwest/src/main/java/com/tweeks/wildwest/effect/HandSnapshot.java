@@ -10,8 +10,8 @@ import net.minecraft.world.item.ItemStack;
 public final class HandSnapshot {
     private HandSnapshot() {}
 
-    private static final String KEY_MAIN = "wildwest:pre_zombified_mainhand";
-    private static final String KEY_OFF  = "wildwest:pre_zombified_offhand";
+    public static final String KEY_MAIN = "wildwest:pre_zombified_mainhand";
+    public static final String KEY_OFF  = "wildwest:pre_zombified_offhand";
 
     /** Snapshot held items into persistent data and clear the slots. No-op if already snapshotted. */
     public static void snapshotAndClear(Mob mob) {

@@ -59,8 +59,6 @@ public final class ZombieVirusHandler {
     private static final int CURING_SHAKE_DURATION_TICKS = 30 * 20;
     private static final double WITHER_CHANCE = 0.10;
 
-    private static final String KEY_MAIN = "wildwest:pre_zombified_mainhand";
-    private static final String KEY_OFF  = "wildwest:pre_zombified_offhand";
 
     /**
      * Bite spread: a zombified attacker hitting a non-immune target via direct
@@ -272,7 +270,7 @@ public final class ZombieVirusHandler {
 
         var ops = RegistryOps.create(NbtOps.INSTANCE, mob.registryAccess());
 
-        for (String key : new String[] { KEY_MAIN, KEY_OFF }) {
+        for (String key : new String[] { HandSnapshot.KEY_MAIN, HandSnapshot.KEY_OFF }) {
             if (!pd.contains(key)) continue;
             var tag = pd.get(key);
             if (tag != null) {

@@ -7,7 +7,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.Mth;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -29,12 +28,11 @@ import net.minecraft.world.level.Level;
 public class PirateCaptainEntity extends WildWestMob implements Outlaw, Enemy {
 
     private final ServerBossEvent bossBar;
-    private boolean equipmentInitialized = false;
 
     public PirateCaptainEntity(EntityType<? extends PirateCaptainEntity> type, Level level) {
         super(type, level);
         this.bossBar = new ServerBossEvent(
-            Mth.createInsecureUUID(this.random),
+            this.getUUID(),
             Component.translatable("entity.wildwest.pirate_captain"),
             BossEvent.BossBarColor.PURPLE,
             BossEvent.BossBarOverlay.PROGRESS);
@@ -88,14 +86,15 @@ public class PirateCaptainEntity extends WildWestMob implements Outlaw, Enemy {
         super.tick();
         // The weapon-mode tick in WildWestMob calls getHandWeaponStack() lazily,
         // so the enchanted rapier appears whenever the captain switches to MELEE.
-        // Force-equip on first server tick so a freshly-spawned captain has the
-        // enchanted blade visible (in OFFHAND) even while still in RANGED mode.
-        if (!this.equipmentInitialized && !this.level().isClientSide()) {
+        // Force-equip a freshly-spawned captain — but only when both hands are
+        // empty, so reloaded captains keep whatever they were holding at save.
+        if (!this.level().isClientSide()
+                && this.getMainHandItem().isEmpty()
+                && this.getOffhandItem().isEmpty()) {
             this.setItemSlot(EquipmentSlot.MAINHAND, this.getGunStack());
             this.setItemSlot(EquipmentSlot.OFFHAND, this.buildEnchantedRapier());
             this.setDropChance(EquipmentSlot.MAINHAND, 1.0f);
             this.setDropChance(EquipmentSlot.OFFHAND, 1.0f);
-            this.equipmentInitialized = true;
         }
     }
 

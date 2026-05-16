@@ -11,9 +11,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.Mth;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Pose;
@@ -42,7 +42,7 @@ public class SteveStackerEntity extends Monster {
     public SteveStackerEntity(EntityType<? extends SteveStackerEntity> type, Level level) {
         super(type, level);
         this.bossBar = new ServerBossEvent(
-            Mth.createInsecureUUID(this.random),
+            this.getUUID(),
             Component.translatable("entity.wildwest.steve_stacker"),
             BossEvent.BossBarColor.PURPLE,
             BossEvent.BossBarOverlay.PROGRESS);
@@ -201,5 +201,11 @@ public class SteveStackerEntity extends Monster {
     public void stopSeenByPlayer(ServerPlayer player) {
         super.stopSeenByPlayer(player);
         this.bossBar.removePlayer(player);
+    }
+
+    @Override
+    public void remove(Entity.RemovalReason reason) {
+        this.bossBar.removeAllPlayers();
+        super.remove(reason);
     }
 }
