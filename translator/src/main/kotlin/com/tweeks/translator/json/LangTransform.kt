@@ -29,8 +29,7 @@ import kotlin.io.path.writeText
 class LangTransform {
 
     fun translate(modRoot: Path, modId: String, outputRoot: Path) {
-        val input = modRoot.resolve("src/generated/clientData/assets/$modId/lang/en_us.json")
-        if (!input.isRegularFile()) return
+        val input = resolveLangInput(modRoot, modId) ?: return
 
         val outputDir = outputRoot.resolve("$modId/resource_pack/texts")
         outputDir.createDirectories()
@@ -40,6 +39,20 @@ class LangTransform {
 
         // languages.json — required for Bedrock to even look at the .lang file.
         outputDir.resolve("languages.json").writeText("[\"en_US\"]\n")
+    }
+
+    /**
+     * Locate the source `en_us.json`. Datagenned mods (securityguard,
+     * creeperskin) put it under `src/generated/clientData`; hand-authored
+     * mods (wildwest) put it under `src/main/resources`. Generated wins
+     * because if both exist it's the canonical post-build output.
+     */
+    private fun resolveLangInput(modRoot: Path, modId: String): Path? {
+        val generated = modRoot.resolve("src/generated/clientData/assets/$modId/lang/en_us.json")
+        if (generated.isRegularFile()) return generated
+        val main = modRoot.resolve("src/main/resources/assets/$modId/lang/en_us.json")
+        if (main.isRegularFile()) return main
+        return null
     }
 
     /**

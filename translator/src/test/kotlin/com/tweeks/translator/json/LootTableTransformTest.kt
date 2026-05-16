@@ -7,9 +7,14 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Path
+import kotlin.io.path.createDirectories
+import kotlin.io.path.isRegularFile
 import kotlin.io.path.readText
+import kotlin.io.path.writeText
 
 class LootTableTransformTest {
 
@@ -137,6 +142,36 @@ class LootTableTransformTest {
         transform.translateJson(javaJson, "securityguard", "entities/guard.json")
         val report = unt.renderReport("securityguard")
         assert(report.contains("random_sequence")) { report }
+    }
+
+    @Test
+    fun `falls back to src main resources when generated serverData absent`(@TempDir tmp: Path) {
+        val modRoot = tmp.resolve("themod")
+        val lootDir = modRoot.resolve("src/main/resources/data/themod/loot_table/entities")
+        lootDir.createDirectories()
+        lootDir.resolve("foo.json").writeText(
+            """{"pools":[{"rolls":1,"entries":[{"type":"minecraft:item","name":"minecraft:stone"}]}]}""",
+        )
+        val out = tmp.resolve("out")
+        LootTableTransform(Untranslatable()).translate(modRoot, "themod", out)
+        val written = out.resolve("themod/behavior_pack/loot_tables/entities/foo.json")
+        assertTrue(written.isRegularFile(), "Expected loot table written at $written")
+    }
+
+    @Test
+    fun `merges generated and src main resources when both exist`(@TempDir tmp: Path) {
+        // Wildwest reality: some loot tables in generated/, others in main/resources/.
+        val modRoot = tmp.resolve("themod")
+        val genDir = modRoot.resolve("src/generated/serverData/data/themod/loot_table/entities")
+        val mainDir = modRoot.resolve("src/main/resources/data/themod/loot_table/chests")
+        genDir.createDirectories()
+        mainDir.createDirectories()
+        genDir.resolve("walker.json").writeText("""{"pools":[]}""")
+        mainDir.resolve("treasure.json").writeText("""{"pools":[]}""")
+        val out = tmp.resolve("out")
+        LootTableTransform(Untranslatable()).translate(modRoot, "themod", out)
+        assertTrue(out.resolve("themod/behavior_pack/loot_tables/entities/walker.json").isRegularFile())
+        assertTrue(out.resolve("themod/behavior_pack/loot_tables/chests/treasure.json").isRegularFile())
     }
 
     private fun readGolden(name: String): String =

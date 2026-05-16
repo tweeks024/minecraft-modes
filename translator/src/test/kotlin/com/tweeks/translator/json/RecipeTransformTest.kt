@@ -5,9 +5,14 @@ import com.tweeks.translator.emit.Untranslatable
 import com.tweeks.translator.manifest.BedrockTarget
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Path
+import kotlin.io.path.createDirectories
+import kotlin.io.path.isRegularFile
 import kotlin.io.path.readText
+import kotlin.io.path.writeText
 
 /**
  * Golden-file tests for [RecipeTransform].
@@ -60,6 +65,40 @@ class RecipeTransformTest {
         assert(report.contains("`guard_helmet`")) {
             "Expected guard_helmet listed in report: $report"
         }
+    }
+
+    @Test
+    fun `merges generated and src main resources when both exist`(@TempDir tmp: Path) {
+        // Wildwest reality: some recipes datagen'd, others authored in src/main/resources.
+        val modRoot = tmp.resolve("themod")
+        val genDir = modRoot.resolve("src/generated/serverData/data/themod/recipe")
+        val mainDir = modRoot.resolve("src/main/resources/data/themod/recipe")
+        genDir.createDirectories()
+        mainDir.createDirectories()
+        val shapeless = """
+          {"type":"minecraft:crafting_shapeless","ingredients":[{"item":"minecraft:stone"}],
+           "result":{"id":"minecraft:cobblestone"}}
+        """.trimIndent()
+        genDir.resolve("gen_recipe.json").writeText(shapeless)
+        mainDir.resolve("main_recipe.json").writeText(shapeless)
+        val out = tmp.resolve("out")
+        RecipeTransform(target, Untranslatable()).translate(modRoot, "themod", out)
+        assertTrue(out.resolve("themod/behavior_pack/recipes/gen_recipe.json").isRegularFile())
+        assertTrue(out.resolve("themod/behavior_pack/recipes/main_recipe.json").isRegularFile())
+    }
+
+    @Test
+    fun `falls back to src main resources when generated absent`(@TempDir tmp: Path) {
+        val modRoot = tmp.resolve("themod")
+        val mainDir = modRoot.resolve("src/main/resources/data/themod/recipe")
+        mainDir.createDirectories()
+        mainDir.resolve("only.json").writeText(
+            """{"type":"minecraft:crafting_shapeless","ingredients":[{"item":"minecraft:stone"}],
+                "result":{"id":"minecraft:cobblestone"}}""".trimIndent(),
+        )
+        val out = tmp.resolve("out")
+        RecipeTransform(target, Untranslatable()).translate(modRoot, "themod", out)
+        assertTrue(out.resolve("themod/behavior_pack/recipes/only.json").isRegularFile())
     }
 
     private fun readGolden(name: String): String =

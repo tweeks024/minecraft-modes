@@ -14,12 +14,12 @@ class ModDiscoveryTest {
     private val repoRoot: Path = ModDiscovery.findRepoRoot(Path.of("").toAbsolutePath())
 
     @Test
-    fun `discovers exactly the four sibling mods`() {
+    fun `discovers all sibling NeoForge mods in settings_gradle order`() {
         val ids = ModDiscovery(repoRoot).discover().map { it.modId }
         assertEquals(
-            listOf("securitycore", "securityguard", "thief", "creeperskin"),
+            listOf("securitycore", "securityguard", "thief", "creeperskin", "wildwest", "craftee"),
             ids,
-            "Expected the four NeoForge mods in settings.gradle order; the translator module itself must be filtered out",
+            "Expected all NeoForge mods in settings.gradle order; the translator module itself must be filtered out",
         )
     }
 

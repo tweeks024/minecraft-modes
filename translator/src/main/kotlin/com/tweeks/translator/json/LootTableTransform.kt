@@ -48,24 +48,33 @@ class LootTableTransform(
 ) {
 
     fun translate(modRoot: Path, modId: String, outputRoot: Path) {
-        val inputDir = modRoot.resolve("src/generated/serverData/data/$modId/loot_table")
-        if (!inputDir.isDirectory()) return
+        val inputDirs = listOf(
+            modRoot.resolve("src/generated/serverData/data/$modId/loot_table"),
+            modRoot.resolve("src/main/resources/data/$modId/loot_table"),
+        ).filter { it.isDirectory() }
+        if (inputDirs.isEmpty()) return
 
         val outputDir = outputRoot.resolve("$modId/behavior_pack/loot_tables")
         outputDir.createDirectories()
 
-        Files.walk(inputDir).use { stream ->
-            stream
-                .asSequence()
-                .filter { it.isRegularFile() && it.extension == "json" }
-                .sortedBy { it.toString() }
-                .forEach { src ->
-                    val rel = src.relativeTo(inputDir)
-                    val dest = outputDir.resolve(rel.toString())
-                    dest.parent?.createDirectories()
-                    val translated = translateJson(src.readText(), modId, rel.toString())
-                    dest.writeText(translated)
-                }
+        // If both roots define the same relative path, generated wins because
+        // it's the canonical post-build form.
+        val seen = mutableSetOf<String>()
+        for (inputDir in inputDirs) {
+            Files.walk(inputDir).use { stream ->
+                stream
+                    .asSequence()
+                    .filter { it.isRegularFile() && it.extension == "json" }
+                    .sortedBy { it.toString() }
+                    .forEach { src ->
+                        val rel = src.relativeTo(inputDir).toString()
+                        if (!seen.add(rel)) return@forEach
+                        val dest = outputDir.resolve(rel)
+                        dest.parent?.createDirectories()
+                        val translated = translateJson(src.readText(), modId, rel)
+                        dest.writeText(translated)
+                    }
+            }
         }
     }
 

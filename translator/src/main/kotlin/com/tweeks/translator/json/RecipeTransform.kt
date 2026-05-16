@@ -52,19 +52,35 @@ class RecipeTransform(
     private val untranslatable: Untranslatable,
 ) {
 
-    /** Run the transform for one mod. No-op if the input directory doesn't exist. */
+    /**
+     * Run the transform for one mod. Reads recipes from both
+     * `src/generated/serverData/data/<modid>/recipe/` (datagen output) and
+     * `src/main/resources/data/<modid>/recipe/` (hand-authored). When a file
+     * with the same name appears in both, generated wins. No-op if neither
+     * directory exists.
+     */
     fun translate(modRoot: Path, modId: String, outputRoot: Path) {
-        val inputDir = modRoot.resolve("src/generated/serverData/data/$modId/recipe")
-        if (!inputDir.isDirectory()) return
+        val inputDirs = listOf(
+            modRoot.resolve("src/generated/serverData/data/$modId/recipe"),
+            modRoot.resolve("src/main/resources/data/$modId/recipe"),
+        ).filter { it.isDirectory() }
+        if (inputDirs.isEmpty()) return
 
         val outputDir = outputRoot.resolve("$modId/behavior_pack/recipes")
         outputDir.createDirectories()
 
-        Files.list(inputDir).use { stream ->
-            stream
-                .filter { it.isRegularFile() && it.extension == "json" }
-                .sorted()
-                .forEach { translateOne(it, modId, outputDir) }
+        val seen = mutableSetOf<String>()
+        for (inputDir in inputDirs) {
+            Files.list(inputDir).use { stream ->
+                stream
+                    .filter { it.isRegularFile() && it.extension == "json" }
+                    .sorted()
+                    .forEach { src ->
+                        if (seen.add(src.fileName.toString())) {
+                            translateOne(src, modId, outputDir)
+                        }
+                    }
+            }
         }
     }
 
