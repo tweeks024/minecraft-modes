@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "facing=north,loaded=false": { "model": "wildwest:block/cannon" },
+    "facing=east,loaded=false":  { "model": "wildwest:block/cannon", "y": 90 },
+    "facing=south,loaded=false": { "model": "wildwest:block/cannon", "y": 180 },
+    "facing=west,loaded=false":  { "model": "wildwest:block/cannon", "y": 270 },
+    "facing=north,loaded=true":  { "model": "wildwest:block/cannon_loaded" },
+    "facing=east,loaded=true":   { "model": "wildwest:block/cannon_loaded", "y": 90 },
+    "facing=south,loaded=true":  { "model": "wildwest:block/cannon_loaded", "y": 180 },
+    "facing=west,loaded=true":   { "model": "wildwest:block/cannon_loaded", "y": 270 }
+  }
+}

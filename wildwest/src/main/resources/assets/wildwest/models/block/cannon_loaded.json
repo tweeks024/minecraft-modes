@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "top": "wildwest:block/cannon_top",
+    "front": "wildwest:block/cannon_front_loaded",
+    "side": "wildwest:block/cannon_side"
+  }
+}
