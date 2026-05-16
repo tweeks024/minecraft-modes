@@ -76,6 +76,21 @@ BANDIT_LEADER_ACCESSORIES = [
 # texture authoring (paint the white-eye Steve variant in Blockbench).
 HEROBRINE_ACCESSORIES = []
 
+# Pirate + Pirate Captain — both reuse vanilla HumanoidModel via
+# ModelLayers.PLAYER (same as Herobrine). The tricorn hat lives in the
+# head OVERLAY layer (X+32 region of the head UV) and is rendered by
+# vanilla's hat layer — no extra cube. Open the bbmodel and paint the
+# hat into the head overlay region directly.
+PIRATE_ACCESSORIES = []
+PIRATE_CAPTAIN_ACCESSORIES = []
+
+# Skeleton Pirate also uses vanilla HumanoidModel (Task 19 fallback —
+# the renderer is HumanoidMobRenderer, not SkeletonRenderer, because
+# SkeletonPirateEntity extends WildWestMob not vanilla Skeleton). But
+# the texture is 64x32 (classic skeleton format), so resolution is half
+# the others. Build a 64x32 variant of the standard humanoid.
+SKELETON_PIRATE_ACCESSORIES = []
+
 
 def java_to_bbmodel(bone, java):
     """Convert Java HumanoidModel addBox args to bbmodel from/to world coords."""
@@ -121,7 +136,7 @@ def make_bone_group(mob_name, name, origin, child_uuids):
     }
 
 
-def build_bbmodel(mob_name, accessory_cubes, texture_path):
+def build_bbmodel(mob_name, accessory_cubes, texture_path, tex_height=64):
     """Return the full bbmodel dict for one mob."""
     elements = []
     # bone_name -> [child cube UUID]
@@ -192,9 +207,9 @@ def build_bbmodel(mob_name, accessory_cubes, texture_path):
         "layers_enabled": False,
         "sync_to_project": "",
         "width": 64,
-        "height": 64,
+        "height": tex_height,
         "uv_width": 64,
-        "uv_height": 64,
+        "uv_height": tex_height,
         "source": tex_data,
     }
 
@@ -210,16 +225,16 @@ def build_bbmodel(mob_name, accessory_cubes, texture_path):
         "variable_placeholders": "",
         "variable_placeholder_buttons": [],
         "unhandled_root_fields": {},
-        "resolution": {"width": 64, "height": 64},
+        "resolution": {"width": 64, "height": tex_height},
         "elements": elements,
         "outliner": outliner,
         "textures": [texture],
     }
 
 
-def write_bbmodel(out_dir, mob_name, accessories, texture_dir):
+def write_bbmodel(out_dir, mob_name, accessories, texture_dir, tex_height=64):
     texture_path = os.path.join(texture_dir, f"{mob_name}.png")
-    bbmodel = build_bbmodel(mob_name, accessories, texture_path)
+    bbmodel = build_bbmodel(mob_name, accessories, texture_path, tex_height)
     out_path = os.path.join(out_dir, f"{mob_name}.bbmodel")
     with open(out_path, 'w') as f:
         json.dump(bbmodel, f, indent=2)
@@ -243,4 +258,7 @@ if __name__ == '__main__':
     write_bbmodel(out_dir, 'bandit',        BANDIT_ACCESSORIES,        texture_dir)
     write_bbmodel(out_dir, 'bandit_leader', BANDIT_LEADER_ACCESSORIES, texture_dir)
     write_bbmodel(out_dir, 'herobrine',     HEROBRINE_ACCESSORIES,     texture_dir)
+    write_bbmodel(out_dir, 'pirate',         PIRATE_ACCESSORIES,         texture_dir)
+    write_bbmodel(out_dir, 'pirate_captain', PIRATE_CAPTAIN_ACCESSORIES, texture_dir)
+    write_bbmodel(out_dir, 'skeleton_pirate', SKELETON_PIRATE_ACCESSORIES, texture_dir, tex_height=32)
     print('OK')

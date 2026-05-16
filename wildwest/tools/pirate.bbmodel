@@ -1,0 +1,335 @@
+{
+  "meta": {
+    "format_version": "4.5",
+    "model_format": "modded_entity",
+    "box_uv": true
+  },
+  "name": "pirate",
+  "model_identifier": "",
+  "visible_box": [
+    4,
+    4,
+    0
+  ],
+  "variable_placeholders": "",
+  "variable_placeholder_buttons": [],
+  "unhandled_root_fields": {},
+  "resolution": {
+    "width": 64,
+    "height": 64
+  },
+  "elements": [
+    {
+      "name": "head",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -4,
+        24,
+        -4
+      ],
+      "to": [
+        4,
+        32,
+        4
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        0,
+        0
+      ],
+      "type": "cube",
+      "uuid": "54af5701-5da8-5cce-bea3-f66e6170766b"
+    },
+    {
+      "name": "body",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -4,
+        12,
+        -2
+      ],
+      "to": [
+        4,
+        24,
+        2
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        16,
+        16
+      ],
+      "type": "cube",
+      "uuid": "ad16da02-e9c0-5546-9c8e-934f797b4a1e"
+    },
+    {
+      "name": "right_arm",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -8,
+        12,
+        -2
+      ],
+      "to": [
+        -4,
+        24,
+        2
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        -5,
+        22,
+        0
+      ],
+      "uv_offset": [
+        40,
+        16
+      ],
+      "type": "cube",
+      "uuid": "cae7b912-641f-5755-a4e8-cb4aedeb0637"
+    },
+    {
+      "name": "left_arm",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        4,
+        12,
+        -2
+      ],
+      "to": [
+        8,
+        24,
+        2
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        5,
+        22,
+        0
+      ],
+      "uv_offset": [
+        32,
+        48
+      ],
+      "type": "cube",
+      "uuid": "211cf226-86ba-52dc-9cce-6745ea03e2f9"
+    },
+    {
+      "name": "right_leg",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -3.9,
+        0,
+        -2
+      ],
+      "to": [
+        0.10000000000000009,
+        12,
+        2
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        -1.9,
+        12,
+        0
+      ],
+      "uv_offset": [
+        0,
+        16
+      ],
+      "type": "cube",
+      "uuid": "772253d1-cca3-5cc5-887e-0e32860c4b8f"
+    },
+    {
+      "name": "left_leg",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -0.10000000000000009,
+        0,
+        -2
+      ],
+      "to": [
+        3.9,
+        12,
+        2
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        1.9,
+        12,
+        0
+      ],
+      "uv_offset": [
+        16,
+        48
+      ],
+      "type": "cube",
+      "uuid": "4a5b4b57-07c1-5ce5-bed2-17f054b7b7ab"
+    }
+  ],
+  "outliner": [
+    {
+      "name": "head",
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "color": 0,
+      "uuid": "f0922b25-3270-5770-90bb-4d3eea7a41ae",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "54af5701-5da8-5cce-bea3-f66e6170766b",
+        "ad16da02-e9c0-5546-9c8e-934f797b4a1e"
+      ]
+    },
+    {
+      "name": "body",
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "color": 0,
+      "uuid": "f0fc6c9d-1fff-5950-9f60-0b1463b68df9",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": []
+    },
+    {
+      "name": "right_arm",
+      "origin": [
+        -5,
+        22,
+        0
+      ],
+      "color": 0,
+      "uuid": "82084416-bf3f-57e1-8c64-574cf89f280c",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "cae7b912-641f-5755-a4e8-cb4aedeb0637"
+      ]
+    },
+    {
+      "name": "left_arm",
+      "origin": [
+        5,
+        22,
+        0
+      ],
+      "color": 0,
+      "uuid": "942a9f6a-28ad-5b41-b799-9fddba3e201a",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "211cf226-86ba-52dc-9cce-6745ea03e2f9"
+      ]
+    },
+    {
+      "name": "right_leg",
+      "origin": [
+        -1.9,
+        12,
+        0
+      ],
+      "color": 0,
+      "uuid": "3317c8ff-e16c-5ff9-8b3c-63d5e5b0b5ed",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "772253d1-cca3-5cc5-887e-0e32860c4b8f"
+      ]
+    },
+    {
+      "name": "left_leg",
+      "origin": [
+        1.9,
+        12,
+        0
+      ],
+      "color": 0,
+      "uuid": "ec30f9a9-12e7-5a90-ab8a-617215c4e3d0",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "4a5b4b57-07c1-5ce5-bed2-17f054b7b7ab"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "path": "/Users/tweeks/code/minecraft-mods/wildwest/src/main/resources/assets/wildwest/textures/entity/pirate.png",
+      "name": "pirate.png",
+      "folder": "entity",
+      "namespace": "wildwest",
+      "id": "0",
+      "particle": false,
+      "render_mode": "default",
+      "render_sides": "auto",
+      "frame_time": 1,
+      "frame_order_type": "loop",
+      "frame_order": "",
+      "frame_interpolate": false,
+      "visible": true,
+      "internal": true,
+      "saved": true,
+      "uuid": "400ee8a7-f582-5b92-bc47-316dddbfb895",
+      "relative_path": "../src/main/resources/assets/wildwest/textures/entity/pirate.png",
+      "use_as_default": false,
+      "layers_enabled": false,
+      "sync_to_project": "",
+      "width": 64,
+      "height": 64,
+      "uv_width": 64,
+      "uv_height": 64,
+      "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABuklEQVR4nO3boU8CURwH8O/99rNcoVAojI3/AIIWy42N5iwWs/wFGigaoBAkG+gGLIzmxiwkgwST0VkoFsoVg25O3cD5Hvoe8o7f77MRjvfue/uxx929xxHBYruYe4WD26dZ5LL/YaVgPP7lZOqUTxCOIBxBOIJwBOEIwhGE4/t+y+k6vwRjfqdzYdy5dVowp7fN+TaMwJ21pyvNJwjHtg67ja6xfdw7xkZ/AOOPAuPKAarVnW/vZx0v2zGdXG1M0X8+BzROuu+vTcLLdFos+nO7d776EWG7DLpeJSLf8/1+sWjMG+Rf8Jv5vW09wMa2XkAQjiAcQTh2DbB95xftP2+Z2xfyBjCfM1yx78DKzbWxfZLUERL2HRhagTbsO1BHQBJWgTbsO1BHQBJWgTbsO1BHQBJWgTb8MHNMyM1v6ghI6v86PXadDjM8y9oIUEoppQSLELh4NPpxya1ZGiKdpfP9czE6j3tf22mtFnyNSimllFqPyDXA9fmCcj52Or7+X8ARQTiCcAThCMIRhGNkXPPu6NW0HmDctzTU+wCCcAThCMIRhGPXANfnC8p5rBUjML5//7ehlaZnwBs7dneiOiZwQgAAAABJRU5ErkJggg=="
+    }
+  ]
+}
