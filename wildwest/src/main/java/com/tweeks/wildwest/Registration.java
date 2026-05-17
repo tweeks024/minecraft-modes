@@ -14,6 +14,7 @@ import com.tweeks.wildwest.item.PistolItem;
 import com.tweeks.wildwest.item.RapierItem;
 import com.tweeks.wildwest.item.RifleItem;
 import com.tweeks.wildwest.item.TaintedVialItem;
+import com.tweeks.wildwest.item.VoidMarkItem;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.BlockItem;
@@ -84,6 +85,11 @@ public final class Registration {
         CursedTomeItem::new,
         p -> p.stacksTo(1).durability(CursedTomeItem.MAX_USES).rarity(Rarity.EPIC));
 
+    public static final DeferredItem<VoidMarkItem> VOID_MARK = ITEMS.registerItem(
+        "void_mark",
+        VoidMarkItem::new,
+        p -> p.stacksTo(16).rarity(Rarity.EPIC));
+
     public static final DeferredItem<MeteorStaffItem> METEOR_STAFF = ITEMS.registerItem(
         "meteor_staff",
         MeteorStaffItem::new,
@@ -134,6 +140,7 @@ public final class Registration {
                     output.accept(HEROBRINE_SPAWN_EGG.get());
                     output.accept(AGENT_SPAWN_EGG.get());
                     output.accept(NULL_SPAWN_EGG.get());
+                    output.accept(VOID_MARK.get());
                     output.accept(CURSED_TOME.get());
                     output.accept(METEOR_STAFF.get());
                     output.accept(TAINTED_VIAL.get());
