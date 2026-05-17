@@ -9,6 +9,7 @@ import com.tweeks.wildwest.item.CursedTomeItem;
 import com.tweeks.wildwest.item.FlintlockPistolItem;
 import com.tweeks.wildwest.item.HerobrineSpawnEggItem;
 import com.tweeks.wildwest.item.MeteorStaffItem;
+import com.tweeks.wildwest.item.NullSpawnEggItem;
 import com.tweeks.wildwest.item.PistolItem;
 import com.tweeks.wildwest.item.RapierItem;
 import com.tweeks.wildwest.item.RifleItem;
@@ -73,6 +74,11 @@ public final class Registration {
         AgentSpawnEggItem::new,
         p -> p.spawnEgg(ModEntities.AGENT.get()));
 
+    public static final DeferredItem<NullSpawnEggItem> NULL_SPAWN_EGG = ITEMS.registerItem(
+        "null_spawn_egg",
+        NullSpawnEggItem::new,
+        p -> p.spawnEgg(ModEntities.NULL.get()));
+
     public static final DeferredItem<CursedTomeItem> CURSED_TOME = ITEMS.registerItem(
         "cursed_tome",
         CursedTomeItem::new,
@@ -127,6 +133,7 @@ public final class Registration {
                     output.accept(STEVE_STACKER_SPAWN_EGG.get());
                     output.accept(HEROBRINE_SPAWN_EGG.get());
                     output.accept(AGENT_SPAWN_EGG.get());
+                    output.accept(NULL_SPAWN_EGG.get());
                     output.accept(CURSED_TOME.get());
                     output.accept(METEOR_STAFF.get());
                     output.accept(TAINTED_VIAL.get());
