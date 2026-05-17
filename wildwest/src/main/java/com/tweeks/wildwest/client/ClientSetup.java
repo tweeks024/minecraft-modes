@@ -42,6 +42,8 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.HEROBRINE.get(), HerobrineRenderer::new);
         event.registerEntityRenderer(ModEntities.AGENT.get(), AgentRenderer::new);
         event.registerEntityRenderer(ModEntities.AGENT_CLONE.get(), AgentCloneRenderer::new);
+        event.registerEntityRenderer(ModEntities.NULL.get(), NullRenderer::new);
+        event.registerEntityRenderer(ModEntities.NULL_RIFT.get(), NullRiftRenderer::new);
         event.registerEntityRenderer(ModEntities.TAINTED_VIAL_PROJECTILE.get(), ThrownItemRenderer::new);
         event.registerEntityRenderer(ModEntities.METEOR.get(), ThrownItemRenderer::new);
         event.registerEntityRenderer(ModEntities.CANNONBALL.get(), ThrownItemRenderer::new);
