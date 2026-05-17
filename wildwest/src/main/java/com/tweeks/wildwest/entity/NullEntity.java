@@ -1,6 +1,8 @@
 package com.tweeks.wildwest.entity;
 
 import javax.annotation.Nullable;
+import com.tweeks.wildwest.entity.ai.NullDriftGoal;
+import com.tweeks.wildwest.entity.ai.NullRiftGoal;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
@@ -17,7 +19,11 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
+import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 
@@ -142,7 +148,12 @@ public class NullEntity extends Monster {
 
     @Override
     protected void registerGoals() {
-        // Goals wired up in Task 15 once NullDriftGoal + NullRiftGoal exist.
+        this.goalSelector.addGoal(1, new NullDriftGoal(this));
+        this.goalSelector.addGoal(2, new NullRiftGoal(this));
+        this.goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 32.0F));
+        this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
+
+        this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, true));
     }
 
     @Override

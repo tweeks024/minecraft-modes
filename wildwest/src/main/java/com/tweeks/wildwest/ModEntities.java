@@ -8,6 +8,7 @@ import com.tweeks.wildwest.entity.AgentCloneEntity;
 import com.tweeks.wildwest.entity.AgentEntity;
 import com.tweeks.wildwest.entity.HerobrineEntity;
 import com.tweeks.wildwest.entity.NullEntity;
+import com.tweeks.wildwest.entity.NullRiftEntity;
 import com.tweeks.wildwest.entity.PirateCaptainEntity;
 import com.tweeks.wildwest.entity.PirateEntity;
 import com.tweeks.wildwest.entity.SherrifEntity;
@@ -120,6 +121,15 @@ public final class ModEntities {
             .clientTrackingRange(10)
             .build(ResourceKey.create(Registries.ENTITY_TYPE,
                 Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "null"))));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<NullRiftEntity>> NULL_RIFT =
+        ENTITY_TYPES.register("null_rift", () -> EntityType.Builder.<NullRiftEntity>of(
+                NullRiftEntity::new, MobCategory.MISC)
+            .sized(3.0f, 3.0f)
+            .clientTrackingRange(8)
+            .updateInterval(2)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "null_rift"))));
 
     public static final DeferredHolder<EntityType<?>, EntityType<PirateEntity>> PIRATE =
         ENTITY_TYPES.register("pirate", () -> EntityType.Builder.<PirateEntity>of(
