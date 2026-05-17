@@ -44,7 +44,7 @@ Per the explicit out-of-scope note in the Entity 303 spec (`2026-05-14-entity303
 1. Create `BossSingletonState` (verbatim copy of existing State POJOs, generic name).
 2. Create `BossSingletonSavedData` with the shared codec construction (the codec factory takes `Function<Boolean, Function<Optional<UUID>, Function<Optional<String>, Self>>>` or equivalent — see implementation note below).
 3. Rewrite `HerobrineSavedData` to extend `BossSingletonSavedData`. `FILE_ID = "wildwest_herobrine"`, static `TYPE`, static `get(server)`. Remove `HerobrineState.java`.
-4. Rewrite `AgentSavedData` to extend `BossSingletonSavedData`. `FILE_ID = "wildwest_agent"`, static `TYPE`, static `get(server)`. Remove `AgentState.java`.
+4. Rewrite `AgentSavedData` to extend `BossSingletonSavedData`. `FILE_ID = "wildwest_the_agent"` (verbatim from current source — was set by the Entity 303 → Agent rename in `fe0f829`; NBT compat requires preserving it), static `TYPE`, static `get(server)`. Remove `AgentState.java`.
 5. Update callers in `HerobrineEntity`, `AgentEntity`, `HerobrineEntityTest`, `AgentEntityTest`, etc. to import `BossSingletonState` and call shared accessors.
 6. Update `HerobrineStateTest` → `BossSingletonStateTest`; delete `AgentStateTest` (covered by `BossSingletonStateTest`).
 7. Verify NBT compatibility: existing `wildwest_herobrine.dat` and `wildwest_agent.dat` files on disk must continue to load. The codec field names (`Alive`, `CurrentId`, `Dimension`) and `SavedDataType` identifiers stay identical — only the in-memory class hierarchy changes. No data migration required.
