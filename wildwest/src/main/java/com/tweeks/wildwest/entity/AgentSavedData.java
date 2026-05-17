@@ -17,7 +17,7 @@ import net.minecraft.world.level.saveddata.SavedDataType;
  */
 public final class AgentSavedData extends BossSingletonSavedData {
 
-    private static final String FILE_ID = "wildwest_agent";
+    private static final String FILE_ID = "wildwest_the_agent";
 
     public static final Codec<AgentSavedData> CODEC = buildCodec(AgentSavedData::new);
 
