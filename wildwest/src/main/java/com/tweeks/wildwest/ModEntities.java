@@ -7,6 +7,7 @@ import com.tweeks.wildwest.entity.DeputyEntity;
 import com.tweeks.wildwest.entity.AgentCloneEntity;
 import com.tweeks.wildwest.entity.AgentEntity;
 import com.tweeks.wildwest.entity.HerobrineEntity;
+import com.tweeks.wildwest.entity.NullEntity;
 import com.tweeks.wildwest.entity.PirateCaptainEntity;
 import com.tweeks.wildwest.entity.PirateEntity;
 import com.tweeks.wildwest.entity.SherrifEntity;
@@ -111,6 +112,14 @@ public final class ModEntities {
             .clientTrackingRange(10)
             .build(ResourceKey.create(Registries.ENTITY_TYPE,
                 Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "the_agent_clone"))));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<NullEntity>> NULL =
+        ENTITY_TYPES.register("null", () -> EntityType.Builder.<NullEntity>of(
+                NullEntity::new, MobCategory.MONSTER)
+            .sized(0.6f, 1.95f)
+            .clientTrackingRange(10)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "null"))));
 
     public static final DeferredHolder<EntityType<?>, EntityType<PirateEntity>> PIRATE =
         ENTITY_TYPES.register("pirate", () -> EntityType.Builder.<PirateEntity>of(
