@@ -95,7 +95,15 @@ public final class VoidMarkHandler {
         if (player.getAbilities().instabuild) return;
 
         float incoming = event.getNewDamage();
-        if (player.getHealth() - incoming > 0.0f) return; // not lethal
+        // NaN / non-positive damage = nothing for the mark to save against.
+        if (!Float.isFinite(incoming) || incoming <= 0.0f) return;
+        // LivingDamageEvent.Pre fires BEFORE absorption hearts are subtracted, so
+        // a hit that looks lethal here may not actually deplete real HP. Mirror
+        // that subtraction before deciding to spend a mark — otherwise a player
+        // with absorption would burn a mark + get force-teleported on hits that
+        // wouldn't have killed them.
+        float effective = Math.max(0.0f, incoming - player.getAbsorptionAmount());
+        if (player.getHealth() - effective > 0.0f) return;
 
         NonNullList<ItemStack> main = player.getInventory().getNonEquipmentItems();
         Item voidMark = Registration.VOID_MARK.get();

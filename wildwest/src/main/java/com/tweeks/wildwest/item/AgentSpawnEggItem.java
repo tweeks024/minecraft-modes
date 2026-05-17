@@ -67,7 +67,7 @@ public class AgentSpawnEggItem extends SpawnEggItem {
         if (savedDim == null) {
             return refuseAway(player);
         }
-        if (savedDim != level.dimension()) {
+        if (!savedDim.equals(level.dimension())) {
             if (player != null) {
                 player.sendOverlayMessage(
                     Component.translatable("item.wildwest.the_agent_spawn_egg.different_dimension"));
