@@ -35,6 +35,14 @@ public class WildWestMod {
         ModEffects.register(modEventBus);
         ModSounds.register(modEventBus);
         modEventBus.addListener(WildWestMod::registerEntityAttributes);
+
+        // Register the Void Mark damage-save handler against the GAME bus.
+        // ZombieVirusHandler uses @EventBusSubscriber to auto-register, but
+        // this one is colocated explicitly to keep the wiring discoverable
+        // alongside the spawn-placement registrations below.
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.register(
+            com.tweeks.wildwest.event.VoidMarkHandler.class);
+
         modEventBus.addListener((net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent event) -> {
             event.register(ModEntities.BANDIT.get(),
                 net.minecraft.world.entity.SpawnPlacementTypes.ON_GROUND,
