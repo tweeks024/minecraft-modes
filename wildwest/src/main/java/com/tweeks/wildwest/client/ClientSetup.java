@@ -50,6 +50,14 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.PIRATE.get(), PirateRenderer::new);
         event.registerEntityRenderer(ModEntities.SKELETON_PIRATE.get(), SkeletonPirateRenderer::new);
         event.registerEntityRenderer(ModEntities.PIRATE_CAPTAIN.get(), PirateCaptainRenderer::new);
+        event.registerEntityRenderer(ModEntities.GRIM_REAPER.get(), GrimReaperRenderer::new);
+        @SuppressWarnings("unchecked")
+        var skeletonRendererProvider =
+            (net.minecraft.client.renderer.entity.EntityRendererProvider<com.tweeks.wildwest.entity.ScytheSkeletonEntity>)
+            (net.minecraft.client.renderer.entity.EntityRendererProvider<?>)
+            (net.minecraft.client.renderer.entity.EntityRendererProvider<net.minecraft.world.entity.monster.skeleton.Skeleton>)
+            net.minecraft.client.renderer.entity.SkeletonRenderer::new;
+        event.registerEntityRenderer(ModEntities.SCYTHE_SKELETON.get(), skeletonRendererProvider);
     }
 
     @SubscribeEvent
