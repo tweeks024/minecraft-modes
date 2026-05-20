@@ -9,6 +9,7 @@ import com.tweeks.wildwest.item.CursedTomeItem;
 import com.tweeks.wildwest.item.FlintlockPistolItem;
 import com.tweeks.wildwest.item.HerobrineSpawnEggItem;
 import com.tweeks.wildwest.item.MeteorStaffItem;
+import com.tweeks.wildwest.item.ReaperScytheItem;
 import com.tweeks.wildwest.item.NullSpawnEggItem;
 import com.tweeks.wildwest.item.PistolItem;
 import com.tweeks.wildwest.item.RapierItem;
@@ -95,6 +96,9 @@ public final class Registration {
         MeteorStaffItem::new,
         p -> p.stacksTo(1).rarity(Rarity.EPIC));
 
+    public static final DeferredItem<ReaperScytheItem> REAPER_SCYTHE = ITEMS.registerItem(
+        "reaper_scythe", ReaperScytheItem::new, p -> p);
+
     public static final DeferredItem<TaintedVialItem> TAINTED_VIAL = ITEMS.registerItem(
         "tainted_vial", TaintedVialItem::new, p -> p);
 
@@ -143,6 +147,7 @@ public final class Registration {
                     output.accept(VOID_MARK.get());
                     output.accept(CURSED_TOME.get());
                     output.accept(METEOR_STAFF.get());
+                    output.accept(REAPER_SCYTHE.get());
                     output.accept(TAINTED_VIAL.get());
                     output.accept(RAPIER.get());
                     output.accept(FLINTLOCK_PISTOL.get());
