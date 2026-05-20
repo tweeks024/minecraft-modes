@@ -45,6 +45,26 @@ public class GrimReaperEntity extends Monster {
         this.setPersistenceRequired();
         this.setCustomName(Component.translatable("entity.wildwest.grim_reaper"));
         this.setCustomNameVisible(false);
+        this.setItemSlot(net.minecraft.world.entity.EquipmentSlot.MAINHAND,
+            new net.minecraft.world.item.ItemStack(
+                com.tweeks.wildwest.Registration.REAPER_SCYTHE.get()));
+        this.setDropChance(net.minecraft.world.entity.EquipmentSlot.MAINHAND, 0.0f);
+    }
+
+    @Override
+    protected void registerGoals() {
+        this.goalSelector.addGoal(0, new net.minecraft.world.entity.ai.goal.FloatGoal(this));
+        this.goalSelector.addGoal(1, new com.tweeks.wildwest.entity.ai.GrimReaperSoulLiftGoal(this));
+        this.goalSelector.addGoal(2, new com.tweeks.wildwest.entity.ai.GrimReaperRaiseDeadGoal(this));
+        this.goalSelector.addGoal(3, new net.minecraft.world.entity.ai.goal.MeleeAttackGoal(this, 1.0D, false));
+        this.goalSelector.addGoal(4, new net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal(this, 0.8D));
+        this.goalSelector.addGoal(5, new net.minecraft.world.entity.ai.goal.LookAtPlayerGoal(
+            this, net.minecraft.world.entity.player.Player.class, 16.0F));
+        this.goalSelector.addGoal(6, new net.minecraft.world.entity.ai.goal.RandomLookAroundGoal(this));
+
+        this.targetSelector.addGoal(1, new net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal(this));
+        this.targetSelector.addGoal(2, new net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal<>(
+            this, net.minecraft.world.entity.player.Player.class, true));
     }
 
     public static AttributeSupplier.Builder createAttributes() {
