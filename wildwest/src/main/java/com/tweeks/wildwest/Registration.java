@@ -10,6 +10,7 @@ import com.tweeks.wildwest.item.FlintlockPistolItem;
 import com.tweeks.wildwest.item.HerobrineSpawnEggItem;
 import com.tweeks.wildwest.item.MeteorStaffItem;
 import com.tweeks.wildwest.item.ReaperScytheItem;
+import com.tweeks.wildwest.item.GrimReaperSpawnEggItem;
 import com.tweeks.wildwest.item.NullSpawnEggItem;
 import com.tweeks.wildwest.item.PistolItem;
 import com.tweeks.wildwest.item.RapierItem;
@@ -81,6 +82,11 @@ public final class Registration {
         NullSpawnEggItem::new,
         p -> p.spawnEgg(ModEntities.NULL.get()));
 
+    public static final DeferredItem<GrimReaperSpawnEggItem> GRIM_REAPER_SPAWN_EGG = ITEMS.registerItem(
+        "grim_reaper_spawn_egg",
+        GrimReaperSpawnEggItem::new,
+        p -> p.spawnEgg(ModEntities.GRIM_REAPER.get()));
+
     public static final DeferredItem<CursedTomeItem> CURSED_TOME = ITEMS.registerItem(
         "cursed_tome",
         CursedTomeItem::new,
@@ -144,6 +150,7 @@ public final class Registration {
                     output.accept(HEROBRINE_SPAWN_EGG.get());
                     output.accept(AGENT_SPAWN_EGG.get());
                     output.accept(NULL_SPAWN_EGG.get());
+                    output.accept(GRIM_REAPER_SPAWN_EGG.get());
                     output.accept(VOID_MARK.get());
                     output.accept(CURSED_TOME.get());
                     output.accept(METEOR_STAFF.get());
