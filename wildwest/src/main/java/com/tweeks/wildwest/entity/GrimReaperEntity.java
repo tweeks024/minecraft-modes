@@ -98,6 +98,13 @@ public class GrimReaperEntity extends Monster {
                     saved.clear();
                 }
             }
+            // Cleanup raised minions
+            sl.getEntitiesOfClass(net.minecraft.world.entity.monster.skeleton.Skeleton.class,
+                this.getBoundingBox().inflate(64.0))
+                .stream()
+                .filter(s -> s.getPersistentData().getBooleanOr(
+                    com.tweeks.wildwest.entity.ai.GrimReaperRaiseDeadGoal.MINION_NBT_KEY, false))
+                .forEach(s -> s.discard());
         }
     }
 
