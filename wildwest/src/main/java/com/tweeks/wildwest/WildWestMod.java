@@ -8,6 +8,7 @@ import com.tweeks.wildwest.entity.DeputyEntity;
 import com.tweeks.wildwest.entity.AgentCloneEntity;
 import com.tweeks.wildwest.entity.AgentEntity;
 import com.tweeks.wildwest.entity.HerobrineEntity;
+import com.tweeks.wildwest.entity.GrimReaperEntity;
 import com.tweeks.wildwest.entity.NullEntity;
 import com.tweeks.wildwest.entity.PirateCaptainEntity;
 import com.tweeks.wildwest.entity.PirateEntity;
@@ -113,6 +114,7 @@ public class WildWestMod {
         event.put(ModEntities.AGENT.get(), AgentEntity.createAttributes().build());
         event.put(ModEntities.AGENT_CLONE.get(), AgentCloneEntity.createAttributes().build());
         event.put(ModEntities.NULL.get(), NullEntity.createAttributes().build());
+        event.put(ModEntities.GRIM_REAPER.get(), GrimReaperEntity.createAttributes().build());
         event.put(ModEntities.PIRATE.get(), PirateEntity.createAttributes().build());
         event.put(ModEntities.SKELETON_PIRATE.get(), SkeletonPirateEntity.createAttributes().build());
         event.put(ModEntities.PIRATE_CAPTAIN.get(), PirateCaptainEntity.createAttributes().build());
