@@ -6,11 +6,13 @@ import com.tweeks.wildwest.entity.BulletEntity;
 import com.tweeks.wildwest.entity.DeputyEntity;
 import com.tweeks.wildwest.entity.AgentCloneEntity;
 import com.tweeks.wildwest.entity.AgentEntity;
+import com.tweeks.wildwest.entity.GrimReaperEntity;
 import com.tweeks.wildwest.entity.HerobrineEntity;
 import com.tweeks.wildwest.entity.NullEntity;
 import com.tweeks.wildwest.entity.NullRiftEntity;
 import com.tweeks.wildwest.entity.PirateCaptainEntity;
 import com.tweeks.wildwest.entity.PirateEntity;
+import com.tweeks.wildwest.entity.ScytheSkeletonEntity;
 import com.tweeks.wildwest.entity.SherrifEntity;
 import com.tweeks.wildwest.entity.SkeletonPirateEntity;
 import com.tweeks.wildwest.entity.SteveStackerEntity;
@@ -130,6 +132,22 @@ public final class ModEntities {
             .updateInterval(2)
             .build(ResourceKey.create(Registries.ENTITY_TYPE,
                 Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "null_rift"))));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<GrimReaperEntity>> GRIM_REAPER =
+        ENTITY_TYPES.register("grim_reaper", () -> EntityType.Builder.<GrimReaperEntity>of(
+                GrimReaperEntity::new, MobCategory.MONSTER)
+            .sized(0.6f, 2.2f)
+            .clientTrackingRange(10)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "grim_reaper"))));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<ScytheSkeletonEntity>> SCYTHE_SKELETON =
+        ENTITY_TYPES.register("scythe_skeleton", () -> EntityType.Builder.<ScytheSkeletonEntity>of(
+                ScytheSkeletonEntity::new, MobCategory.CREATURE)
+            .sized(0.6f, 1.99f)
+            .clientTrackingRange(8)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "scythe_skeleton"))));
 
     public static final DeferredHolder<EntityType<?>, EntityType<PirateEntity>> PIRATE =
         ENTITY_TYPES.register("pirate", () -> EntityType.Builder.<PirateEntity>of(
