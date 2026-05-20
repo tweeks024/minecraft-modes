@@ -132,7 +132,7 @@ Create `wildwest/src/main/java/com/tweeks/wildwest/entity/ScytheSkeletonEntity.j
 package com.tweeks.wildwest.entity;
 
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.monster.Skeleton;
+import net.minecraft.world.entity.monster.skeleton.Skeleton;
 import net.minecraft.world.level.Level;
 
 /**
@@ -1090,7 +1090,7 @@ import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.entity.monster.Skeleton;
+import net.minecraft.world.entity.monster.skeleton.Skeleton;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ItemEnchantments;
@@ -1103,7 +1103,7 @@ import net.minecraft.world.level.block.Blocks;
  * Grim Reaper signature ability. On a 10s cooldown, picks 2–3 ground
  * positions within 8 blocks of the current target, plays a 1s emerge
  * animation (dirt particles + sound), then spawns vanilla
- * {@link net.minecraft.world.entity.monster.Skeleton} entities holding
+ * {@link net.minecraft.world.entity.monster.skeleton.Skeleton} entities holding
  * iron swords enchanted with {@link Enchantments#SHARPNESS} level 3.
  * Spawned skeletons carry an NBT marker ({@code wildwest:grim_reaper_minion})
  * so {@link GrimReaperEntity#die} can clean them up.
@@ -1272,7 +1272,7 @@ public void die(DamageSource damageSource) {
             }
         }
         // Cleanup raised minions
-        sl.getEntitiesOfClass(net.minecraft.world.entity.monster.Skeleton.class,
+        sl.getEntitiesOfClass(net.minecraft.world.entity.monster.skeleton.Skeleton.class,
             this.getBoundingBox().inflate(64.0))
             .stream()
             .filter(s -> s.getPersistentData().getBooleanOr(
@@ -1527,8 +1527,8 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.monster.AbstractSkeleton;
-import net.minecraft.world.entity.monster.Skeleton;
+import net.minecraft.world.entity.monster.skeleton.AbstractSkeleton;
+import net.minecraft.world.entity.monster.skeleton.Skeleton;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;

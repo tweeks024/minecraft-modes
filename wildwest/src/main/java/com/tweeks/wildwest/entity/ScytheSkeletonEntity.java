@@ -1,7 +1,7 @@
 package com.tweeks.wildwest.entity;
 
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.monster.skeleton.Skeleton;
 import net.minecraft.world.level.Level;
 
 /**
@@ -11,8 +11,8 @@ import net.minecraft.world.level.Level;
  *
  * <p>Stub — full behavior added in later plan tasks.
  */
-public class ScytheSkeletonEntity extends Monster {
-    public ScytheSkeletonEntity(EntityType<? extends ScytheSkeletonEntity> type, Level level) {
+public class ScytheSkeletonEntity extends Skeleton {
+    public ScytheSkeletonEntity(EntityType<? extends Skeleton> type, Level level) {
         super(type, level);
     }
 }
