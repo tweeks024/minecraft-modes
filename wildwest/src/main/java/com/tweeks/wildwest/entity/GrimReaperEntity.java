@@ -118,13 +118,15 @@ public class GrimReaperEntity extends Monster {
                     saved.clear();
                 }
             }
-            // Cleanup raised minions
-            sl.getEntitiesOfClass(net.minecraft.world.entity.monster.skeleton.Skeleton.class,
-                this.getBoundingBox().inflate(64.0))
-                .stream()
-                .filter(s -> s.getPersistentData().getBooleanOr(
+            // Cleanup raised minions across the whole level — not just within
+            // a radius of the reaper's corpse, since a kited fight can leave
+            // tagged skeletons far from the final death position.
+            sl.getEntities(
+                net.minecraft.world.level.entity.EntityTypeTest.forClass(
+                    net.minecraft.world.entity.monster.skeleton.Skeleton.class),
+                s -> s.getPersistentData().getBooleanOr(
                     com.tweeks.wildwest.entity.ai.GrimReaperRaiseDeadGoal.MINION_NBT_KEY, false))
-                .forEach(s -> s.discard());
+                .forEach(net.minecraft.world.entity.Entity::discard);
         }
     }
 

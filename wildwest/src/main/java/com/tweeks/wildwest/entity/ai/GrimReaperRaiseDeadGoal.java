@@ -59,6 +59,7 @@ public class GrimReaperRaiseDeadGoal extends Goal {
             this.cooldown--;
             return false;
         }
+        if (this.reaper.swinging) return false;
         LivingEntity target = this.reaper.getTarget();
         return target != null
             && target.isAlive()
