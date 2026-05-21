@@ -49,7 +49,6 @@ public class ScytheSkeletonFollowOwnerGoal extends Goal {
 
     @Override
     public boolean canContinueToUse() {
-        if (this.navigation.isDone()) return false;
         if (this.owner == null) return false;
         return this.skeleton.distanceToSqr(this.owner) > (this.startDistance * 0.5f) * (this.startDistance * 0.5f);
     }
@@ -57,6 +56,9 @@ public class ScytheSkeletonFollowOwnerGoal extends Goal {
     @Override
     public void start() {
         this.timeToRecalcPath = 0;
+        if (this.owner != null) {
+            this.navigation.moveTo(this.owner, this.speed);
+        }
     }
 
     @Override

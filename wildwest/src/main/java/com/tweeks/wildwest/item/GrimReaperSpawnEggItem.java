@@ -65,7 +65,10 @@ public class GrimReaperSpawnEggItem extends SpawnEggItem {
         ServerLevel target = server.getLevel(savedDim);
         if (target == null) return refuseAway(player);
 
-        Entity existing = target.getEntity(saved.getCurrentId());
+        var savedId = saved.getCurrentId();
+        if (savedId == null) return refuseAway(player);
+
+        Entity existing = target.getEntity(savedId);
         if (!(existing instanceof GrimReaperEntity reaper)) {
             return refuseAway(player);
         }

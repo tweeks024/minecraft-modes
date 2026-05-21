@@ -103,6 +103,7 @@ public class ScytheSkeletonEntity extends Skeleton {
         if (this.getRemainingFireTicks() > 0) {
             this.setRemainingFireTicks(0);
         }
+        if (this.level().isClientSide()) return;
         // Bump idle counter when no target, no active path, and not adjacent to owner.
         Player owner = this.getOwnerPlayer();
         if (this.getTarget() != null

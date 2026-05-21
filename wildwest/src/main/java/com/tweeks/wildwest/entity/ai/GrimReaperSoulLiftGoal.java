@@ -108,6 +108,11 @@ public class GrimReaperSoulLiftGoal extends Goal {
 
     @Override
     public void stop() {
+        // If aborted mid-telegraph (target died, moved out of range, etc.),
+        // still apply the cooldown so the reaper can't immediately re-cast.
+        if (this.telegraphTimer > 0 && this.cooldown <= 0) {
+            this.cooldown = COOLDOWN_TICKS;
+        }
         this.captured = null;
         this.telegraphTimer = 0;
     }

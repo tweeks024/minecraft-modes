@@ -75,6 +75,8 @@ public class GrimReaperRaiseDeadGoal extends Goal {
     public void start() {
         LivingEntity target = this.reaper.getTarget();
         if (target == null || !(this.reaper.level() instanceof ServerLevel sl)) {
+            // Apply a short grace cooldown so canUse doesn't fire again next tick.
+            this.cooldown = 20;
             return;
         }
 

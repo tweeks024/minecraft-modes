@@ -78,6 +78,20 @@ public class GrimReaperEntity extends Monster {
     }
 
     @Override
+    protected void enchantSpawnedWeapon(ServerLevelAccessor level, net.minecraft.util.RandomSource random,
+                                        net.minecraft.world.DifficultyInstance difficulty) {
+        // Keep the Reaper Scythe pristine — vanilla random-enchant pass would
+        // apply Sharpness/Smite under high local difficulty.
+    }
+
+    @Override
+    protected void enchantSpawnedArmor(ServerLevelAccessor level, net.minecraft.util.RandomSource random,
+                                       net.minecraft.world.entity.EquipmentSlot slot,
+                                       net.minecraft.world.DifficultyInstance difficulty) {
+        // No armor on the reaper, but suppress the random-enchant pass anyway.
+    }
+
+    @Override
     public boolean isInvulnerableTo(ServerLevel level, DamageSource source) {
         if (source.is(DamageTypeTags.IS_FIRE)) return true;
         return super.isInvulnerableTo(level, source);
