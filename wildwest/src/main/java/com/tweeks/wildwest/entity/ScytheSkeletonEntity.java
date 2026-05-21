@@ -34,6 +34,8 @@ public class ScytheSkeletonEntity extends Skeleton {
     @Nullable
     private UUID ownerUUID;
 
+    private int idleTicks = 0;
+
     public ScytheSkeletonEntity(EntityType<? extends Skeleton> type, Level level) {
         super(type, level);
         this.setPersistenceRequired();
@@ -57,6 +59,14 @@ public class ScytheSkeletonEntity extends Skeleton {
         return entity instanceof Player p ? p : null;
     }
 
+    public int getIdleTicks() {
+        return this.idleTicks;
+    }
+
+    public void resetIdleTicks() {
+        this.idleTicks = 0;
+    }
+
     public static AttributeSupplier.Builder createAttributes() {
         return AbstractSkeleton.createAttributes()
             .add(Attributes.MAX_HEALTH, 20.0)
@@ -76,9 +86,17 @@ public class ScytheSkeletonEntity extends Skeleton {
     @Override
     public void aiStep() {
         super.aiStep();
-        // Sun-immune: clear any fire applied by the daylight burn check.
         if (this.getRemainingFireTicks() > 0) {
             this.setRemainingFireTicks(0);
+        }
+        // Bump idle counter when no target, no active path, and not adjacent to owner.
+        Player owner = this.getOwnerPlayer();
+        if (this.getTarget() != null
+            || this.getNavigation().isInProgress()
+            || (owner != null && this.distanceToSqr(owner) < 5.0 * 5.0)) {
+            this.idleTicks = 0;
+        } else {
+            this.idleTicks++;
         }
     }
 
