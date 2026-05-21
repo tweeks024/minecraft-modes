@@ -76,15 +76,57 @@ public class ReaperScytheItem extends Item {
         }
 
         if (level.isClientSide()) {
-            // Client returns SUCCESS so the swing/animation fires; server
-            // does the real work below.
             return InteractionResult.SUCCESS;
         }
 
-        // Full summon implementation arrives in Task 18 once
-        // ScytheSkeletonEntity supports owner UUID + spawn helper.
-        // For now: stamp the cooldown so we can verify plumbing.
+        if (!(level instanceof net.minecraft.server.level.ServerLevel sl)) {
+            return InteractionResult.PASS;
+        }
+
+        int alive = com.tweeks.wildwest.entity.ScytheSkeletonEntity.countMinionsOwnedBy(sl, player.getUUID());
+        if (alive >= MAX_MINIONS) {
+            player.sendOverlayMessage(
+                net.minecraft.network.chat.Component.translatable("item.wildwest.reaper_scythe.cap_reached"));
+            return InteractionResult.FAIL;
+        }
+
+        var eye = player.getEyePosition();
+        var look = player.getLookAngle();
+        double sx = eye.x + look.x * SUMMON_RANGE;
+        double sy = eye.y + look.y * SUMMON_RANGE;
+        double sz = eye.z + look.z * SUMMON_RANGE;
+        net.minecraft.core.BlockPos.MutableBlockPos cursor =
+            new net.minecraft.core.BlockPos.MutableBlockPos(
+                (int) Math.floor(sx), (int) Math.floor(sy), (int) Math.floor(sz));
+        for (int dy = 0; dy < 4; dy++) {
+            net.minecraft.core.BlockPos below = cursor.below();
+            if (!sl.getBlockState(below).isAir()) {
+                break;
+            }
+            cursor.setY(below.getY());
+        }
+        double spawnY = cursor.getY();
+
+        com.tweeks.wildwest.entity.ScytheSkeletonEntity minion =
+            com.tweeks.wildwest.ModEntities.SCYTHE_SKELETON.get()
+                .create(sl, net.minecraft.world.entity.EntitySpawnReason.MOB_SUMMONED);
+        if (minion == null) {
+            return InteractionResult.FAIL;
+        }
+        minion.setPos(sx, spawnY, sz);
+        minion.setOwnerUUID(player.getUUID());
+        minion.finalizeSpawn(sl, sl.getCurrentDifficultyAt(minion.blockPosition()),
+            net.minecraft.world.entity.EntitySpawnReason.MOB_SUMMONED, null);
+        sl.addFreshEntity(minion);
+
+        sl.sendParticles(net.minecraft.core.particles.ParticleTypes.SOUL,
+            sx, spawnY + 0.5, sz, 15, 0.3, 0.5, 0.3, 0.05);
+        sl.playSound(null, sx, spawnY, sz,
+            net.minecraft.sounds.SoundEvents.ZOMBIE_VILLAGER_CONVERTED,
+            net.minecraft.sounds.SoundSource.PLAYERS, 1.0f, 1.2f);
+
         player.getCooldowns().addCooldown(stack, COOLDOWN_TICKS);
+        player.swing(hand);
         return InteractionResult.CONSUME;
     }
 
