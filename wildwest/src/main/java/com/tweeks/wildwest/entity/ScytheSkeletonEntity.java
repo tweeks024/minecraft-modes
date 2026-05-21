@@ -102,19 +102,32 @@ public class ScytheSkeletonEntity extends Skeleton {
     }
 
     /**
+     * Generic counter helper — delegates to {@link MinionCounter#countMatching}
+     * so callers can reference it via {@code ScytheSkeletonEntity::countMatching}.
+     * Testable without a {@link ServerLevel} because {@link MinionCounter} has
+     * no Minecraft superclass.
+     */
+    public static <T> int countMatching(Iterable<T> candidates,
+                                        UUID owner,
+                                        java.util.function.Predicate<T> aliveProbe,
+                                        java.util.function.Function<T, Optional<UUID>> ownerProbe) {
+        return MinionCounter.countMatching(candidates, owner, aliveProbe, ownerProbe);
+    }
+
+    /**
      * Count alive scythe-skeleton minions in the given level whose owner UUID
      * matches the given player. Used by {@code ReaperScytheItem} for cap-check
      * before spawning a new minion.
      */
     public static int countMinionsOwnedBy(ServerLevel level, UUID owner) {
-        int count = 0;
+        var minions = new java.util.ArrayList<ScytheSkeletonEntity>();
         for (var entity : level.getAllEntities()) {
-            if (entity instanceof ScytheSkeletonEntity minion
-                && minion.isAlive()
-                && minion.getOwnerUUID().filter(owner::equals).isPresent()) {
-                count++;
+            if (entity instanceof ScytheSkeletonEntity minion) {
+                minions.add(minion);
             }
         }
-        return count;
+        return MinionCounter.countMatching(minions, owner,
+            net.minecraft.world.entity.LivingEntity::isAlive,
+            ScytheSkeletonEntity::getOwnerUUID);
     }
 }
