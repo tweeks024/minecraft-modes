@@ -75,6 +75,20 @@ public class ScytheSkeletonEntity extends Skeleton {
     }
 
     @Override
+    protected void registerGoals() {
+        this.goalSelector.addGoal(0, new net.minecraft.world.entity.ai.goal.FloatGoal(this));
+        this.goalSelector.addGoal(2, new net.minecraft.world.entity.ai.goal.MeleeAttackGoal(this, 1.1D, true));
+        this.goalSelector.addGoal(3, new com.tweeks.wildwest.entity.ai.ScytheSkeletonMineOreGoal(this));
+        this.goalSelector.addGoal(4, new com.tweeks.wildwest.entity.ai.ScytheSkeletonFollowOwnerGoal(
+            this, 1.0D, 5.0F, 10.0F));
+        this.goalSelector.addGoal(5, new net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal(this, 0.8D));
+        this.goalSelector.addGoal(6, new net.minecraft.world.entity.ai.goal.LookAtPlayerGoal(
+            this, Player.class, 8.0F));
+
+        this.targetSelector.addGoal(1, new com.tweeks.wildwest.entity.ai.ScytheSkeletonTargetHostilesGoal(this));
+    }
+
+    @Override
     protected void populateDefaultEquipmentSlots(RandomSource random, DifficultyInstance difficulty) {
         // Override vanilla skeleton (which gives a bow). Custom loadout: iron sword + helmet.
         this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.IRON_SWORD));
