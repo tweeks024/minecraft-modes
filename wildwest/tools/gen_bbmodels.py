@@ -91,6 +91,21 @@ PIRATE_CAPTAIN_ACCESSORIES = []
 # the others. Build a 64x32 variant of the standard humanoid.
 SKELETON_PIRATE_ACCESSORIES = []
 
+# Grim Reaper — reuses vanilla HumanoidModel via ModelLayers.PLAYER.
+# Adds a hood cube on top of the head for the reaper silhouette. Paint
+# the dark robe into the body / arms / legs UV regions in Blockbench;
+# paint a skeletal face into the head front. The hood UV lives at the
+# (32, 0) overlay region by convention.
+GRIM_REAPER_ACCESSORIES = [
+    ('hood',      HEAD_BONE, (-4.5, -8.5, -4.5, 9, 9, 9), (32, 0)),
+]
+
+# Scythe Skeleton — extends vanilla Skeleton. Uses SkeletonRenderer
+# directly (64x32 texture in classic skeleton UV layout). No accessory
+# cubes — equipment (iron helmet + iron sword) renders via the standard
+# Mob equipment layer.
+SCYTHE_SKELETON_ACCESSORIES = []
+
 
 def java_to_bbmodel(bone, java):
     """Convert Java HumanoidModel addBox args to bbmodel from/to world coords."""
@@ -261,4 +276,6 @@ if __name__ == '__main__':
     write_bbmodel(out_dir, 'pirate',         PIRATE_ACCESSORIES,         texture_dir)
     write_bbmodel(out_dir, 'pirate_captain', PIRATE_CAPTAIN_ACCESSORIES, texture_dir)
     write_bbmodel(out_dir, 'skeleton_pirate', SKELETON_PIRATE_ACCESSORIES, texture_dir, tex_height=32)
+    write_bbmodel(out_dir, 'grim_reaper',     GRIM_REAPER_ACCESSORIES,     texture_dir)
+    write_bbmodel(out_dir, 'scythe_skeleton', SCYTHE_SKELETON_ACCESSORIES, texture_dir, tex_height=32)
     print('OK')
