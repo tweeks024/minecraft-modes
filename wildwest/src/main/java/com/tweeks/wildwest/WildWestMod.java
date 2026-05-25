@@ -51,6 +51,11 @@ public class WildWestMod {
                 net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 com.tweeks.wildwest.spawning.OutlawSpawnRules::checkSpawnRules,
                 net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
+            event.register(ModEntities.ANOMALY.get(),
+                net.minecraft.world.entity.SpawnPlacementTypes.ON_GROUND,
+                net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                net.minecraft.world.entity.monster.Monster::checkMonsterSpawnRules,
+                net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
             event.register(ModEntities.BANDIT_LEADER.get(),
                 net.minecraft.world.entity.SpawnPlacementTypes.ON_GROUND,
                 net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
@@ -108,6 +113,7 @@ public class WildWestMod {
         event.put(ModEntities.DEPUTY.get(), DeputyEntity.createAttributes().build());
         event.put(ModEntities.SHERRIF.get(), SherrifEntity.createAttributes().build());
         event.put(ModEntities.BANDIT.get(), BanditEntity.createAttributes().build());
+        event.put(ModEntities.ANOMALY.get(), com.tweeks.wildwest.entity.AnomalyEntity.createAttributes().build());
         event.put(ModEntities.BANDIT_LEADER.get(), BanditLeaderEntity.createAttributes().build());
         event.put(ModEntities.WALKER.get(), WalkerEntity.createAttributes().build());
         event.put(ModEntities.STEVE_STACKER.get(), SteveStackerEntity.createAttributes().build());
