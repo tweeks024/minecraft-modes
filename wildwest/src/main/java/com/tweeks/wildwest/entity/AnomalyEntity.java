@@ -171,6 +171,20 @@ public class AnomalyEntity extends Monster {
         return SoundEvents.VILLAGER_AMBIENT;
     }
 
+    /**
+     * Pin XP drop to 5 explicitly (spec §109). Vanilla {@code Monster}
+     * defaults {@code xpReward} to 5 today, but overriding
+     * {@code getBaseExperienceReward} guards against an upstream default
+     * change silently shifting the value. NeoForge 26.1.2 patches the
+     * signature to take a {@link ServerLevel} (vanilla 26.1.2 is no-arg);
+     * {@code getExperienceReward(ServerLevel, Entity)} itself is
+     * {@code final}, so this base method is the override hook.
+     */
+    @Override
+    protected int getBaseExperienceReward(ServerLevel level) {
+        return 5;
+    }
+
     @Override
     protected SoundEvent getHurtSound(DamageSource source) {
         return com.tweeks.wildwest.ModSounds.ANOMALY_HURT.get();
