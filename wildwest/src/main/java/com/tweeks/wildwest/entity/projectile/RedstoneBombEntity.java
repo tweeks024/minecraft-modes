@@ -43,10 +43,22 @@ public class RedstoneBombEntity extends ThrowableItemProjectile {
         super(type, level);
     }
 
+    public RedstoneBombEntity(Level level, LivingEntity owner) {
+        this(com.tweeks.wildwest.ModEntities.REDSTONE_BOMB.get(), level);
+        this.setOwner(owner);
+        Vec3 eye = owner.getEyePosition();
+        this.setPos(eye.x, eye.y - 0.2, eye.z);
+    }
+
     @Override
     protected Item getDefaultItem() {
         // Renderer shows this item as the projectile sprite (TNT for now).
         return Items.TNT;
+    }
+
+    @Override
+    protected double getDefaultGravity() {
+        return 0.04;
     }
 
     @Override
