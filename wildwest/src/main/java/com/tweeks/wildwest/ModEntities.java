@@ -21,6 +21,7 @@ import com.tweeks.wildwest.entity.SteveStackerEntity;
 import com.tweeks.wildwest.entity.WalkerEntity;
 import com.tweeks.wildwest.entity.projectile.CannonballEntity;
 import com.tweeks.wildwest.entity.projectile.MeteorEntity;
+import com.tweeks.wildwest.entity.projectile.RedstoneBombEntity;
 import com.tweeks.wildwest.entity.projectile.TaintedVialEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
@@ -217,6 +218,15 @@ public final class ModEntities {
             .updateInterval(10)
             .build(ResourceKey.create(Registries.ENTITY_TYPE,
                 Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "tainted_vial_projectile"))));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<RedstoneBombEntity>> REDSTONE_BOMB =
+        ENTITY_TYPES.register("redstone_bomb", () -> EntityType.Builder.<RedstoneBombEntity>of(
+                RedstoneBombEntity::new, MobCategory.MISC)
+            .sized(0.4f, 0.4f)
+            .clientTrackingRange(4)
+            .updateInterval(10)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "redstone_bomb"))));
 
     public static void register(IEventBus modEventBus) {
         ENTITY_TYPES.register(modEventBus);
