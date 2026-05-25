@@ -22,6 +22,9 @@ public final class ModEffects {
     public static final DeferredHolder<MobEffect, MobEffect> CURING_SHAKE =
         EFFECTS.register("curing_shake", CuringShakeEffect::new);
 
+    public static final DeferredHolder<MobEffect, MobEffect> ANOMALY_BLEED =
+        EFFECTS.register("anomaly_bleed", AnomalyBleedEffect::new);
+
     public static void register(IEventBus modEventBus) {
         EFFECTS.register(modEventBus);
     }
