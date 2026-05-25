@@ -2,6 +2,7 @@ package com.tweeks.wildwest;
 
 import com.tweeks.wildwest.ModBlocks;
 import com.tweeks.wildwest.item.AgentSpawnEggItem;
+import com.tweeks.wildwest.item.AnomalyToothItem;
 import com.tweeks.wildwest.item.BanditKnifeItem;
 import com.tweeks.wildwest.item.BillyClubItem;
 import com.tweeks.wildwest.item.CaptainPistolItem;
@@ -130,6 +131,12 @@ public final class Registration {
 
     public static final DeferredItem<SpawnEggItem> PIRATE_CAPTAIN_SPAWN_EGG = ITEMS.registerItem(
         "pirate_captain_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.PIRATE_CAPTAIN.get()));
+
+    public static final DeferredItem<AnomalyToothItem> ANOMALY_TOOTH = ITEMS.registerItem(
+        "anomaly_tooth", AnomalyToothItem::new, p -> p);
+
+    public static final DeferredItem<SpawnEggItem> ANOMALY_SPAWN_EGG = ITEMS.registerItem(
+        "anomaly_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.ANOMALY.get()));
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> WILDWEST_TAB =
         CREATIVE_TABS.register("main", () ->
