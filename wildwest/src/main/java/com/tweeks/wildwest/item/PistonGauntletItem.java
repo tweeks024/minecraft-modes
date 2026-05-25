@@ -1,7 +1,10 @@
 package com.tweeks.wildwest.item;
 
 import com.tweeks.wildwest.WildWestDamageTypes;
+import java.util.function.Consumer;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -14,6 +17,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -107,5 +112,17 @@ public class PistonGauntletItem extends Item {
         player.swing(hand);
 
         return InteractionResult.CONSUME;
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack,
+                                Item.TooltipContext context,
+                                TooltipDisplay display,
+                                Consumer<Component> adder,
+                                TooltipFlag flag) {
+        adder.accept(Component.translatable("item.wildwest.piston_gauntlet.tooltip.use")
+            .withStyle(ChatFormatting.GRAY));
+        adder.accept(Component.translatable("item.wildwest.piston_gauntlet.tooltip.launch")
+            .withStyle(ChatFormatting.GRAY));
     }
 }
