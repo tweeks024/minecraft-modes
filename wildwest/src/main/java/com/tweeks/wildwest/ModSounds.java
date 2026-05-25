@@ -17,6 +17,11 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> RIFLE_FIRE  = register("rifle_fire");
     public static final DeferredHolder<SoundEvent, SoundEvent> BOLT_CYCLE  = register("bolt_cycle");
 
+    public static final DeferredHolder<SoundEvent, SoundEvent> ANOMALY_REVEAL = register("entity.anomaly.reveal");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ANOMALY_HURT   = register("entity.anomaly.hurt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ANOMALY_DEATH  = register("entity.anomaly.death");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ANOMALY_BITE   = register("entity.anomaly.bite");
+
     private static DeferredHolder<SoundEvent, SoundEvent> register(String name) {
         Identifier id = Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, name);
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(id));
