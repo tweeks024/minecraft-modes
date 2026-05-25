@@ -12,7 +12,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
@@ -70,11 +71,17 @@ public class RedstoneBombEntity extends ThrowableItemProjectile {
     }
 
     @Override
-    protected void onHit(HitResult result) {
-        super.onHit(result);
+    protected void onHitEntity(EntityHitResult result) {
+        super.onHitEntity(result);
         if (!(this.level() instanceof ServerLevel)) return;
-        Vec3 impact = result.getLocation();
-        detonate(impact);
+        detonate(result.getLocation());
+    }
+
+    @Override
+    protected void onHitBlock(BlockHitResult result) {
+        super.onHitBlock(result);
+        if (!(this.level() instanceof ServerLevel)) return;
+        detonate(result.getLocation());
     }
 
     private void detonate(Vec3 center) {

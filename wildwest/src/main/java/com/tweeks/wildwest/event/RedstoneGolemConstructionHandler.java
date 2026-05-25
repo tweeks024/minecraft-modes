@@ -130,9 +130,17 @@ public final class RedstoneGolemConstructionHandler {
 
         Vec3 spawnAt = Vec3.atBottomCenterOf(torso);
         RedstoneGolemEntity golem = ModEntities.REDSTONE_GOLEM.get().create(level, EntitySpawnReason.MOB_SUMMONED);
-        if (golem != null) {
-            golem.snapTo(spawnAt.x, spawnAt.y, spawnAt.z, 0.0F, 0.0F);
-            level.addFreshEntity(golem);
+        if (golem == null) {
+            WildWestMod.LOGGER.error(
+                "Redstone Golem failed to spawn at {} after consuming construction materials; entity type returned null",
+                spawnAt);
+            return;
+        }
+        golem.snapTo(spawnAt.x, spawnAt.y, spawnAt.z, 0.0F, 0.0F);
+        if (!level.addFreshEntity(golem)) {
+            WildWestMod.LOGGER.error(
+                "Redstone Golem rejected by level.addFreshEntity at {}; construction materials lost", spawnAt);
+            return;
         }
 
         level.playSound(null, spawnAt.x, spawnAt.y, spawnAt.z,
