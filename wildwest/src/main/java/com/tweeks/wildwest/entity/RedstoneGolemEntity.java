@@ -8,6 +8,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -23,8 +24,8 @@ import net.minecraft.world.level.Level;
 
 /**
  * Sixth apex boss. Player-built tank: T-pattern of redstone blocks topped
- * with TNT spawns one via {@link com.tweeks.wildwest.event.RedstoneGolemConstructionHandler}.
- * No singleton — multiple instances allowed.
+ * with TNT spawns one via RedstoneGolemConstructionHandler (added in a
+ * subsequent commit). No singleton — multiple instances allowed.
  */
 public class RedstoneGolemEntity extends Monster {
 
@@ -78,7 +79,7 @@ public class RedstoneGolemEntity extends Monster {
     }
 
     @Override
-    protected int getBaseExperienceReward(net.minecraft.server.level.ServerLevel level) {
+    public int getBaseExperienceReward(net.minecraft.server.level.ServerLevel level) {
         return XP_DROP;
     }
 
@@ -110,6 +111,7 @@ public class RedstoneGolemEntity extends Monster {
     @Override
     public void aiStep() {
         super.aiStep();
+        if (this.level().isClientSide()) return;
         this.bossBar.setProgress(this.getHealth() / this.getMaxHealth());
     }
 
@@ -123,5 +125,11 @@ public class RedstoneGolemEntity extends Monster {
     public void stopSeenByPlayer(ServerPlayer player) {
         super.stopSeenByPlayer(player);
         this.bossBar.removePlayer(player);
+    }
+
+    @Override
+    public void remove(Entity.RemovalReason reason) {
+        this.bossBar.removeAllPlayers();
+        super.remove(reason);
     }
 }
