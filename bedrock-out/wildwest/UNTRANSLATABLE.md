@@ -119,4 +119,10 @@ Entity TaintedVialEntity (tainted_vial_projectile) is a projectile (extends Thro
 - **Disguised damage resist** uses `minecraft:damage_sensor.damage_multiplier=0.75`
   in the disguised component group rather than an event-bus listener.
   Functionally equivalent; just a different API surface.
+- **Bleed DoT is not replicated.** Java applies a `wildwest:anomaly_bleed`
+  MobEffect on every successful melee hit (1 dmg/sec × 4s). The Bedrock
+  port has no equivalent — bites do flat damage with no follow-up DoT.
+  Consequently there's no `effect.wildwest.anomaly_bleed` Bedrock lang
+  entry, and the Bedrock Anomaly is slightly less dangerous than the
+  Java version.
 
