@@ -1,0 +1,36 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "wildwest:anomaly",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/anomaly"
+      },
+      "geometry": {
+        "default": "geometry.wildwest.anomaly"
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ],
+      "animations": {
+        "walk": "animation.anomaly.walk",
+        "idle": "animation.anomaly.idle",
+        "jaw_open": "animation.anomaly.jaw_open"
+      },
+      "scripts": {
+        "animate": [
+          "walk",
+          "idle",
+          { "jaw_open": "query.is_family('monster')" }
+        ]
+      },
+      "spawn_egg": {
+        "base_color": "#7a6a5a",
+        "overlay_color": "#b40000"
+      }
+    }
+  }
+}
