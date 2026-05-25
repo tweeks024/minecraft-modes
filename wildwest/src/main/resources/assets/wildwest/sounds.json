@@ -19,5 +19,25 @@
     "sounds": [
       { "name": "minecraft:item.crossbow.loading_middle", "type": "event" }
     ]
+  },
+  "entity.anomaly.reveal": {
+    "category": "hostile",
+    "subtitle": "subtitles.entity.anomaly.reveal",
+    "sounds": [ { "name": "wildwest:entity/anomaly/reveal", "stream": false } ]
+  },
+  "entity.anomaly.hurt": {
+    "category": "hostile",
+    "subtitle": "subtitles.entity.anomaly.hurt",
+    "sounds": [ { "name": "wildwest:entity/anomaly/hurt", "stream": false } ]
+  },
+  "entity.anomaly.death": {
+    "category": "hostile",
+    "subtitle": "subtitles.entity.anomaly.death",
+    "sounds": [ { "name": "wildwest:entity/anomaly/death", "stream": false } ]
+  },
+  "entity.anomaly.bite": {
+    "category": "hostile",
+    "subtitle": "subtitles.entity.anomaly.bite",
+    "sounds": [ { "name": "wildwest:entity/anomaly/bite", "stream": false } ]
   }
 }
