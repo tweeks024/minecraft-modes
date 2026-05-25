@@ -15,4 +15,14 @@ class RedstoneGolemGoalsTest {
         assertEquals(4.0f, RedstoneGolemGroundSlamGoal.DAMAGE);
         assertEquals(2.5, RedstoneGolemGroundSlamGoal.KNOCKBACK_STRENGTH);
     }
+
+    @Test
+    void throwBomb_constants_matchSpec() {
+        assertEquals(12, RedstoneGolemThrowBombGoal.WIND_UP_TICKS);
+        assertEquals(100, RedstoneGolemThrowBombGoal.COOLDOWN_TICKS);
+        assertEquals(6.0, RedstoneGolemThrowBombGoal.MIN_RANGE);
+        assertEquals(16.0, RedstoneGolemThrowBombGoal.MAX_RANGE);
+        assertEquals(1.4f, RedstoneGolemThrowBombGoal.PROJECTILE_VELOCITY);
+        assertEquals(2.0f, RedstoneGolemThrowBombGoal.PROJECTILE_INACCURACY);
+    }
 }
