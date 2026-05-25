@@ -31,6 +31,10 @@ public final class WildWestDamageTypes {
         Registries.DAMAGE_TYPE,
         Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "cannonball"));
 
+    public static final ResourceKey<DamageType> PISTON_PUNCH = ResourceKey.create(
+        Registries.DAMAGE_TYPE,
+        Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "piston_punch"));
+
     public static DamageSource gunshot(Entity attacker) {
         return new DamageSource(
             attacker.level().registryAccess()
@@ -83,5 +87,13 @@ public final class WildWestDamageTypes {
             level.registryAccess()
                 .lookupOrThrow(Registries.DAMAGE_TYPE)
                 .getOrThrow(CANNONBALL));
+    }
+
+    public static DamageSource pistonPunch(Entity attacker) {
+        return new DamageSource(
+            attacker.level().registryAccess()
+                .lookupOrThrow(Registries.DAMAGE_TYPE)
+                .getOrThrow(PISTON_PUNCH),
+            attacker);
     }
 }

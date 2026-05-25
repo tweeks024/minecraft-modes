@@ -18,5 +18,7 @@ public final class ModDamageTypeProvider {
             new DamageType("wildwest.meteor", 0.1f));
         ctx.register(WildWestDamageTypes.CANNONBALL,
             new DamageType("wildwest.cannonball", 0.1f));
+        ctx.register(WildWestDamageTypes.PISTON_PUNCH,
+            new DamageType("wildwest.piston_punch", 0.1f));
     }
 }

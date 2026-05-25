@@ -1,6 +1,9 @@
-// 26.1.2	2026-04-30T20:03:37.943561	Registries
+// 26.1.2	2026-05-25T13:56:44.795647	Registries
+57e0c5f8b49fe57fd5009a6d27c5fd0aa36ad228 data/wildwest/damage_type/cannonball.json
 4ed0893a0b17cdefb37ffe8b20d2818f90ddfe24 data/wildwest/damage_type/club.json
 d355de8bda9b7abda86403cc9532fad3247469af data/wildwest/damage_type/gunshot.json
 9621443056e34fd8a47d3f1e5a4dd2b3181a2afd data/wildwest/damage_type/knife.json
+2732f8bb94d65a2d16e24682b0799263c89d6869 data/wildwest/damage_type/meteor.json
+a5a46f0073597f2015d6a38f762c6a4d467f2419 data/wildwest/damage_type/piston_punch.json
 86966e087b24ddc00b9d04f8279d46f336448bb1 data/wildwest/neoforge/biome_modifier/add_bandit_leaders.json
 259f93bc36483f8006f4d103111dbcd95a54ec39 data/wildwest/neoforge/biome_modifier/add_bandits.json
