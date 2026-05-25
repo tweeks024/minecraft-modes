@@ -170,6 +170,8 @@ public final class Registration {
                     output.accept(PIRATE_SPAWN_EGG.get());
                     output.accept(SKELETON_PIRATE_SPAWN_EGG.get());
                     output.accept(PIRATE_CAPTAIN_SPAWN_EGG.get());
+                    output.accept(ANOMALY_TOOTH.get());
+                    output.accept(ANOMALY_SPAWN_EGG.get());
                 })
                 .build());
 
