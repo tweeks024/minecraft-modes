@@ -6,6 +6,7 @@ import com.tweeks.wildwest.entity.BulletEntity;
 import com.tweeks.wildwest.entity.DeputyEntity;
 import com.tweeks.wildwest.entity.AgentCloneEntity;
 import com.tweeks.wildwest.entity.AgentEntity;
+import com.tweeks.wildwest.entity.AnomalyEntity;
 import com.tweeks.wildwest.entity.GrimReaperEntity;
 import com.tweeks.wildwest.entity.HerobrineEntity;
 import com.tweeks.wildwest.entity.NullEntity;
@@ -67,6 +68,14 @@ public final class ModEntities {
             .clientTrackingRange(10)
             .build(ResourceKey.create(Registries.ENTITY_TYPE,
                 Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "bandit"))));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<AnomalyEntity>> ANOMALY =
+        ENTITY_TYPES.register("anomaly", () -> EntityType.Builder.<AnomalyEntity>of(
+                AnomalyEntity::new, MobCategory.MONSTER)
+            .sized(0.6f, 1.95f)
+            .clientTrackingRange(10)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "anomaly"))));
 
     public static final DeferredHolder<EntityType<?>, EntityType<BanditLeaderEntity>> BANDIT_LEADER =
         ENTITY_TYPES.register("bandit_leader", () -> EntityType.Builder.<BanditLeaderEntity>of(
