@@ -112,10 +112,14 @@ Entity TaintedVialEntity (tainted_vial_projectile) is a projectile (extends Thro
 ## Anomaly
 
 - **Re-disguise condition** is approximated on Bedrock: Java tracks
-  `getTarget() == null && (tickCount - lastHurtByMobTimestamp) > DAMAGE_GRACE_TICKS`,
-  but Bedrock script API exposes no target accessor. The Bedrock script
-  ticks up unconditionally while revealed; an Anomaly in active combat
-  may briefly re-disguise and re-aggro on the next damage event.
+  `getTarget() == null && (tickCount - lastHurtByMobTimestamp) > DAMAGE_GRACE_TICKS`.
+  Bedrock script API exposes no target accessor, but it DOES expose
+  `world.afterEvents.entityHurt`, so the script tracks last-hurt-tick
+  per-Anomaly and resets the re-disguise countdown on recent damage.
+  The remaining divergence: if an Anomaly is revealed and has a target
+  but isn't taking damage (e.g., player kiting just outside its reach),
+  the Java version stays revealed but Bedrock will re-disguise after
+  10 s. Considered acceptable.
 - **Disguised damage resist** uses `minecraft:damage_sensor.damage_multiplier=0.75`
   in the disguised component group rather than an event-bus listener.
   Functionally equivalent; just a different API surface.

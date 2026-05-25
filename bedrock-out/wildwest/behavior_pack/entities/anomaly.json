@@ -19,10 +19,12 @@
           "value": 0.2
         },
         "minecraft:damage_sensor": {
-          "triggers": {
-            "deals_damage": true,
-            "damage_multiplier": 0.75
-          }
+          "triggers": [
+            {
+              "cause": "all",
+              "damage_multiplier": 0.75
+            }
+          ]
         },
         "minecraft:behavior.random_stroll": {
           "priority": 5,

@@ -23,6 +23,7 @@ import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
@@ -95,6 +96,13 @@ public class AnomalyEntity extends Monster {
         goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.6));
         goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 8.0f));
         goalSelector.addGoal(7, new RandomLookAroundGoal(this));
+        // HurtByTarget fires earlier (priority 0) than the LOS-required
+        // NearestAttackableTarget so a player who breaks line-of-sight and
+        // then hits the Anomaly from behind still gets re-aggroed. Both
+        // target goals are gated on isRevealed() so disguised hits never
+        // trigger aggression — that's the spec's "stay disguised under
+        // first hit" contract.
+        targetSelector.addGoal(0, new RevealedOnlyHurtByTargetGoal(this));
         targetSelector.addGoal(1, new RevealedOnlyTargetGoal(this));
     }
 
@@ -110,13 +118,19 @@ public class AnomalyEntity extends Monster {
 
     @Override
     public InteractionResult mobInteract(Player player, InteractionHand hand) {
-        if (!level().isClientSide() && !isRevealed()) {
-            setRevealed(true);
-            this.setTarget(player);
-            this.reDisguiseTicks = 0;
-            level().playSound(null, blockPosition(),
-                com.tweeks.wildwest.ModSounds.ANOMALY_REVEAL.get(),
-                SoundSource.HOSTILE, 1.0f, 1.0f);
+        // Consume the right-click on BOTH sides while disguised so the
+        // player's held item doesn't also fire (no torch-placing through
+        // the entity, no food-eating, no spawn-egg misfire). Server runs
+        // the actual state change; client just acknowledges the consume.
+        if (!isRevealed()) {
+            if (!level().isClientSide()) {
+                setRevealed(true);
+                this.setTarget(player);
+                this.reDisguiseTicks = 0;
+                level().playSound(null, blockPosition(),
+                    com.tweeks.wildwest.ModSounds.ANOMALY_REVEAL.get(),
+                    SoundSource.HOSTILE, 1.0f, 1.0f);
+            }
             return InteractionResult.SUCCESS;
         }
         return super.mobInteract(player, hand);
@@ -209,6 +223,16 @@ public class AnomalyEntity extends Monster {
         private final AnomalyEntity anomaly;
         RevealedOnlyTargetGoal(AnomalyEntity anomaly) {
             super(anomaly, Player.class, true);
+            this.anomaly = anomaly;
+        }
+        @Override public boolean canUse() { return anomaly.isRevealed() && super.canUse(); }
+        @Override public boolean canContinueToUse() { return anomaly.isRevealed() && super.canContinueToUse(); }
+    }
+
+    private static final class RevealedOnlyHurtByTargetGoal extends HurtByTargetGoal {
+        private final AnomalyEntity anomaly;
+        RevealedOnlyHurtByTargetGoal(AnomalyEntity anomaly) {
+            super(anomaly);
             this.anomaly = anomaly;
         }
         @Override public boolean canUse() { return anomaly.isRevealed() && super.canUse(); }
