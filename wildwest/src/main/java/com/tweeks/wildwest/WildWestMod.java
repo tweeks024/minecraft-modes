@@ -12,6 +12,7 @@ import com.tweeks.wildwest.entity.GrimReaperEntity;
 import com.tweeks.wildwest.entity.NullEntity;
 import com.tweeks.wildwest.entity.PirateCaptainEntity;
 import com.tweeks.wildwest.entity.PirateEntity;
+import com.tweeks.wildwest.entity.RedstoneGolemEntity;
 import com.tweeks.wildwest.entity.ScytheSkeletonEntity;
 import com.tweeks.wildwest.entity.SherrifEntity;
 import com.tweeks.wildwest.entity.SkeletonPirateEntity;
@@ -126,5 +127,6 @@ public class WildWestMod {
         event.put(ModEntities.PIRATE.get(), PirateEntity.createAttributes().build());
         event.put(ModEntities.SKELETON_PIRATE.get(), SkeletonPirateEntity.createAttributes().build());
         event.put(ModEntities.PIRATE_CAPTAIN.get(), PirateCaptainEntity.createAttributes().build());
+        event.put(ModEntities.REDSTONE_GOLEM.get(), RedstoneGolemEntity.createAttributes().build());
     }
 }

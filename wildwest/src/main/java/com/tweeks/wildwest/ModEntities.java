@@ -13,6 +13,7 @@ import com.tweeks.wildwest.entity.NullEntity;
 import com.tweeks.wildwest.entity.NullRiftEntity;
 import com.tweeks.wildwest.entity.PirateCaptainEntity;
 import com.tweeks.wildwest.entity.PirateEntity;
+import com.tweeks.wildwest.entity.RedstoneGolemEntity;
 import com.tweeks.wildwest.entity.ScytheSkeletonEntity;
 import com.tweeks.wildwest.entity.SherrifEntity;
 import com.tweeks.wildwest.entity.SkeletonPirateEntity;
@@ -181,6 +182,14 @@ public final class ModEntities {
             .clientTrackingRange(12)
             .build(ResourceKey.create(Registries.ENTITY_TYPE,
                 Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "pirate_captain"))));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<RedstoneGolemEntity>> REDSTONE_GOLEM =
+        ENTITY_TYPES.register("redstone_golem", () -> EntityType.Builder.<RedstoneGolemEntity>of(
+                RedstoneGolemEntity::new, MobCategory.MONSTER)
+            .sized(1.4f, 2.7f)
+            .clientTrackingRange(10)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "redstone_golem"))));
 
     public static final DeferredHolder<EntityType<?>, EntityType<MeteorEntity>> METEOR =
         ENTITY_TYPES.register("meteor", () -> EntityType.Builder.<MeteorEntity>of(
