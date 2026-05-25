@@ -81,8 +81,14 @@ public final class RedstoneGolemConstructionHandler {
         Level level = event.getLevel();
         BlockPos headPos = primedTnt.blockPosition();
 
-        if (tryMatch(level, headPos, Direction.Axis.X) || tryMatch(level, headPos, Direction.Axis.Z)) {
-            spawnGolem(level, headPos, primedTnt);
+        Direction.Axis matchedAxis = null;
+        if (tryMatch(level, headPos, Direction.Axis.X)) {
+            matchedAxis = Direction.Axis.X;
+        } else if (tryMatch(level, headPos, Direction.Axis.Z)) {
+            matchedAxis = Direction.Axis.Z;
+        }
+        if (matchedAxis != null) {
+            spawnGolem(level, headPos, primedTnt, matchedAxis);
         }
     }
 
@@ -106,23 +112,14 @@ public final class RedstoneGolemConstructionHandler {
         return level.getBlockState(pos).is(Blocks.REDSTONE_BLOCK);
     }
 
-    private static void spawnGolem(Level level, BlockPos headPos, PrimedTnt primedTnt) {
+    private static void spawnGolem(Level level, BlockPos headPos, PrimedTnt primedTnt, Direction.Axis axis) {
         BlockPos shoulderCenter = headPos.below();
         BlockPos torso = headPos.below(2);
+        BlockPos shoulderPos = shoulderCenter.relative(axis, 1);
+        BlockPos shoulderNeg = shoulderCenter.relative(axis, -1);
 
-        // Remove the matched shoulder arms (whichever axis matched). We do a
-        // second axis check here rather than threading the matched axis through
-        // because either axis may have matched first; either way the redstone
-        // blocks at the relevant positions are still present at this moment.
-        for (Direction.Axis axis : new Direction.Axis[]{Direction.Axis.X, Direction.Axis.Z}) {
-            BlockPos sPos = shoulderCenter.relative(axis, 1);
-            BlockPos sNeg = shoulderCenter.relative(axis, -1);
-            if (isRedstone(level, sPos) && isRedstone(level, sNeg)) {
-                level.setBlockAndUpdate(sPos, Blocks.AIR.defaultBlockState());
-                level.setBlockAndUpdate(sNeg, Blocks.AIR.defaultBlockState());
-                break;
-            }
-        }
+        level.setBlockAndUpdate(shoulderPos, Blocks.AIR.defaultBlockState());
+        level.setBlockAndUpdate(shoulderNeg, Blocks.AIR.defaultBlockState());
         level.setBlockAndUpdate(shoulderCenter, Blocks.AIR.defaultBlockState());
         level.setBlockAndUpdate(torso, Blocks.AIR.defaultBlockState());
 
@@ -131,7 +128,7 @@ public final class RedstoneGolemConstructionHandler {
         primedTnt.getPersistentData().putBoolean(CONSUMED_TAG, true);
         primedTnt.discard();
 
-        Vec3 spawnAt = Vec3.atBottomCenterOf(torso.above());
+        Vec3 spawnAt = Vec3.atBottomCenterOf(torso);
         RedstoneGolemEntity golem = ModEntities.REDSTONE_GOLEM.get().create(level, EntitySpawnReason.MOB_SUMMONED);
         if (golem != null) {
             golem.snapTo(spawnAt.x, spawnAt.y, spawnAt.z, 0.0F, 0.0F);
