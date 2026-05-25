@@ -1,0 +1,48 @@
+{
+  "format_version": "1.14.0",
+  "sound_definitions": {
+    "wildwest:bolt_cycle": {
+      "category": "neutral",
+      "sounds": [
+        {
+          "name": "item.crossbow.loading_middle",
+          "stream": false
+        }
+      ]
+    },
+    "wildwest:pistol_fire": {
+      "category": "neutral",
+      "sounds": [
+        {
+          "name": "item.crossbow.shoot",
+          "stream": false
+        }
+      ]
+    },
+    "wildwest:rifle_fire": {
+      "category": "neutral",
+      "sounds": [
+        {
+          "name": "item.crossbow.shoot",
+          "stream": false
+        }
+      ]
+    },
+    "entity.anomaly.reveal": {
+      "category": "hostile",
+      "sounds": [ "sounds/entity/anomaly/reveal" ]
+    },
+    "entity.anomaly.hurt": {
+      "category": "hostile",
+      "sounds": [ "sounds/entity/anomaly/hurt" ]
+    },
+    "entity.anomaly.death": {
+      "category": "hostile",
+      "sounds": [ "sounds/entity/anomaly/death" ]
+    },
+    "entity.anomaly.bite": {
+      "category": "hostile",
+      "sounds": [ "sounds/entity/anomaly/bite" ]
+    }
+  }
+}
