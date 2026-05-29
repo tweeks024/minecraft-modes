@@ -1,2 +1,4 @@
-// 26.1.2	2026-04-30T18:56:33.944064	Tags for minecraft:damage_type mod id vanilla
+// 26.1.2	2026-05-16T08:25:47.130381	Tags for minecraft:damage_type mod id vanilla
+2e4c3f252c18b78f7080d8ddd310ba3e59ced9fa data/minecraft/tags/damage_type/is_explosion.json
+2be187bd17de46a5a6319694df5cec8bae4cdfb7 data/minecraft/tags/damage_type/is_fire.json
 84c163cfca9dcb7203ff7533203a6916fb292e62 data/minecraft/tags/damage_type/is_projectile.json

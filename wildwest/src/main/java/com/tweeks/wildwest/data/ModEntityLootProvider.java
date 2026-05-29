@@ -98,6 +98,9 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
                     .add(LootItem.lootTableItem(Items.EMERALD).setWeight(30))
                     .add(EmptyLootItem.emptyItem().setWeight(70)))
                 .withPool(gunDropPool(Registration.RIFLE.get())));
+
+        // Crab: no drops
+        this.add(ModEntities.CRAB.get(), LootTable.lootTable());
     }
 
     @Override
@@ -106,7 +109,8 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
             ModEntities.DEPUTY.get(),
             ModEntities.SHERRIF.get(),
             ModEntities.BANDIT.get(),
-            ModEntities.BANDIT_LEADER.get()
+            ModEntities.BANDIT_LEADER.get(),
+            ModEntities.CRAB.get()
         );
         return BuiltInRegistries.ENTITY_TYPE.stream().filter(known::contains);
     }
