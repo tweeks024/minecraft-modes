@@ -30,10 +30,13 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 public class CrabEntity extends Animal implements NeutralMob {
+
+    public final AnimationState pinchState = new AnimationState();
 
     private static final UniformInt PERSISTENT_ANGER_TIME =
         TimeUtil.rangeOfSeconds(CrabEntityConstants.ANGER_SECONDS_MIN, CrabEntityConstants.ANGER_SECONDS_MAX);
@@ -115,6 +118,15 @@ public class CrabEntity extends Animal implements NeutralMob {
         super.aiStep();
         if (!level().isClientSide()) {
             updatePersistentAnger((ServerLevel) level(), true);
+        }
+    }
+
+    @Override
+    public void handleEntityEvent(byte id) {
+        if (id == CrabEntityConstants.EVENT_ID_PINCH) {
+            this.pinchState.start(this.tickCount);
+        } else {
+            super.handleEntityEvent(id);
         }
     }
 }

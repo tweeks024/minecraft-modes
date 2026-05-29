@@ -6,6 +6,7 @@ import com.tweeks.wildwest.client.model.BanditLeaderModel;
 import com.tweeks.wildwest.client.model.BanditModel;
 import com.tweeks.wildwest.client.model.DeputyModel;
 import com.tweeks.wildwest.client.model.AnomalyModel;
+import com.tweeks.wildwest.client.model.CrabModel;
 import com.tweeks.wildwest.client.model.RedstoneGolemModel;
 import com.tweeks.wildwest.client.model.SherrifModel;
 import com.tweeks.wildwest.client.model.SteveStackerModel;
@@ -56,6 +57,7 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.GRIM_REAPER.get(), GrimReaperRenderer::new);
         event.registerEntityRenderer(ModEntities.ANOMALY.get(), AnomalyRenderer::new);
         event.registerEntityRenderer(ModEntities.REDSTONE_GOLEM.get(), RedstoneGolemRenderer::new);
+        event.registerEntityRenderer(ModEntities.CRAB.get(), CrabRenderer::new);
         @SuppressWarnings("unchecked")
         var skeletonRendererProvider =
             (net.minecraft.client.renderer.entity.EntityRendererProvider<com.tweeks.wildwest.entity.ScytheSkeletonEntity>)
@@ -80,5 +82,6 @@ public final class ClientSetup {
         event.registerLayerDefinition(SteveStackerModel.LAYER_LOCATION, SteveStackerModel::createBodyLayer);
         event.registerLayerDefinition(AnomalyModel.LAYER_LOCATION, AnomalyModel::createBodyLayer);
         event.registerLayerDefinition(RedstoneGolemModel.LAYER_LOCATION, RedstoneGolemModel::createBodyLayer);
+        event.registerLayerDefinition(CrabModel.LAYER_LOCATION, CrabModel::createBodyLayer);
     }
 }
