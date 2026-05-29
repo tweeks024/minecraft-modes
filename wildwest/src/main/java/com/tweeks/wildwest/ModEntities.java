@@ -13,6 +13,7 @@ import com.tweeks.wildwest.entity.NullEntity;
 import com.tweeks.wildwest.entity.NullRiftEntity;
 import com.tweeks.wildwest.entity.PirateCaptainEntity;
 import com.tweeks.wildwest.entity.PirateEntity;
+import com.tweeks.wildwest.entity.CrabEntity;
 import com.tweeks.wildwest.entity.RedstoneGolemEntity;
 import com.tweeks.wildwest.entity.ScytheSkeletonEntity;
 import com.tweeks.wildwest.entity.SherrifEntity;
@@ -227,6 +228,14 @@ public final class ModEntities {
             .updateInterval(10)
             .build(ResourceKey.create(Registries.ENTITY_TYPE,
                 Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "redstone_bomb"))));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<CrabEntity>> CRAB =
+        ENTITY_TYPES.register("crab", () -> EntityType.Builder.<CrabEntity>of(
+                CrabEntity::new, MobCategory.CREATURE)
+            .sized(0.5f, 0.5f)
+            .clientTrackingRange(10)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "crab"))));
 
     public static void register(IEventBus modEventBus) {
         ENTITY_TYPES.register(modEventBus);

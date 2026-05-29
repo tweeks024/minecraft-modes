@@ -107,6 +107,11 @@ public class WildWestMod {
                 net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 net.minecraft.world.entity.monster.Monster::checkMonsterSpawnRules,
                 net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
+            event.register(ModEntities.CRAB.get(),
+                net.minecraft.world.entity.SpawnPlacementTypes.ON_GROUND,
+                net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                net.minecraft.world.entity.animal.Animal::checkAnimalSpawnRules,
+                net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
         });
     }
 
@@ -128,5 +133,6 @@ public class WildWestMod {
         event.put(ModEntities.SKELETON_PIRATE.get(), SkeletonPirateEntity.createAttributes().build());
         event.put(ModEntities.PIRATE_CAPTAIN.get(), PirateCaptainEntity.createAttributes().build());
         event.put(ModEntities.REDSTONE_GOLEM.get(), RedstoneGolemEntity.createAttributes().build());
+        event.put(ModEntities.CRAB.get(), com.tweeks.wildwest.entity.CrabEntity.createAttributes().build());
     }
 }
