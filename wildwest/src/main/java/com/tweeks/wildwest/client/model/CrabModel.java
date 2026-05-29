@@ -17,6 +17,8 @@ public class CrabModel extends EntityModel<CrabRenderState> {
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(
         Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "crab"), "main");
 
+    private static final long PINCH_DURATION_MS = 500L;
+
     private final ModelPart body;
     private final ModelPart clawLeft;
     private final ModelPart clawRight;
@@ -64,8 +66,14 @@ public class CrabModel extends EntityModel<CrabRenderState> {
         float scale = 1.0F;
         if (state.pinchState.isStarted()) {
             long elapsed = state.pinchState.getTimeInMillis(state.ageInTicks);
-            float t = (elapsed % 500L) / 500.0F;
-            scale = (t < 0.5F) ? 1.0F + (0.6F * (t * 2.0F)) : 1.0F + (0.6F * ((1.0F - t) * 2.0F));
+            if (elapsed >= PINCH_DURATION_MS) {
+                // One-shot animation. Without an explicit stop(), isStarted() stays true
+                // and the claws would pulse forever after the first swing.
+                state.pinchState.stop();
+            } else {
+                float t = elapsed / (float) PINCH_DURATION_MS;
+                scale = (t < 0.5F) ? 1.0F + (0.6F * (t * 2.0F)) : 1.0F + (0.6F * ((1.0F - t) * 2.0F));
+            }
         }
         this.clawLeft.yScale = scale;
         this.clawRight.yScale = scale;

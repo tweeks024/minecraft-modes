@@ -1,7 +1,9 @@
 package com.tweeks.wildwest.entity;
 
 import com.tweeks.wildwest.entity.ai.CrabAlertSwarmHelper;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.util.TimeUtil;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.damagesource.DamageSource;
@@ -18,7 +20,6 @@ import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.FollowParentGoal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
-import net.minecraft.world.entity.ai.goal.PanicGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.RandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.TemptGoal;
@@ -32,6 +33,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Blocks;
 import org.jetbrains.annotations.Nullable;
 
 public class CrabEntity extends Animal implements NeutralMob {
@@ -46,6 +49,26 @@ public class CrabEntity extends Animal implements NeutralMob {
 
     public CrabEntity(EntityType<? extends CrabEntity> type, Level level) {
         super(type, level);
+    }
+
+    /**
+     * Spawn predicate for crabs. Replaces {@code Animal::checkAnimalSpawnRules} because
+     * the vanilla animal predicate requires the block below to be {@code #animals_spawnable_on}
+     * (tag containing only {@code minecraft:grass_block}). Beach biomes have sand below,
+     * warm ocean has sand below water — neither is grass, so the vanilla predicate would
+     * silently veto every candidate position.
+     *
+     * <p>Crabs accept sand or any solid surface; sky-light check matches the animal-spawn
+     * convention (light > 8).
+     */
+    public static boolean checkCrabSpawnRules(EntityType<? extends CrabEntity> type,
+                                              LevelAccessor level,
+                                              EntitySpawnReason reason,
+                                              BlockPos pos,
+                                              RandomSource random) {
+        var below = level.getBlockState(pos.below());
+        boolean validGround = below.is(Blocks.SAND) || below.is(Blocks.GRAVEL) || below.isSolid();
+        return validGround && level.getRawBrightness(pos, 0) > 8;
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -78,8 +101,10 @@ public class CrabEntity extends Animal implements NeutralMob {
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
-        this.goalSelector.addGoal(1, new PanicGoal(this, 1.25));
-        this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.0, true) {
+        // Intentionally NO PanicGoal: the panic_causes damage tag includes mob_attack and
+        // is_player_attack, which would make the crab flee instead of fight back. Spec is
+        // "neutral, swarm-retaliate" — closer to Wolf than to Sheep.
+        this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.0, true) {
             @Override
             protected void checkAndPerformAttack(LivingEntity target) {
                 super.checkAndPerformAttack(target);
@@ -91,13 +116,13 @@ public class CrabEntity extends Animal implements NeutralMob {
                 }
             }
         });
-        this.goalSelector.addGoal(3, new BreedGoal(this, 1.0));
-        this.goalSelector.addGoal(4, new TemptGoal(this, 1.2,
+        this.goalSelector.addGoal(2, new BreedGoal(this, 1.0));
+        this.goalSelector.addGoal(3, new TemptGoal(this, 1.2,
             s -> s.is(Items.SEAGRASS), false));
-        this.goalSelector.addGoal(5, new FollowParentGoal(this, 1.1));
-        this.goalSelector.addGoal(6, new RandomStrollGoal(this, 1.0));
-        this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 6.0F));
-        this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
+        this.goalSelector.addGoal(4, new FollowParentGoal(this, 1.1));
+        this.goalSelector.addGoal(5, new RandomStrollGoal(this, 1.0));
+        this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 6.0F));
+        this.goalSelector.addGoal(7, new RandomLookAroundGoal(this));
 
         this.targetSelector.addGoal(1, new HurtByTargetGoal(this).setAlertOthers());
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Monster.class, true));
@@ -107,7 +132,7 @@ public class CrabEntity extends Animal implements NeutralMob {
     @Override
     public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
         boolean result = super.hurtServer(level, source, amount);
-        if (result && source.getEntity() instanceof LivingEntity attacker) {
+        if (result && !isDeadOrDying() && source.getEntity() instanceof LivingEntity attacker) {
             CrabAlertSwarmHelper.alertNearby(this, attacker);
         }
         return result;

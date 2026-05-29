@@ -17,9 +17,9 @@ class CrabAlertSwarmHelperTest {
     }
 
     @Test
-    void shouldNotAlert_atExactRadius() {
-        // strict less-than: distance == SWARM_RADIUS is NOT alerted
-        assertFalse(CrabAlertSwarmHelper.shouldAlert(8.0, false, false));
+    void shouldAlert_atExactRadius_inclusive() {
+        // "within 8 blocks" is inclusive — a crab at exactly 8.0 blocks is alerted.
+        assertTrue(CrabAlertSwarmHelper.shouldAlert(8.0, false, false));
     }
 
     @Test

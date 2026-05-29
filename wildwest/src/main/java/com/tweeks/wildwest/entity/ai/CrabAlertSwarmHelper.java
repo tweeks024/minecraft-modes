@@ -17,7 +17,8 @@ public final class CrabAlertSwarmHelper {
      * - hasTarget: candidate already targets something
      */
     public static boolean shouldAlert(double distance, boolean isBaby, boolean hasTarget) {
-        if (distance >= CrabEntityConstants.SWARM_RADIUS) return false;
+        // Inclusive: a crab sitting exactly 8 blocks away counts as "within 8 blocks".
+        if (distance > CrabEntityConstants.SWARM_RADIUS) return false;
         if (isBaby) return false;
         if (hasTarget) return false;
         return true;

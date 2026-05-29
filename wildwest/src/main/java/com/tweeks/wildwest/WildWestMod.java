@@ -110,7 +110,7 @@ public class WildWestMod {
             event.register(ModEntities.CRAB.get(),
                 net.minecraft.world.entity.SpawnPlacementTypes.ON_GROUND,
                 net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                net.minecraft.world.entity.animal.Animal::checkAnimalSpawnRules,
+                com.tweeks.wildwest.entity.CrabEntity::checkCrabSpawnRules,
                 net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
         });
     }
