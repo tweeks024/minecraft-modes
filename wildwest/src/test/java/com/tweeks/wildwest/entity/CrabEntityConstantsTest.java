@@ -20,6 +20,6 @@ class CrabEntityConstantsTest {
         assertEquals(6, CrabEntityConstants.SPAWN_WEIGHT);
         assertEquals(2, CrabEntityConstants.SPAWN_GROUP_MIN);
         assertEquals(4, CrabEntityConstants.SPAWN_GROUP_MAX);
-        assertEquals((byte) 60, CrabEntityConstants.EVENT_ID_PINCH);
+        assertEquals((byte) 61, CrabEntityConstants.EVENT_ID_PINCH);
     }
 }

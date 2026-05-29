@@ -16,5 +16,7 @@ public final class CrabEntityConstants {
     public static final int SPAWN_GROUP_MIN = 2;
     public static final int SPAWN_GROUP_MAX = 4;
 
-    public static final byte EVENT_ID_PINCH = (byte) 60;
+    // 61 (not 60): byte 60 is used by LivingEntity for makePoofParticles (death event).
+    // Intercepting it would suppress crab death particles.
+    public static final byte EVENT_ID_PINCH = (byte) 61;
 }

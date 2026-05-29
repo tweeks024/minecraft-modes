@@ -63,7 +63,7 @@ public class CrabModel extends EntityModel<CrabRenderState> {
         // ModelPart.yScale is a public float field available in NeoForge 26.1.2.
         float scale = 1.0F;
         if (state.pinchState.isStarted()) {
-            long elapsed = state.pinchState.getTimeInMillis(state.ageInTicks * 50.0F);
+            long elapsed = state.pinchState.getTimeInMillis(state.ageInTicks);
             float t = (elapsed % 500L) / 500.0F;
             scale = (t < 0.5F) ? 1.0F + (0.6F * (t * 2.0F)) : 1.0F + (0.6F * ((1.0F - t) * 2.0F));
         }
