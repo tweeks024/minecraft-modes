@@ -38,7 +38,6 @@ public class ModLanguageProvider extends LanguageProvider {
         add(ModEntities.SHERRIF.get(), "Sheriff");
         add(ModEntities.BANDIT.get(), "Bandit");
         add(ModEntities.BANDIT_LEADER.get(), "Bandit Leader");
-        add(ModEntities.CRAB.get(), "Crab");
 
         // Spawn eggs
         add(Registration.DEPUTY_SPAWN_EGG.get(), "Deputy Spawn Egg");
