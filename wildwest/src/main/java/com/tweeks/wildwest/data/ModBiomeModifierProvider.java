@@ -27,6 +27,10 @@ public final class ModBiomeModifierProvider {
         NeoForgeRegistries.Keys.BIOME_MODIFIERS,
         Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "add_bandit_leaders"));
 
+    private static final ResourceKey<BiomeModifier> ADD_CRABS = ResourceKey.create(
+        NeoForgeRegistries.Keys.BIOME_MODIFIERS,
+        Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "add_crabs"));
+
     public static void bootstrap(BootstrapContext<BiomeModifier> ctx) {
         var biomes = ctx.lookup(Registries.BIOME);
 
@@ -45,5 +49,18 @@ public final class ModBiomeModifierProvider {
             targetBiomes,
             WeightedList.of(java.util.List.of(new Weighted<>(
                 new MobSpawnSettings.SpawnerData(ModEntities.BANDIT_LEADER.get(), 1, 1), 1)))));
+
+        HolderSet<Biome> crabBiomes = HolderSet.direct(
+            biomes.getOrThrow(Biomes.BEACH),
+            biomes.getOrThrow(Biomes.WARM_OCEAN));
+
+        ctx.register(ADD_CRABS, new BiomeModifiers.AddSpawnsBiomeModifier(
+            crabBiomes,
+            WeightedList.of(java.util.List.of(new Weighted<>(
+                new MobSpawnSettings.SpawnerData(
+                    com.tweeks.wildwest.ModEntities.CRAB.get(),
+                    com.tweeks.wildwest.entity.CrabEntityConstants.SPAWN_GROUP_MIN,
+                    com.tweeks.wildwest.entity.CrabEntityConstants.SPAWN_GROUP_MAX),
+                com.tweeks.wildwest.entity.CrabEntityConstants.SPAWN_WEIGHT)))));
     }
 }
