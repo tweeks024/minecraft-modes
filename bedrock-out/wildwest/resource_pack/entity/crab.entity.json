@@ -1,0 +1,32 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "wildwest:crab",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/crab"
+      },
+      "geometry": {
+        "default": "geometry.wildwest.crab"
+      },
+      "animations": {
+        "pinch": "animation.crab.pinch"
+      },
+      "scripts": {
+        "animate": [
+          { "pinch": "query.actor_count > 0" }
+        ]
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ],
+      "spawn_egg": {
+        "base_color": "#c43c2a",
+        "overlay_color": "#3a1610"
+      }
+    }
+  }
+}
