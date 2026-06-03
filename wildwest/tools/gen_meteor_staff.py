@@ -160,6 +160,68 @@ def paint_3d_texture():
     return img
 
 
+def paint_gui_icon():
+    """Hand-composed 16x16 pixel-art icon.
+
+    PIL pixel coordinates are top-left origin; spec coords match.
+    """
+    img = Image.new('RGBA', (16, 16), TRANSPARENT)
+
+    # Diagonal shaft: Bresenham line from (3,14) to (11,5). dx=8, dy=-9.
+    shaft_pts = []
+    x0, y0, x1, y1 = 3, 14, 11, 5
+    dx = abs(x1 - x0); dy = -abs(y1 - y0)
+    sx = 1 if x0 < x1 else -1; sy = 1 if y0 < y1 else -1
+    err = dx + dy
+    x, y = x0, y0
+    while True:
+        shaft_pts.append((x, y))
+        if x == x1 and y == y1:
+            break
+        e2 = 2 * err
+        if e2 >= dy:
+            err += dy; x += sx
+        if e2 <= dx:
+            err += dx; y += sy
+    # Shadow pass first so shaft pixels always win over shadow strokes.
+    for (sx_, sy_) in shaft_pts:
+        # Shadow stroke offset 1 down-left
+        if 0 <= sx_ - 1 < 16 and 0 <= sy_ + 1 < 16:
+            # Don't overwrite the magma blob area
+            if not (sx_ - 1 >= 11 and sy_ + 1 <= 5):
+                img.putpixel((sx_ - 1, sy_ + 1), WOOD_GRAIN)
+    for (sx_, sy_) in shaft_pts:
+        img.putpixel((sx_, sy_), WOOD_BASE)
+
+    # Iron band 1: (4,12)-(6,13)
+    for bx in range(4, 7):
+        for by in range(12, 14):
+            img.putpixel((bx, by), IRON_BASE)
+    img.putpixel((5, 12), IRON_RIVET)
+
+    # Iron band 2: (7,9)-(9,10)
+    for bx in range(7, 10):
+        for by in range(9, 11):
+            img.putpixel((bx, by), IRON_BASE)
+    img.putpixel((8, 9), IRON_RIVET)
+
+    # Magma blob: (11,3)-(13,5)
+    for mx in range(11, 14):
+        for my in range(3, 6):
+            img.putpixel((mx, my), MAGMA_OUTER)
+    img.putpixel((12, 4), MAGMA_HOT)
+    img.putpixel((13, 3), MAGMA_CRACK)
+
+    # Glow halo: 4 dim ember pixels at the corners around the blob
+    for (gx, gy) in ((10, 2), (14, 2), (10, 6), (14, 6)):
+        img.putpixel((gx, gy), EMBER)
+
+    # Wisp pixel
+    img.putpixel((13, 1), EMBER_HOT)
+
+    return img
+
+
 def main():
     arg = sys.argv[1] if len(sys.argv) > 1 else None
     tools_dir, assets_dir = resolve_paths(arg)
@@ -172,6 +234,11 @@ def main():
     texture_3d_path = os.path.join(assets_dir, 'textures/item/meteor_staff.png')
     texture_3d.save(texture_3d_path)
     print(f"  wrote {texture_3d_path}")
+
+    texture_gui = paint_gui_icon()
+    texture_gui_path = os.path.join(assets_dir, 'textures/item/meteor_staff_gui.png')
+    texture_gui.save(texture_gui_path)
+    print(f"  wrote {texture_gui_path}")
 
 
 if __name__ == '__main__':
