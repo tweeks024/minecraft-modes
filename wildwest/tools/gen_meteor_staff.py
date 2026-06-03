@@ -262,6 +262,15 @@ def build_model_json():
     }
 
 
+def build_gui_model_json():
+    return {
+        "parent": "minecraft:item/generated",
+        "textures": {
+            "layer0": "wildwest:item/meteor_staff_gui",
+        },
+    }
+
+
 def main():
     arg = sys.argv[1] if len(sys.argv) > 1 else None
     tools_dir, assets_dir = resolve_paths(arg)
@@ -286,6 +295,13 @@ def main():
         json.dump(model_3d, f, indent=2)
         f.write('\n')
     print(f"  wrote {model_3d_path}")
+
+    model_gui = build_gui_model_json()
+    model_gui_path = os.path.join(assets_dir, 'models/item/meteor_staff_gui.json')
+    with open(model_gui_path, 'w') as f:
+        json.dump(model_gui, f, indent=2)
+        f.write('\n')
+    print(f"  wrote {model_gui_path}")
 
 
 if __name__ == '__main__':
