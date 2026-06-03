@@ -271,6 +271,89 @@ def build_gui_model_json():
     }
 
 
+def png_to_data_url(img):
+    import io
+    buf = io.BytesIO()
+    img.save(buf, format='PNG')
+    return 'data:image/png;base64,' + base64.b64encode(buf.getvalue()).decode('ascii')
+
+
+def build_bbmodel(texture_3d_img, texture_3d_relpath):
+    elements = []
+    outliner = []
+    for name, frm, to, group in CUBES:
+        eid = det_uuid(f'element/{name}')
+        uv = uv_for(group)
+        elements.append({
+            "name": name,
+            "rescale": False,
+            "locked": False,
+            "from": list(frm),
+            "to": list(to),
+            "autouv": 0,
+            "color": 0,
+            "origin": [0, 0, 0],
+            "faces": {
+                "north": {"uv": uv, "texture": 0},
+                "east":  {"uv": uv, "texture": 0},
+                "south": {"uv": uv, "texture": 0},
+                "west":  {"uv": uv, "texture": 0},
+                "up":    {"uv": uv, "texture": 0},
+                "down":  {"uv": uv, "texture": 0},
+            },
+            "type": "cube",
+            "uuid": eid,
+        })
+        outliner.append(eid)
+
+    texture = {
+        "path": "",
+        "name": "meteor_staff.png",
+        "folder": "item",
+        "namespace": "wildwest",
+        "id": "0",
+        "particle": True,
+        "render_mode": "default",
+        "render_sides": "auto",
+        "frame_time": 1,
+        "frame_order_type": "loop",
+        "frame_order": "",
+        "frame_interpolate": False,
+        "visible": True,
+        "internal": True,
+        "saved": False,
+        "uuid": det_uuid('texture/meteor_staff'),
+        "relative_path": texture_3d_relpath,
+        "use_as_default": True,
+        "layers_enabled": False,
+        "sync_to_project": "",
+        "width": 32,
+        "height": 32,
+        "uv_width": 32,
+        "uv_height": 32,
+        "source": png_to_data_url(texture_3d_img),
+    }
+
+    return {
+        "meta": {
+            "format_version": "4.5",
+            "model_format": "java_block",
+            "box_uv": False,
+        },
+        "name": "meteor_staff",
+        "model_identifier": "wildwest:meteor_staff",
+        "visible_box": [2, 2, 0],
+        "variable_placeholders": "",
+        "variable_placeholder_buttons": [],
+        "unhandled_root_fields": {},
+        "resolution": {"width": 32, "height": 32},
+        "elements": elements,
+        "outliner": outliner,
+        "textures": [texture],
+        "display": DISPLAY,
+    }
+
+
 def main():
     arg = sys.argv[1] if len(sys.argv) > 1 else None
     tools_dir, assets_dir = resolve_paths(arg)
@@ -302,6 +385,14 @@ def main():
         json.dump(model_gui, f, indent=2)
         f.write('\n')
     print(f"  wrote {model_gui_path}")
+
+    bbmodel_relpath = '../src/main/resources/assets/wildwest/textures/item/meteor_staff.png'
+    bbmodel = build_bbmodel(texture_3d, bbmodel_relpath)
+    bbmodel_path = os.path.join(tools_dir, 'meteor_staff.bbmodel')
+    with open(bbmodel_path, 'w') as f:
+        json.dump(bbmodel, f, indent=2)
+        f.write('\n')
+    print(f"  wrote {bbmodel_path}")
 
 
 if __name__ == '__main__':
