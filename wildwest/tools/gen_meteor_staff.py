@@ -183,15 +183,13 @@ def paint_gui_icon():
             err += dy; x += sx
         if e2 <= dx:
             err += dx; y += sy
-    # Shadow pass first so shaft pixels always win over shadow strokes.
-    for (sx_, sy_) in shaft_pts:
-        # Shadow stroke offset 1 down-left
-        if 0 <= sx_ - 1 < 16 and 0 <= sy_ + 1 < 16:
-            # Don't overwrite the magma blob area
-            if not (sx_ - 1 >= 11 and sy_ + 1 <= 5):
-                img.putpixel((sx_ - 1, sy_ + 1), WOOD_GRAIN)
-    for (sx_, sy_) in shaft_pts:
-        img.putpixel((sx_, sy_), WOOD_BASE)
+    # First pass: shadow stroke offset 1 down-left
+    for (px, py) in shaft_pts:
+        if 0 <= px - 1 < 16 and 0 <= py + 1 < 16:
+            img.putpixel((px - 1, py + 1), WOOD_GRAIN)
+    # Second pass: shaft pixels overwrite shadow at overlaps
+    for (px, py) in shaft_pts:
+        img.putpixel((px, py), WOOD_BASE)
 
     # Iron band 1: (4,12)-(6,13)
     for bx in range(4, 7):
