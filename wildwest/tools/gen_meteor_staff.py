@@ -102,14 +102,76 @@ def resolve_paths(arg):
     return tools_dir, assets_dir
 
 
+def paint_3d_texture():
+    """Paint the 32x32 atlas with wood/iron/magma/ember regions.
+
+    Margin pixels around each UV group are filled with the dominant adjacent
+    palette colour (#1a0e08 dark wood streak) so any mipmap bleed at distance
+    is invisible (see spec §Texture layout).
+    """
+    img = Image.new('RGBA', (32, 32), TRANSPARENT)
+    draw = ImageDraw.Draw(img)
+
+    # Margin fill: paint columns 8 and 16 + row 24 with WOOD_GRAIN so any
+    # mipmap bleed reads as dark wood, not pink/transparent.
+    draw.rectangle((8,  0,  8,  31), fill=WOOD_GRAIN)
+    draw.rectangle((16, 0,  16, 31), fill=WOOD_GRAIN)
+    draw.rectangle((0,  24, 31, 24), fill=WOOD_GRAIN)
+
+    # ── Wood region: (0,0)–(7,23). Each shaft cube reuses this strip. ──
+    draw.rectangle((0, 0, 7, 23), fill=WOOD_BASE)
+    # Vertical grain streaks
+    for x in (1, 4, 6):
+        draw.line(((x, 0), (x, 23)), fill=WOOD_GRAIN)
+    # Highlight column
+    draw.line(((2, 0), (2, 23)), fill=WOOD_HI)
+    # Knot speckles
+    for (kx, ky) in ((3, 4), (5, 11), (3, 17), (6, 20)):
+        img.putpixel((kx, ky), WOOD_GRAIN)
+
+    # ── Iron band region: (9,0)–(15,7). ──
+    draw.rectangle((9, 0, 15, 7), fill=IRON_BASE)
+    # Top + bottom shade lines
+    draw.line(((9, 0), (15, 0)), fill=IRON_SHADE)
+    draw.line(((9, 7), (15, 7)), fill=IRON_SHADE)
+    # Rivet dots
+    for rx in (10, 13):
+        img.putpixel((rx, 3), IRON_RIVET)
+        img.putpixel((rx, 4), IRON_RIVET)
+
+    # ── Magma core region: (0,25)–(31,31). Full-width strip. ──
+    draw.rectangle((0, 25, 31, 31), fill=MAGMA_OUTER)
+    # Hot pixels scattered
+    for (mx, my) in ((3, 27), (7, 29), (12, 26), (15, 28), (19, 27),
+                     (22, 30), (25, 26), (28, 28)):
+        img.putpixel((mx, my), MAGMA_HOT)
+    # Crack lines
+    for (cx, cy) in ((5, 28), (11, 29), (17, 27), (23, 26), (27, 30)):
+        img.putpixel((cx, cy), MAGMA_CRACK)
+
+    # ── Ember spike region: (17,0)–(23,7). ──
+    draw.rectangle((17, 0, 23, 7), fill=EMBER)
+    # Hot pixels
+    for (ex, ey) in ((18, 1), (21, 3), (19, 5), (22, 6)):
+        img.putpixel((ex, ey), EMBER_HOT)
+    # Shadow on one edge for depth
+    draw.line(((17, 7), (23, 7)), fill=MAGMA_OUTER)
+
+    return img
+
+
 def main():
     arg = sys.argv[1] if len(sys.argv) > 1 else None
     tools_dir, assets_dir = resolve_paths(arg)
-    print(f"tools_dir: {tools_dir}")
-    print(f"assets_dir: {assets_dir}")
-    print(f"cubes: {len(CUBES)}")
-    print(f"uv groups: {list(UV_REGIONS.keys())}")
-    # Subsequent tasks fill in: paint textures, write bbmodel, write JSON.
+
+    os.makedirs(os.path.join(assets_dir, 'textures/item'), exist_ok=True)
+    os.makedirs(os.path.join(assets_dir, 'models/item'), exist_ok=True)
+    os.makedirs(tools_dir, exist_ok=True)
+
+    texture_3d = paint_3d_texture()
+    texture_3d_path = os.path.join(assets_dir, 'textures/item/meteor_staff.png')
+    texture_3d.save(texture_3d_path)
+    print(f"  wrote {texture_3d_path}")
 
 
 if __name__ == '__main__':
