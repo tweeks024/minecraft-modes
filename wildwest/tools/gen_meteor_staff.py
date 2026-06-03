@@ -221,16 +221,29 @@ def paint_gui_icon():
 
 
 def uv_for(group):
-    """Return the 4-tuple [u1, v1, u2, v2] for a given UV group.
+    """Return the 4-tuple [u1, v1, u2, v2] in pixel coords for a given UV group.
 
     All faces of all cubes in the same group share the same UV rect — the
     geometry is small enough that texture detail comes from group-level
-    palette/pattern, not per-face uniqueness.
+    palette/pattern, not per-face uniqueness. Returned coords are in actual
+    32x32 pixel space (Blockbench's convention). The model JSON consumer
+    must rescale via `uv_for_model_json`.
     """
     x1, y1, x2, y2 = UV_REGIONS[group]
     # +1 on the upper bounds because UV_REGIONS stores inclusive pixel
-    # coords but model JSON uv is half-open like a slice end.
+    # coords but UV format is half-open like a slice end.
     return [x1, y1, x2 + 1, y2 + 1]
+
+
+# Minecraft model JSON UVs are always normalized to a virtual 16-pixel space,
+# regardless of `texture_size`. The renderer multiplies UV by `texture_size/16`
+# to sample the actual texture. Our atlas is 32x32, so we halve pixel coords.
+MODEL_JSON_UV_SCALE = 16.0 / 32.0
+
+
+def uv_for_model_json(group):
+    """Return the model-JSON-scaled UV (0..16 normalized space)."""
+    return [v * MODEL_JSON_UV_SCALE for v in uv_for(group)]
 
 
 def build_model_json():
@@ -241,7 +254,7 @@ def build_model_json():
     """
     elements = []
     for name, frm, to, group in CUBES:
-        uv = uv_for(group)
+        uv = uv_for_model_json(group)
         elements.append({
             "name": name,
             "from": list(frm),
