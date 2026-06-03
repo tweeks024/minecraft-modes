@@ -234,6 +234,11 @@ def uv_for(group):
 
 
 def build_model_json():
+    """Return the 3D voxel item model dict for `models/item/meteor_staff.json`.
+
+    Bound to texture variable `#0` (and `particle`) via the `textures` map.
+    Shares `display` transforms with the bbmodel via the DISPLAY constant.
+    """
     elements = []
     for name, frm, to, group in CUBES:
         uv = uv_for(group)
@@ -258,7 +263,7 @@ def build_model_json():
             "particle": "wildwest:item/meteor_staff",
         },
         "elements": elements,
-        "display": DISPLAY,
+        "display": dict(DISPLAY),
     }
 
 
@@ -350,7 +355,7 @@ def build_bbmodel(texture_3d_img, texture_3d_relpath):
         "elements": elements,
         "outliner": outliner,
         "textures": [texture],
-        "display": DISPLAY,
+        "display": dict(DISPLAY),
     }
 
 
