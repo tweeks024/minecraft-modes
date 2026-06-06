@@ -85,7 +85,14 @@ public class InfinityGauntletItem extends Item {
         return InteractionResult.CONSUME;
     }
 
-    /** Dispatch to the stone's ability. Return false to skip cooldown/durability. */
+    /**
+     * Dispatch to the stone's ability. Return false to skip cooldown/durability.
+     *
+     * <p>The switch is exhaustive over {@link InfinityStone}. If a future
+     * stone is added without wiring a case here, the compiler will warn
+     * (no default branch covers it) — better to fail loudly at compile
+     * time than ship a stone that silently does nothing.
+     */
     private boolean castStone(InfinityStone stone, ServerLevel level, ServerPlayer player, ItemStack stack) {
         return switch (stone) {
             case POWER -> castPower(level, player);
@@ -94,7 +101,6 @@ public class InfinityGauntletItem extends Item {
             case SOUL -> castSoul(level, player);
             case MIND -> castMind(level, player);
             case REALITY -> castReality(level, player);
-            default -> false;
         };
     }
 

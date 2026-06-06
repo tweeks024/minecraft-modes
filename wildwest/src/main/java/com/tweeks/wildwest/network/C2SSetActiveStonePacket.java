@@ -1,7 +1,9 @@
 package com.tweeks.wildwest.network;
 
+import com.mojang.logging.LogUtils;
 import com.tweeks.wildwest.Registration;
 import com.tweeks.wildwest.WildWestMod;
+import com.tweeks.wildwest.item.InfinityStone;
 import com.tweeks.wildwest.item.ModDataComponents;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -12,6 +14,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+import org.slf4j.Logger;
 
 public record C2SSetActiveStonePacket(int stoneIndex, boolean mainHand) implements CustomPacketPayload {
 
@@ -24,16 +27,29 @@ public record C2SSetActiveStonePacket(int stoneIndex, boolean mainHand) implemen
             ByteBufCodecs.BOOL,    C2SSetActiveStonePacket::mainHand,
             C2SSetActiveStonePacket::new);
 
+    private static final Logger LOGGER = LogUtils.getLogger();
+
     @Override
     public Type<? extends CustomPacketPayload> type() { return TYPE; }
 
     public static void handle(C2SSetActiveStonePacket pkt, IPayloadContext ctx) {
-        if (pkt.stoneIndex() < 0 || pkt.stoneIndex() > 5) return;
+        int max = InfinityStone.values().length - 1;
+        if (pkt.stoneIndex() < 0 || pkt.stoneIndex() > max) {
+            LOGGER.debug("Dropping C2SSetActiveStonePacket with out-of-range stoneIndex={}", pkt.stoneIndex());
+            return;
+        }
         ctx.enqueueWork(() -> {
-            if (!(ctx.player() instanceof ServerPlayer player)) return;
+            if (!(ctx.player() instanceof ServerPlayer player)) {
+                LOGGER.warn("C2SSetActiveStonePacket received without a ServerPlayer context");
+                return;
+            }
             InteractionHand hand = pkt.mainHand() ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
             ItemStack stack = player.getItemInHand(hand);
-            if (!stack.is(Registration.INFINITY_GAUNTLET.get())) return;
+            if (!stack.is(Registration.INFINITY_GAUNTLET.get())) {
+                // Plausible race: player swapped hands or dropped item between
+                // opening the picker and clicking. Silent drop is correct.
+                return;
+            }
             stack.set(ModDataComponents.ACTIVE_STONE.get(), pkt.stoneIndex());
         });
     }
