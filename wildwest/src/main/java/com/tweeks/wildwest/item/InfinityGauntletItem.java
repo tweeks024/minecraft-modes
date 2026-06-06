@@ -65,8 +65,41 @@ public class InfinityGauntletItem extends Item {
             case POWER -> castPower(level, player);
             case SPACE -> castSpace(level, player);
             case TIME -> castTime(level, player);
+            case SOUL -> castSoul(level, player);
             default -> false;
         };
+    }
+
+    private boolean castSoul(ServerLevel level, ServerPlayer player) {
+        double maxDist = 16.0;
+        net.minecraft.world.phys.Vec3 eye = player.getEyePosition();
+        net.minecraft.world.phys.Vec3 look = player.getLookAngle();
+        net.minecraft.world.phys.Vec3 end = eye.add(look.scale(maxDist));
+        AABB rayAabb = player.getBoundingBox().expandTowards(look.scale(maxDist)).inflate(0.5);
+
+        net.minecraft.world.phys.EntityHitResult hit =
+            net.minecraft.world.entity.projectile.ProjectileUtil.getEntityHitResult(
+                player, eye, end, rayAabb,
+                e -> e != player && e.isAlive() && e instanceof LivingEntity,
+                maxDist * maxDist);
+
+        if (hit == null) return false;
+
+        LivingEntity target = (LivingEntity) hit.getEntity();
+        target.hurt(WildWestDamageTypes.infinitySoul(player), 4.0f);
+        player.heal(4.0f);
+
+        for (int i = 0; i <= 16; i++) {
+            double t = i / 16.0;
+            level.sendParticles(ParticleTypes.SOUL,
+                eye.x + (target.getX() - eye.x) * t,
+                eye.y + (target.getY() + target.getBbHeight() / 2 - eye.y) * t,
+                eye.z + (target.getZ() - eye.z) * t,
+                1, 0, 0, 0, 0);
+        }
+        level.playSound(null, player.getX(), player.getY(), player.getZ(),
+            SoundEvents.SOUL_SAND_BREAK, SoundSource.PLAYERS, 1.0f, 1.0f);
+        return true;
     }
 
     private boolean castTime(ServerLevel level, ServerPlayer player) {
