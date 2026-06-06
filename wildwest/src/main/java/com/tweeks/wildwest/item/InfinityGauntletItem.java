@@ -64,8 +64,29 @@ public class InfinityGauntletItem extends Item {
         return switch (stone) {
             case POWER -> castPower(level, player);
             case SPACE -> castSpace(level, player);
+            case TIME -> castTime(level, player);
             default -> false;
         };
+    }
+
+    private boolean castTime(ServerLevel level, ServerPlayer player) {
+        double radius = 6.0;
+        AABB area = player.getBoundingBox().inflate(radius);
+        int durationTicks = 160;
+        for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class, area)) {
+            if (target == player) continue;
+            if (!(target instanceof Enemy)) continue;
+            target.addEffect(new net.minecraft.world.effect.MobEffectInstance(
+                net.minecraft.world.effect.MobEffects.SLOWNESS, durationTicks, 3));
+            target.addEffect(new net.minecraft.world.effect.MobEffectInstance(
+                net.minecraft.world.effect.MobEffects.MINING_FATIGUE, durationTicks, 2));
+        }
+        level.sendParticles(ParticleTypes.GLOW,
+            player.getX(), player.getY() + 1.0, player.getZ(),
+            40, radius * 0.5, 0.5, radius * 0.5, 0.0);
+        level.playSound(null, player.getX(), player.getY(), player.getZ(),
+            SoundEvents.BEACON_AMBIENT, SoundSource.PLAYERS, 1.0f, 1.5f);
+        return true;
     }
 
     private boolean castSpace(ServerLevel level, ServerPlayer player) {
