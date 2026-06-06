@@ -1,11 +1,18 @@
 package com.tweeks.wildwest.client;
 
+import com.tweeks.wildwest.Registration;
+import com.tweeks.wildwest.item.InfinityCooldowns;
 import com.tweeks.wildwest.item.InfinityStone;
+import com.tweeks.wildwest.item.ModDataComponents;
 import com.tweeks.wildwest.network.C2SSetActiveStonePacket;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 /**
@@ -46,26 +53,71 @@ public class RadialPickerScreen extends Screen {
 
         graphics.fill(0, 0, this.width, this.height, 0x80000000);
 
+        long[] cds = readCooldowns();
+        long now = currentGameTime();
+
         for (int i = 0; i < 6; i++) {
             InfinityStone stone = InfinityStone.byIndex(i);
             double angle = -Math.PI / 2 + i * (Math.PI / 3);
             int discCx = cx + (int) (Math.cos(angle) * OUTER_RADIUS_PX);
             int discCy = cy + (int) (Math.sin(angle) * OUTER_RADIUS_PX);
 
-            int color = 0xFF000000 | (stone.colorRgb() & 0x00FFFFFF);
+            boolean onCooldown = InfinityCooldowns.isOnCooldown(cds, i, now);
+            int color = onCooldown
+                ? dim(stone.colorRgb())
+                : (0xFF000000 | (stone.colorRgb() & 0x00FFFFFF));
             int outline = (i == hoveredWedge) ? 0xFFFFFFFF : 0xFF202020;
             graphics.fill(discCx - DISC_HALF_PX - 2, discCy - DISC_HALF_PX - 2,
                           discCx + DISC_HALF_PX + 2, discCy + DISC_HALF_PX + 2, outline);
             graphics.fill(discCx - DISC_HALF_PX, discCy - DISC_HALF_PX,
                           discCx + DISC_HALF_PX, discCy + DISC_HALF_PX, color);
 
+            // Overlay remaining seconds on cooldown discs
+            if (onCooldown) {
+                long remainingTicks = cds[i] - now;
+                String remaining = formatRemaining(remainingTicks);
+                graphics.centeredText(this.font, Component.literal(remaining),
+                    discCx, discCy - 3, 0xFFFFFFFF);
+            }
+
             Component label = Component.translatable(
                 "item.wildwest.infinity_gauntlet.stone." + stone.translationSuffix());
-            graphics.centeredText(this.font, label, discCx, discCy + DISC_HALF_PX + 4, 0xFFFFFFFF);
+            int labelColor = onCooldown ? 0xFF888888 : 0xFFFFFFFF;
+            graphics.centeredText(this.font, label, discCx, discCy + DISC_HALF_PX + 4, labelColor);
         }
 
         Component prompt = Component.translatable("screen.wildwest.infinity_gauntlet_radial.prompt");
         graphics.centeredText(this.font, prompt, cx, cy - 4, 0xFFCCCCCC);
+    }
+
+    /** Read the held gauntlet's cooldowns, or all-zero if not found. */
+    private long[] readCooldowns() {
+        Player player = Minecraft.getInstance().player;
+        if (player == null) return InfinityCooldowns.emptyCooldowns();
+        ItemStack stack = player.getItemInHand(
+            mainHand ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND);
+        if (!stack.is(Registration.INFINITY_GAUNTLET.get())) return InfinityCooldowns.emptyCooldowns();
+        return stack.getOrDefault(ModDataComponents.COOLDOWNS.get(), InfinityCooldowns.emptyCooldowns());
+    }
+
+    private long currentGameTime() {
+        Minecraft mc = Minecraft.getInstance();
+        return mc.level == null ? 0L : mc.level.getGameTime();
+    }
+
+    /** Dim the stone color to ~30% intensity with full alpha. */
+    private static int dim(int rgb) {
+        int r = (rgb >> 16) & 0xFF;
+        int g = (rgb >> 8) & 0xFF;
+        int b = rgb & 0xFF;
+        return 0xFF000000 | ((r / 3) << 16) | ((g / 3) << 8) | (b / 3);
+    }
+
+    /** Format ticks as "X.Ys" rounded to one decimal, or "Xs" if >=10s. */
+    private static String formatRemaining(long ticks) {
+        double seconds = ticks / 20.0;
+        if (seconds >= 10.0) return ((int) Math.ceil(seconds)) + "s";
+        return String.format(java.util.Locale.ROOT, "%.1fs", seconds);
     }
 
     @Override

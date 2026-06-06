@@ -80,14 +80,16 @@ public class InfinityGauntletItem extends Item {
             return InteractionResult.PASS;
         }
 
-        // NOTE: do not call player.getCooldowns().addCooldown(stack, ...) here.
-        // Vanilla ItemCooldowns is per-item, not per-stone — it would lock all
-        // six stones for the duration of whichever one was just cast, defeating
-        // the per-stone COOLDOWNS component. The trade-off is that we lose the
-        // vanilla hotbar cooldown sweep; the FAIL InteractionResult on a cast
-        // attempt during cooldown still gives the player feedback.
         long[] nextCds = InfinityCooldowns.applyCooldown(cds, stone.ordinal(), now, stone.cooldownTicks());
         stack.set(ModDataComponents.COOLDOWNS.get(), nextCds);
+
+        // Drive the vanilla hotbar cooldown sweep for the *active* stone.
+        // Vanilla ItemCooldowns is per-item, but here that's intentional:
+        // we want the sweep to reflect the currently-displayed stone's
+        // cooldown. When the player swaps stones via the radial picker,
+        // the packet handler re-syncs this to the newly-active stone
+        // (see C2SSetActiveStonePacket.handle).
+        player.getCooldowns().addCooldown(stack, stone.cooldownTicks());
 
         EquipmentSlot slot = hand == InteractionHand.MAIN_HAND
             ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;

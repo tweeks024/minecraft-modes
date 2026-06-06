@@ -3,6 +3,7 @@ package com.tweeks.wildwest.network;
 import com.mojang.logging.LogUtils;
 import com.tweeks.wildwest.Registration;
 import com.tweeks.wildwest.WildWestMod;
+import com.tweeks.wildwest.item.InfinityCooldowns;
 import com.tweeks.wildwest.item.InfinityStone;
 import com.tweeks.wildwest.item.ModDataComponents;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -51,6 +52,23 @@ public record C2SSetActiveStonePacket(int stoneIndex, boolean mainHand) implemen
                 return;
             }
             stack.set(ModDataComponents.ACTIVE_STONE.get(), pkt.stoneIndex());
+
+            // Re-sync the vanilla hotbar cooldown sweep to the newly-active
+            // stone. If the stone is mid-cooldown, set the sweep to the
+            // remaining ticks; otherwise clear the sweep entirely. The true
+            // per-stone cooldown gate still lives in the COOLDOWNS data
+            // component (read in InfinityGauntletItem.use), so vanilla
+            // ItemCooldowns is purely a visual mirror.
+            long[] cds = stack.getOrDefault(
+                ModDataComponents.COOLDOWNS.get(), InfinityCooldowns.emptyCooldowns());
+            long now = player.level().getGameTime();
+            if (InfinityCooldowns.isOnCooldown(cds, pkt.stoneIndex(), now)) {
+                int remaining = (int) Math.min(cds[pkt.stoneIndex()] - now, Integer.MAX_VALUE);
+                player.getCooldowns().addCooldown(stack, remaining);
+            } else {
+                player.getCooldowns().removeCooldown(
+                    player.getCooldowns().getCooldownGroup(stack));
+            }
         });
     }
 }
