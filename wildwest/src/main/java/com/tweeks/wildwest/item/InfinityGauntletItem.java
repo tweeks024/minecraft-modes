@@ -63,8 +63,42 @@ public class InfinityGauntletItem extends Item {
     private boolean castStone(InfinityStone stone, ServerLevel level, ServerPlayer player, ItemStack stack) {
         return switch (stone) {
             case POWER -> castPower(level, player);
+            case SPACE -> castSpace(level, player);
             default -> false;
         };
+    }
+
+    private boolean castSpace(ServerLevel level, ServerPlayer player) {
+        double maxDist = 32.0;
+        net.minecraft.world.phys.Vec3 eye = player.getEyePosition();
+        net.minecraft.world.phys.Vec3 look = player.getLookAngle();
+        net.minecraft.world.phys.Vec3 end = eye.add(look.scale(maxDist));
+
+        net.minecraft.world.phys.BlockHitResult hit = level.clip(
+            new net.minecraft.world.level.ClipContext(eye, end,
+                net.minecraft.world.level.ClipContext.Block.COLLIDER,
+                net.minecraft.world.level.ClipContext.Fluid.NONE, player));
+
+        net.minecraft.world.phys.Vec3 target;
+        if (hit.getType() == net.minecraft.world.phys.HitResult.Type.MISS) {
+            target = end;
+        } else {
+            target = hit.getLocation().subtract(look.scale(1.0));
+        }
+
+        level.sendParticles(ParticleTypes.REVERSE_PORTAL,
+            player.getX(), player.getY() + 1.0, player.getZ(),
+            20, 0.3, 0.5, 0.3, 0.01);
+
+        player.teleportTo(target.x, target.y, target.z);
+        player.fallDistance = 0.0f;
+
+        level.sendParticles(ParticleTypes.REVERSE_PORTAL,
+            target.x, target.y + 1.0, target.z,
+            20, 0.3, 0.5, 0.3, 0.01);
+        level.playSound(null, target.x, target.y, target.z,
+            SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1.0f, 1.0f);
+        return true;
     }
 
     private boolean castPower(ServerLevel level, ServerPlayer player) {
