@@ -45,8 +45,18 @@ public class GauntletEditorScreen extends Screen {
 
     @Override
     protected void init() {
+        // Preserve unsaved text across resize. init() is called both on
+        // first show AND on window resize; without snapshotting, the user's
+        // typed-but-not-yet-saved text would be reset to the stack's last
+        // saved value every time they resized the window.
+        List<String> previous = new ArrayList<>(InfinityCommands.SLOT_COUNT);
+        boolean hadBoxes = !boxes.isEmpty();
+        for (EditBox b : boxes) previous.add(b.getValue());
         boxes.clear();
-        List<String> existing = readCommands();
+
+        List<String> initial = hadBoxes
+            ? InfinityCommands.normalize(previous)
+            : readCommands();
 
         int totalH = ROW_HEIGHT * InfinityCommands.SLOT_COUNT + 50;
         int top = (this.height - totalH) / 2 + 20;
@@ -59,7 +69,7 @@ public class GauntletEditorScreen extends Screen {
                 BOX_WIDTH, 18,
                 Component.translatable("item.wildwest.infinity_gauntlet.stone." + stone.translationSuffix()));
             box.setMaxLength(C2SSetGauntletCommandsPacket.MAX_COMMAND_LENGTH);
-            box.setValue(InfinityCommands.get(existing, i));
+            box.setValue(InfinityCommands.get(initial, i));
             this.addRenderableWidget(box);
             this.boxes.add(box);
         }

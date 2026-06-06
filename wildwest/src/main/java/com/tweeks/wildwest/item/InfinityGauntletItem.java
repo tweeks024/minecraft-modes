@@ -131,9 +131,23 @@ public class InfinityGauntletItem extends Item {
     }
 
     /**
+     * Per-thread re-entrancy guard. If a player-authored command somehow
+     * re-invokes {@link #use} on the same gauntlet (e.g. via /trigger or
+     * /execute as ... run ... that scripts the player swinging), we
+     * short-circuit the inner cast to bound recursion at depth 1. Without
+     * this, a hand-crafted loop could blow the server stack.
+     */
+    private static final ThreadLocal<Boolean> CASTING_COMMAND = ThreadLocal.withInitial(() -> false);
+
+    /**
      * Run an arbitrary command at the player's command source. The command
      * source uses the player's permission level (op vs. non-op), so a
      * survival player can't escalate to op commands via the gauntlet.
+     *
+     * <p>Output is suppressed via {@link
+     * net.minecraft.commands.CommandSourceStack#withSuppressedOutput} so
+     * the player's chat isn't spammed with /effect-style feedback on every
+     * cast.
      *
      * <p>Returns {@code true} whether the command parsed/succeeded or not:
      * the cast attempt still consumes the cooldown and durability. This
@@ -142,9 +156,16 @@ public class InfinityGauntletItem extends Item {
      */
     private boolean castCommand(ServerLevel level, ServerPlayer player,
                                 InfinityStone stone, String command) {
+        if (CASTING_COMMAND.get()) {
+            // Re-entry from a player-authored command. Refuse and drop
+            // through; the outer cast will still consume the cooldown.
+            return true;
+        }
         net.minecraft.server.MinecraftServer server = level.getServer();
         if (server == null) return false;
-        net.minecraft.commands.CommandSourceStack source = player.createCommandSourceStack();
+        net.minecraft.commands.CommandSourceStack source =
+            player.createCommandSourceStack().withSuppressedOutput();
+        CASTING_COMMAND.set(true);
         try {
             server.getCommands().performPrefixedCommand(source, command);
         } catch (Exception ex) {
@@ -154,6 +175,8 @@ public class InfinityGauntletItem extends Item {
                 "item.wildwest.infinity_gauntlet.command_failed",
                 ex.getMessage() == null ? ex.getClass().getSimpleName() : ex.getMessage())
                 .withStyle(net.minecraft.ChatFormatting.RED));
+        } finally {
+            CASTING_COMMAND.set(false);
         }
         // Generic spell-cast feedback so custom commands feel like a cast.
         level.sendParticles(
