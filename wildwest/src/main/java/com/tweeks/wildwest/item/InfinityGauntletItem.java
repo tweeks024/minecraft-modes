@@ -61,6 +61,13 @@ public class InfinityGauntletItem extends Item {
             ModDataComponents.COOLDOWNS.get(), InfinityCooldowns.emptyCooldowns());
         long now = level.getGameTime();
         if (InfinityCooldowns.isOnCooldown(cds, stone.ordinal(), now)) {
+            // Without this client-side cue, FAIL produces no swing/sound/sweep
+            // and the player thinks the item is broken. A short low-volume
+            // dispenser-empty click is the vanilla "this is on cooldown" idiom.
+            if (level.isClientSide()) {
+                level.playLocalSound(player.getX(), player.getY(), player.getZ(),
+                    SoundEvents.DISPENSER_FAIL, SoundSource.PLAYERS, 0.5f, 1.5f, false);
+            }
             return InteractionResult.FAIL;
         }
 

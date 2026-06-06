@@ -40,10 +40,16 @@ public final class InfinityGauntletKeybind {
         Player player = mc.player;
         if (player == null) return;
 
+        boolean opened = false;
         while (OPEN_RADIAL.consumeClick()) {
+            // Drain queued clicks but only open the screen once. Without this,
+            // rapid taps would call setScreen() repeatedly, leaking instances
+            // of RadialPickerScreen whose lifecycle never completes.
+            if (opened) continue;
             InteractionHand hand = findGauntletHand(player);
             if (hand != null) {
                 mc.setScreen(new RadialPickerScreen(hand == InteractionHand.MAIN_HAND));
+                opened = true;
             }
         }
     }

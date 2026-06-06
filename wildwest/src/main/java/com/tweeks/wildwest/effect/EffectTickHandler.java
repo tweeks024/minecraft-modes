@@ -83,10 +83,14 @@ public final class EffectTickHandler {
                 nearest = candidate;
             }
         }
-        // Always clear targeting first, then point at nearest hostile if any.
-        // The null-target path is critical: it stops vanilla AI from falling
-        // back to the caster (whose UUID the mob remembers in charm.casterUuid()).
-        mob.setTarget(nearest);
+        // Only write the target if it changed. Mob#setTarget fires
+        // LivingChangeTargetEvent which other mods may listen to; calling it
+        // every tick when the target is unchanged is wasted event-bus traffic.
+        // The null-write path is still critical: if vanilla AI has retargeted
+        // to the caster, we clear it here, but only when the change is real.
+        if (mob.getTarget() != nearest) {
+            mob.setTarget(nearest);
+        }
     }
 
     private static void tickRealityBubble(ServerLevel level, Mob bat, long now) {
@@ -129,7 +133,18 @@ public final class EffectTickHandler {
         }
 
         restored.snapTo(bat.getX(), bat.getY(), bat.getZ(), bat.getYRot(), 0.0f);
-        level.addFreshEntity(restored);
+        // Mirror the castReality safeguard: if addFreshEntity is refused
+        // (spawn event cancelled, chunk unloaded), the restored entity
+        // leaks if we don't discard it AND we lose the bat if we discard
+        // it without a replacement. Keep the bat for retry instead.
+        if (!level.addFreshEntity(restored)) {
+            LOGGER.warn(
+                "Reality-bubble restore was refused by level for type {}; keeping bat alive for retry",
+                typeId);
+            restored.discard();
+            extendBubble(bat, bubble);
+            return;
+        }
         bat.discard();
     }
 
