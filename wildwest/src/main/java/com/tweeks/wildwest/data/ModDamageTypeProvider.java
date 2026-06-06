@@ -20,5 +20,9 @@ public final class ModDamageTypeProvider {
             new DamageType("wildwest.cannonball", 0.1f));
         ctx.register(WildWestDamageTypes.PISTON_PUNCH,
             new DamageType("wildwest.piston_punch", 0.1f));
+        ctx.register(WildWestDamageTypes.INFINITY_POWER,
+            new DamageType("wildwest.infinity_power", 0.1f));
+        ctx.register(WildWestDamageTypes.INFINITY_SOUL,
+            new DamageType("wildwest.infinity_soul", 0.1f));
     }
 }

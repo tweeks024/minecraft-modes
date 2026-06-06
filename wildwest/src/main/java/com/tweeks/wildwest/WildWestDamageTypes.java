@@ -35,6 +35,14 @@ public final class WildWestDamageTypes {
         Registries.DAMAGE_TYPE,
         Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "piston_punch"));
 
+    public static final ResourceKey<DamageType> INFINITY_POWER = ResourceKey.create(
+        Registries.DAMAGE_TYPE,
+        Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "infinity_power"));
+
+    public static final ResourceKey<DamageType> INFINITY_SOUL = ResourceKey.create(
+        Registries.DAMAGE_TYPE,
+        Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "infinity_soul"));
+
     public static DamageSource gunshot(Entity attacker) {
         return new DamageSource(
             attacker.level().registryAccess()
@@ -94,6 +102,22 @@ public final class WildWestDamageTypes {
             attacker.level().registryAccess()
                 .lookupOrThrow(Registries.DAMAGE_TYPE)
                 .getOrThrow(PISTON_PUNCH),
+            attacker);
+    }
+
+    public static DamageSource infinityPower(Entity attacker) {
+        return new DamageSource(
+            attacker.level().registryAccess()
+                .lookupOrThrow(Registries.DAMAGE_TYPE)
+                .getOrThrow(INFINITY_POWER),
+            attacker);
+    }
+
+    public static DamageSource infinitySoul(Entity attacker) {
+        return new DamageSource(
+            attacker.level().registryAccess()
+                .lookupOrThrow(Registries.DAMAGE_TYPE)
+                .getOrThrow(INFINITY_SOUL),
             attacker);
     }
 }
