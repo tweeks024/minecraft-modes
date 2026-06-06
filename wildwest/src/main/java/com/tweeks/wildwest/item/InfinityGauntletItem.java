@@ -26,6 +26,32 @@ public class InfinityGauntletItem extends Item {
     }
 
     @Override
+    public net.minecraft.network.chat.Component getName(ItemStack stack) {
+        InfinityStone stone = InfinityStone.byIndex(
+            stack.getOrDefault(ModDataComponents.ACTIVE_STONE.get(), 0));
+        return net.minecraft.network.chat.Component.translatable(
+            "item.wildwest.infinity_gauntlet.named",
+            net.minecraft.network.chat.Component.translatable(
+                "item.wildwest.infinity_gauntlet.stone." + stone.translationSuffix()));
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack,
+                                Item.TooltipContext context,
+                                net.minecraft.world.item.component.TooltipDisplay display,
+                                java.util.function.Consumer<net.minecraft.network.chat.Component> adder,
+                                net.minecraft.world.item.TooltipFlag flag) {
+        InfinityStone stone = InfinityStone.byIndex(
+            stack.getOrDefault(ModDataComponents.ACTIVE_STONE.get(), 0));
+        adder.accept(net.minecraft.network.chat.Component.translatable(
+            "item.wildwest.infinity_gauntlet.tooltip." + stone.translationSuffix())
+            .withStyle(net.minecraft.ChatFormatting.GRAY));
+        adder.accept(net.minecraft.network.chat.Component.translatable(
+            "item.wildwest.infinity_gauntlet.tooltip.swap")
+            .withStyle(net.minecraft.ChatFormatting.DARK_GRAY));
+    }
+
+    @Override
     public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         InfinityStone stone = InfinityStone.byIndex(
