@@ -1,7 +1,9 @@
-// 26.1.2	2026-05-29T06:53:59.762453	Registries
+// 26.1.2	2026-06-06T07:52:29.096731	Registries
 57e0c5f8b49fe57fd5009a6d27c5fd0aa36ad228 data/wildwest/damage_type/cannonball.json
 4ed0893a0b17cdefb37ffe8b20d2818f90ddfe24 data/wildwest/damage_type/club.json
 d355de8bda9b7abda86403cc9532fad3247469af data/wildwest/damage_type/gunshot.json
+47b94da584c3c81acec9bdab56001e0eea1bde45 data/wildwest/damage_type/infinity_power.json
+03511173a3c68a3f2d14239ec8f00181719f74da data/wildwest/damage_type/infinity_soul.json
 9621443056e34fd8a47d3f1e5a4dd2b3181a2afd data/wildwest/damage_type/knife.json
 2732f8bb94d65a2d16e24682b0799263c89d6869 data/wildwest/damage_type/meteor.json
 a5a46f0073597f2015d6a38f762c6a4d467f2419 data/wildwest/damage_type/piston_punch.json

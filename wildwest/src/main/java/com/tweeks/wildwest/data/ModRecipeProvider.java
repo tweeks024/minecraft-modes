@@ -57,6 +57,19 @@ public class ModRecipeProvider extends RecipeProvider {
             .define('L', Items.LEATHER)
             .unlockedBy("has_iron", this.has(Items.IRON_INGOT))
             .save(this.output);
+
+        ShapedRecipeBuilder.shaped(itemLookup, RecipeCategory.COMBAT, Registration.INFINITY_GAUNTLET.get())
+            .pattern("SDS")
+            .pattern("N*N")
+            .pattern("HTH")
+            .define('S', Items.ECHO_SHARD)
+            .define('D', Items.WITHER_SKELETON_SKULL)
+            .define('N', Items.NETHERITE_BLOCK)
+            .define('*', Items.NETHER_STAR)
+            .define('H', Items.HEART_OF_THE_SEA)
+            .define('T', Items.TOTEM_OF_UNDYING)
+            .unlockedBy("has_nether_star", this.has(Items.NETHER_STAR))
+            .save(this.output);
     }
 
     public static class Runner extends RecipeProvider.Runner {
