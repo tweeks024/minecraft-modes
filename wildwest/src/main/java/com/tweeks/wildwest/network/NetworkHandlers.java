@@ -18,5 +18,9 @@ public final class NetworkHandlers {
             S2CTracerPacket.TYPE,
             S2CTracerPacket.STREAM_CODEC,
             TracerClientHandler::handle);
+        reg.playToServer(
+            C2SSetActiveStonePacket.TYPE,
+            C2SSetActiveStonePacket.STREAM_CODEC,
+            C2SSetActiveStonePacket::handle);
     }
 }
