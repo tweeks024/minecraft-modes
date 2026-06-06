@@ -29,28 +29,57 @@ public final class EffectTickHandler {
         long now = level.getGameTime();
         for (net.minecraft.world.entity.Entity e : level.getAllEntities()) {
             if (!(e instanceof Mob mob)) continue;
-            MindCharmAttachment charm = mob.getData(ModAttachments.MIND_CHARM.get());
-            if (charm == null) continue;
-            if (now >= charm.expiresAtTick()) {
-                mob.removeData(ModAttachments.MIND_CHARM.get());
-                continue;
-            }
-            AABB search = mob.getBoundingBox().inflate(16.0);
-            net.minecraft.world.entity.LivingEntity nearest = null;
-            double nearestSq = Double.MAX_VALUE;
-            for (net.minecraft.world.entity.LivingEntity candidate :
-                    level.getEntitiesOfClass(net.minecraft.world.entity.LivingEntity.class, search)) {
-                if (candidate == mob) continue;
-                if (!(candidate instanceof Enemy)) continue;
-                double dsq = candidate.distanceToSqr(mob);
-                if (dsq < nearestSq) {
-                    nearestSq = dsq;
-                    nearest = candidate;
-                }
-            }
-            if (nearest != null) {
-                mob.setTarget(nearest);
+            tickMindCharm(level, mob, now);
+            tickRealityBubble(level, mob, now);
+        }
+    }
+
+    private static void tickMindCharm(ServerLevel level, Mob mob, long now) {
+        MindCharmAttachment charm = mob.getData(ModAttachments.MIND_CHARM.get());
+        if (charm == null) return;
+        if (now >= charm.expiresAtTick()) {
+            mob.removeData(ModAttachments.MIND_CHARM.get());
+            return;
+        }
+        AABB search = mob.getBoundingBox().inflate(16.0);
+        net.minecraft.world.entity.LivingEntity nearest = null;
+        double nearestSq = Double.MAX_VALUE;
+        for (net.minecraft.world.entity.LivingEntity candidate :
+                level.getEntitiesOfClass(net.minecraft.world.entity.LivingEntity.class, search)) {
+            if (candidate == mob) continue;
+            if (!(candidate instanceof Enemy)) continue;
+            double dsq = candidate.distanceToSqr(mob);
+            if (dsq < nearestSq) {
+                nearestSq = dsq;
+                nearest = candidate;
             }
         }
+        if (nearest != null) {
+            mob.setTarget(nearest);
+        }
+    }
+
+    private static void tickRealityBubble(ServerLevel level, Mob bat, long now) {
+        RealityBubbleAttachment bubble = bat.getData(ModAttachments.REALITY_BUBBLE.get());
+        if (bubble == null) return;
+        if (now >= bubble.expiresAtTick()) {
+            restoreFromBubble(level, bat, bubble);
+        }
+    }
+
+    private static void restoreFromBubble(ServerLevel level, Mob bat, RealityBubbleAttachment bubble) {
+        net.minecraft.resources.Identifier typeId =
+            net.minecraft.resources.Identifier.parse(bubble.originalTypeId());
+        net.minecraft.world.entity.EntityType<?> type =
+            net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getValue(typeId);
+        if (type != null) {
+            net.minecraft.world.entity.Entity restored = type.create(level,
+                net.minecraft.world.entity.EntitySpawnReason.MOB_SUMMONED);
+            if (restored != null) {
+                restored.snapTo(bat.getX(), bat.getY(), bat.getZ(), bat.getYRot(), 0.0f);
+                level.addFreshEntity(restored);
+            }
+        }
+        bat.discard();
     }
 }

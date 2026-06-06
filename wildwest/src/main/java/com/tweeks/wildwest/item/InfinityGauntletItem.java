@@ -67,8 +67,49 @@ public class InfinityGauntletItem extends Item {
             case TIME -> castTime(level, player);
             case SOUL -> castSoul(level, player);
             case MIND -> castMind(level, player);
+            case REALITY -> castReality(level, player);
             default -> false;
         };
+    }
+
+    private boolean castReality(ServerLevel level, ServerPlayer player) {
+        double maxDist = 8.0;
+        net.minecraft.world.phys.Vec3 eye = player.getEyePosition();
+        net.minecraft.world.phys.Vec3 look = player.getLookAngle();
+        net.minecraft.world.phys.Vec3 end = eye.add(look.scale(maxDist));
+        AABB rayAabb = player.getBoundingBox().expandTowards(look.scale(maxDist)).inflate(0.5);
+
+        net.minecraft.world.phys.EntityHitResult hit =
+            net.minecraft.world.entity.projectile.ProjectileUtil.getEntityHitResult(
+                player, eye, end, rayAabb,
+                e -> e != player && e.isAlive()
+                    && e instanceof net.minecraft.world.entity.Mob
+                    && e instanceof Enemy,
+                maxDist * maxDist);
+
+        if (hit == null) return false;
+
+        net.minecraft.world.entity.Mob original = (net.minecraft.world.entity.Mob) hit.getEntity();
+
+        String typeId = net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE
+            .getKey(original.getType()).toString();
+
+        net.minecraft.world.entity.ambient.Bat bat =
+            net.minecraft.world.entity.EntityType.BAT.create(level,
+                net.minecraft.world.entity.EntitySpawnReason.MOB_SUMMONED);
+        if (bat == null) return false;
+        bat.snapTo(original.getX(), original.getY(), original.getZ(), original.getYRot(), 0.0f);
+        bat.setData(com.tweeks.wildwest.effect.ModAttachments.REALITY_BUBBLE.get(),
+            new com.tweeks.wildwest.effect.RealityBubbleAttachment(typeId, level.getGameTime() + 1200));
+        level.addFreshEntity(bat);
+        original.discard();
+
+        level.sendParticles(ParticleTypes.DUST_PLUME,
+            bat.getX(), bat.getY() + 0.5, bat.getZ(),
+            30, 0.5, 0.5, 0.5, 0.05);
+        level.playSound(null, player.getX(), player.getY(), player.getZ(),
+            SoundEvents.EVOKER_CAST_SPELL, SoundSource.PLAYERS, 1.0f, 1.0f);
+        return true;
     }
 
     private boolean castMind(ServerLevel level, ServerPlayer player) {
