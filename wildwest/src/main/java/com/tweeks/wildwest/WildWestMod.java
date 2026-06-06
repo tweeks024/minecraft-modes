@@ -35,6 +35,7 @@ public class WildWestMod {
         ModEntities.register(modEventBus);
         ModBlocks.register(modEventBus);
         Registration.register(modEventBus);
+        com.tweeks.wildwest.item.ModDataComponents.register(modEventBus);
         ModEffects.register(modEventBus);
         ModSounds.register(modEventBus);
         modEventBus.addListener(WildWestMod::registerEntityAttributes);
