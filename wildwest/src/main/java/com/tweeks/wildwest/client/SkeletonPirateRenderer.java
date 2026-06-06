@@ -28,8 +28,10 @@ public class SkeletonPirateRenderer
         Identifier.fromNamespaceAndPath(WildWestMod.MOD_ID, "textures/entity/skeleton_pirate.png");
 
     public SkeletonPirateRenderer(EntityRendererProvider.Context context) {
+        // SKELETON layer (64x32 UV layout) matches the classic-format texture.
+        // PLAYER layer (64x64) would read UVs outside the texture bounds.
         super(context,
-            new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER)),
+            new HumanoidModel<>(context.bakeLayer(ModelLayers.SKELETON)),
             0.5F);
     }
 
