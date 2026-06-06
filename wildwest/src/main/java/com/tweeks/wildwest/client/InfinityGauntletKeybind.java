@@ -3,9 +3,6 @@ package com.tweeks.wildwest.client;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.tweeks.wildwest.Registration;
 import com.tweeks.wildwest.WildWestMod;
-import com.tweeks.wildwest.item.InfinityStone;
-import com.tweeks.wildwest.item.ModDataComponents;
-import com.tweeks.wildwest.network.C2SSetActiveStonePacket;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.InteractionHand;
@@ -16,33 +13,24 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 /**
- * Client-side keybind that cycles the held Infinity Gauntlet's active
- * stone forward by one (0 → 1 → ... → 5 → 0). Default key: G.
- *
- * <p>The spec originally called for a radial picker {@code Screen}, but
- * MC 26.1.2 overhauled the {@code Screen} rendering API to use
- * {@code GuiGraphicsExtractor} with no clear migration path for custom
- * screens — see <a href="../../../../../../../../docs/superpowers/specs/2026-06-06-infinity-gauntlet-design.md">the design doc</a>.
- * Cycling is a pragmatic fallback that ships the feature today; the
- * radial picker can be revisited in a follow-up once examples exist
- * elsewhere in the codebase.
+ * Client-side keybind that opens the {@link RadialPickerScreen} when the
+ * player is holding an Infinity Gauntlet. Default key: G.
  */
 @EventBusSubscriber(modid = WildWestMod.MOD_ID, value = Dist.CLIENT)
 public final class InfinityGauntletKeybind {
     private InfinityGauntletKeybind() {}
 
-    public static final KeyMapping CYCLE_STONE = new KeyMapping(
-        "key.wildwest.infinity_gauntlet_cycle",
+    public static final KeyMapping OPEN_RADIAL = new KeyMapping(
+        "key.wildwest.infinity_gauntlet_radial",
         InputConstants.Type.KEYSYM,
         InputConstants.KEY_G,
         KeyMapping.Category.MISC);
 
     @SubscribeEvent
     public static void onRegister(RegisterKeyMappingsEvent event) {
-        event.register(CYCLE_STONE);
+        event.register(OPEN_RADIAL);
     }
 
     @SubscribeEvent
@@ -52,14 +40,11 @@ public final class InfinityGauntletKeybind {
         Player player = mc.player;
         if (player == null) return;
 
-        while (CYCLE_STONE.consumeClick()) {
+        while (OPEN_RADIAL.consumeClick()) {
             InteractionHand hand = findGauntletHand(player);
-            if (hand == null) continue;
-            ItemStack stack = player.getItemInHand(hand);
-            int current = stack.getOrDefault(ModDataComponents.ACTIVE_STONE.get(), 0);
-            int next = (current + 1) % InfinityStone.values().length;
-            ClientPacketDistributor.sendToServer(
-                new C2SSetActiveStonePacket(next, hand == InteractionHand.MAIN_HAND));
+            if (hand != null) {
+                mc.setScreen(new RadialPickerScreen(hand == InteractionHand.MAIN_HAND));
+            }
         }
     }
 
