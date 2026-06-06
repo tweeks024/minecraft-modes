@@ -75,7 +75,19 @@ public class InfinityGauntletItem extends Item {
             return InteractionResult.CONSUME;
         }
 
-        boolean success = castStone(stone, (ServerLevel) level, (ServerPlayer) player, stack);
+        // Custom command overrides built-in ability if non-empty. Command is
+        // executed at the player's command source (their permission level,
+        // their position) — same semantics as a command block running as its
+        // placer.
+        String customCommand = InfinityCommands.get(
+            stack.getOrDefault(ModDataComponents.COMMANDS.get(), InfinityCommands.empty()),
+            stone.ordinal());
+        boolean success;
+        if (!customCommand.isEmpty()) {
+            success = castCommand((ServerLevel) level, (ServerPlayer) player, stone, customCommand);
+        } else {
+            success = castStone(stone, (ServerLevel) level, (ServerPlayer) player, stack);
+        }
         if (!success) {
             return InteractionResult.PASS;
         }
@@ -116,6 +128,41 @@ public class InfinityGauntletItem extends Item {
             case MIND -> castMind(level, player);
             case REALITY -> castReality(level, player);
         };
+    }
+
+    /**
+     * Run an arbitrary command at the player's command source. The command
+     * source uses the player's permission level (op vs. non-op), so a
+     * survival player can't escalate to op commands via the gauntlet.
+     *
+     * <p>Returns {@code true} whether the command parsed/succeeded or not:
+     * the cast attempt still consumes the cooldown and durability. This
+     * mirrors how a command block ticks whether or not its command parses,
+     * and stops players from spamming a typo-loaded command with no cost.
+     */
+    private boolean castCommand(ServerLevel level, ServerPlayer player,
+                                InfinityStone stone, String command) {
+        net.minecraft.server.MinecraftServer server = level.getServer();
+        if (server == null) return false;
+        net.minecraft.commands.CommandSourceStack source = player.createCommandSourceStack();
+        try {
+            server.getCommands().performPrefixedCommand(source, command);
+        } catch (Exception ex) {
+            // Surface failures to the player but still apply cooldown — the
+            // gauntlet "tried" the cast.
+            player.sendSystemMessage(net.minecraft.network.chat.Component.translatable(
+                "item.wildwest.infinity_gauntlet.command_failed",
+                ex.getMessage() == null ? ex.getClass().getSimpleName() : ex.getMessage())
+                .withStyle(net.minecraft.ChatFormatting.RED));
+        }
+        // Generic spell-cast feedback so custom commands feel like a cast.
+        level.sendParticles(
+            new net.minecraft.core.particles.DustParticleOptions(stone.colorRgb() & 0xFFFFFF, 1.5f),
+            player.getX(), player.getY() + 1.0, player.getZ(),
+            16, 0.4, 0.6, 0.4, 0.05);
+        level.playSound(null, player.getX(), player.getY(), player.getZ(),
+            SoundEvents.ENCHANTMENT_TABLE_USE, SoundSource.PLAYERS, 0.6f, 1.4f);
+        return true;
     }
 
     private boolean castReality(ServerLevel level, ServerPlayer player) {
@@ -263,17 +310,41 @@ public class InfinityGauntletItem extends Item {
             target = hit.getLocation().subtract(look.scale(1.0));
         }
 
+        // Clearance check: refuse to drop the player inside a solid block. If
+        // the first candidate fails, pull back along the look vector up to
+        // 3 times before giving up. Without this, a wall-bounce shot can
+        // suffocate the player on landing. Cooldown is NOT consumed on
+        // failure (castStone treats `false` as a no-op).
+        net.minecraft.world.phys.Vec3 safeTarget = null;
+        for (int attempt = 0; attempt < 4; attempt++) {
+            net.minecraft.world.phys.Vec3 candidate = attempt == 0
+                ? target
+                : target.subtract(look.scale(attempt));
+            if (level.noCollision(player, player.getBoundingBox().move(
+                    candidate.x - player.getX(),
+                    candidate.y - player.getY(),
+                    candidate.z - player.getZ()))) {
+                safeTarget = candidate;
+                break;
+            }
+        }
+        if (safeTarget == null) {
+            level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 0.3f, 0.5f);
+            return false;
+        }
+
         level.sendParticles(ParticleTypes.REVERSE_PORTAL,
             player.getX(), player.getY() + 1.0, player.getZ(),
             20, 0.3, 0.5, 0.3, 0.01);
 
-        player.teleportTo(target.x, target.y, target.z);
+        player.teleportTo(safeTarget.x, safeTarget.y, safeTarget.z);
         player.fallDistance = 0.0f;
 
         level.sendParticles(ParticleTypes.REVERSE_PORTAL,
-            target.x, target.y + 1.0, target.z,
+            safeTarget.x, safeTarget.y + 1.0, safeTarget.z,
             20, 0.3, 0.5, 0.3, 0.01);
-        level.playSound(null, target.x, target.y, target.z,
+        level.playSound(null, safeTarget.x, safeTarget.y, safeTarget.z,
             SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1.0f, 1.0f);
         return true;
     }

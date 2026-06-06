@@ -25,6 +25,20 @@ public final class ModDataComponents {
                 .networkSynchronized(ByteBufCodecs.VAR_INT));
 
     /**
+     * Per-stone custom commands as a {@code List<String>} of length 6.
+     * An empty string (or absent slot) means "use the stone's built-in
+     * ability". Edited via the {@code GauntletEditorScreen}; executed
+     * by {@link InfinityGauntletItem#use} as the player.
+     */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<java.util.List<String>>> COMMANDS =
+        COMPONENTS.registerComponentType(
+            "commands",
+            builder -> builder
+                .persistent(Codec.STRING.listOf())
+                .networkSynchronized(net.minecraft.network.codec.ByteBufCodecs.STRING_UTF8.apply(
+                    net.minecraft.network.codec.ByteBufCodecs.list())));
+
+    /**
      * Per-stone cooldown timestamps as a {@code long[]} of length 6, where
      * each entry is the {@code Level#gameTime()} at which that stone becomes
      * available again. Absent component is treated as "all zero" — no

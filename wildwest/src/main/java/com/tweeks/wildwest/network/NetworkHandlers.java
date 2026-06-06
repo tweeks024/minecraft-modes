@@ -22,5 +22,9 @@ public final class NetworkHandlers {
             C2SSetActiveStonePacket.TYPE,
             C2SSetActiveStonePacket.STREAM_CODEC,
             C2SSetActiveStonePacket::handle);
+        reg.playToServer(
+            C2SSetGauntletCommandsPacket.TYPE,
+            C2SSetGauntletCommandsPacket.STREAM_CODEC,
+            C2SSetGauntletCommandsPacket::handle);
     }
 }

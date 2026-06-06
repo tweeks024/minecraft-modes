@@ -42,15 +42,23 @@ public final class InfinityGauntletKeybind {
 
         boolean opened = false;
         while (OPEN_RADIAL.consumeClick()) {
-            // Drain queued clicks but only open the screen once. Without this,
+            // Drain queued clicks but only open one screen. Without this,
             // rapid taps would call setScreen() repeatedly, leaking instances
-            // of RadialPickerScreen whose lifecycle never completes.
+            // whose lifecycle never completes.
             if (opened) continue;
             InteractionHand hand = findGauntletHand(player);
-            if (hand != null) {
-                mc.setScreen(new RadialPickerScreen(hand == InteractionHand.MAIN_HAND));
-                opened = true;
+            if (hand == null) continue;
+            boolean mainHand = hand == InteractionHand.MAIN_HAND;
+            // Shift+G opens the command editor; plain G opens the radial picker.
+            com.mojang.blaze3d.platform.Window window = mc.getWindow();
+            boolean shift = InputConstants.isKeyDown(window, InputConstants.KEY_LSHIFT)
+                || InputConstants.isKeyDown(window, /* KEY_RSHIFT */ 344);
+            if (shift) {
+                mc.setScreen(new GauntletEditorScreen(mainHand));
+            } else {
+                mc.setScreen(new RadialPickerScreen(mainHand));
             }
+            opened = true;
         }
     }
 
