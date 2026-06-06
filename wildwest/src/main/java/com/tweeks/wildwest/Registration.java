@@ -9,6 +9,7 @@ import com.tweeks.wildwest.item.CaptainPistolItem;
 import com.tweeks.wildwest.item.CursedTomeItem;
 import com.tweeks.wildwest.item.FlintlockPistolItem;
 import com.tweeks.wildwest.item.HerobrineSpawnEggItem;
+import com.tweeks.wildwest.item.InfinityGauntletItem;
 import com.tweeks.wildwest.item.MeteorStaffItem;
 import com.tweeks.wildwest.item.ReaperScytheItem;
 import com.tweeks.wildwest.item.GrimReaperSpawnEggItem;
@@ -112,6 +113,11 @@ public final class Registration {
         PistonGauntletItem::new,
         p -> p.stacksTo(1).durability(PistonGauntletItem.DURABILITY).rarity(Rarity.RARE));
 
+    public static final DeferredItem<InfinityGauntletItem> INFINITY_GAUNTLET = ITEMS.registerItem(
+        "infinity_gauntlet",
+        InfinityGauntletItem::new,
+        p -> p.stacksTo(1).durability(InfinityGauntletItem.DURABILITY).rarity(Rarity.EPIC));
+
     public static final DeferredItem<TaintedVialItem> TAINTED_VIAL = ITEMS.registerItem(
         "tainted_vial", TaintedVialItem::new, p -> p);
 
@@ -169,6 +175,7 @@ public final class Registration {
                     output.accept(METEOR_STAFF.get());
                     output.accept(REAPER_SCYTHE.get());
                     output.accept(PISTON_GAUNTLET.get());
+                    output.accept(INFINITY_GAUNTLET.get());
                     output.accept(TAINTED_VIAL.get());
                     output.accept(RAPIER.get());
                     output.accept(FLINTLOCK_PISTOL.get());
