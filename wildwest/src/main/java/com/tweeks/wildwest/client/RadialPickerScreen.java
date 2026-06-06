@@ -82,16 +82,20 @@ public class RadialPickerScreen extends Screen {
     @Override
     public void onClose() {
         if (!selectionSent && hoveredWedge >= 0) {
-            select(hoveredWedge);
-        } else {
-            super.onClose();
+            // Fire the selection packet but fall through to super.onClose()
+            // so the parent screen-close cleanup (focus stack, narrator)
+            // still runs. select() no longer touches the screen state.
+            selectionSent = true;
+            ClientPacketDistributor.sendToServer(new C2SSetActiveStonePacket(hoveredWedge, mainHand));
         }
+        super.onClose();
     }
 
     private void select(int wedge) {
         if (selectionSent) return;
         selectionSent = true;
         ClientPacketDistributor.sendToServer(new C2SSetActiveStonePacket(wedge, mainHand));
-        if (this.minecraft != null) this.minecraft.setScreen(null);
+        // Route through onClose so parent cleanup runs uniformly.
+        onClose();
     }
 }

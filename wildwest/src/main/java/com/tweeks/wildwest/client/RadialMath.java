@@ -25,6 +25,10 @@ public final class RadialMath {
         double shifted = angle + wedgeRad / 2;
         if (shifted >= Math.PI * 2) shifted -= Math.PI * 2;
 
-        return (int) (shifted / wedgeRad);
+        int wedge = (int) (shifted / wedgeRad);
+        // Floating-point edge case: an angle of exactly 2π after shift+subtract
+        // can still divide to 6 on some JVMs. Clamp so InfinityStone.byIndex
+        // doesn't quietly fall back to POWER.
+        return wedge >= 6 ? 0 : wedge;
     }
 }

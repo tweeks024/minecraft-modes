@@ -39,8 +39,16 @@ public final class EffectTickHandler {
     public static void onLevelTick(LevelTickEvent.Post event) {
         if (!(event.getLevel() instanceof ServerLevel level)) return;
         long now = level.getGameTime();
+        // Snapshot the entity list before iterating. tickRealityBubble can
+        // discard the bat (and add the restored entity), which would mutate
+        // the underlying entity collection mid-iteration. Copying to a list
+        // up-front avoids ConcurrentModificationException.
+        java.util.List<Mob> mobs = new java.util.ArrayList<>();
         for (net.minecraft.world.entity.Entity e : level.getAllEntities()) {
-            if (!(e instanceof Mob mob)) continue;
+            if (e instanceof Mob mob) mobs.add(mob);
+        }
+        for (Mob mob : mobs) {
+            if (!mob.isAlive()) continue;
             try {
                 tickMindCharm(level, mob, now);
             } catch (Exception ex) {
