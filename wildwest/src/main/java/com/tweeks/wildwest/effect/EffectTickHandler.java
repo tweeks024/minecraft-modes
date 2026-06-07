@@ -63,6 +63,11 @@ public final class EffectTickHandler {
     }
 
     private static void tickMindCharm(ServerLevel level, Mob mob, long now) {
+        // hasData first: getData() would auto-populate the attachment with
+        // the default-supplier value (null) on every mob, which would then
+        // crash world save. Only proceed if the mob actually carries the
+        // attachment.
+        if (!mob.hasData(ModAttachments.MIND_CHARM.get())) return;
         MindCharmAttachment charm = mob.getData(ModAttachments.MIND_CHARM.get());
         if (charm == null) return;
         if (now >= charm.expiresAtTick()) {
@@ -94,6 +99,8 @@ public final class EffectTickHandler {
     }
 
     private static void tickRealityBubble(ServerLevel level, Mob bat, long now) {
+        // Same auto-populate caveat as tickMindCharm above.
+        if (!bat.hasData(ModAttachments.REALITY_BUBBLE.get())) return;
         RealityBubbleAttachment bubble = bat.getData(ModAttachments.REALITY_BUBBLE.get());
         if (bubble == null) return;
         if (now < bubble.expiresAtTick()) return;

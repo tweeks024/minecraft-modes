@@ -13,16 +13,22 @@ public final class ModAttachments {
     public static final DeferredRegister<AttachmentType<?>> ATTACHMENTS =
         DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, WildWestMod.MOD_ID);
 
+    // Default-value supplier returns null because the attachment is "not set"
+    // for the vast majority of mobs. We MUST pair that with a shouldSerialize
+    // predicate that rejects null — otherwise getData() auto-populates the
+    // holder with null, and the next world save crashes with NPE inside
+    // RecordCodecBuilder trying to encode a null record. Read-paths in the
+    // tick handler also use hasData() first to avoid the auto-populate.
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<MindCharmAttachment>> MIND_CHARM =
         ATTACHMENTS.register("mind_charm",
             () -> AttachmentType.<MindCharmAttachment>builder(() -> null)
-                .serialize(MindCharmAttachment.CODEC)
+                .serialize(MindCharmAttachment.CODEC, attachment -> attachment != null)
                 .build());
 
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<RealityBubbleAttachment>> REALITY_BUBBLE =
         ATTACHMENTS.register("reality_bubble",
             () -> AttachmentType.<RealityBubbleAttachment>builder(() -> null)
-                .serialize(RealityBubbleAttachment.CODEC)
+                .serialize(RealityBubbleAttachment.CODEC, attachment -> attachment != null)
                 .build());
 
     public static void register(IEventBus modEventBus) {
