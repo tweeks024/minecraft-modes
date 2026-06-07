@@ -5,7 +5,6 @@ import com.tweeks.wildwest.WildWestMod;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -44,37 +43,23 @@ public final class ModDataComponents {
                     .apply(net.minecraft.network.codec.ByteBufCodecs.list(InfinityCommands.SLOT_COUNT))));
 
     /**
-     * Per-stone cooldown timestamps as a {@code long[]} of length 6, where
-     * each entry is the {@code Level#gameTime()} at which that stone becomes
-     * available again. Absent component is treated as "all zero" — no
-     * cooldown active.
+     * Per-stone cooldown timestamps as a {@code List<Long>} of length 6,
+     * where each entry is the {@code Level#gameTime()} at which that
+     * stone becomes available again. Absent component is treated as
+     * "all zero" — no cooldown active.
+     *
+     * <p>Stored as {@code List<Long>} (not {@code long[]}) because
+     * NeoForge's {@code CommonHooks.validateComponent} rejects raw
+     * arrays — Java arrays use identity equality, but data components
+     * require value equality for sync change-detection.
      */
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<long[]>> COOLDOWNS =
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<java.util.List<Long>>> COOLDOWNS =
         COMPONENTS.registerComponentType(
             "cooldowns",
             builder -> builder
-                .persistent(Codec.LONG.listOf().xmap(
-                    list -> list.stream().mapToLong(Long::longValue).toArray(),
-                    arr -> java.util.Arrays.stream(arr).boxed().toList()))
-                .networkSynchronized(StreamCodec.of(
-                    (buf, arr) -> {
-                        buf.writeVarInt(arr.length);
-                        for (long v : arr) buf.writeVarLong(v);
-                    },
-                    buf -> {
-                        int n = buf.readVarInt();
-                        // Cap the length to bound allocation. Attacker- or
-                        // corruption-controlled VarInt could otherwise
-                        // demand a multi-GB long[] on receive.
-                        if (n < 0 || n > InfinityCooldowns.SLOT_COUNT) {
-                            throw new io.netty.handler.codec.DecoderException(
-                                "Cooldowns length " + n + " out of bounds 0.."
-                                    + InfinityCooldowns.SLOT_COUNT);
-                        }
-                        long[] out = new long[n];
-                        for (int i = 0; i < n; i++) out[i] = buf.readVarLong();
-                        return out;
-                    })));
+                .persistent(Codec.LONG.listOf())
+                .networkSynchronized(net.minecraft.network.codec.ByteBufCodecs.VAR_LONG.apply(
+                    net.minecraft.network.codec.ByteBufCodecs.list(InfinityCooldowns.SLOT_COUNT))));
 
     public static void register(IEventBus modEventBus) {
         COMPONENTS.register(modEventBus);

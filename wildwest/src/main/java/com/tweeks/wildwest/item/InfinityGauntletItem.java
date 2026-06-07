@@ -57,7 +57,7 @@ public class InfinityGauntletItem extends Item {
         InfinityStone stone = InfinityStone.byIndex(
             stack.getOrDefault(ModDataComponents.ACTIVE_STONE.get(), 0));
 
-        long[] cds = stack.getOrDefault(
+        java.util.List<Long> cds = stack.getOrDefault(
             ModDataComponents.COOLDOWNS.get(), InfinityCooldowns.emptyCooldowns());
         long now = level.getGameTime();
         if (InfinityCooldowns.isOnCooldown(cds, stone.ordinal(), now)) {
@@ -92,7 +92,7 @@ public class InfinityGauntletItem extends Item {
             return InteractionResult.PASS;
         }
 
-        long[] nextCds = InfinityCooldowns.applyCooldown(cds, stone.ordinal(), now, stone.cooldownTicks());
+        java.util.List<Long> nextCds = InfinityCooldowns.applyCooldown(cds, stone.ordinal(), now, stone.cooldownTicks());
         stack.set(ModDataComponents.COOLDOWNS.get(), nextCds);
 
         // Drive the vanilla hotbar cooldown sweep for the *active* stone.

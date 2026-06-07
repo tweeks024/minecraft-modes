@@ -53,7 +53,7 @@ public class RadialPickerScreen extends Screen {
 
         graphics.fill(0, 0, this.width, this.height, 0x80000000);
 
-        long[] cds = readCooldowns();
+        java.util.List<Long> cds = readCooldowns();
         long now = currentGameTime();
 
         for (int i = 0; i < 6; i++) {
@@ -74,7 +74,7 @@ public class RadialPickerScreen extends Screen {
 
             // Overlay remaining seconds on cooldown discs
             if (onCooldown) {
-                long remainingTicks = cds[i] - now;
+                long remainingTicks = InfinityCooldowns.getExpiry(cds, i) - now;
                 String remaining = formatRemaining(remainingTicks);
                 graphics.centeredText(this.font, Component.literal(remaining),
                     discCx, discCy - 3, 0xFFFFFFFF);
@@ -91,7 +91,7 @@ public class RadialPickerScreen extends Screen {
     }
 
     /** Read the held gauntlet's cooldowns, or all-zero if not found. */
-    private long[] readCooldowns() {
+    private java.util.List<Long> readCooldowns() {
         Player player = Minecraft.getInstance().player;
         if (player == null) return InfinityCooldowns.emptyCooldowns();
         ItemStack stack = player.getItemInHand(

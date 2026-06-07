@@ -59,11 +59,12 @@ public record C2SSetActiveStonePacket(int stoneIndex, boolean mainHand) implemen
             // per-stone cooldown gate still lives in the COOLDOWNS data
             // component (read in InfinityGauntletItem.use), so vanilla
             // ItemCooldowns is purely a visual mirror.
-            long[] cds = stack.getOrDefault(
+            java.util.List<Long> cds = stack.getOrDefault(
                 ModDataComponents.COOLDOWNS.get(), InfinityCooldowns.emptyCooldowns());
             long now = player.level().getGameTime();
             if (InfinityCooldowns.isOnCooldown(cds, pkt.stoneIndex(), now)) {
-                int remaining = (int) Math.min(cds[pkt.stoneIndex()] - now, Integer.MAX_VALUE);
+                int remaining = (int) Math.min(
+                    InfinityCooldowns.getExpiry(cds, pkt.stoneIndex()) - now, Integer.MAX_VALUE);
                 player.getCooldowns().addCooldown(stack, remaining);
             } else {
                 player.getCooldowns().removeCooldown(
