@@ -44,6 +44,14 @@ public class RadialPickerScreen extends Screen {
     public boolean isPauseScreen() { return false; }
 
     @Override
+    public boolean isInGameUi() {
+        // Lighter "in-game" rendering path: just the transparent dim instead
+        // of the full menu background + blur. Keeps the world visible behind
+        // the picker which is the expected look for a radial selector.
+        return true;
+    }
+
+    @Override
     public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         super.extractRenderState(graphics, mouseX, mouseY, partialTick);
 
