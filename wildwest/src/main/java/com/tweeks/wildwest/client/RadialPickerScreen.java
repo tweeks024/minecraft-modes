@@ -1,5 +1,6 @@
 package com.tweeks.wildwest.client;
 
+import com.mojang.logging.LogUtils;
 import com.tweeks.wildwest.Registration;
 import com.tweeks.wildwest.item.InfinityCooldowns;
 import com.tweeks.wildwest.item.InfinityStone;
@@ -14,6 +15,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import org.slf4j.Logger;
 
 /**
  * Radial picker for the Infinity Gauntlet's six stones. Press the keybind
@@ -26,6 +28,8 @@ import net.neoforged.neoforge.client.network.ClientPacketDistributor;
  * primitives on the extractor.
  */
 public class RadialPickerScreen extends Screen {
+
+    private static final Logger LOGGER = LogUtils.getLogger();
 
     private static final double DEADZONE_PX = 18.0;
     private static final int OUTER_RADIUS_PX = 90;
@@ -132,6 +136,8 @@ public class RadialPickerScreen extends Screen {
     public boolean mouseClicked(MouseButtonEvent event, boolean isFocused) {
         int wedge = RadialMath.wedgeFromMouse(event.x(), event.y(),
             this.width / 2.0, this.height / 2.0, DEADZONE_PX);
+        LOGGER.info("[gauntlet-picker] mouseClicked button={} x={} y={} wedge={}",
+            event.button(), event.x(), event.y(), wedge);
         if (wedge >= 0) {
             select(wedge);
             return true;
@@ -141,6 +147,8 @@ public class RadialPickerScreen extends Screen {
 
     @Override
     public void onClose() {
+        LOGGER.info("[gauntlet-picker] onClose selectionSent={} hoveredWedge={}",
+            selectionSent, hoveredWedge);
         if (!selectionSent && hoveredWedge >= 0) {
             // Fire the selection packet but fall through to super.onClose()
             // so the parent screen-close cleanup (focus stack, narrator)
@@ -153,6 +161,7 @@ public class RadialPickerScreen extends Screen {
 
     private void select(int wedge) {
         if (selectionSent) return;
+        LOGGER.info("[gauntlet-picker] select wedge={} mainHand={}", wedge, mainHand);
         selectionSent = true;
         ClientPacketDistributor.sendToServer(new C2SSetActiveStonePacket(wedge, mainHand));
         // Route through onClose so parent cleanup runs uniformly.

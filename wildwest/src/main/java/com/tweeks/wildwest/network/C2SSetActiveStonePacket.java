@@ -34,6 +34,8 @@ public record C2SSetActiveStonePacket(int stoneIndex, boolean mainHand) implemen
     public Type<? extends CustomPacketPayload> type() { return TYPE; }
 
     public static void handle(C2SSetActiveStonePacket pkt, IPayloadContext ctx) {
+        LOGGER.info("[gauntlet-picker] server received SetActiveStone stoneIndex={} mainHand={}",
+            pkt.stoneIndex(), pkt.mainHand());
         int max = InfinityStone.values().length - 1;
         if (pkt.stoneIndex() < 0 || pkt.stoneIndex() > max) {
             LOGGER.debug("Dropping C2SSetActiveStonePacket with out-of-range stoneIndex={}", pkt.stoneIndex());
@@ -49,9 +51,12 @@ public record C2SSetActiveStonePacket(int stoneIndex, boolean mainHand) implemen
             if (!stack.is(Registration.INFINITY_GAUNTLET.get())) {
                 // Plausible race: player swapped hands or dropped item between
                 // opening the picker and clicking. Silent drop is correct.
+                LOGGER.info("[gauntlet-picker] server dropping packet — hand={} does not hold gauntlet (holds={})",
+                    hand, net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stack.getItem()));
                 return;
             }
             stack.set(ModDataComponents.ACTIVE_STONE.get(), pkt.stoneIndex());
+            LOGGER.info("[gauntlet-picker] server set ACTIVE_STONE={} on {}", pkt.stoneIndex(), player.getName().getString());
 
             // Re-sync the vanilla hotbar cooldown sweep to the newly-active
             // stone. If the stone is mid-cooldown, set the sweep to the
