@@ -1,0 +1,395 @@
+{
+  "meta": {
+    "format_version": "4.5",
+    "model_format": "modded_entity",
+    "box_uv": true
+  },
+  "name": "battle_droid",
+  "model_identifier": "",
+  "visible_box": [
+    4,
+    4,
+    0
+  ],
+  "variable_placeholders": "",
+  "variable_placeholder_buttons": [],
+  "unhandled_root_fields": {},
+  "resolution": {
+    "width": 64,
+    "height": 64
+  },
+  "elements": [
+    {
+      "name": "head",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -2.0,
+        24.0,
+        -2.0
+      ],
+      "to": [
+        2.0,
+        30.0,
+        2.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        0,
+        0
+      ],
+      "type": "cube",
+      "uuid": "2ad535a0-e202-57bd-afe6-57e486e9765b"
+    },
+    {
+      "name": "snout",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -1.0,
+        25.0,
+        -5.0
+      ],
+      "to": [
+        1.0,
+        27.0,
+        -2.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        16,
+        0
+      ],
+      "type": "cube",
+      "uuid": "645b88a6-d48d-5acb-aab2-2c089b81fc35"
+    },
+    {
+      "name": "body",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -3.0,
+        14.0,
+        -1.5
+      ],
+      "to": [
+        3.0,
+        24.0,
+        1.5
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        0,
+        16
+      ],
+      "type": "cube",
+      "uuid": "e07a9b13-e3b1-5fa8-8b04-3b75c27e1c74"
+    },
+    {
+      "name": "hip_block",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -1.0,
+        12.0,
+        -1.0
+      ],
+      "to": [
+        1.0,
+        14.0,
+        1.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        18,
+        16
+      ],
+      "type": "cube",
+      "uuid": "f7604054-1140-5443-88c4-1400b7e3631d"
+    },
+    {
+      "name": "right_arm",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -6.0,
+        11.0,
+        -1.0
+      ],
+      "to": [
+        -4.0,
+        23.0,
+        1.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        -5,
+        22,
+        0
+      ],
+      "uv_offset": [
+        32,
+        16
+      ],
+      "type": "cube",
+      "uuid": "6936d425-cc2b-5d69-b4be-66fbca4f7b80"
+    },
+    {
+      "name": "left_arm",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        4.0,
+        11.0,
+        -1.0
+      ],
+      "to": [
+        6.0,
+        23.0,
+        1.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        5,
+        22,
+        0
+      ],
+      "uv_offset": [
+        40,
+        16
+      ],
+      "type": "cube",
+      "uuid": "b01e6aca-9e08-53fa-9957-e9b9d2675080"
+    },
+    {
+      "name": "right_leg",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -2.9,
+        0.0,
+        -1.0
+      ],
+      "to": [
+        -0.8999999999999999,
+        12.0,
+        1.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        -1.9,
+        12,
+        0
+      ],
+      "uv_offset": [
+        48,
+        16
+      ],
+      "type": "cube",
+      "uuid": "b4cccdac-315a-5e24-9290-fc54dd0b54f9"
+    },
+    {
+      "name": "left_leg",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        0.8999999999999999,
+        0.0,
+        -1.0
+      ],
+      "to": [
+        2.9,
+        12.0,
+        1.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        1.9,
+        12,
+        0
+      ],
+      "uv_offset": [
+        56,
+        16
+      ],
+      "type": "cube",
+      "uuid": "00345aea-c424-5587-b875-fdf559fef2a4"
+    }
+  ],
+  "outliner": [
+    {
+      "name": "head",
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "color": 0,
+      "uuid": "617076c9-fbb6-552f-b7aa-8780466e5d65",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "2ad535a0-e202-57bd-afe6-57e486e9765b",
+        "645b88a6-d48d-5acb-aab2-2c089b81fc35",
+        "e07a9b13-e3b1-5fa8-8b04-3b75c27e1c74",
+        "f7604054-1140-5443-88c4-1400b7e3631d"
+      ]
+    },
+    {
+      "name": "body",
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "color": 0,
+      "uuid": "0d751564-d167-5493-8895-f174ad813274",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": []
+    },
+    {
+      "name": "right_arm",
+      "origin": [
+        -5,
+        22,
+        0
+      ],
+      "color": 0,
+      "uuid": "b0c830b9-0f39-5591-a897-033d10e1567b",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "6936d425-cc2b-5d69-b4be-66fbca4f7b80"
+      ]
+    },
+    {
+      "name": "left_arm",
+      "origin": [
+        5,
+        22,
+        0
+      ],
+      "color": 0,
+      "uuid": "0c66a1cf-7c5b-5b2f-8528-ee73293013fc",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "b01e6aca-9e08-53fa-9957-e9b9d2675080"
+      ]
+    },
+    {
+      "name": "right_leg",
+      "origin": [
+        -1.9,
+        12,
+        0
+      ],
+      "color": 0,
+      "uuid": "2b4df9ce-fae4-5f16-b777-5b9717c47cb8",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "b4cccdac-315a-5e24-9290-fc54dd0b54f9"
+      ]
+    },
+    {
+      "name": "left_leg",
+      "origin": [
+        1.9,
+        12,
+        0
+      ],
+      "color": 0,
+      "uuid": "26c73ec2-b32c-55dd-9683-638457ae62a8",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "00345aea-c424-5587-b875-fdf559fef2a4"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "path": "/Users/tweeks/code/minecraft-mods/starwars/src/main/resources/assets/starwars/textures/entity/battle_droid.png",
+      "name": "battle_droid.png",
+      "folder": "entity",
+      "namespace": "starwars",
+      "id": "0",
+      "particle": false,
+      "render_mode": "default",
+      "render_sides": "auto",
+      "frame_time": 1,
+      "frame_order_type": "loop",
+      "frame_order": "",
+      "frame_interpolate": false,
+      "visible": true,
+      "internal": true,
+      "saved": true,
+      "uuid": "bf47f6e7-9b65-5849-8eed-b49a49ba4f5d",
+      "relative_path": "../src/main/resources/assets/starwars/textures/entity/battle_droid.png",
+      "use_as_default": false,
+      "layers_enabled": false,
+      "sync_to_project": "",
+      "width": 64,
+      "height": 64,
+      "uv_width": 64,
+      "uv_height": 64,
+      "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAq0lEQVR4nO3YvQ3CMBCA0YzgWZiBAaiYJVNQMQBjUDAFC4UqBRI/kc/GSPeedFKq2PnkSFGm62VeInOaj5tm+lcCCCDA0wOVUl5eC/BmRu8/LPoKjN5/mAACJA8AQGb323lpMYf97uP0Xr92wt8B69QGaLV+9XeMAAI0ulGl9AG+nZzeMzxA+hMggAACjA2w9bd2r9/e6QO0Wv/X+24mfQAAAAAAAAAAADp7AIfFprgsbs95AAAAAElFTkSuQmCC"
+    }
+  ]
+}

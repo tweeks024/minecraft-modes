@@ -4,8 +4,12 @@
   "death.attack.starwars.blaster_bolt.player": "%1$s was vaporized by %2$s",
   "death.attack.starwars.force_lightning": "%1$s was electrocuted by %2$s",
   "death.attack.starwars.lightsaber": "%1$s was cut down by %2$s",
+  "entity.starwars.battle_droid": "Battle Droid",
+  "entity.starwars.stormtrooper": "Stormtrooper",
+  "item.starwars.battle_droid_spawn_egg": "Battle Droid Spawn Egg",
   "item.starwars.blaster_pistol": "Blaster Pistol",
   "item.starwars.blaster_rifle": "Blaster Rifle",
+  "item.starwars.stormtrooper_spawn_egg": "Stormtrooper Spawn Egg",
   "itemGroup.starwars": "Star Wars",
   "subtitle.starwars.blaster_fire": "Blaster fires"
 }

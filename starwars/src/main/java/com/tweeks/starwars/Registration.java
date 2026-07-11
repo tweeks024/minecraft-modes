@@ -3,6 +3,7 @@ package com.tweeks.starwars;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.SpawnEggItem;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -23,6 +24,12 @@ public final class Registration {
     public static final DeferredItem<com.tweeks.starwars.item.BlasterRifleItem> BLASTER_RIFLE =
         ITEMS.registerItem("blaster_rifle", com.tweeks.starwars.item.BlasterRifleItem::new, p -> p);
 
+    public static final DeferredItem<SpawnEggItem> STORMTROOPER_SPAWN_EGG = ITEMS.registerItem(
+        "stormtrooper_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.STORMTROOPER.get()));
+
+    public static final DeferredItem<SpawnEggItem> BATTLE_DROID_SPAWN_EGG = ITEMS.registerItem(
+        "battle_droid_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.BATTLE_DROID.get()));
+
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> STARWARS_TAB =
         CREATIVE_TABS.register("main", () ->
             CreativeModeTab.builder()
@@ -31,6 +38,8 @@ public final class Registration {
                 .displayItems((params, output) -> {
                     output.accept(BLASTER_PISTOL.get());
                     output.accept(BLASTER_RIFLE.get());
+                    output.accept(STORMTROOPER_SPAWN_EGG.get());
+                    output.accept(BATTLE_DROID_SPAWN_EGG.get());
                     // Later tasks append their items here.
                 })
                 .build());
