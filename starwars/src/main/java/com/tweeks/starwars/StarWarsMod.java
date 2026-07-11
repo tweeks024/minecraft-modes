@@ -17,5 +17,6 @@ public class StarWarsMod {
         ModEntities.register(modEventBus);
         Registration.register(modEventBus);
         ModSounds.register(modEventBus);
+        com.tweeks.starwars.faction.ModAttachments.register(modEventBus);
     }
 }
