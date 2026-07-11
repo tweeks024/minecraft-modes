@@ -52,13 +52,26 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
                     .when(LootItemRandomChanceCondition.randomChance(0.15f))
                     .add(LootItem.lootTableItem(Registration.BLASTER_PISTOL.get())
                         .apply(SetItemDamageFunction.setDamage(UniformGenerator.between(0.0f, 0.7f))))));
+
+        // Jedi Knight: 0-1 glowstone_dust @50%; 10% lightsaber drop (sabers
+        // are the ruin's treasure — a 20% common-mob drop would be too generous).
+        this.add(ModEntities.JEDI_KNIGHT.get(),
+            LootTable.lootTable()
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.GLOWSTONE_DUST).setWeight(50)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(0.0f, 1.0f))))
+                    .add(EmptyLootItem.emptyItem().setWeight(50)))
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .when(LootItemRandomChanceCondition.randomChance(0.10f))
+                    .add(LootItem.lootTableItem(Registration.LIGHTSABER.get()))));
     }
 
     @Override
     protected Stream<EntityType<?>> getKnownEntityTypes() {
         Set<EntityType<?>> known = Set.of(
             ModEntities.STORMTROOPER.get(),
-            ModEntities.BATTLE_DROID.get()
+            ModEntities.BATTLE_DROID.get(),
+            ModEntities.JEDI_KNIGHT.get()
         );
         return BuiltInRegistries.ENTITY_TYPE.stream().filter(known::contains);
     }

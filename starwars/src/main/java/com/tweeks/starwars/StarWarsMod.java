@@ -33,6 +33,13 @@ public class StarWarsMod {
                 net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 com.tweeks.starwars.spawning.TrooperSpawnRules::checkSpawnRules,
                 net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
+            // Jedi Knight is a CREATURE, not a MONSTER — monster spawn rules
+            // (darkness required) don't apply; use vanilla's generic mob rule.
+            event.register(ModEntities.JEDI_KNIGHT.get(),
+                net.minecraft.world.entity.SpawnPlacementTypes.ON_GROUND,
+                net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                net.minecraft.world.entity.PathfinderMob::checkMobSpawnRules,
+                net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
         });
     }
 
@@ -41,5 +48,7 @@ public class StarWarsMod {
             com.tweeks.starwars.entity.StormtrooperEntity.createAttributes().build());
         event.put(ModEntities.BATTLE_DROID.get(),
             com.tweeks.starwars.entity.BattleDroidEntity.createAttributes().build());
+        event.put(ModEntities.JEDI_KNIGHT.get(),
+            com.tweeks.starwars.entity.JediKnightEntity.createAttributes().build());
     }
 }

@@ -31,6 +31,14 @@ public final class ModEntities {
             .build(ResourceKey.create(Registries.ENTITY_TYPE,
                 Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "battle_droid"))));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<com.tweeks.starwars.entity.JediKnightEntity>> JEDI_KNIGHT =
+        ENTITY_TYPES.register("jedi_knight", () -> EntityType.Builder.<com.tweeks.starwars.entity.JediKnightEntity>of(
+                com.tweeks.starwars.entity.JediKnightEntity::new, MobCategory.CREATURE)
+            .sized(0.6f, 1.95f)
+            .clientTrackingRange(10)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "jedi_knight"))));
+
     public static void register(IEventBus modEventBus) {
         ENTITY_TYPES.register(modEventBus);
     }

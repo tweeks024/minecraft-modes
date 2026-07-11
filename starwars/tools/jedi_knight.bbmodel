@@ -1,0 +1,396 @@
+{
+  "meta": {
+    "format_version": "4.5",
+    "model_format": "modded_entity",
+    "box_uv": true
+  },
+  "name": "jedi_knight",
+  "model_identifier": "",
+  "visible_box": [
+    4,
+    4,
+    0
+  ],
+  "variable_placeholders": "",
+  "variable_placeholder_buttons": [],
+  "unhandled_root_fields": {},
+  "resolution": {
+    "width": 64,
+    "height": 64
+  },
+  "elements": [
+    {
+      "name": "head",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -4,
+        24,
+        -4
+      ],
+      "to": [
+        4,
+        32,
+        4
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        0,
+        0
+      ],
+      "type": "cube",
+      "uuid": "5c924ac6-0c66-5289-acc2-f9986270ba4d"
+    },
+    {
+      "name": "body",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -4,
+        12,
+        -2
+      ],
+      "to": [
+        4,
+        24,
+        2
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        16,
+        16
+      ],
+      "type": "cube",
+      "uuid": "c2f40948-955b-5f73-afc9-89b0e40c1de5"
+    },
+    {
+      "name": "right_arm",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -8,
+        12,
+        -2
+      ],
+      "to": [
+        -4,
+        24,
+        2
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        -5,
+        22,
+        0
+      ],
+      "uv_offset": [
+        40,
+        16
+      ],
+      "type": "cube",
+      "uuid": "eeccf286-258d-54e1-b05f-07e13c481a62"
+    },
+    {
+      "name": "left_arm",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        4,
+        12,
+        -2
+      ],
+      "to": [
+        8,
+        24,
+        2
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        5,
+        22,
+        0
+      ],
+      "uv_offset": [
+        32,
+        48
+      ],
+      "type": "cube",
+      "uuid": "803fa158-349c-5834-86da-b0441d773ca1"
+    },
+    {
+      "name": "right_leg",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -3.9,
+        0,
+        -2
+      ],
+      "to": [
+        0.10000000000000009,
+        12,
+        2
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        -1.9,
+        12,
+        0
+      ],
+      "uv_offset": [
+        0,
+        16
+      ],
+      "type": "cube",
+      "uuid": "af545d96-1aa8-5aef-9125-40d8c0278e40"
+    },
+    {
+      "name": "left_leg",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -0.10000000000000009,
+        0,
+        -2
+      ],
+      "to": [
+        3.9,
+        12,
+        2
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        1.9,
+        12,
+        0
+      ],
+      "uv_offset": [
+        16,
+        48
+      ],
+      "type": "cube",
+      "uuid": "0c4cc85a-5c9d-5b34-9adc-aa7c0a1b6596"
+    },
+    {
+      "name": "robe_skirt",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -4.5,
+        5.0,
+        -2.5
+      ],
+      "to": [
+        4.5,
+        12.0,
+        2.5
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        32,
+        32
+      ],
+      "type": "cube",
+      "uuid": "20207a88-cc58-5d2d-b032-5523d0c5e1ae"
+    },
+    {
+      "name": "hood",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -4.0,
+        24.0,
+        -4.0
+      ],
+      "to": [
+        4.0,
+        32.0,
+        4.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        32,
+        0
+      ],
+      "type": "cube",
+      "uuid": "a935c99c-8497-5c2d-a0c4-cc12b76f0fd3",
+      "inflate": 0.5
+    }
+  ],
+  "outliner": [
+    {
+      "name": "head",
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "color": 0,
+      "uuid": "c08d05fe-d1dd-56ef-9a67-851723cbe3a2",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "5c924ac6-0c66-5289-acc2-f9986270ba4d",
+        "c2f40948-955b-5f73-afc9-89b0e40c1de5",
+        "20207a88-cc58-5d2d-b032-5523d0c5e1ae",
+        "a935c99c-8497-5c2d-a0c4-cc12b76f0fd3"
+      ]
+    },
+    {
+      "name": "body",
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "color": 0,
+      "uuid": "eccae1c9-f3cb-5000-b71e-531cbd57a39f",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": []
+    },
+    {
+      "name": "right_arm",
+      "origin": [
+        -5,
+        22,
+        0
+      ],
+      "color": 0,
+      "uuid": "3bbe9c89-7a05-5405-90db-724b7cf66ee4",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "eeccf286-258d-54e1-b05f-07e13c481a62"
+      ]
+    },
+    {
+      "name": "left_arm",
+      "origin": [
+        5,
+        22,
+        0
+      ],
+      "color": 0,
+      "uuid": "cf0b2391-c3cf-5657-8848-79e734ffe486",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "803fa158-349c-5834-86da-b0441d773ca1"
+      ]
+    },
+    {
+      "name": "right_leg",
+      "origin": [
+        -1.9,
+        12,
+        0
+      ],
+      "color": 0,
+      "uuid": "60ce0d79-49be-5b4b-a425-c06ced8801b2",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "af545d96-1aa8-5aef-9125-40d8c0278e40"
+      ]
+    },
+    {
+      "name": "left_leg",
+      "origin": [
+        1.9,
+        12,
+        0
+      ],
+      "color": 0,
+      "uuid": "898ce2c9-a45c-5f1f-aaa0-0dadf27fadb4",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "0c4cc85a-5c9d-5b34-9adc-aa7c0a1b6596"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "path": "/Users/tweeks/code/minecraft-mods/starwars/src/main/resources/assets/starwars/textures/entity/jedi_knight.png",
+      "name": "jedi_knight.png",
+      "folder": "entity",
+      "namespace": "starwars",
+      "id": "0",
+      "particle": false,
+      "render_mode": "default",
+      "render_sides": "auto",
+      "frame_time": 1,
+      "frame_order_type": "loop",
+      "frame_order": "",
+      "frame_interpolate": false,
+      "visible": true,
+      "internal": true,
+      "saved": true,
+      "uuid": "17c57ca2-7a2f-5484-a1de-8ea3f9e8bbda",
+      "relative_path": "../src/main/resources/assets/starwars/textures/entity/jedi_knight.png",
+      "use_as_default": false,
+      "layers_enabled": false,
+      "sync_to_project": "",
+      "width": 64,
+      "height": 64,
+      "uv_width": 64,
+      "uv_height": 64,
+      "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAA7ElEQVR4nO3ZsQmDQBSHcQdJEVJYWViEICG1RYpwc2SWDJARUqZwAAfIABnBLc5egq/45/HA+4QPbDzOH3qgV11PhxzZPR1DqwAAAAAAAACgYIDv553Xsm7Aut7KnKBxAOANMI3P1YoB2Lfp53kxAMU/AQAAsFGA1HdZSQVQgays8QEAAAAAAAAAAAAAAACA/wBcmp0UAIvxbudaygTo2jorDa+HawB4A3gvYt6LnBoAAAAAAAAAAAAAAAAAAEBI6teeGgAAiDeg/lJT32F1/gAAAAAAAAAAAAAAAAAAACEA3ru/7gDq9joAwQAz39Xkmzr5yxEAAAAASUVORK5CYII="
+    }
+  ]
+}

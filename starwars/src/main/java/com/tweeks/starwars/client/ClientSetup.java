@@ -3,6 +3,7 @@ package com.tweeks.starwars.client;
 import com.tweeks.starwars.ModEntities;
 import com.tweeks.starwars.StarWarsMod;
 import com.tweeks.starwars.client.model.BattleDroidModel;
+import com.tweeks.starwars.client.model.JediKnightModel;
 import com.tweeks.starwars.client.model.StormtrooperModel;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -17,11 +18,13 @@ public final class ClientSetup {
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(ModEntities.STORMTROOPER.get(), StormtrooperRenderer::new);
         event.registerEntityRenderer(ModEntities.BATTLE_DROID.get(), BattleDroidRenderer::new);
+        event.registerEntityRenderer(ModEntities.JEDI_KNIGHT.get(), JediKnightRenderer::new);
     }
 
     @SubscribeEvent
     public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(StormtrooperModel.LAYER_LOCATION, StormtrooperModel::createBodyLayer);
         event.registerLayerDefinition(BattleDroidModel.LAYER_LOCATION, BattleDroidModel::createBodyLayer);
+        event.registerLayerDefinition(JediKnightModel.LAYER_LOCATION, JediKnightModel::createBodyLayer);
     }
 }

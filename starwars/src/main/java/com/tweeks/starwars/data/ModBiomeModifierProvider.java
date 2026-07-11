@@ -27,6 +27,10 @@ public final class ModBiomeModifierProvider {
         NeoForgeRegistries.Keys.BIOME_MODIFIERS,
         Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "add_battle_droids"));
 
+    private static final ResourceKey<BiomeModifier> ADD_JEDI_KNIGHTS = ResourceKey.create(
+        NeoForgeRegistries.Keys.BIOME_MODIFIERS,
+        Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "add_jedi_knights"));
+
     public static void bootstrap(BootstrapContext<BiomeModifier> ctx) {
         var biomes = ctx.lookup(Registries.BIOME);
 
@@ -49,5 +53,15 @@ public final class ModBiomeModifierProvider {
             droidBiomes,
             WeightedList.of(java.util.List.of(new Weighted<>(
                 new MobSpawnSettings.SpawnerData(ModEntities.BATTLE_DROID.get(), 3, 5), 6)))));
+
+        HolderSet<Biome> jediBiomes = HolderSet.direct(
+            biomes.getOrThrow(Biomes.FOREST),
+            biomes.getOrThrow(Biomes.JUNGLE),
+            biomes.getOrThrow(Biomes.TAIGA));
+
+        ctx.register(ADD_JEDI_KNIGHTS, new BiomeModifiers.AddSpawnsBiomeModifier(
+            jediBiomes,
+            WeightedList.of(java.util.List.of(new Weighted<>(
+                new MobSpawnSettings.SpawnerData(ModEntities.JEDI_KNIGHT.get(), 1, 2), 4)))));
     }
 }

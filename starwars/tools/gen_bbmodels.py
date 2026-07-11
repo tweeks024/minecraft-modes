@@ -69,9 +69,15 @@ BATTLE_DROID_CUBES = [
     ('left_leg',  LLEG_BONE, (-1.0,  0.0, -1.0, 2, 12, 2), (56, 16)),
 ]
 
+JEDI_KNIGHT_ACCESSORIES = [
+    ('robe_skirt', BODY_BONE, (-4.5, 12.0, -2.5, 9, 7, 5), (32, 32), 0.0),
+    ('hood',       HEAD_BONE, (-4.0, -8.0, -4.0, 8, 8, 8), (32, 0), 0.5),
+]
+
 MOBS = {
     'stormtrooper': HUMANOID_CUBES + STORMTROOPER_ACCESSORIES,
     'battle_droid': BATTLE_DROID_CUBES,
+    'jedi_knight': HUMANOID_CUBES + JEDI_KNIGHT_ACCESSORIES,
 }
 
 

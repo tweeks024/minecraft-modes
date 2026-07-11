@@ -112,9 +112,40 @@ def paint_battle_droid(rgba):
         rect(rgba, u0, 28, u0 + 8, 30, TAN_SH)
         rect(rgba, u0, 16, u0 + 8, 17, TAN_HI)
 
+# Jedi knight: cream tunic, brown robe/hood, tan belt.
+TUNIC   = (0xD8, 0xCC, 0xB0, 0xFF)
+TUNIC_S = (0xB4, 0xA8, 0x8C, 0xFF)
+ROBE    = (0x6A, 0x50, 0x34, 0xFF)
+ROBE_S  = (0x4E, 0x3A, 0x26, 0xFF)
+BELT    = (0x3C, 0x2C, 0x1C, 0xFF)
+SKIN    = (0xE8, 0xC0, 0x98, 0xFF)
+HAIR    = (0x4A, 0x36, 0x22, 0xFF)
+
+def paint_jedi_knight(rgba):
+    fill(rgba, TUNIC)
+    rect(rgba, 0, 0, 32, 8, HAIR)          # head top: hair
+    rect(rgba, 8, 8, 16, 16, SKIN)         # face
+    rect(rgba, 8, 8, 16, 10, HAIR)         # hairline
+    rect(rgba, 10, 11, 11, 12, (0x20, 0x30, 0x50, 0xFF))  # eyes
+    rect(rgba, 13, 11, 14, 12, (0x20, 0x30, 0x50, 0xFF))
+    rect(rgba, 32, 0, 64, 16, ROBE)        # hood overlay strip
+    rect(rgba, 40, 8, 48, 16, (0, 0, 0, 0))  # hood front opening (transparent)
+    rect(rgba, 16, 16, 40, 32, TUNIC)      # body
+    rect(rgba, 20, 28, 36, 30, BELT)       # belt
+    rect(rgba, 16, 30, 40, 32, TUNIC_S)
+    for (u0, v0) in ((40, 16), (32, 48)):  # arms: robe sleeves
+        rect(rgba, u0, v0, u0 + 16, v0 + 16, ROBE)
+        rect(rgba, u0, v0 + 13, u0 + 16, v0 + 16, ROBE_S)
+    for (u0, v0) in ((0, 16), (16, 48)):   # legs: dark trousers
+        rect(rgba, u0, v0, u0 + 16, v0 + 16, (0x50, 0x46, 0x38, 0xFF))
+        rect(rgba, u0, v0 + 14, u0 + 16, v0 + 16, (0x38, 0x30, 0x26, 0xFF))
+    rect(rgba, 32, 32, 64, 48, ROBE)       # robe skirt region (u32.., v32..)
+    rect(rgba, 32, 45, 64, 48, ROBE_S)
+
 MOBS = {
     'stormtrooper': paint_stormtrooper,
     'battle_droid': paint_battle_droid,
+    'jedi_knight': paint_jedi_knight,
 }
 
 if __name__ == '__main__':
