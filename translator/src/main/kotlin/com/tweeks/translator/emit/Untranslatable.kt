@@ -34,6 +34,7 @@ class Untranslatable {
     private val bbmodelFlipYUnset = TreeMap<String, TreeSet<String>>()
     private val javaParseErrors = TreeMap<String, TreeMap<String, String>>()
     private val entityGoalsDeferred = TreeMap<String, TreeMap<String, TreeMap<String, GoalDeferral>>>()
+    private val entityGoalsGatedOff = TreeMap<String, TreeMap<String, TreeSet<String>>>()
     // Phase 3: per-mod accumulators for the LLM-stage outcomes. The String
     // key on the inner map is the goal class simple name (`StunningMeleeGoal`).
     private val entityGoalsLlmTranslated = TreeMap<String, TreeMap<String, String>>()
@@ -140,6 +141,21 @@ class Untranslatable {
         entityGoalsDeferred
             .getOrPut(modId) { TreeMap() }
             .getOrPut(entityName) { TreeMap() }[goalKey] = GoalDeferral(bucket, reason, sourceExcerpt)
+    }
+
+    /**
+     * Record an AI goal that was registered on a shared superclass but gated
+     * by a per-entity condition (an anonymous `canUse` override, e.g. SwMob's
+     * `MeleeAttackGoal` gated on `!usesBlaster()`). For [entityName] the gate
+     * resolved statically closed (or could not be resolved), so the goal was
+     * dropped from that entity's Bedrock JSON. [summary] explains which goal
+     * and gate.
+     */
+    fun recordEntityGoalGatedOff(modId: String, entityName: String, summary: String) {
+        entityGoalsGatedOff
+            .getOrPut(modId) { TreeMap() }
+            .getOrPut(entityName) { TreeSet() }
+            .add(summary)
     }
 
     /**
@@ -279,6 +295,7 @@ class Untranslatable {
         ids.addAll(bbmodelFlipYUnset.keys)
         ids.addAll(javaParseErrors.keys)
         ids.addAll(entityGoalsDeferred.keys)
+        ids.addAll(entityGoalsGatedOff.keys)
         ids.addAll(entityGoalsLlmTranslated.keys)
         ids.addAll(entityGoalsLlmStubbed.keys)
         ids.addAll(itemCustomBehavior.keys)
@@ -499,6 +516,19 @@ class Untranslatable {
                     }
                     sb.append('\n')
                 }
+            }
+        }
+        entityGoalsGatedOff[modId]?.takeIf { it.isNotEmpty() }?.let { entities ->
+            any = true
+            sb.append("## Entity goals gated off per-entity\n\n")
+            sb.append("These goals are registered on a shared superclass but gated by a per-entity ")
+            sb.append("condition (an anonymous `canUse` override). For the entities below the gate ")
+            sb.append("resolved statically closed (or could not be resolved), so the goal was dropped ")
+            sb.append("from their Bedrock JSON — for a closed gate this matches the Java behavior, not a loss:\n\n")
+            for ((entityName, summaries) in entities) {
+                sb.append("### `").append(entityName).append("`\n\n")
+                for (s in summaries) sb.append("- ").append(s).append('\n')
+                sb.append('\n')
             }
         }
         itemCustomBehavior[modId]?.takeIf { it.isNotEmpty() }?.let { items ->

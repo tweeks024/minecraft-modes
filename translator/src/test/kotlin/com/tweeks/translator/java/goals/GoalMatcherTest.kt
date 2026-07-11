@@ -147,6 +147,81 @@ class GoalMatcherTest {
         }
     }
 
+    // ----- anonymous per-entity gated goals (SwMob MeleeAttackGoal pattern) -----
+
+    /**
+     * Superclass that registers an anonymous `MeleeAttackGoal` gated on an
+     * abstract `usesBlaster()` — the starwars SwMob pattern. Each leaf
+     * overrides `usesBlaster()` with a literal, so the gate is static per leaf.
+     */
+    private val swMobSrc = """
+        public abstract class SwMob {
+            public abstract boolean usesBlaster();
+            protected void registerGoals() {
+                this.goalSelector.addGoal(0, new net.minecraft.world.entity.ai.goal.FloatGoal(this));
+                this.goalSelector.addGoal(2, new net.minecraft.world.entity.ai.goal.MeleeAttackGoal(this, 1.2, true) {
+                    @Override public boolean canUse() { return !SwMob.this.usesBlaster() && super.canUse(); }
+                    @Override public boolean canContinueToUse() { return !SwMob.this.usesBlaster() && super.canContinueToUse(); }
+                });
+            }
+        }
+    """.trimIndent()
+
+    @Test
+    fun `blaster mob drops the gated melee goal and records it`() {
+        val leaf = parseClass("public class Trooper extends SwMob { public boolean usesBlaster() { return true; } }")
+        val superSw = parseClass(swMobSrc)
+        val unt = Untranslatable()
+        val result = GoalMatcher(unt).match("test", leaf) { if (it == "SwMob") superSw else null }
+
+        // Float (priority 0) is kept; the gated melee_attack is dropped.
+        val names = result.components.map { it.componentName }
+        assertEquals(listOf("minecraft:behavior.float"), names)
+        assertTrue(!names.contains("minecraft:behavior.melee_attack")) {
+            "blaster mob must not melee-charge: $names"
+        }
+        val report = unt.renderReport("test")
+        assertTrue(report.contains("Entity goals gated off per-entity")) { report }
+        assertTrue(report.contains("Trooper")) { report }
+        assertTrue(report.contains("usesBlaster()")) { report }
+    }
+
+    @Test
+    fun `saber mob keeps the gated melee goal`() {
+        val leaf = parseClass("public class Jedi extends SwMob { public boolean usesBlaster() { return false; } }")
+        val superSw = parseClass(swMobSrc)
+        val unt = Untranslatable()
+        val result = GoalMatcher(unt).match("test", leaf) { if (it == "SwMob") superSw else null }
+
+        val names = result.components.map { it.componentName }.sorted()
+        assertEquals(
+            listOf("minecraft:behavior.float", "minecraft:behavior.melee_attack"),
+            names,
+        )
+        assertTrue(!unt.renderReport("test").contains("gated off")) {
+            "open gate must not record a gated-off finding: ${unt.renderReport("test")}"
+        }
+    }
+
+    @Test
+    fun `unresolvable gate drops the goal and records honestly`() {
+        // Leaf's usesBlaster() returns a non-literal — the gate can't be folded.
+        val leaf = parseClass(
+            "public class Mystery extends SwMob { public boolean usesBlaster() { return computeIt(); } }"
+        )
+        val superSw = parseClass(swMobSrc)
+        val unt = Untranslatable()
+        val result = GoalMatcher(unt).match("test", leaf) { if (it == "SwMob") superSw else null }
+
+        val names = result.components.map { it.componentName }
+        assertTrue(!names.contains("minecraft:behavior.melee_attack")) {
+            "unresolvable gate must drop the melee goal rather than blind-emit: $names"
+        }
+        val report = unt.renderReport("test")
+        assertTrue(report.contains("Entity goals gated off per-entity")) { report }
+        assertTrue(report.contains("unresolvable")) { report }
+    }
+
     private fun parseClass(src: String): ClassOrInterfaceDeclaration {
         val parser = JavaParser()
         val unit = parser.parse(src).result.orElseThrow { IllegalStateException("parse failed") }

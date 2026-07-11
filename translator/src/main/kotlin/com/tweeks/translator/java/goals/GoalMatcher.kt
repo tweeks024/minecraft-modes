@@ -17,6 +17,7 @@ import com.github.javaparser.ast.expr.StringLiteralExpr
 import com.github.javaparser.ast.expr.SuperExpr
 import com.github.javaparser.ast.expr.UnaryExpr
 import com.github.javaparser.ast.expr.ThisExpr
+import com.github.javaparser.ast.stmt.ReturnStmt
 import com.tweeks.translator.emit.Untranslatable
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
@@ -88,7 +89,10 @@ internal class GoalMatcher(private val unt: Untranslatable) {
     ): Result {
         val components = mutableListOf<MatchedComponent>()
         val deferred = mutableListOf<DeferredGoal>()
-        collectGoals(modId, entity, superclassLookup, components, deferred, mutableSetOf())
+        // The leaf entity stays fixed while the walk descends into
+        // superclasses; anonymous per-entity goal gates (see
+        // [resolveAnonymousGate]) are evaluated against the leaf's overrides.
+        collectGoals(modId, entity, entity, superclassLookup, components, deferred, mutableSetOf())
         return Result(components, deferred)
     }
 
@@ -96,6 +100,7 @@ internal class GoalMatcher(private val unt: Untranslatable) {
     private fun collectGoals(
         modId: String,
         entity: ClassOrInterfaceDeclaration,
+        leafEntity: ClassOrInterfaceDeclaration,
         superclassLookup: (String) -> ClassOrInterfaceDeclaration?,
         components: MutableList<MatchedComponent>,
         deferred: MutableList<DeferredGoal>,
@@ -108,12 +113,12 @@ internal class GoalMatcher(private val unt: Untranslatable) {
         val registerGoals = entity.methods.firstOrNull { it.nameAsString == "registerGoals" }
         if (registerGoals == null) {
             // No override: goals are inherited wholesale from the superclass.
-            walkSuperclasses(modId, entity, superclassLookup, components, deferred, visited)
+            walkSuperclasses(modId, entity, leafEntity, superclassLookup, components, deferred, visited)
             return
         }
 
         for (call in registerGoals.findAll(MethodCallExpr::class.java)) {
-            val outcome = processAddGoalCall(modId, entity, call) ?: continue
+            val outcome = processAddGoalCall(modId, entity, leafEntity, superclassLookup, call) ?: continue
             when (outcome) {
                 is Outcome.Component -> components.add(outcome.component)
                 is Outcome.Deferred -> deferred.add(outcome.goal)
@@ -121,13 +126,14 @@ internal class GoalMatcher(private val unt: Untranslatable) {
         }
         // Only merge the superclass's goals when the override chains up.
         if (callsSuperRegisterGoals(registerGoals)) {
-            walkSuperclasses(modId, entity, superclassLookup, components, deferred, visited)
+            walkSuperclasses(modId, entity, leafEntity, superclassLookup, components, deferred, visited)
         }
     }
 
     private fun walkSuperclasses(
         modId: String,
         entity: ClassOrInterfaceDeclaration,
+        leafEntity: ClassOrInterfaceDeclaration,
         superclassLookup: (String) -> ClassOrInterfaceDeclaration?,
         components: MutableList<MatchedComponent>,
         deferred: MutableList<DeferredGoal>,
@@ -135,7 +141,7 @@ internal class GoalMatcher(private val unt: Untranslatable) {
     ) {
         for (extended in entity.extendedTypes) {
             val superDecl = superclassLookup(extended.nameAsString) ?: continue
-            collectGoals(modId, superDecl, superclassLookup, components, deferred, visited)
+            collectGoals(modId, superDecl, leafEntity, superclassLookup, components, deferred, visited)
         }
     }
 
@@ -162,6 +168,8 @@ internal class GoalMatcher(private val unt: Untranslatable) {
     private fun processAddGoalCall(
         modId: String,
         entity: ClassOrInterfaceDeclaration,
+        leafEntity: ClassOrInterfaceDeclaration,
+        superclassLookup: (String) -> ClassOrInterfaceDeclaration?,
         call: MethodCallExpr,
     ): Outcome? {
         if (call.nameAsString != "addGoal") return null
@@ -187,6 +195,30 @@ internal class GoalMatcher(private val unt: Untranslatable) {
         if (ctor == null) {
             logDeferral(modId, entity, call, "non-constructor goal expression", Untranslatable.GoalBucket.LOW)
             return null
+        }
+
+        // Anonymous-subclass goals that override `canUse` with a per-entity
+        // gate (SwMob's `new MeleeAttackGoal(...) { canUse = !usesBlaster() &&
+        // super.canUse() }`) must NOT be blind-emitted: the gate is static per
+        // leaf class, so blind-emitting would make every leaf run the goal
+        // (stormtrooper/droid/boba would melee-charge). Resolve the gate
+        // against the leaf's literal override and drop when it's closed.
+        when (val gate = resolveAnonymousGate(entity, leafEntity, superclassLookup, ctor)) {
+            null, is Gate.Open -> { /* not gated, or gate open for this leaf: emit normally */ }
+            is Gate.Closed -> {
+                unt.recordEntityGoalGatedOff(
+                    modId, leafEntity.nameAsString,
+                    "${ctor.type.nameAsString} goal gated off for this entity by ${gate.method}",
+                )
+                return null
+            }
+            is Gate.Unresolvable -> {
+                unt.recordEntityGoalGatedOff(
+                    modId, leafEntity.nameAsString,
+                    "${ctor.type.nameAsString} goal dropped — anonymous canUse gate unresolvable: ${gate.detail}",
+                )
+                return null
+            }
         }
 
         val fqn = resolveFqn(ctor)
@@ -404,5 +436,125 @@ internal class GoalMatcher(private val unt: Untranslatable) {
             }
             else -> null
         }
+    }
+
+    /** Outcome of resolving an anonymous-subclass goal's per-entity `canUse` gate. */
+    private sealed class Gate {
+        /** Gate resolves open for this leaf — emit the goal as usual. */
+        object Open : Gate()
+        /** Gate statically closed for this leaf — drop the goal. [method] is `usesBlaster()`. */
+        data class Closed(val method: String) : Gate()
+        /** Gate present but couldn't be resolved — drop conservatively. */
+        data class Unresolvable(val detail: String) : Gate()
+    }
+
+    /**
+     * If [ctor] is an anonymous-subclass goal that overrides `canUse` with a
+     * per-entity gate (a call to an abstract boolean method of the goal's
+     * declaring-class hierarchy, e.g. `!usesBlaster() && super.canUse()`),
+     * resolve that gate against [leafEntity]'s literal override of the gating
+     * method.
+     *
+     * Returns null when [ctor] is not a gated anonymous subclass (caller emits
+     * normally). Otherwise returns [Gate.Open] (emit), [Gate.Closed] (drop +
+     * record), or [Gate.Unresolvable] (drop + record honestly).
+     */
+    private fun resolveAnonymousGate(
+        declaringClass: ClassOrInterfaceDeclaration,
+        leafEntity: ClassOrInterfaceDeclaration,
+        superclassLookup: (String) -> ClassOrInterfaceDeclaration?,
+        ctor: ObjectCreationExpr,
+    ): Gate? {
+        val anonBody = ctor.anonymousClassBody.orElse(null) ?: return null
+        val canUse = anonBody.filterIsInstance<MethodDeclaration>()
+            .firstOrNull { it.nameAsString == "canUse" } ?: return null
+
+        // The gate is a call to one of the declaring-class hierarchy's abstract
+        // boolean methods (SwMob.usesBlaster()); each leaf overrides it with a
+        // literal.
+        val gateMethods = abstractBooleanMethodNames(declaringClass, superclassLookup)
+        if (gateMethods.isEmpty()) {
+            return Gate.Unresolvable("canUse override, but no abstract boolean gate method in the hierarchy")
+        }
+
+        val gateCalls = canUse.findAll(MethodCallExpr::class.java).filter {
+            it.arguments.isEmpty() &&
+                it.scope.orElse(null) !is SuperExpr &&
+                it.nameAsString in gateMethods
+        }
+        if (gateCalls.isEmpty()) {
+            return Gate.Unresolvable("canUse override does not call a known per-entity gate method")
+        }
+        val names = gateCalls.map { it.nameAsString }.toSet()
+        if (names.size != 1) {
+            return Gate.Unresolvable("canUse gated by multiple methods $names")
+        }
+        val method = names.first()
+        val negations = gateCalls.map { isNegated(it) }.toSet()
+        if (negations.size != 1) {
+            return Gate.Unresolvable("gate method $method() used with mixed polarity")
+        }
+        val negated = negations.first()
+
+        val literal = resolveBooleanOverride(leafEntity, method, superclassLookup)
+            ?: return Gate.Unresolvable("could not resolve $method() literal for ${leafEntity.nameAsString}")
+
+        val gateOpen = if (negated) !literal else literal
+        return if (gateOpen) Gate.Open else Gate.Closed("$method()")
+    }
+
+    /** True if [call] is the operand of a `!` (logical-complement) expression. */
+    private fun isNegated(call: MethodCallExpr): Boolean {
+        val parent = call.parentNode.orElse(null)
+        return parent is UnaryExpr && parent.operator == UnaryExpr.Operator.LOGICAL_COMPLEMENT
+    }
+
+    /** Names of no-arg `abstract boolean` methods declared on [start] or its same-module superclasses. */
+    private fun abstractBooleanMethodNames(
+        start: ClassOrInterfaceDeclaration,
+        superclassLookup: (String) -> ClassOrInterfaceDeclaration?,
+    ): Set<String> {
+        val names = mutableSetOf<String>()
+        var current: ClassOrInterfaceDeclaration? = start
+        val seen = mutableSetOf<String>()
+        while (current != null && seen.add(current.nameAsString)) {
+            for (m in current.methods) {
+                if (m.isAbstract && m.parameters.isEmpty() && m.type.toString() == "boolean") {
+                    names.add(m.nameAsString)
+                }
+            }
+            current = current.extendedTypes.firstNotNullOfOrNull { superclassLookup(it.nameAsString) }
+        }
+        return names
+    }
+
+    /**
+     * Walk [leaf] and its same-module superclasses for a concrete no-arg method
+     * named [methodName] whose body is a single `return <boolean literal>;`.
+     * Returns the literal, or null if not found / not a clean literal.
+     */
+    private fun resolveBooleanOverride(
+        leaf: ClassOrInterfaceDeclaration,
+        methodName: String,
+        superclassLookup: (String) -> ClassOrInterfaceDeclaration?,
+    ): Boolean? {
+        var current: ClassOrInterfaceDeclaration? = leaf
+        val seen = mutableSetOf<String>()
+        while (current != null && seen.add(current.nameAsString)) {
+            val m = current.methods.firstOrNull {
+                it.nameAsString == methodName && it.parameters.isEmpty() && !it.isAbstract
+            }
+            if (m != null) return booleanReturnLiteral(m)
+            current = current.extendedTypes.firstNotNullOfOrNull { superclassLookup(it.nameAsString) }
+        }
+        return null
+    }
+
+    private fun booleanReturnLiteral(method: MethodDeclaration): Boolean? {
+        val body = method.body.orElse(null) ?: return null
+        val returns = body.findAll(ReturnStmt::class.java)
+        if (returns.size != 1) return null
+        val expr = returns[0].expression.orElse(null)
+        return (expr as? BooleanLiteralExpr)?.value
     }
 }
