@@ -1,6 +1,8 @@
 package com.tweeks.starwars.entity.ai;
 
 import com.tweeks.starwars.entity.LukeSkywalkerEntity;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.phys.Vec3;
@@ -43,11 +45,11 @@ public class LukeLeapGoal extends Goal {
         Vec3 toTarget = target.position().subtract(luke.position());
         Vec3 flat = new Vec3(toTarget.x, 0, toTarget.z).normalize().scale(HORIZONTAL_SPEED);
         luke.setDeltaMovement(flat.x, VERTICAL_BOOST, flat.z);
-        // No fall damage from a Force-assisted landing. No resetFallDistance()
-        // method exists on this MC version's Entity (grepped "fallDistance"
-        // across wildwest/ — callers assign the protected field directly, e.g.
-        // AgentTeleportGoal.java), so assign the field directly.
-        luke.fallDistance = 0;
+        // No fall damage from a Force-assisted landing. Assigning fallDistance
+        // at launch is ineffective — it accumulates again during the arc — so
+        // apply Slow Falling for the flight (the Boba jetpack pattern), which
+        // both softens the arc and zeroes fall damage on landing.
+        luke.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 60, 0));
         this.cooldown = COOLDOWN_TICKS;
     }
 

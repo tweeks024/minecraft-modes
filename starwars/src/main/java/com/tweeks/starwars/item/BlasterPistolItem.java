@@ -75,10 +75,17 @@ public class BlasterPistolItem extends Item {
             ? MAX_RANGE
             : start.distanceTo(blockHit.getLocation());
 
+        // Mirror vanilla projectile filtering: only hittable entities are
+        // candidates. canBeHitByProjectile() folds in isAlive() && isPickable();
+        // skip spectators and anything invulnerable to a blaster bolt so the
+        // shot passes through them instead of silently "hitting" a no-op target.
+        ServerLevel serverLevel = (ServerLevel) level;
+        var blasterSource = StarWarsDamageTypes.blasterBolt(player);
         List<LivingEntity> nearby = level.getEntitiesOfClass(
             LivingEntity.class,
             new AABB(start, end).inflate(1.0),
-            e -> e != player && e.isAlive());
+            e -> e != player && e.canBeHitByProjectile() && !e.isSpectator()
+                && !e.isInvulnerableTo(serverLevel, blasterSource));
 
         List<Hitscan.Candidate> candidates = new ArrayList<>();
         Map<String, LivingEntity> byId = new HashMap<>();
@@ -96,11 +103,13 @@ public class BlasterPistolItem extends Item {
         if (hit.isPresent()) {
             LivingEntity target = byId.get(hit.get().id());
             target.invulnerableTime = 0;
-            target.hurtServer((ServerLevel) level, StarWarsDamageTypes.blasterBolt(player), this.getDamage());
+            target.hurtServer(serverLevel, blasterSource, this.getDamage());
             endPoint = target.position().add(0, target.getBbHeight() * 0.5, 0);
         }
 
-        stack.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
+        EquipmentSlot slot = hand == InteractionHand.MAIN_HAND
+            ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
+        stack.hurtAndBreak(1, player, slot);
         player.getCooldowns().addCooldown(stack, getCooldownTicks());
         level.playSound(null, player.getX(), player.getY(), player.getZ(),
             ModSounds.BLASTER_FIRE.get(),
@@ -150,10 +159,15 @@ public class BlasterPistolItem extends Item {
             ? MAX_RANGE
             : start.distanceTo(blockHit.getLocation());
 
+        // Same vanilla-projectile candidate filter as the player path: only
+        // hittable, non-spectator, non-invulnerable entities are candidates.
+        ServerLevel serverLevel = (ServerLevel) level;
+        var blasterSource = StarWarsDamageTypes.blasterBolt(shooter);
         List<LivingEntity> nearby = level.getEntitiesOfClass(
             LivingEntity.class,
             new AABB(start, end).inflate(1.0),
-            e -> e != shooter && e.isAlive());
+            e -> e != shooter && e.canBeHitByProjectile() && !e.isSpectator()
+                && !e.isInvulnerableTo(serverLevel, blasterSource));
 
         List<Hitscan.Candidate> candidates = new ArrayList<>();
         Map<String, LivingEntity> byId = new HashMap<>();
@@ -171,8 +185,7 @@ public class BlasterPistolItem extends Item {
         if (hit.isPresent()) {
             LivingEntity hitTarget = byId.get(hit.get().id());
             hitTarget.invulnerableTime = 0;
-            hitTarget.hurtServer((ServerLevel) level,
-                StarWarsDamageTypes.blasterBolt(shooter), damage);
+            hitTarget.hurtServer(serverLevel, blasterSource, damage);
             endPoint = hitTarget.position().add(0, hitTarget.getBbHeight() * 0.5, 0);
         }
 

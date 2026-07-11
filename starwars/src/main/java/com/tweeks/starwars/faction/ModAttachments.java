@@ -20,6 +20,7 @@ public final class ModAttachments {
         ATTACHMENTS.register("alignment",
             () -> AttachmentType.<AlignmentAttachment>builder(() -> null)
                 .serialize(AlignmentAttachment.CODEC, attachment -> attachment != null)
+                .copyOnDeath()
                 .build());
 
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<PacifyAttachment>> PACIFIED =

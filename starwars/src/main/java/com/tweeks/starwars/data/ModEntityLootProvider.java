@@ -40,7 +40,7 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
                 .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
                     .when(LootItemRandomChanceCondition.randomChance(0.25f))
                     .add(LootItem.lootTableItem(Registration.BLASTER_RIFLE.get())
-                        .apply(SetItemDamageFunction.setDamage(UniformGenerator.between(0.0f, 0.7f)))))
+                        .apply(SetItemDamageFunction.setDamage(UniformGenerator.between(0.3f, 1.0f)))))
                 .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
                     .when(LootItemRandomChanceCondition.randomChance(0.10f))
                     .add(LootItem.lootTableItem(Registration.STORMTROOPER_HELMET.get()))
@@ -58,7 +58,7 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
                 .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
                     .when(LootItemRandomChanceCondition.randomChance(0.15f))
                     .add(LootItem.lootTableItem(Registration.BLASTER_PISTOL.get())
-                        .apply(SetItemDamageFunction.setDamage(UniformGenerator.between(0.0f, 0.7f))))));
+                        .apply(SetItemDamageFunction.setDamage(UniformGenerator.between(0.3f, 1.0f))))));
 
         // Jedi Knight: 0-1 glowstone_dust @50%; 10% lightsaber drop (sabers
         // are the ruin's treasure — a 20% common-mob drop would be too generous).
@@ -143,7 +143,7 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
                 .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
                     .when(LootItemRandomChanceCondition.randomChance(0.50f))
                     .add(LootItem.lootTableItem(Registration.BLASTER_RIFLE.get())
-                        .apply(SetItemDamageFunction.setDamage(UniformGenerator.between(0.0f, 0.7f)))))
+                        .apply(SetItemDamageFunction.setDamage(UniformGenerator.between(0.3f, 1.0f)))))
                 .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
                     .when(LootItemRandomChanceCondition.randomChance(0.25f))
                     .add(LootItem.lootTableItem(Registration.HOLOCRON.get()))));
