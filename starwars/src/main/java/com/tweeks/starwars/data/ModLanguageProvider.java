@@ -33,9 +33,18 @@ public class ModLanguageProvider extends LanguageProvider {
         add(com.tweeks.starwars.Registration.STORMTROOPER_CHESTPLATE.get(), "Stormtrooper Chestplate");
         add(com.tweeks.starwars.Registration.STORMTROOPER_LEGGINGS.get(), "Stormtrooper Leggings");
         add(com.tweeks.starwars.Registration.STORMTROOPER_BOOTS.get(), "Stormtrooper Boots");
+        add(com.tweeks.starwars.Registration.HOLOCRON.get(), "Kyber Holocron");
         add("subtitle.starwars.blaster_fire", "Blaster fires");
         add("subtitle.starwars.saber_ignite", "Lightsaber ignites");
         add("subtitle.starwars.saber_clash", "Lightsabers clash");
+        add("subtitle.starwars.force_cast", "Force power cast");
+        add("subtitle.starwars.force_lightning", "Force lightning crackles");
+
+        add("force_power.starwars.push", "Force Push");
+        add("force_power.starwars.pull", "Force Pull");
+        add("force_power.starwars.leap", "Force Leap");
+        add("force_power.starwars.mind_trick", "Mind Trick");
+        add("force_power.starwars.lightning", "Force Lightning");
 
         add("death.attack.starwars.blaster_bolt", "%1$s was vaporized");
         add("death.attack.starwars.blaster_bolt.player", "%1$s was vaporized by %2$s");

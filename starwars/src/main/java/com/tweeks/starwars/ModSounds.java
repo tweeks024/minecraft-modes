@@ -21,6 +21,8 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> BLASTER_FIRE = register("blaster_fire");
     public static final DeferredHolder<SoundEvent, SoundEvent> SABER_IGNITE = register("saber_ignite");
     public static final DeferredHolder<SoundEvent, SoundEvent> SABER_CLASH = register("saber_clash");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FORCE_CAST = register("force_cast");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FORCE_LIGHTNING_SOUND = register("force_lightning");
 
     // More sound events land here in later tasks via register("name").
 

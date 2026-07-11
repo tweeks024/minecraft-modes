@@ -68,6 +68,11 @@ STOCK_HI   = (0x55, 0x48, 0x38, 0xFF)
 STOCK_DARK = (0x2A, 0x22, 0x1A, 0xFF)
 METAL_DARK = (0x1A, 0x1A, 0x20, 0xFF)  # barrel/scope shading, distinct from grip black
 
+# ─── Holocron palette ────────────────────────────────────────────────────
+HOLOCRON_BLUE = (0x20, 0x38, 0x80, 0xFF)  # deep blue cube faces
+HOLOCRON_CYAN = (0x60, 0xC8, 0xE0, 0xFF)  # cyan edge lines / corner studs
+HOLOCRON_GLOW = (0xFF, 0xFF, 0xFF, 0xFF)  # glowing white core
+
 # ─── Cube lists (units = model pixels, y up, wildwest pistol.json style) ─
 LIGHTSABER_CUBES = [
     # (name, from, to, texture_region)
@@ -90,6 +95,17 @@ BLASTER_RIFLE_CUBES = [
     ('scope',  (7, 8, 7),   (9, 9.5, 10),  'metal_dark'),
 ]
 
+# 6x6x6 centered core cube + four 1x1x1 studs sitting on its top-face
+# corners. All faces share the single 'core' UV region (procedural, not
+# pixel-mapped) — the studs read as small glowing nubs on the cube corners.
+HOLOCRON_CUBES = [
+    ('core',     (5, 5, 5),   (11, 11, 11), 'core'),
+    ('stud_nw',  (5, 11, 5),  (6, 12, 6),   'core'),
+    ('stud_ne',  (10, 11, 5), (11, 12, 6),  'core'),
+    ('stud_sw',  (5, 11, 10), (6, 12, 11),  'core'),
+    ('stud_se',  (10, 11, 10), (11, 12, 11), 'core'),
+]
+
 # ─── UV atlas regions (inclusive pixel coords, half-open via uv_for) ────
 SABER_TEXTURE_SIZE = 16
 UV_REGIONS_SABER = {
@@ -104,6 +120,11 @@ UV_REGIONS_BLASTER = {
     'metal_dark': (17, 0, 23, 7),
     'grip':       (25, 0, 31, 7),
     'wood':       (0, 11, 15, 19),
+}
+
+HOLOCRON_TEXTURE_SIZE = 16
+UV_REGIONS_HOLOCRON = {
+    'core': (0, 0, 15, 15),
 }
 
 # ─── Display transforms (shared across all generated weapon models) ─────
@@ -198,6 +219,26 @@ def paint_blaster_texture(include_wood):
         draw.rectangle((0, 19, 15, 19), fill=STOCK_DARK)
         for x in (3, 7, 11):
             draw.line(((x, 12), (x, 18)), fill=STOCK_DARK)
+
+    return img
+
+
+def paint_holocron_texture():
+    """16x16: deep blue base, cyan border edge lines, glowing white 2x2 center."""
+    img = Image.new('RGBA', (HOLOCRON_TEXTURE_SIZE, HOLOCRON_TEXTURE_SIZE), TRANSPARENT)
+    draw = ImageDraw.Draw(img)
+
+    # 'core' region: deep blue base fill.
+    draw.rectangle((0, 0, 15, 15), fill=HOLOCRON_BLUE)
+
+    # Cyan edge lines tracing the region border.
+    draw.rectangle((0, 0, 15, 0), fill=HOLOCRON_CYAN)
+    draw.rectangle((0, 15, 15, 15), fill=HOLOCRON_CYAN)
+    draw.rectangle((0, 0, 0, 15), fill=HOLOCRON_CYAN)
+    draw.rectangle((15, 0, 15, 15), fill=HOLOCRON_CYAN)
+
+    # Glowing white 2x2 center.
+    draw.rectangle((7, 7, 8, 8), fill=HOLOCRON_GLOW)
 
     return img
 
@@ -351,6 +392,16 @@ def build_lightsaber_item_json():
     }
 
 
+def build_holocron_item_json():
+    """Plain model selector — the holocron has no per-instance visual variant."""
+    return {
+        "model": {
+            "type": "minecraft:model",
+            "model": "starwars:item/holocron",
+        }
+    }
+
+
 def write_json(path, data):
     with open(path, 'w') as f:
         json.dump(data, f, indent=2)
@@ -427,6 +478,25 @@ def main():
         '../src/main/resources/assets/starwars/textures/item/blaster_rifle.png',
         BLASTER_TEXTURE_SIZE, 'starwars:blaster_rifle')
     write_json(os.path.join(tools_dir, 'blaster_rifle.bbmodel'), rifle_bbmodel)
+
+    # ── Holocron ──
+    holocron_tex = paint_holocron_texture()
+    holocron_tex_path = os.path.join(textures_dir, 'holocron.png')
+    holocron_tex.save(holocron_tex_path)
+    print(f"  wrote {holocron_tex_path}")
+
+    holocron_model = build_model_json(
+        'holocron', HOLOCRON_CUBES, UV_REGIONS_HOLOCRON,
+        HOLOCRON_TEXTURE_SIZE, 'starwars:item/holocron')
+    write_json(os.path.join(models_dir, 'holocron.json'), holocron_model)
+
+    holocron_bbmodel = build_bbmodel(
+        'holocron', HOLOCRON_CUBES, UV_REGIONS_HOLOCRON, holocron_tex,
+        '../src/main/resources/assets/starwars/textures/item/holocron.png',
+        HOLOCRON_TEXTURE_SIZE, 'starwars:holocron')
+    write_json(os.path.join(tools_dir, 'holocron.bbmodel'), holocron_bbmodel)
+
+    write_json(os.path.join(items_dir, 'holocron.json'), build_holocron_item_json())
 
     print('OK')
 

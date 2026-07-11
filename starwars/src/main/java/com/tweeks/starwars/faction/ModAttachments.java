@@ -22,6 +22,12 @@ public final class ModAttachments {
                 .serialize(AlignmentAttachment.CODEC, attachment -> attachment != null)
                 .build());
 
+    public static final DeferredHolder<AttachmentType<?>, AttachmentType<PacifyAttachment>> PACIFIED =
+        ATTACHMENTS.register("pacified",
+            () -> AttachmentType.<PacifyAttachment>builder(() -> null)
+                .serialize(PacifyAttachment.CODEC, attachment -> attachment != null)
+                .build());
+
     public static void register(IEventBus modEventBus) {
         ATTACHMENTS.register(modEventBus);
     }

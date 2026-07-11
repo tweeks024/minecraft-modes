@@ -28,6 +28,9 @@ public final class Registration {
     public static final DeferredItem<com.tweeks.starwars.item.LightsaberItem> LIGHTSABER =
         ITEMS.registerItem("lightsaber", com.tweeks.starwars.item.LightsaberItem::new, p -> p);
 
+    public static final DeferredItem<com.tweeks.starwars.item.HolocronItem> HOLOCRON =
+        ITEMS.registerItem("holocron", com.tweeks.starwars.item.HolocronItem::new, p -> p);
+
     public static final DeferredItem<SpawnEggItem> STORMTROOPER_SPAWN_EGG = ITEMS.registerItem(
         "stormtrooper_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.STORMTROOPER.get()));
 
@@ -91,6 +94,7 @@ public final class Registration {
                     output.accept(STORMTROOPER_CHESTPLATE.get());
                     output.accept(STORMTROOPER_LEGGINGS.get());
                     output.accept(STORMTROOPER_BOOTS.get());
+                    output.accept(HOLOCRON.get());
                     // Later tasks append their items here.
                 })
                 .build());

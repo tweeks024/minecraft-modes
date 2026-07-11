@@ -86,7 +86,10 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
             LootTable.lootTable()
                 .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
                     .add(LootItem.lootTableItem(Items.OBSIDIAN)
-                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0f, 4.0f))))));
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0f, 4.0f)))))
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .when(LootItemRandomChanceCondition.randomChance(0.25f))
+                    .add(LootItem.lootTableItem(Registration.HOLOCRON.get()))));
 
         // Luke Skywalker: 1-2 gold_ingot @60% (a hero-tier but not
         // boss-tier haul). A 30% green-lightsaber drop was planned, but —
@@ -103,7 +106,10 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
                 .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
                     .add(LootItem.lootTableItem(Items.GOLD_INGOT).setWeight(60)
                         .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0f, 2.0f))))
-                    .add(EmptyLootItem.emptyItem().setWeight(40))));
+                    .add(EmptyLootItem.emptyItem().setWeight(40)))
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .when(LootItemRandomChanceCondition.randomChance(0.25f))
+                    .add(LootItem.lootTableItem(Registration.HOLOCRON.get()))));
 
         // Obi-Wan Kenobi: 1-2 emerald @60% (a hero-tier but not boss-tier
         // haul, matching Luke). A blue-lightsaber drop was planned, but —
@@ -121,7 +127,10 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
                 .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
                     .add(LootItem.lootTableItem(Items.EMERALD).setWeight(60)
                         .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0f, 2.0f))))
-                    .add(EmptyLootItem.emptyItem().setWeight(40))));
+                    .add(EmptyLootItem.emptyItem().setWeight(40)))
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .when(LootItemRandomChanceCondition.randomChance(0.25f))
+                    .add(LootItem.lootTableItem(Registration.HOLOCRON.get()))));
     }
 
     @Override
