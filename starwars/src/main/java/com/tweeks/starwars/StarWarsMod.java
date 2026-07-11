@@ -18,5 +18,27 @@ public class StarWarsMod {
         Registration.register(modEventBus);
         ModSounds.register(modEventBus);
         com.tweeks.starwars.faction.ModAttachments.register(modEventBus);
+
+        modEventBus.addListener(StarWarsMod::registerEntityAttributes);
+
+        modEventBus.addListener((net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent event) -> {
+            event.register(ModEntities.STORMTROOPER.get(),
+                net.minecraft.world.entity.SpawnPlacementTypes.ON_GROUND,
+                net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                com.tweeks.starwars.spawning.TrooperSpawnRules::checkSpawnRules,
+                net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
+            event.register(ModEntities.BATTLE_DROID.get(),
+                net.minecraft.world.entity.SpawnPlacementTypes.ON_GROUND,
+                net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                com.tweeks.starwars.spawning.TrooperSpawnRules::checkSpawnRules,
+                net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
+        });
+    }
+
+    private static void registerEntityAttributes(net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent event) {
+        event.put(ModEntities.STORMTROOPER.get(),
+            com.tweeks.starwars.entity.StormtrooperEntity.createAttributes().build());
+        event.put(ModEntities.BATTLE_DROID.get(),
+            com.tweeks.starwars.entity.BattleDroidEntity.createAttributes().build());
     }
 }
