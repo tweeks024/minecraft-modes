@@ -1,0 +1,14 @@
+{
+  "format_version": "1.14.0",
+  "sound_definitions": {
+    "starwars:blaster_fire": {
+      "category": "neutral",
+      "sounds": [
+        {
+          "name": "entity.blaze.shoot",
+          "stream": false
+        }
+      ]
+    }
+  }
+}

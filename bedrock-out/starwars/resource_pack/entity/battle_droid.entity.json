@@ -1,0 +1,20 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "starwars:battle_droid",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/battle_droid.png"
+      },
+      "geometry": {
+        "default": "geometry.starwars.battle_droid"
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ]
+    }
+  }
+}

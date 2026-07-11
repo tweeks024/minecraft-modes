@@ -1,0 +1,20 @@
+{
+  "format_version": "1.21.0",
+  "minecraft:item": {
+    "description": {
+      "identifier": "starwars:battle_droid_spawn_egg",
+      "menu_category": {
+        "category": "nature"
+      }
+    },
+    "components": {
+      "minecraft:icon": "starwars:battle_droid_spawn_egg",
+      "minecraft:max_stack_size": 64,
+      "minecraft:spawn_egg": {
+        "type_id": "starwars:battle_droid",
+        "base_color": "#444444",
+        "overlay_color": "#888888"
+      }
+    }
+  }
+}

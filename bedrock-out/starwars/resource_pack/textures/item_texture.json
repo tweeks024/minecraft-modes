@@ -1,0 +1,18 @@
+{
+  "resource_pack_name": "starwars",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "starwars:battle_droid_spawn_egg": {
+      "textures": "textures/items/battle_droid_spawn_egg"
+    },
+    "starwars:blaster_pistol": {
+      "textures": "textures/items/blaster_pistol"
+    },
+    "starwars:blaster_rifle": {
+      "textures": "textures/items/blaster_rifle"
+    },
+    "starwars:stormtrooper_spawn_egg": {
+      "textures": "textures/items/stormtrooper_spawn_egg"
+    }
+  }
+}

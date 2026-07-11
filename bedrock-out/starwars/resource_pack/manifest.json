@@ -1,0 +1,39 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Star Wars (Resource Pack)",
+    "description": "Comprehensive Star Wars mod: Empire vs Light faction war, blasters,\nlightsabers, Force powers, and worldgen structures.",
+    "uuid": "d83d4335-3daf-5f5f-a27d-bf76fd3cea7c",
+    "version": [
+      1,
+      0,
+      0
+    ],
+    "min_engine_version": [
+      1,
+      21,
+      80
+    ]
+  },
+  "modules": [
+    {
+      "type": "resources",
+      "uuid": "44b79963-3891-5125-b1b4-3ede7121b319",
+      "version": [
+        1,
+        0,
+        0
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "53819f57-9c98-58b3-8d7d-ffa9d808d759",
+      "version": [
+        1,
+        0,
+        0
+      ]
+    }
+  ]
+}
