@@ -10,6 +10,24 @@
         }
       ]
     },
+    "starwars:force_cast": {
+      "category": "neutral",
+      "sounds": [
+        {
+          "name": "entity.illusioner.cast_spell",
+          "stream": false
+        }
+      ]
+    },
+    "starwars:force_lightning": {
+      "category": "neutral",
+      "sounds": [
+        {
+          "name": "entity.guardian.attack",
+          "stream": false
+        }
+      ]
+    },
     "starwars:saber_clash": {
       "category": "neutral",
       "sounds": [

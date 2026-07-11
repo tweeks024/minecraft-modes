@@ -30,6 +30,8 @@ Bedrock's subtitle system is structurally different (per-locale text vs. a trans
 Subtitles for these events were dropped:
 
 - `blaster_fire`
+- `force_cast`
+- `force_lightning`
 - `saber_clash`
 - `saber_ignite`
 
@@ -39,6 +41,8 @@ Java→Bedrock vanilla-sound path mapping is best-effort for Phase 1a (the trans
 
 - `minecraft:block.beacon.activate` → `block.beacon.activate`
 - `minecraft:entity.blaze.shoot` → `entity.blaze.shoot`
+- `minecraft:entity.guardian.attack` → `entity.guardian.attack`
+- `minecraft:entity.illusioner.cast_spell` → `entity.illusioner.cast_spell`
 - `minecraft:entity.zombie.attack_iron_door` → `entity.zombie.attack_iron_door`
 
 ## Entity goals stubbed for LLM (cache miss; run :translate --with-llm to translate)
@@ -56,6 +60,7 @@ These goals produced a `// TODO LLM:` stub at `behavior_pack/scripts/goals/<Goal
 These items override `Item` methods (e.g. `postHurtEnemy`, `useOn`, `hurtEnemy`) with custom logic. Phase 3 (LLM stage) translates these to `behavior_pack/scripts/items/*.ts` event handlers; Phase 2 only emits the static item JSON:
 
 - `blaster_pistol`: BlasterPistolItem overrides: use
+- `holocron`: HolocronItem overrides: use
 - `lightsaber`: LightsaberItem overrides: use, hurtEnemy
 - `stormtrooper_boots`: armor protection emitted as iron-armor defaults (BOOTS); verify against the source ArmorMaterial if the mod customized it.
 - `stormtrooper_chestplate`: armor protection emitted as iron-armor defaults (CHESTPLATE); verify against the source ArmorMaterial if the mod customized it.
@@ -74,6 +79,7 @@ These items have a `resource_pack/attachables/<id>.json` (from a `.bbmodel`) who
 
 - `blaster_pistol`: no dedicated textures/entity/blaster_pistol texture was authored; the attachable falls back to the item icon texture textures/items/blaster_pistol for the 3D held-item view — verify visually in-game.
 - `blaster_rifle`: no dedicated textures/entity/blaster_rifle texture was authored; the attachable falls back to the item icon texture textures/items/blaster_rifle for the 3D held-item view — verify visually in-game.
+- `holocron`: no dedicated textures/entity/holocron texture was authored; the attachable falls back to the item icon texture textures/items/holocron for the 3D held-item view — verify visually in-game.
 - `lightsaber`: no dedicated textures/entity/lightsaber texture was authored; the attachable falls back to the item icon texture textures/items/lightsaber_blue for the 3D held-item view — verify visually in-game.
 
 ## Spawn egg colors hardcoded

@@ -19,6 +19,21 @@
           ]
         }
       ]
+    },
+    {
+      "rolls": 1.0,
+      "conditions": [
+        {
+          "chance": 0.25,
+          "condition": "random_chance"
+        }
+      ],
+      "entries": [
+        {
+          "type": "item",
+          "name": "starwars:holocron"
+        }
+      ]
     }
   ]
 }

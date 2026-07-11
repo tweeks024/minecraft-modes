@@ -37,6 +37,25 @@ public class SwTargetGoal extends NearestAttackableTargetGoal<LivingEntity> {
                     myFaction, isCombatant, targetFaction, isPlayer, score, disguised);
             });
     }
+
+    /**
+     * Mind Trick gate: {@code this.mob} is the vanilla
+     * {@code TargetGoal}'s protected field (confirmed against the vanilla
+     * 26.1.2 source — declared {@code protected final Mob mob;}), and
+     * {@code Mob} inherits attachment access from {@code Entity}, so no
+     * cast to {@code SwMob} is needed here.
+     */
+    @Override
+    public boolean canUse() {
+        if (this.mob.hasData(com.tweeks.starwars.faction.ModAttachments.PACIFIED.get())) {
+            var p = this.mob.getData(com.tweeks.starwars.faction.ModAttachments.PACIFIED.get());
+            if (p != null && com.tweeks.starwars.faction.PacifyState.isActive(
+                    p.until(), this.mob.level().getGameTime())) {
+                return false;
+            }
+        }
+        return super.canUse();
+    }
 }
 
 */

@@ -14,6 +14,9 @@
     "starwars:darth_vader_spawn_egg": {
       "textures": "textures/items/darth_vader_spawn_egg"
     },
+    "starwars:holocron": {
+      "textures": "textures/items/holocron"
+    },
     "starwars:jedi_knight_spawn_egg": {
       "textures": "textures/items/jedi_knight_spawn_egg"
     },
