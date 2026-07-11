@@ -7,7 +7,7 @@
         "default": "entity_alphatest"
       },
       "textures": {
-        "default": "textures/entity/lightsaber"
+        "default": "textures/items/lightsaber_blue"
       },
       "geometry": {
         "default": "geometry.starwars.lightsaber"

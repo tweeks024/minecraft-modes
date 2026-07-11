@@ -7,7 +7,7 @@
         "default": "entity_alphatest"
       },
       "textures": {
-        "default": "textures/entity/blaster_pistol"
+        "default": "textures/items/blaster_pistol"
       },
       "geometry": {
         "default": "geometry.starwars.blaster_pistol"

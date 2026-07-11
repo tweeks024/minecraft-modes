@@ -47,6 +47,20 @@ These items override `Item` methods (e.g. `postHurtEnemy`, `useOn`, `hurtEnemy`)
 - `blaster_pistol`: BlasterPistolItem overrides: use
 - `lightsaber`: LightsaberItem overrides: use, hurtEnemy
 
+## Item model selector not translatable — static icon used
+
+These items use a `minecraft:select` component-keyed client model (e.g. a data-component-driven color). Phase 2 does not translate the selector; the item was instead given a fixed icon so it isn't a broken/missing texture reference in Bedrock. If the selected color/state matters in-game, hand-write the swap via Phase 3 scripting:
+
+- `lightsaber`: item model selector not translatable — using starwars:lightsaber_blue as static icon
+
+## Attachable held-item texture substituted or missing
+
+These items have a `resource_pack/attachables/<id>.json` (from a `.bbmodel`) whose conventional `textures/entity/<id>` texture doesn't exist in the output. Verify the 3D held-item view in-game:
+
+- `blaster_pistol`: no dedicated textures/entity/blaster_pistol texture was authored; the attachable falls back to the item icon texture textures/items/blaster_pistol for the 3D held-item view — verify visually in-game.
+- `blaster_rifle`: no dedicated textures/entity/blaster_rifle texture was authored; the attachable falls back to the item icon texture textures/items/blaster_rifle for the 3D held-item view — verify visually in-game.
+- `lightsaber`: no dedicated textures/entity/lightsaber texture was authored; the attachable falls back to the item icon texture textures/items/lightsaber_blue for the 3D held-item view — verify visually in-game.
+
 ## Spawn egg colors hardcoded
 
 These spawn eggs received default base/overlay colors because the Java side computes them at runtime via `EntityType.Builder` defaults. Hand-tune per the source mod's mob palette if the colors look wrong in-game:
