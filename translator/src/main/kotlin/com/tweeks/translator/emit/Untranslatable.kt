@@ -44,6 +44,7 @@ class Untranslatable {
     private val spawnEggColorsHardcoded = TreeMap<String, TreeMap<String, String>>()
     private val renderControllerAmbiguous = TreeMap<String, TreeMap<String, String>>()
     private val entityAttributesUnresolved = TreeMap<String, TreeMap<String, TreeSet<String>>>()
+    private val datapackWorldgenStructures = TreeMap<String, TreeMap<String, String>>()
     private val phase2Failures = TreeMap<String, MutableList<String>>()
     private val duplicateBehaviorComponents = TreeMap<String, TreeMap<String, TreeSet<String>>>()
 
@@ -219,6 +220,20 @@ class Untranslatable {
     }
 
     /**
+     * Record a datapack worldgen structure (a JSON file under
+     * `data/<mod>/worldgen/structure/`, driven by a Java `Structure`/
+     * `StructurePiece` pair via datagen) that has
+     * no Bedrock representation. Bedrock has no equivalent of Java's
+     * procedural structure-placement API, so these structures — and whatever
+     * they place (loot, mob spawns) beyond a plain chest loot table — simply
+     * don't generate on the Bedrock side. [structureId] is the structure's
+     * resource-path (namespace stripped), e.g. `escape_pod` or `sub/nested`.
+     */
+    fun recordDatapackWorldgenStructure(modId: String, structureId: String, summary: String) {
+        datapackWorldgenStructures.getOrPut(modId) { TreeMap() }[structureId] = summary
+    }
+
+    /**
      * Record a Phase 2 analyzer that threw on this mod. The CLI catches
      * the exception so other mods continue to translate; this entry
      * tells the user what went wrong.
@@ -272,6 +287,7 @@ class Untranslatable {
         ids.addAll(spawnEggColorsHardcoded.keys)
         ids.addAll(renderControllerAmbiguous.keys)
         ids.addAll(entityAttributesUnresolved.keys)
+        ids.addAll(datapackWorldgenStructures.keys)
         ids.addAll(phase2Failures.keys)
         ids.addAll(duplicateBehaviorComponents.keys)
         return ids
@@ -546,6 +562,18 @@ class Untranslatable {
                 for (a in attrs) sb.append("- ").append(a).append('\n')
                 sb.append('\n')
             }
+        }
+        datapackWorldgenStructures[modId]?.takeIf { it.isNotEmpty() }?.let { items ->
+            any = true
+            sb.append("## Datapack worldgen structures not translatable\n\n")
+            sb.append("Bedrock has no equivalent of Java's procedural `Structure`/`StructurePiece` datapack API — ")
+            sb.append("there is no `.nbt`/jigsaw template for these on disk, so there is nothing to translate. ")
+            sb.append("These structures (and the biome placement / spacing that controls where they generate) do not ")
+            sb.append("appear in Bedrock worldgen; any loot table they place is translated separately and listed elsewhere in this report:\n\n")
+            for ((structureId, summary) in items) {
+                sb.append("- `").append(structureId).append("`: ").append(summary).append('\n')
+            }
+            sb.append('\n')
         }
         phase2Failures[modId]?.takeIf { it.isNotEmpty() }?.let { summaries ->
             any = true

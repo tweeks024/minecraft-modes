@@ -22,6 +22,7 @@ import com.tweeks.translator.json.LangTransform
 import com.tweeks.translator.json.LootTableTransform
 import com.tweeks.translator.json.RecipeTransform
 import com.tweeks.translator.json.SoundTransform
+import com.tweeks.translator.json.WorldgenStructureScanner
 import com.tweeks.translator.manifest.BedrockTarget
 import com.tweeks.translator.manifest.ManifestWriter
 import java.nio.file.Files
@@ -152,6 +153,7 @@ private fun runPipeline(repoRoot: Path, opts: CliOptions, outputRoot: Path) {
     val assetCopier = { unt: Untranslatable -> AssetCopier(unt) }
     val atlasBuilder = ItemAtlasBuilder()
     val bbmodelConverter = { unt: Untranslatable -> BbmodelConverter(target, unt) }
+    val worldgenStructureScanner = { unt: Untranslatable -> WorldgenStructureScanner(unt) }
 
     // Phase 2a Java pipeline foundation. The full discovered list is
     // needed so [JavaSourceLoader] can wire sibling mods' src dirs as
@@ -214,6 +216,7 @@ private fun runPipeline(repoRoot: Path, opts: CliOptions, outputRoot: Path) {
         runStage("assets", mod.modId, unt) { copyResult = assetCopier(unt).copy(mod.rootDir, mod.modId, outputRoot) }
         copyResult?.let { runStage("atlas", mod.modId, unt) { atlasBuilder.build(mod.modId, it.itemTextureShortNames, outputRoot) } }
         runStage("bbmodel", mod.modId, unt) { bbmodelConverter(unt).convert(mod.modId, mod.rootDir.resolve("tools"), outputRoot) }
+        runStage("worldgen-structures", mod.modId, unt) { worldgenStructureScanner(unt).scan(mod.rootDir, mod.modId) }
 
         // Phase 2: parse the Java sources, then run entity + item
         // analyzers against the AST. The classpath property is set by
