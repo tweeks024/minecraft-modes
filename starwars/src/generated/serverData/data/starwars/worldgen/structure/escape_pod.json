@@ -1,0 +1,10 @@
+{
+  "type": "starwars:escape_pod",
+  "biomes": [
+    "minecraft:plains",
+    "minecraft:desert"
+  ],
+  "spawn_overrides": {},
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin"
+}

@@ -19,6 +19,7 @@ public class StarWarsMod {
         ModSounds.register(modEventBus);
         com.tweeks.starwars.item.ModDataComponents.register(modEventBus);
         com.tweeks.starwars.faction.ModAttachments.register(modEventBus);
+        com.tweeks.starwars.world.ModStructures.register(modEventBus);
 
         modEventBus.addListener(StarWarsMod::registerEntityAttributes);
 

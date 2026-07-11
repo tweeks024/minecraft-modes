@@ -26,7 +26,9 @@ public class DataGenerators {
         RegistrySetBuilder builder = new RegistrySetBuilder()
             .add(Registries.DAMAGE_TYPE, ModDamageTypeProvider::bootstrap)
             .add(net.neoforged.neoforge.registries.NeoForgeRegistries.Keys.BIOME_MODIFIERS,
-                 ModBiomeModifierProvider::bootstrap);
+                 ModBiomeModifierProvider::bootstrap)
+            .add(Registries.STRUCTURE, ModStructureProvider::bootstrapStructures)
+            .add(Registries.STRUCTURE_SET, ModStructureProvider::bootstrapSets);
         gen.addProvider(true, new DatapackBuiltinEntriesProvider(
             output, lookup, builder, Set.of(StarWarsMod.MOD_ID)));
 
