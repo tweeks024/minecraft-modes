@@ -72,7 +72,7 @@ public class ImperialOutpostPiece extends ScatteredFeaturePiece {
                 case ROOF -> Blocks.POLISHED_BLACKSTONE_SLAB.defaultBlockState();
                 case AIR -> Blocks.AIR.defaultBlockState();
                 case CHEST -> null;                          // handled via createChest
-                case GARRISON_TROOPER, GARRISON_DROID -> null;   // entity spawn below
+                case GARRISON_TROOPER, GARRISON_DROID -> Blocks.AIR.defaultBlockState(); // carve air so garrison doesn't suffocate on slopes; entity spawn below
             };
             if (state != null) {
                 this.placeBlock(level, state, p.dx(), p.dy(), p.dz(), box);

@@ -61,11 +61,11 @@ import java.util.Set;
  * NamedCharacterSavedData} singleton. The explicit {@code data.setAlive(...)}
  * below is therefore a harmless re-claim of state finalizeSpawn already set.
  *
- * <p>The stormtrooper ring uses the same square-jitter-around-a-center
- * pattern as {@code LeaderEntourageSpawner#spawnFollowers} (random offset
- * within a radius, snapped to the local heightmap), reimplemented here rather
- * than imported because it operates on {@code SwMob}, not wildwest's {@code
- * WildWestMob}, and this module has no dependency on wildwest.
+ * <p>The stormtrooper ring reuses {@link #pickSpawnPosition} — the same
+ * polar (angle + distance) sampling used for the main character roll above —
+ * rather than the square-jitter offset {@code LeaderEntourageSpawner#
+ * spawnFollowers} uses in wildwest; this module has no dependency on
+ * wildwest, so there is no shared helper to import.
  */
 @EventBusSubscriber(modid = StarWarsMod.MOD_ID)
 public final class NamedCharacterSpawner {
@@ -133,7 +133,7 @@ public final class NamedCharacterSpawner {
             ModEntities.BOBA_FETT.get(), BOBA_FETT_BIOMES, IMPERIAL_STRUCTURES, false);
     }
 
-    /** Core roll, shared by all three characters. */
+    /** Core roll, shared by all four characters. */
     private static <T extends SwMob> void tryRollCharacter(
             ServerLevel level,
             NamedCharacterSavedData data,
@@ -240,8 +240,8 @@ public final class NamedCharacterSpawner {
     }
 
     /**
-     * Vader's stormtrooper ring: same square-jitter-around-a-center pattern
-     * as {@code LeaderEntourageSpawner#spawnFollowers}, re-validated per spot
+     * Vader's stormtrooper ring: same {@link #pickSpawnPosition} polar
+     * sampling used for the main character roll, re-validated per spot
      * (fluid + spawn rules) and skipped (not retried) on failure.
      */
     private static void spawnTrooperEscort(ServerLevel level, BlockPos center) {

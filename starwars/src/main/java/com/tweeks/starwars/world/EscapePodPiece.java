@@ -69,8 +69,8 @@ public class EscapePodPiece extends ScatteredFeaturePiece {
                 case SHELL -> Blocks.LIGHT_GRAY_CONCRETE.defaultBlockState();
                 case FLOOR -> Blocks.GRAY_CONCRETE.defaultBlockState();
                 case AIR -> Blocks.AIR.defaultBlockState();
-                case CHEST -> null;       // handled below via createChest
-                case ASTROMECH -> null;   // entity spawn below
+                case CHEST -> null;                          // handled below via createChest
+                case ASTROMECH -> Blocks.AIR.defaultBlockState(); // carve air so the droid doesn't suffocate on slopes; entity spawn below
             };
             if (state != null) {
                 this.placeBlock(level, state, p.dx(), p.dy(), p.dz(), box);

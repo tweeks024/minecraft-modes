@@ -31,14 +31,6 @@ public final class StarWarsDamageTypes {
             attacker);
     }
 
-    public static DamageSource lightsaber(Entity attacker) {
-        return new DamageSource(
-            attacker.level().registryAccess()
-                .lookupOrThrow(Registries.DAMAGE_TYPE)
-                .getOrThrow(LIGHTSABER),
-            attacker);
-    }
-
     public static DamageSource forceLightning(Entity attacker) {
         return new DamageSource(
             attacker.level().registryAccess()

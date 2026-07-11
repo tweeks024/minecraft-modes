@@ -71,7 +71,7 @@ public class JediRuinPiece extends ScatteredFeaturePiece {
                 case PILLAR_CRACKED -> Blocks.CRACKED_STONE_BRICKS.defaultBlockState();
                 case DAIS -> Blocks.CHISELED_STONE_BRICKS.defaultBlockState();
                 case CHEST -> null;                     // handled via createChest
-                case GUARDIAN_JEDI -> null;             // entity spawn below
+                case GUARDIAN_JEDI -> Blocks.AIR.defaultBlockState(); // carve air so the guardian doesn't suffocate on slopes; entity spawn below
             };
             if (state != null) {
                 this.placeBlock(level, state, p.dx(), p.dy(), p.dz(), box);

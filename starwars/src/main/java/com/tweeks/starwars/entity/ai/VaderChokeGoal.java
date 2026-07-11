@@ -71,7 +71,7 @@ public class VaderChokeGoal extends Goal {
         target.addEffect(new MobEffectInstance(MobEffects.LEVITATION, 10, 0));
         target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 30, 2));
         if (chokeTicks % 20 == 0 && vader.level() instanceof ServerLevel sl) {
-            target.hurtServer(sl, StarWarsDamageTypes.forceLightningAoe(sl), 1.0F);
+            target.hurtServer(sl, StarWarsDamageTypes.forceLightning(vader), 1.0F);
         }
     }
 }
