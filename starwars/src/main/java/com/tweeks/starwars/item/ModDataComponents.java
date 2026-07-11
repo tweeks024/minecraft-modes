@@ -23,7 +23,22 @@ public final class ModDataComponents {
                 .persistent(Codec.INT)
                 .networkSynchronized(ByteBufCodecs.VAR_INT));
 
-    // ACTIVE_POWER + POWER_COOLDOWNS join in Milestone 5.
+    /** Active ForcePower index 0..4. Defaults to 0 (PUSH). */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> ACTIVE_POWER =
+        COMPONENTS.registerComponentType(
+            "active_power",
+            builder -> builder
+                .persistent(Codec.INT)
+                .networkSynchronized(ByteBufCodecs.VAR_INT));
+
+    /** Per-power cooldown expiry gameTime ticks, List<Long> length 5. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<java.util.List<Long>>> POWER_COOLDOWNS =
+        COMPONENTS.registerComponentType(
+            "power_cooldowns",
+            builder -> builder
+                .persistent(Codec.LONG.listOf())
+                .networkSynchronized(net.minecraft.network.codec.ByteBufCodecs.VAR_LONG.apply(
+                    net.minecraft.network.codec.ByteBufCodecs.list(ForceCooldowns.SLOT_COUNT))));
 
     public static void register(IEventBus modEventBus) {
         COMPONENTS.register(modEventBus);
