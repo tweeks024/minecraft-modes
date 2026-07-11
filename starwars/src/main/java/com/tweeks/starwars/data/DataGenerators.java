@@ -24,11 +24,21 @@ public class DataGenerators {
         CompletableFuture<HolderLookup.Provider> lookup = event.getLookupProvider();
 
         RegistrySetBuilder builder = new RegistrySetBuilder()
-            .add(Registries.DAMAGE_TYPE, ModDamageTypeProvider::bootstrap);
+            .add(Registries.DAMAGE_TYPE, ModDamageTypeProvider::bootstrap)
+            .add(net.neoforged.neoforge.registries.NeoForgeRegistries.Keys.BIOME_MODIFIERS,
+                 ModBiomeModifierProvider::bootstrap);
         gen.addProvider(true, new DatapackBuiltinEntriesProvider(
             output, lookup, builder, Set.of(StarWarsMod.MOD_ID)));
 
         gen.addProvider(true, new ModDamageTypeTagsProvider(output, lookup));
+
+        gen.addProvider(true, new net.minecraft.data.loot.LootTableProvider(
+            output,
+            Set.of(),
+            java.util.List.of(new net.minecraft.data.loot.LootTableProvider.SubProviderEntry(
+                ModEntityLootProvider::new,
+                net.minecraft.world.level.storage.loot.parameters.LootContextParamSets.ENTITY)),
+            lookup));
     }
 
     @SubscribeEvent
