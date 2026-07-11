@@ -11,6 +11,30 @@
     "starwars:blaster_rifle": {
       "textures": "textures/items/blaster_rifle"
     },
+    "starwars:darth_vader_spawn_egg": {
+      "textures": "textures/items/darth_vader_spawn_egg"
+    },
+    "starwars:jedi_knight_spawn_egg": {
+      "textures": "textures/items/jedi_knight_spawn_egg"
+    },
+    "starwars:lightsaber_blue": {
+      "textures": "textures/items/lightsaber_blue"
+    },
+    "starwars:lightsaber_green": {
+      "textures": "textures/items/lightsaber_green"
+    },
+    "starwars:lightsaber_purple": {
+      "textures": "textures/items/lightsaber_purple"
+    },
+    "starwars:lightsaber_red": {
+      "textures": "textures/items/lightsaber_red"
+    },
+    "starwars:luke_skywalker_spawn_egg": {
+      "textures": "textures/items/luke_skywalker_spawn_egg"
+    },
+    "starwars:obi_wan_spawn_egg": {
+      "textures": "textures/items/obi_wan_spawn_egg"
+    },
     "starwars:stormtrooper_spawn_egg": {
       "textures": "textures/items/stormtrooper_spawn_egg"
     }

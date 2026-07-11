@@ -1,0 +1,19 @@
+{
+  "format_version": "1.21.0",
+  "minecraft:item": {
+    "description": {
+      "identifier": "starwars:lightsaber",
+      "menu_category": {
+        "category": "items"
+      }
+    },
+    "components": {
+      "minecraft:durability": {
+        "max_durability": 1500
+      },
+      "minecraft:hand_equipped": true,
+      "minecraft:icon": "starwars:lightsaber",
+      "minecraft:max_stack_size": 1
+    }
+  }
+}

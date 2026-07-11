@@ -1,0 +1,20 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "starwars:luke_skywalker",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/luke_skywalker.png"
+      },
+      "geometry": {
+        "default": "geometry.starwars.luke_skywalker"
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ]
+    }
+  }
+}

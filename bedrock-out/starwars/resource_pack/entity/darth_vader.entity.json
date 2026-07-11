@@ -1,0 +1,20 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "starwars:darth_vader",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/darth_vader.png"
+      },
+      "geometry": {
+        "default": "geometry.starwars.darth_vader"
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ]
+    }
+  }
+}

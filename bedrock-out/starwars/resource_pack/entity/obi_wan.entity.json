@@ -1,0 +1,20 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "starwars:obi_wan",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/obi_wan.png"
+      },
+      "geometry": {
+        "default": "geometry.starwars.obi_wan"
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ]
+    }
+  }
+}

@@ -9,6 +9,24 @@
           "stream": false
         }
       ]
+    },
+    "starwars:saber_clash": {
+      "category": "neutral",
+      "sounds": [
+        {
+          "name": "entity.zombie.attack_iron_door",
+          "stream": false
+        }
+      ]
+    },
+    "starwars:saber_ignite": {
+      "category": "neutral",
+      "sounds": [
+        {
+          "name": "block.beacon.activate",
+          "stream": false
+        }
+      ]
     }
   }
 }
