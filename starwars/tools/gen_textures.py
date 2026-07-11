@@ -281,6 +281,14 @@ ARMOR_W, ARMOR_H = 64, 32
 def paint_stormtrooper_armor_layers(humanoid_rgba, leggings_rgba):
     """Paint the two worn-armor sheets for the stormtrooper equipment asset.
 
+    Both sheets are left fully transparent outside the UV regions vanilla's
+    box-UV format actually samples: for each body-part block, the top rows
+    hold only an inset top/bottom-face strip (not the full block width) and
+    the remaining rows hold the full-width wraparound strip. This mirrors
+    the exact extents painted in craftee's own worn-armor sheets
+    (assets/craftee/textures/entity/equipment/{humanoid,humanoid_leggings}/
+    craftee.png) rather than flat-filling whole UV blocks.
+
     Layer 1 ("humanoid", assets/.../equipment/humanoid/stormtrooper.png)
     covers the helmet (head UV block), chestplate (body + arm UV blocks),
     and boots (leg UV block) — everything except leggings.
@@ -289,43 +297,86 @@ def paint_stormtrooper_armor_layers(humanoid_rgba, leggings_rgba):
     stormtrooper.png) covers only the leg UV block, matching the visible
     extent of craftee's own humanoid_leggings/craftee.png (bbox (0,16)-
     (16,32) — the waist/body region is left transparent there too).
-    """
-    fill_buf(humanoid_rgba, WHITE)
 
-    # Head block (helmet), UV 0..32,0..16 — front face at 8..16,8..16.
-    rect(humanoid_rgba, 8, 8, 16, 16, WHITE_HI)
+    Every region gets 3 white tones (top-highlight / base / bottom-shade)
+    plus black inter-plate seams at the joints, with a sliver of GRAY
+    under-suit showing through at each seam's end gaps.
+    """
+    fill_buf(humanoid_rgba, (0, 0, 0, 0))
+    fill_buf(leggings_rgba, (0, 0, 0, 0))
+
+    # ---- Head block (helmet), UV 0..32,0..16 ----
+    # Top/bottom faces: y0..7, inset to x8..24 (craftee's exact extent),
+    # 3-tone gradient left-to-right.
+    rect(humanoid_rgba, 8, 0, 13, 8, WHITE_HI)
+    rect(humanoid_rgba, 13, 0, 19, 8, WHITE)
+    rect(humanoid_rgba, 19, 0, 24, 8, WHITE_SH)
+    # Wraparound sides: y8..16, full x0..32.
+    rect(humanoid_rgba, 0, 8, 32, 9, WHITE_HI)     # dome top highlight
+    rect(humanoid_rgba, 0, 9, 32, 13, WHITE)       # base band
+    rect(humanoid_rgba, 0, 13, 32, 15, WHITE_SH)   # lower dome shade
+    rect(humanoid_rgba, 0, 15, 32, 16, GRAY)       # neck seam: under-suit peek
+    # Front face detail (x8..16,y8..16): eye slits + aerator + chin vent.
     rect(humanoid_rgba, 9, 10, 11, 11, SUIT_BLACK)   # left eye slit
     rect(humanoid_rgba, 13, 10, 15, 11, SUIT_BLACK)  # right eye slit
     rect(humanoid_rgba, 10, 13, 14, 14, GRAY)        # aerator frown
     rect(humanoid_rgba, 11, 14, 13, 15, SUIT_BLACK)  # chin vent
-    rect(humanoid_rgba, 30, 8, 32, 16, WHITE_SH)     # head right-edge shade
 
-    # Body block (chestplate), UV 16..40,16..32.
-    rect(humanoid_rgba, 16, 16, 40, 17, WHITE_HI)    # chest top highlight
-    rect(humanoid_rgba, 26, 20, 30, 24, GRAY)        # chest control box
-    rect(humanoid_rgba, 20, 26, 36, 28, SUIT_BLACK)  # ab plate seam
-    rect(humanoid_rgba, 16, 30, 40, 32, WHITE_SH)    # body bottom shade
+    # ---- Body block (chestplate), UV 16..40,16..32 ----
+    # Top/bottom faces: y16..19, inset to x20..28.
+    rect(humanoid_rgba, 20, 16, 24, 20, WHITE_HI)
+    rect(humanoid_rgba, 24, 16, 28, 20, WHITE_SH)
+    # Wraparound: y20..32, full x16..40 — ab-plate seam (2 horizontal +
+    # 1 vertical) with under-suit peeking through at the seam ends.
+    rect(humanoid_rgba, 16, 20, 40, 21, WHITE_HI)    # shoulder top highlight
+    rect(humanoid_rgba, 16, 21, 40, 26, WHITE)       # chest base
+    rect(humanoid_rgba, 24, 21, 32, 24, GRAY)        # chest control box
+    rect(humanoid_rgba, 16, 26, 40, 27, SUIT_BLACK)  # ab-plate seam 1
+    rect(humanoid_rgba, 16, 26, 18, 27, GRAY)        # seam gap: under-suit peek
+    rect(humanoid_rgba, 38, 26, 40, 27, GRAY)
+    rect(humanoid_rgba, 27, 21, 29, 30, SUIT_BLACK)  # ab-plate vertical seam
+    rect(humanoid_rgba, 16, 27, 40, 29, WHITE)       # lower ab plate
+    rect(humanoid_rgba, 16, 29, 40, 30, SUIT_BLACK)  # ab-plate seam 2
+    rect(humanoid_rgba, 16, 30, 40, 32, WHITE_SH)    # waist shade
 
-    # Arm block (chestplate sleeves), UV 40..56,16..32.
-    rect(humanoid_rgba, 40, 16, 56, 17, WHITE_HI)    # shoulder highlight
-    rect(humanoid_rgba, 40, 22, 56, 23, SUIT_BLACK)  # elbow seam
+    # ---- Arm block (chestplate sleeve), UV 40..56,16..32 ----
+    # Top/bottom faces: y16..19, inset to x44..52.
+    rect(humanoid_rgba, 44, 16, 48, 20, WHITE_HI)
+    rect(humanoid_rgba, 48, 16, 52, 20, WHITE_SH)
+    # Wraparound: y20..32, full x40..56 — elbow seam with under-suit peek.
+    rect(humanoid_rgba, 40, 20, 56, 21, WHITE_HI)    # shoulder highlight
+    rect(humanoid_rgba, 40, 21, 56, 25, WHITE)       # upper sleeve
+    rect(humanoid_rgba, 40, 25, 56, 26, SUIT_BLACK)  # elbow seam
+    rect(humanoid_rgba, 40, 25, 41, 26, GRAY)        # seam gap: under-suit peek
+    rect(humanoid_rgba, 55, 25, 56, 26, GRAY)
+    rect(humanoid_rgba, 40, 26, 56, 30, WHITE)       # forearm
     rect(humanoid_rgba, 40, 30, 56, 32, WHITE_SH)    # wrist shade
 
-    # Leg block (boots), UV 0..16,16..32 — boot cuff seam + sole shading.
-    rect(humanoid_rgba, 0, 16, 16, 17, WHITE_HI)     # thigh top highlight
-    rect(humanoid_rgba, 0, 22, 16, 23, SUIT_BLACK)   # boot cuff seam
-    rect(humanoid_rgba, 0, 23, 16, 32, WHITE_SH)     # boot body, shaded
-    rect(humanoid_rgba, 0, 30, 16, 32, SUIT_BLACK)   # boot sole
+    # ---- Leg block (boots, on the humanoid sheet), UV 0..16,16..32 ----
+    # Top/bottom faces: y16..19, inset to x4..12.
+    rect(humanoid_rgba, 4, 16, 8, 20, WHITE_HI)
+    rect(humanoid_rgba, 8, 16, 12, 20, WHITE_SH)
+    # Wraparound: y20..32, full x0..16 — cuff seam, under-suit peek, sole.
+    rect(humanoid_rgba, 0, 20, 16, 21, WHITE_HI)     # ankle top highlight
+    rect(humanoid_rgba, 0, 21, 16, 23, WHITE)        # boot cuff
+    rect(humanoid_rgba, 0, 23, 16, 24, SUIT_BLACK)   # cuff seam
+    rect(humanoid_rgba, 0, 23, 1, 24, GRAY)          # seam gap: under-suit peek
+    rect(humanoid_rgba, 15, 23, 16, 24, GRAY)
+    rect(humanoid_rgba, 0, 24, 16, 29, WHITE_SH)     # boot body, shaded
+    rect(humanoid_rgba, 0, 29, 16, 32, GRAY)         # sole, darker gray
 
-    fill_buf(leggings_rgba, (0, 0, 0, 0))  # transparent base
-    # Leg block (leggings), UV 0..16,16..32 — the only region craftee's own
-    # humanoid_leggings sheet paints; the body/waist UV block stays
-    # transparent (the leggings bbmodel's body cube still exists for
-    # correct armor-model geometry, it just renders no pixels there).
-    rect(leggings_rgba, 0, 16, 16, 32, WHITE)
-    rect(leggings_rgba, 0, 16, 16, 17, WHITE_HI)     # thigh top highlight
-    rect(leggings_rgba, 0, 22, 16, 23, SUIT_BLACK)   # knee seam
-    rect(leggings_rgba, 0, 30, 16, 32, WHITE_SH)     # ankle shade
+    # ---- Leggings sheet: leg block only, UV 0..16,16..32 ----
+    # Top/bottom faces: y16..19, inset to x4..12.
+    rect(leggings_rgba, 4, 16, 8, 20, WHITE_HI)
+    rect(leggings_rgba, 8, 16, 12, 20, WHITE_SH)
+    # Wraparound: y20..32, full x0..16 — knee seam, thigh/shin tone split.
+    rect(leggings_rgba, 0, 20, 16, 21, WHITE_HI)     # thigh top highlight
+    rect(leggings_rgba, 0, 21, 16, 24, WHITE)        # thigh
+    rect(leggings_rgba, 0, 24, 16, 25, SUIT_BLACK)   # knee seam
+    rect(leggings_rgba, 0, 24, 1, 25, GRAY)          # seam gap: under-suit peek
+    rect(leggings_rgba, 15, 24, 16, 25, GRAY)
+    rect(leggings_rgba, 0, 25, 16, 30, WHITE_SH)     # shin (darker than thigh)
+    rect(leggings_rgba, 0, 30, 16, 32, GRAY)         # ankle cuff, darker
 
 if __name__ == '__main__':
     out_dir = sys.argv[1] if len(sys.argv) > 1 else \
