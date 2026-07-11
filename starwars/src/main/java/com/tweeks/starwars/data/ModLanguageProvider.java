@@ -14,6 +14,10 @@ public class ModLanguageProvider extends LanguageProvider {
     protected void addTranslations() {
         add("itemGroup." + StarWarsMod.MOD_ID, "Star Wars");
 
+        add(com.tweeks.starwars.Registration.BLASTER_PISTOL.get(), "Blaster Pistol");
+        add(com.tweeks.starwars.Registration.BLASTER_RIFLE.get(), "Blaster Rifle");
+        add("subtitle.starwars.blaster_fire", "Blaster fires");
+
         add("death.attack.starwars.blaster_bolt", "%1$s was vaporized");
         add("death.attack.starwars.blaster_bolt.player", "%1$s was vaporized by %2$s");
         add("death.attack.starwars.blaster_bolt.item", "%1$s was vaporized by %2$s using %3$s");

@@ -1,0 +1,121 @@
+#!/usr/bin/env python3
+"""Generate 16x16 RGBA PNG item icon textures for the starwars blaster items.
+
+Reuses the chunk/PNG writer approach from wildwest/tools/gen_textures.py,
+parametrized to a 16x16 canvas (standard flat item-icon size) instead of the
+64x64 humanoid skin layout used for mob textures.
+
+Each icon is a side-profile pixel-art blaster, painted with explicit rect()
+calls: shaded gunmetal body with a top-edge highlight, an angled grip built
+from stacked 2px rects, a muzzle tip, and (rifle only) a wood-brown stock
+with darker underside shading.
+"""
+import struct, zlib, sys, os
+
+W, H = 16, 16
+
+def rect(rgba, x0, y0, x1, y1, color):
+    """Fill (x0..x1, y0..y1) — half-open in x and y — with color."""
+    r, g, b, a = color
+    for y in range(y0, y1):
+        for x in range(x0, x1):
+            if x < 0 or x >= W or y < 0 or y >= H:
+                continue
+            i = 4 * (y * W + x)
+            rgba[i + 0] = r
+            rgba[i + 1] = g
+            rgba[i + 2] = b
+            rgba[i + 3] = a
+
+def write_png(path, rgba):
+    """Write a WxH RGBA PNG from a flat byte buffer."""
+    sig = b'\x89PNG\r\n\x1a\n'
+    def chunk(tag, data):
+        crc = zlib.crc32(tag + data) & 0xffffffff
+        return struct.pack('>I', len(data)) + tag + data + struct.pack('>I', crc)
+
+    ihdr = struct.pack('>IIBBBBB', W, H, 8, 6, 0, 0, 0)  # 8-bit RGBA
+    raw = bytearray()
+    for y in range(H):
+        raw.append(0)  # filter type 'none' per scanline
+        raw.extend(rgba[4*W*y : 4*W*(y+1)])
+    idat = zlib.compress(bytes(raw))
+    iend = b''
+    out = sig + chunk(b'IHDR', ihdr) + chunk(b'IDAT', idat) + chunk(b'IEND', iend)
+    with open(path, 'wb') as f:
+        f.write(out)
+
+# Palette
+GUNMETAL   = (0x2A, 0x2A, 0x30, 0xFF)
+HIGHLIGHT  = (0x55, 0x55, 0x60, 0xFF)
+GRIP_BLACK = (0x18, 0x18, 0x18, 0xFF)
+MUZZLE     = (0x66, 0x30, 0x30, 0xFF)
+SCOPE      = (0x80, 0x80, 0x88, 0xFF)
+STOCK_WOOD = (0x3A, 0x30, 0x28, 0xFF)
+STOCK_DARK = (0x2A, 0x22, 0x1A, 0xFF)
+OUTLINE    = (0x0A, 0x0A, 0x0C, 0xFF)
+
+def gen_blaster_pistol(out_path):
+    rgba = bytearray(W * H * 4)  # fully transparent
+
+    # Body: barrel + frame running left-to-right across the middle rows.
+    rect(rgba, 2, 6, 13, 9, GUNMETAL)
+    # Light edge highlight along the top row of the body.
+    rect(rgba, 2, 6, 13, 7, HIGHLIGHT)
+    # Outline under the body for definition.
+    rect(rgba, 2, 9, 13, 10, OUTLINE)
+
+    # Muzzle tip at the front (right) end of the barrel.
+    rect(rgba, 12, 6, 14, 9, MUZZLE)
+    rect(rgba, 13, 7, 14, 8, HIGHLIGHT)
+
+    # Scope notch — rear sight bump on top of the frame.
+    rect(rgba, 4, 4, 6, 6, SCOPE)
+    rect(rgba, 4, 5, 6, 6, GUNMETAL)
+
+    # Grip: black, angled downward-right, built from stacked 2px rects.
+    rect(rgba, 7, 9, 9, 11, GRIP_BLACK)
+    rect(rgba, 8, 11, 10, 13, GRIP_BLACK)
+    rect(rgba, 9, 13, 11, 15, GRIP_BLACK)
+    # Trigger guard sliver in front of the grip.
+    rect(rgba, 6, 9, 7, 11, OUTLINE)
+
+    write_png(out_path, rgba)
+
+def gen_blaster_rifle(out_path):
+    rgba = bytearray(W * H * 4)  # fully transparent
+
+    # Long body/barrel spanning most of the 16px width.
+    rect(rgba, 1, 6, 15, 8, GUNMETAL)
+    rect(rgba, 1, 6, 15, 7, HIGHLIGHT)
+    rect(rgba, 1, 8, 15, 9, OUTLINE)
+
+    # Barrel tip at the far right.
+    rect(rgba, 14, 6, 16, 8, MUZZLE)
+
+    # Wood-brown stock at the left end, with darker underside shading.
+    rect(rgba, 0, 5, 4, 9, STOCK_WOOD)
+    rect(rgba, 0, 8, 4, 10, STOCK_DARK)
+    rect(rgba, 0, 5, 4, 6, HIGHLIGHT)
+
+    # Folding stock line — thin diagonal seam across the stock.
+    rect(rgba, 2, 6, 3, 7, STOCK_DARK)
+    rect(rgba, 3, 7, 4, 8, STOCK_DARK)
+
+    # Scope notch on top of the receiver.
+    rect(rgba, 8, 3, 11, 5, SCOPE)
+    rect(rgba, 8, 4, 11, 5, GUNMETAL)
+    rect(rgba, 9, 5, 10, 6, GUNMETAL)
+
+    # Grip: black, angled downward-right, built from stacked 2px rects.
+    rect(rgba, 9, 8, 11, 10, GRIP_BLACK)
+    rect(rgba, 10, 10, 12, 12, GRIP_BLACK)
+    rect(rgba, 11, 12, 13, 14, GRIP_BLACK)
+
+    write_png(out_path, rgba)
+
+if __name__ == '__main__':
+    out_dir = sys.argv[1] if len(sys.argv) > 1 else '.'
+    gen_blaster_pistol(os.path.join(out_dir, 'blaster_pistol.png'))
+    gen_blaster_rifle(os.path.join(out_dir, 'blaster_rifle.png'))
+    print('OK')

@@ -18,7 +18,9 @@ public final class ModSounds {
             Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, name)));
     }
 
-    // Sound events land here in later tasks via register("name").
+    public static final DeferredHolder<SoundEvent, SoundEvent> BLASTER_FIRE = register("blaster_fire");
+
+    // More sound events land here in later tasks via register("name").
 
     public static void register(IEventBus modEventBus) {
         SOUNDS.register(modEventBus);

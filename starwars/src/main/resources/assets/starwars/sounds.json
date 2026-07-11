@@ -1,0 +1,9 @@
+{
+  "blaster_fire": {
+    "category": "player",
+    "subtitle": "subtitle.starwars.blaster_fire",
+    "sounds": [
+      { "name": "minecraft:entity.blaze.shoot", "type": "event", "pitch": 1.6 }
+    ]
+  }
+}

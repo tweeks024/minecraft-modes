@@ -4,5 +4,8 @@
   "death.attack.starwars.blaster_bolt.player": "%1$s was vaporized by %2$s",
   "death.attack.starwars.force_lightning": "%1$s was electrocuted by %2$s",
   "death.attack.starwars.lightsaber": "%1$s was cut down by %2$s",
-  "itemGroup.starwars": "Star Wars"
+  "item.starwars.blaster_pistol": "Blaster Pistol",
+  "item.starwars.blaster_rifle": "Blaster Rifle",
+  "itemGroup.starwars": "Star Wars",
+  "subtitle.starwars.blaster_fire": "Blaster fires"
 }
