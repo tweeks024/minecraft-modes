@@ -50,6 +50,33 @@
           ]
         }
       ]
+    },
+    {
+      "rolls": 1.0,
+      "conditions": [
+        {
+          "chance": 0.1,
+          "condition": "random_chance"
+        }
+      ],
+      "entries": [
+        {
+          "type": "item",
+          "name": "starwars:stormtrooper_helmet"
+        },
+        {
+          "type": "item",
+          "name": "starwars:stormtrooper_chestplate"
+        },
+        {
+          "type": "item",
+          "name": "starwars:stormtrooper_leggings"
+        },
+        {
+          "type": "item",
+          "name": "starwars:stormtrooper_boots"
+        }
+      ]
     }
   ]
 }

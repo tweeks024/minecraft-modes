@@ -1,0 +1,29 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "starwars:blaster_pistol"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "II",
+      "RN"
+    ],
+    "key": {
+      "I": {
+        "item": "minecraft:iron_ingot"
+      },
+      "N": {
+        "item": "minecraft:iron_nugget"
+      },
+      "R": {
+        "item": "minecraft:redstone"
+      }
+    },
+    "result": {
+      "item": "starwars:blaster_pistol"
+    }
+  }
+}

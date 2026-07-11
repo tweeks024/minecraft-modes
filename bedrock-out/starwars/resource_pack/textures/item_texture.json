@@ -35,6 +35,18 @@
     "starwars:obi_wan_spawn_egg": {
       "textures": "textures/items/obi_wan_spawn_egg"
     },
+    "starwars:stormtrooper_boots": {
+      "textures": "textures/items/stormtrooper_boots"
+    },
+    "starwars:stormtrooper_chestplate": {
+      "textures": "textures/items/stormtrooper_chestplate"
+    },
+    "starwars:stormtrooper_helmet": {
+      "textures": "textures/items/stormtrooper_helmet"
+    },
+    "starwars:stormtrooper_leggings": {
+      "textures": "textures/items/stormtrooper_leggings"
+    },
     "starwars:stormtrooper_spawn_egg": {
       "textures": "textures/items/stormtrooper_spawn_egg"
     }
