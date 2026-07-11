@@ -77,9 +77,9 @@ public final class NamedCharacterSpawner {
     public static final int TROOPER_ESCORT_COUNT = 3;
     public static final int TROOPER_RING_RADIUS = 4;
 
-    /** Search radius (in chunks) for an Imperial outpost to anchor Vader to. */
+    /** Search radius (in chunks) for a faction structure to anchor a character to. */
     public static final int STRUCTURE_SEARCH_CHUNKS = 100;
-    /** Max block distance from the player at which a found outpost is used as Vader's anchor. */
+    /** Max block distance from the player at which a found structure is used as an anchor. */
     public static final int ANCHOR_MAX_DISTANCE = 256;
 
     /**
@@ -90,6 +90,16 @@ public final class NamedCharacterSpawner {
     private static final TagKey<Structure> IMPERIAL_STRUCTURES = TagKey.create(
         Registries.STRUCTURE,
         Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "imperial"));
+
+    /**
+     * Structure tag for Jedi ruins (Task 29). The heroes (Luke, Obi-Wan) prefer
+     * to appear near an ancient Jedi ruin; falls back to a random spawn when
+     * none is nearby. Same 100-chunk search + 256-block gate as Vader, but no
+     * escort.
+     */
+    private static final TagKey<Structure> JEDI_STRUCTURES = TagKey.create(
+        Registries.STRUCTURE,
+        Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "jedi"));
 
     private static final Set<ResourceKey<Biome>> VADER_BIOMES =
         Set.of(Biomes.DESERT, Biomes.BADLANDS, Biomes.PLAINS);
@@ -111,11 +121,11 @@ public final class NamedCharacterSpawner {
         tickCounter = 0;
 
         tryRollCharacter(sl, VaderSavedData.get(sl.getServer()),
-            ModEntities.DARTH_VADER.get(), VADER_BIOMES, true);
+            ModEntities.DARTH_VADER.get(), VADER_BIOMES, IMPERIAL_STRUCTURES, true);
         tryRollCharacter(sl, LukeSavedData.get(sl.getServer()),
-            ModEntities.LUKE_SKYWALKER.get(), JEDI_BIOMES, false);
+            ModEntities.LUKE_SKYWALKER.get(), JEDI_BIOMES, JEDI_STRUCTURES, false);
         tryRollCharacter(sl, ObiWanSavedData.get(sl.getServer()),
-            ModEntities.OBI_WAN.get(), JEDI_BIOMES, false);
+            ModEntities.OBI_WAN.get(), JEDI_BIOMES, JEDI_STRUCTURES, false);
     }
 
     /** Core roll, shared by all three characters. */
@@ -124,6 +134,7 @@ public final class NamedCharacterSpawner {
             NamedCharacterSavedData data,
             EntityType<T> type,
             Set<ResourceKey<Biome>> biomes,
+            TagKey<Structure> anchorStructures,
             boolean withTrooperEscort) {
         if (data.isAlive()) return;
 
@@ -134,16 +145,15 @@ public final class NamedCharacterSpawner {
         if (players.isEmpty()) return;
         ServerPlayer player = players.get(random.nextInt(players.size()));
 
-        // Vader (the escorted character) musters at an Imperial outpost when one
-        // is near the player; otherwise falls back to a random spawn around the
-        // player. Anchoring re-centers pickSpawnPosition on the outpost.
+        // Each character musters at its faction's structure when one is near the
+        // player (Vader → Imperial outposts, heroes → Jedi ruins); otherwise
+        // falls back to a random spawn around the player. Anchoring re-centers
+        // pickSpawnPosition on the structure.
         BlockPos center = player.blockPosition();
-        if (withTrooperEscort) {
-            BlockPos anchor = level.findNearestMapStructure(
-                IMPERIAL_STRUCTURES, player.blockPosition(), STRUCTURE_SEARCH_CHUNKS, false);
-            if (anchor != null && anchor.closerThan(player.blockPosition(), ANCHOR_MAX_DISTANCE)) {
-                center = anchor;
-            }
+        BlockPos anchor = level.findNearestMapStructure(
+            anchorStructures, player.blockPosition(), STRUCTURE_SEARCH_CHUNKS, false);
+        if (anchor != null && anchor.closerThan(player.blockPosition(), ANCHOR_MAX_DISTANCE)) {
+            center = anchor;
         }
 
         BlockPos pos = pickSpawnPosition(level, center, type,

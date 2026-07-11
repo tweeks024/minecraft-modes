@@ -3,6 +3,7 @@ package com.tweeks.starwars.data;
 import com.tweeks.starwars.StarWarsMod;
 import com.tweeks.starwars.world.EscapePodStructure;
 import com.tweeks.starwars.world.ImperialOutpostStructure;
+import com.tweeks.starwars.world.JediRuinStructure;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
@@ -37,6 +38,14 @@ public final class ModStructureProvider {
         Registries.STRUCTURE_SET,
         Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "imperial_outposts"));
 
+    public static final ResourceKey<Structure> JEDI_RUIN = ResourceKey.create(
+        Registries.STRUCTURE,
+        Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "jedi_ruin"));
+
+    public static final ResourceKey<StructureSet> JEDI_RUIN_SET = ResourceKey.create(
+        Registries.STRUCTURE_SET,
+        Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "jedi_ruins"));
+
     public static void bootstrapStructures(BootstrapContext<Structure> ctx) {
         var biomes = ctx.lookup(Registries.BIOME);
         ctx.register(ESCAPE_POD, new EscapePodStructure(new Structure.StructureSettings(
@@ -54,6 +63,14 @@ public final class ModStructureProvider {
             Map.of(),                                  // no spawn overrides
             GenerationStep.Decoration.SURFACE_STRUCTURES,
             TerrainAdjustment.BEARD_THIN)));
+
+        ctx.register(JEDI_RUIN, new JediRuinStructure(new Structure.StructureSettings(
+            HolderSet.direct(
+                biomes.getOrThrow(Biomes.FOREST),
+                biomes.getOrThrow(Biomes.JUNGLE)),
+            Map.of(),                                  // no spawn overrides
+            GenerationStep.Decoration.SURFACE_STRUCTURES,
+            TerrainAdjustment.BEARD_THIN)));
     }
 
     public static void bootstrapSets(BootstrapContext<StructureSet> ctx) {
@@ -65,5 +82,9 @@ public final class ModStructureProvider {
         ctx.register(IMPERIAL_OUTPOST_SET, new StructureSet(
             structures.getOrThrow(IMPERIAL_OUTPOST),
             new RandomSpreadStructurePlacement(40, 12, RandomSpreadType.LINEAR, 1977100502)));
+
+        ctx.register(JEDI_RUIN_SET, new StructureSet(
+            structures.getOrThrow(JEDI_RUIN),
+            new RandomSpreadStructurePlacement(40, 12, RandomSpreadType.LINEAR, 1977100503)));
     }
 }

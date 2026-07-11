@@ -31,6 +31,13 @@ public final class ModStructures {
         STRUCTURE_PIECES.register("imperial_outpost",
             () -> (StructurePieceType) ImperialOutpostPiece::new);
 
+    public static final DeferredHolder<StructureType<?>, StructureType<JediRuinStructure>> JEDI_RUIN_TYPE =
+        STRUCTURE_TYPES.register("jedi_ruin", () -> () -> JediRuinStructure.CODEC);
+
+    public static final DeferredHolder<StructurePieceType, StructurePieceType> JEDI_RUIN_PIECE =
+        STRUCTURE_PIECES.register("jedi_ruin",
+            () -> (StructurePieceType) JediRuinPiece::new);
+
     public static void register(IEventBus modEventBus) {
         STRUCTURE_TYPES.register(modEventBus);
         STRUCTURE_PIECES.register(modEventBus);

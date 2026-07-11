@@ -1,0 +1,14 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 1977100503,
+    "separation": 12,
+    "spacing": 40
+  },
+  "structures": [
+    {
+      "structure": "starwars:jedi_ruin",
+      "weight": 1
+    }
+  ]
+}
