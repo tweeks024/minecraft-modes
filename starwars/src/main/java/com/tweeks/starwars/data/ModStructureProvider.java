@@ -2,6 +2,7 @@ package com.tweeks.starwars.data;
 
 import com.tweeks.starwars.StarWarsMod;
 import com.tweeks.starwars.world.EscapePodStructure;
+import com.tweeks.starwars.world.ImperialOutpostStructure;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
@@ -28,12 +29,28 @@ public final class ModStructureProvider {
         Registries.STRUCTURE_SET,
         Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "escape_pods"));
 
+    public static final ResourceKey<Structure> IMPERIAL_OUTPOST = ResourceKey.create(
+        Registries.STRUCTURE,
+        Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "imperial_outpost"));
+
+    public static final ResourceKey<StructureSet> IMPERIAL_OUTPOST_SET = ResourceKey.create(
+        Registries.STRUCTURE_SET,
+        Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "imperial_outposts"));
+
     public static void bootstrapStructures(BootstrapContext<Structure> ctx) {
         var biomes = ctx.lookup(Registries.BIOME);
         ctx.register(ESCAPE_POD, new EscapePodStructure(new Structure.StructureSettings(
             HolderSet.direct(
                 biomes.getOrThrow(Biomes.PLAINS),
                 biomes.getOrThrow(Biomes.DESERT)),
+            Map.of(),                                  // no spawn overrides
+            GenerationStep.Decoration.SURFACE_STRUCTURES,
+            TerrainAdjustment.BEARD_THIN)));
+
+        ctx.register(IMPERIAL_OUTPOST, new ImperialOutpostStructure(new Structure.StructureSettings(
+            HolderSet.direct(
+                biomes.getOrThrow(Biomes.DESERT),
+                biomes.getOrThrow(Biomes.BADLANDS)),
             Map.of(),                                  // no spawn overrides
             GenerationStep.Decoration.SURFACE_STRUCTURES,
             TerrainAdjustment.BEARD_THIN)));
@@ -44,5 +61,9 @@ public final class ModStructureProvider {
         ctx.register(ESCAPE_POD_SET, new StructureSet(
             structures.getOrThrow(ESCAPE_POD),
             new RandomSpreadStructurePlacement(24, 8, RandomSpreadType.LINEAR, 1977100501)));
+
+        ctx.register(IMPERIAL_OUTPOST_SET, new StructureSet(
+            structures.getOrThrow(IMPERIAL_OUTPOST),
+            new RandomSpreadStructurePlacement(40, 12, RandomSpreadType.LINEAR, 1977100502)));
     }
 }

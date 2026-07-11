@@ -9,7 +9,10 @@ import com.tweeks.starwars.entity.StormtrooperEntity;
 import com.tweeks.starwars.entity.SwMob;
 import com.tweeks.starwars.entity.VaderSavedData;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.TagKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
@@ -23,6 +26,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.levelgen.structure.Structure;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
@@ -73,6 +77,20 @@ public final class NamedCharacterSpawner {
     public static final int TROOPER_ESCORT_COUNT = 3;
     public static final int TROOPER_RING_RADIUS = 4;
 
+    /** Search radius (in chunks) for an Imperial outpost to anchor Vader to. */
+    public static final int STRUCTURE_SEARCH_CHUNKS = 100;
+    /** Max block distance from the player at which a found outpost is used as Vader's anchor. */
+    public static final int ANCHOR_MAX_DISTANCE = 256;
+
+    /**
+     * Structure tag for Imperial outposts (Task 28). Hoisted to a field so the
+     * per-tick Vader roll doesn't rebuild it. Vader prefers to muster at a
+     * garrison; falls back to a random spawn when none is nearby.
+     */
+    private static final TagKey<Structure> IMPERIAL_STRUCTURES = TagKey.create(
+        Registries.STRUCTURE,
+        Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "imperial"));
+
     private static final Set<ResourceKey<Biome>> VADER_BIOMES =
         Set.of(Biomes.DESERT, Biomes.BADLANDS, Biomes.PLAINS);
     private static final Set<ResourceKey<Biome>> JEDI_BIOMES =
@@ -116,7 +134,19 @@ public final class NamedCharacterSpawner {
         if (players.isEmpty()) return;
         ServerPlayer player = players.get(random.nextInt(players.size()));
 
-        BlockPos pos = pickSpawnPosition(level, player.blockPosition(), type,
+        // Vader (the escorted character) musters at an Imperial outpost when one
+        // is near the player; otherwise falls back to a random spawn around the
+        // player. Anchoring re-centers pickSpawnPosition on the outpost.
+        BlockPos center = player.blockPosition();
+        if (withTrooperEscort) {
+            BlockPos anchor = level.findNearestMapStructure(
+                IMPERIAL_STRUCTURES, player.blockPosition(), STRUCTURE_SEARCH_CHUNKS, false);
+            if (anchor != null && anchor.closerThan(player.blockPosition(), ANCHOR_MAX_DISTANCE)) {
+                center = anchor;
+            }
+        }
+
+        BlockPos pos = pickSpawnPosition(level, center, type,
             MIN_DISTANCE, MAX_DISTANCE, random);
         if (pos == null) return;
 

@@ -1,0 +1,10 @@
+{
+  "type": "starwars:imperial_outpost",
+  "biomes": [
+    "minecraft:desert",
+    "minecraft:badlands"
+  ],
+  "spawn_overrides": {},
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin"
+}

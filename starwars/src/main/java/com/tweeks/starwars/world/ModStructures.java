@@ -24,6 +24,13 @@ public final class ModStructures {
         STRUCTURE_PIECES.register("escape_pod",
             () -> (StructurePieceType) EscapePodPiece::new);
 
+    public static final DeferredHolder<StructureType<?>, StructureType<ImperialOutpostStructure>> IMPERIAL_OUTPOST_TYPE =
+        STRUCTURE_TYPES.register("imperial_outpost", () -> () -> ImperialOutpostStructure.CODEC);
+
+    public static final DeferredHolder<StructurePieceType, StructurePieceType> IMPERIAL_OUTPOST_PIECE =
+        STRUCTURE_PIECES.register("imperial_outpost",
+            () -> (StructurePieceType) ImperialOutpostPiece::new);
+
     public static void register(IEventBus modEventBus) {
         STRUCTURE_TYPES.register(modEventBus);
         STRUCTURE_PIECES.register(modEventBus);
