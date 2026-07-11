@@ -19,7 +19,9 @@ public class EscapePodStructure extends Structure {
     protected Optional<GenerationStub> findGenerationPoint(GenerationContext context) {
         return onTopOfChunkCenter(context, Heightmap.Types.WORLD_SURFACE_WG,
             builder -> builder.addPiece(new EscapePodPiece(
-                context.chunkPos().getMiddleBlockPosition(0))));
+                context.random(),
+                context.chunkPos().getMinBlockX(),
+                context.chunkPos().getMinBlockZ())));
     }
 
     @Override
