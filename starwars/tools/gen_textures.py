@@ -142,10 +142,51 @@ def paint_jedi_knight(rgba):
     rect(rgba, 32, 32, 64, 48, ROBE)       # robe skirt region (u32.., v32..)
     rect(rgba, 32, 45, 64, 48, ROBE_S)
 
+# Darth Vader: near-black armored suit, gloss highlights, silver eye lenses,
+# dark-gray aerator, a colored-button chest panel, and a fold-striped cape.
+VADER_BASE    = (0x14, 0x14, 0x18, 0xFF)
+VADER_GLOSS   = (0x2E, 0x2E, 0x38, 0xFF)
+VADER_LIMB    = (0x1E, 0x1E, 0x24, 0xFF)
+VADER_JOINT   = (0x0A, 0x0A, 0x0C, 0xFF)
+VADER_EYE     = (0x9A, 0x9A, 0xA4, 0xFF)
+VADER_AERATOR = (0x50, 0x50, 0x58, 0xFF)
+VADER_PANEL   = (0x3A, 0x3A, 0x42, 0xFF)
+VADER_RED     = (0xC0, 0x30, 0x30, 0xFF)
+
+def paint_darth_vader(rgba):
+    fill(rgba, VADER_BASE)
+    # Head front (u 8..16, v 8..16): faceplate with silver eye lenses +
+    # a dark-gray aerator block suggesting the triangular mouth grille.
+    rect(rgba, 9, 10, 11, 11, VADER_EYE)         # left eye lens
+    rect(rgba, 13, 10, 15, 11, VADER_EYE)        # right eye lens
+    rect(rgba, 10, 12, 14, 15, VADER_AERATOR)    # aerator
+    # Helmet-overlay region (u 32..64, v 0..16): dome + flare, gloss top highlight.
+    rect(rgba, 32, 0, 64, 1, VADER_GLOSS)        # dome top gloss
+    # Cape UV footprint (u 44..64, v 32..53): flat near-black with vertical
+    # fold stripes every 3px.
+    for x in range(44, 64, 3):
+        rect(rgba, x, 32, x + 1, 53, VADER_LIMB)
+    # Chest-panel UV footprint (u 56..64, v 54..58): panel plate + 3 buttons
+    # (red, silver, red).
+    rect(rgba, 56, 54, 64, 58, VADER_PANEL)
+    rect(rgba, 57, 55, 58, 56, VADER_RED)
+    rect(rgba, 59, 55, 60, 56, VADER_EYE)
+    rect(rgba, 61, 55, 62, 56, VADER_RED)
+    # Arms/legs: charcoal with black joint seams + gloss shoulder/hip highlight.
+    for (u0, v0) in ((40, 16), (32, 48), (0, 16), (16, 48)):
+        rect(rgba, u0, v0, u0 + 16, v0 + 16, VADER_LIMB)
+        rect(rgba, u0, v0 + 6, u0 + 16, v0 + 7, VADER_JOINT)   # elbow/knee seam
+        rect(rgba, u0, v0, u0 + 16, v0 + 1, VADER_GLOSS)       # shoulder/hip top gloss
+        rect(rgba, u0, v0 + 14, u0 + 16, v0 + 16, VADER_BASE)  # lower shade
+    # Global shading pass: darken the right/bottom edge of head + body.
+    rect(rgba, 30, 8, 32, 16, VADER_JOINT)
+    rect(rgba, 16, 30, 40, 32, VADER_JOINT)
+
 MOBS = {
     'stormtrooper': paint_stormtrooper,
     'battle_droid': paint_battle_droid,
     'jedi_knight': paint_jedi_knight,
+    'darth_vader': paint_darth_vader,
 }
 
 if __name__ == '__main__':

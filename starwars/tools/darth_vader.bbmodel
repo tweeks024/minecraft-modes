@@ -1,0 +1,456 @@
+{
+  "meta": {
+    "format_version": "4.5",
+    "model_format": "modded_entity",
+    "box_uv": true
+  },
+  "name": "darth_vader",
+  "model_identifier": "",
+  "visible_box": [
+    4,
+    4,
+    0
+  ],
+  "variable_placeholders": "",
+  "variable_placeholder_buttons": [],
+  "unhandled_root_fields": {},
+  "resolution": {
+    "width": 64,
+    "height": 64
+  },
+  "elements": [
+    {
+      "name": "head",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -4,
+        24,
+        -4
+      ],
+      "to": [
+        4,
+        32,
+        4
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        0,
+        0
+      ],
+      "type": "cube",
+      "uuid": "06aadc7f-e075-5b2d-8892-43574502e58b"
+    },
+    {
+      "name": "body",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -4,
+        12,
+        -2
+      ],
+      "to": [
+        4,
+        24,
+        2
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        16,
+        16
+      ],
+      "type": "cube",
+      "uuid": "5ca5a753-e817-50e4-87d1-773329230d2f"
+    },
+    {
+      "name": "right_arm",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -8,
+        12,
+        -2
+      ],
+      "to": [
+        -4,
+        24,
+        2
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        -5,
+        22,
+        0
+      ],
+      "uv_offset": [
+        40,
+        16
+      ],
+      "type": "cube",
+      "uuid": "40de00cd-b4f1-5bea-bf3e-7323a22a1336"
+    },
+    {
+      "name": "left_arm",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        4,
+        12,
+        -2
+      ],
+      "to": [
+        8,
+        24,
+        2
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        5,
+        22,
+        0
+      ],
+      "uv_offset": [
+        32,
+        48
+      ],
+      "type": "cube",
+      "uuid": "27f367f9-1f0f-54cd-b9d3-8aca17a9764f"
+    },
+    {
+      "name": "right_leg",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -3.9,
+        0,
+        -2
+      ],
+      "to": [
+        0.10000000000000009,
+        12,
+        2
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        -1.9,
+        12,
+        0
+      ],
+      "uv_offset": [
+        0,
+        16
+      ],
+      "type": "cube",
+      "uuid": "ffe43d2a-b829-51b0-bd9c-8b585d60c30d"
+    },
+    {
+      "name": "left_leg",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -0.10000000000000009,
+        0,
+        -2
+      ],
+      "to": [
+        3.9,
+        12,
+        2
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        1.9,
+        12,
+        0
+      ],
+      "uv_offset": [
+        16,
+        48
+      ],
+      "type": "cube",
+      "uuid": "a13d01df-af98-513a-a51e-71b6fb1bdcea"
+    },
+    {
+      "name": "helmet_dome",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -4.0,
+        24.0,
+        -4.0
+      ],
+      "to": [
+        4.0,
+        32.0,
+        4.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        32,
+        0
+      ],
+      "type": "cube",
+      "uuid": "918e3226-8cfd-5ad9-b953-12b255db44fa",
+      "inflate": 0.7
+    },
+    {
+      "name": "helmet_flare",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -5.0,
+        24.0,
+        -5.0
+      ],
+      "to": [
+        5.0,
+        26.0,
+        5.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        32,
+        16
+      ],
+      "type": "cube",
+      "uuid": "b9852164-ff31-5455-af11-4a3fad7ef083"
+    },
+    {
+      "name": "cape",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -4.5,
+        4.0,
+        2.1
+      ],
+      "to": [
+        4.5,
+        24.0,
+        3.1
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        44,
+        32
+      ],
+      "type": "cube",
+      "uuid": "2b2b3d74-1253-5e8b-8465-5a35ab1f5c30"
+    },
+    {
+      "name": "chest_panel",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -2.0,
+        18.0,
+        -2.6
+      ],
+      "to": [
+        2.0,
+        21.0,
+        -1.6
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        56,
+        54
+      ],
+      "type": "cube",
+      "uuid": "b32683be-5cac-5ed6-8553-9e5470bf9028"
+    }
+  ],
+  "outliner": [
+    {
+      "name": "head",
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "color": 0,
+      "uuid": "ee1d8da4-c03c-53a6-95fb-ada7bbf3fabf",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "06aadc7f-e075-5b2d-8892-43574502e58b",
+        "5ca5a753-e817-50e4-87d1-773329230d2f",
+        "918e3226-8cfd-5ad9-b953-12b255db44fa",
+        "b9852164-ff31-5455-af11-4a3fad7ef083",
+        "2b2b3d74-1253-5e8b-8465-5a35ab1f5c30",
+        "b32683be-5cac-5ed6-8553-9e5470bf9028"
+      ]
+    },
+    {
+      "name": "body",
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "color": 0,
+      "uuid": "8fc655fa-b9e8-591c-8f1f-aeda094cc08f",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": []
+    },
+    {
+      "name": "right_arm",
+      "origin": [
+        -5,
+        22,
+        0
+      ],
+      "color": 0,
+      "uuid": "41860709-ebfe-5914-a9f5-9c3ff315f20d",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "40de00cd-b4f1-5bea-bf3e-7323a22a1336"
+      ]
+    },
+    {
+      "name": "left_arm",
+      "origin": [
+        5,
+        22,
+        0
+      ],
+      "color": 0,
+      "uuid": "e672029c-5fd0-56cf-8a98-b2853f554455",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "27f367f9-1f0f-54cd-b9d3-8aca17a9764f"
+      ]
+    },
+    {
+      "name": "right_leg",
+      "origin": [
+        -1.9,
+        12,
+        0
+      ],
+      "color": 0,
+      "uuid": "eae909c5-a296-512e-8953-c4397ea5d056",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "ffe43d2a-b829-51b0-bd9c-8b585d60c30d"
+      ]
+    },
+    {
+      "name": "left_leg",
+      "origin": [
+        1.9,
+        12,
+        0
+      ],
+      "color": 0,
+      "uuid": "c2b549af-577d-5cd2-9ab2-ebeecbf4c965",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "a13d01df-af98-513a-a51e-71b6fb1bdcea"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "path": "/Users/tweeks/code/minecraft-mods/starwars/src/main/resources/assets/starwars/textures/entity/darth_vader.png",
+      "name": "darth_vader.png",
+      "folder": "entity",
+      "namespace": "starwars",
+      "id": "0",
+      "particle": false,
+      "render_mode": "default",
+      "render_sides": "auto",
+      "frame_time": 1,
+      "frame_order_type": "loop",
+      "frame_order": "",
+      "frame_interpolate": false,
+      "visible": true,
+      "internal": true,
+      "saved": true,
+      "uuid": "4f1a57ff-e95c-5813-beed-9a7795398b2c",
+      "relative_path": "../src/main/resources/assets/starwars/textures/entity/darth_vader.png",
+      "use_as_default": false,
+      "layers_enabled": false,
+      "sync_to_project": "",
+      "width": 64,
+      "height": 64,
+      "uv_width": 64,
+      "uv_height": 64,
+      "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAA+0lEQVR4nO3avQ6CMBSG4c7EkcGJyZkwGkavgNFr68yFeGcYmpjIoIm2Jx/lvMMbZfLwpOGnMbTteVHW91dpQQ2gDgD1AOoAUA+gDgD1AOpkAE1zSgFQA0CMc+rT8eEB3K+AtWm6bwIAAGcApdsNQO77tPWA1vOFrrssOVkDWM8HAAAAOAd43Y7+zRrAej5WAAAAAAAAAJ4BcgfMvU+rnzMAsP6B0r0v6xLfAVCfEAAAAAAAAAAAAAAAAAAAAAA1Aqj/7y8H+GV/ziIAAAAAgJx2vy2eu20+jrevHX4FrCf5GIb0GeO8OXYD4H4FuAYwvwgCAIBzgNpzD/AE7zeRgya/pEYAAAAASUVORK5CYII="
+    }
+  ]
+}

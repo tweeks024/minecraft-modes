@@ -64,6 +64,22 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
                 .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
                     .when(LootItemRandomChanceCondition.randomChance(0.10f))
                     .add(LootItem.lootTableItem(Registration.LIGHTSABER.get()))));
+
+        // Darth Vader: 2-4 obsidian @100% (a boss-tier material haul, no
+        // nether_star). A 30% red-lightsaber drop was planned, but this MC
+        // version has no component-setting loot function (grepped
+        // "SetComponents|set_components" across wildwest/ and craftee/ with
+        // no hits — see LootItemFunction/SetItemCountFunction/SetItemDamageFunction
+        // siblings for what *is* available), and LightsaberItem.stackWithColor's
+        // color lives in a data component with no setter loot function to pin it
+        // to red — a plain LootItem drop would render blue (index 0) by default,
+        // which is wrong for "Vader's saber". Falling back to obsidian-only per
+        // the task brief until a component-setting loot function exists.
+        this.add(ModEntities.DARTH_VADER.get(),
+            LootTable.lootTable()
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.OBSIDIAN)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0f, 4.0f))))));
     }
 
     @Override
@@ -71,7 +87,8 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
         Set<EntityType<?>> known = Set.of(
             ModEntities.STORMTROOPER.get(),
             ModEntities.BATTLE_DROID.get(),
-            ModEntities.JEDI_KNIGHT.get()
+            ModEntities.JEDI_KNIGHT.get(),
+            ModEntities.DARTH_VADER.get()
         );
         return BuiltInRegistries.ENTITY_TYPE.stream().filter(known::contains);
     }

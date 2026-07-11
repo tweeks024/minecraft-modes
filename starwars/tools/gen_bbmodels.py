@@ -74,10 +74,18 @@ JEDI_KNIGHT_ACCESSORIES = [
     ('hood',       HEAD_BONE, (-4.0, -8.0, -4.0, 8, 8, 8), (32, 0), 0.5),
 ]
 
+DARTH_VADER_ACCESSORIES = [
+    ('helmet_dome',  HEAD_BONE, (-4.0, -8.0, -4.0, 8, 8, 8),  (32, 0), 0.7),
+    ('helmet_flare', HEAD_BONE, (-5.0, -2.0, -5.0, 10, 2, 10),(32, 16), 0.0),
+    ('cape',         BODY_BONE, (-4.5,  0.0,  2.1, 9, 20, 1), (44, 32), 0.0),
+    ('chest_panel',  BODY_BONE, (-2.0,  3.0, -2.6, 4, 3, 1),  (56, 54), 0.0),
+]
+
 MOBS = {
     'stormtrooper': HUMANOID_CUBES + STORMTROOPER_ACCESSORIES,
     'battle_droid': BATTLE_DROID_CUBES,
     'jedi_knight': HUMANOID_CUBES + JEDI_KNIGHT_ACCESSORIES,
+    'darth_vader': HUMANOID_CUBES + DARTH_VADER_ACCESSORIES,
 }
 
 
