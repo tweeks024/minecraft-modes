@@ -53,12 +53,13 @@ State machine (single field — unit-testable as pure logic in a `QuickdrawState
 - `canUse()` = Han `usesBlaster()` && has a living, visible target && target UUID `!= lastAmbushedTargetId`.
 - On `start()`: windup counter = `QUICKDRAW_WINDUP_TICKS = 8`.
 - On windup expiry: fire via `BlasterPistolItem.fireFromMob(mob, target, 2 * BlasterPistolItem.DAMAGE, color)` (the same static entry point `BlasterAttackGoal.tick()` uses, with doubled damage), record the target UUID into `lastAmbushedTargetId`, and stop.
+- The goal sets `Flag.LOOK` (same flag set as `BlasterAttackGoal`), so at priority 1 it cleanly suspends the priority-2 blaster goal during the windup — no normal bolt can fire mid-windup, and `BlasterAttackGoal.start()` resetting its cooldown to 30 ticks means no double-tap on handoff.
 - Re-acquiring a *different* target re-arms the quickdraw; re-acquiring the *same* target does not (only one ambush per continuous acquaintance; the single-field memory means switching back and forth re-arms, which is acceptable and keeps the state trivially small).
 
 ### 3.4 Spawning, egg, alignment
 
 - Joins `NamedCharacterSpawner` with one added `tryRollCharacter(sl, HanSavedData.get(...), ModEntities.HAN_SOLO.get(), JEDI_BIOMES, JEDI_STRUCTURES, false)` line — same biomes/anchor as Luke/Obi-Wan, no escort. Existing constants (`CHECK_INTERVAL_TICKS = 1200`, `SPAWN_CHANCE = 0.15f`) are untouched.
-- Spawn egg registered in `Registration` following the existing egg pattern; colors: base `0xE8E0D0` (off-white shirt), accents `0x2B2B2B` (black vest).
+- Spawn egg registered in `Registration` following the existing egg pattern (plain `DeferredItem<SpawnEggItem>` — no colors at registration in this version). Colors go in the `EGGS` table in `starwars/tools/gen_spawn_eggs.py` as an `(primary, secondary)` RGB tuple: base `0xE8E0D0` (off-white shirt), accents `0x2B2B2B` (black vest).
 - Alignment: **no new alignment code.** As a `SwFaction.LIGHT` combatant he automatically inherits the existing deltas (`Alignment.deltaForKill(LIGHT) = -5`, hit = −1) — killing Han pushes the player toward the Empire exactly as killing Luke does.
 
 ### 3.5 Art
@@ -87,7 +88,7 @@ Identical pattern to §3.2 with `LeiaSavedData`, `FILE_ID = "starwars_leia"`.
 
 - **Cadence:** at most one pulse per `RALLY_INTERVAL_TICKS = 240` (12 s), tracked by a cooldown counter inside the goal.
 - **Trigger (`canUse()`):** cooldown elapsed **and** combat is happening nearby — Leia herself has a target, or at least one eligible ally within radius has an attack target.
-- **Pulse effect:** every eligible ally within `RALLY_RADIUS = 12.0` blocks receives Strength I + Regeneration I for `RALLY_DURATION_TICKS = 160` (8 s).
+- **Pulse effect:** every eligible ally within `RALLY_RADIUS = 12.0` blocks receives **Resistance I + Regeneration I** for `RALLY_DURATION_TICKS = 160` (8 s). Resistance (not Strength) because blaster damage in this codebase is a flat constant passed straight to `hurtServer(...)` — it never reads the `ATTACK_DAMAGE` attribute Strength modifies, so Strength would be a silent no-op for every blaster-wielding ally (Han, Leia herself). Resistance is applied on the *victim* side of the damage pipeline and benefits everyone.
 - **Eligible allies:** (a) any `SwCombatant` mob whose `getFaction() == SwFaction.LIGHT` (includes Leia herself), and (b) any player whose alignment score is **strictly positive** (score > 0 — a neutral score of 0 does not qualify). Alignment is read through the existing `AlignmentAttachment` accessor used by `SwTargetGoal`/`AlignmentEvents`.
 - **Feedback:** a ring of `ParticleTypes.END_ROD` particles at the rally radius edge (server-side `ServerLevel.sendParticles`, ~24 points around the circle at Leia's Y + 1) and vanilla `SoundEvents.BEACON_ACTIVATE` at 1.4 pitch, 0.8 volume. No new audio assets.
 - **Pure logic extraction:** target-eligibility predicate and cooldown arithmetic live in a static-method helper `RallyMath` (package `faction` or `entity.ai`) so unit tests cover faction filtering, the score > 0 boundary, and radius math without engine classes.
@@ -95,7 +96,7 @@ Identical pattern to §3.2 with `LeiaSavedData`, `FILE_ID = "starwars_leia"`.
 ### 4.4 Spawning, egg, alignment, art
 
 - One added `tryRollCharacter(...)` line with `LeiaSavedData`, `JEDI_BIOMES`, `JEDI_STRUCTURES`, no escort.
-- Spawn egg colors: base `0xF2EEE6` (white robes), accents `0x5A4030` (brown hair).
+- Spawn egg colors (in the `gen_spawn_eggs.py` `EGGS` table, per §3.4): base `0xF2EEE6` (white robes), accents `0x5A4030` (brown hair).
 - Alignment: inherited LIGHT deltas, no new code.
 - Art: `princess_leia.bbmodel` — **side hair buns modeled as geometry** (two cubes flanking the head; this is the mandatory silhouette feature), white senatorial robe with belt detail, 3+ tones.
 
@@ -112,7 +113,7 @@ Faction AI ignores it: it is not a `SwCombatant`, so `SwTargetGoal` never target
 ### 5.2 Ride plumbing (boat pattern — lift from decompiled `AbstractBoat`)
 
 - `getControllingPassenger()` returns the first passenger when it is a `Player` (boat behavior).
-- **Client-simulated driving:** when `isControlledByLocalInstance()`, the driving client runs the physics tick and the engine's standard vehicle-move packet sync propagates position — exactly the mechanism that makes vanilla boats feel responsive. Rider input (forward/strafe) is read the way `AbstractBoat` reads its controlling player's input in this version.
+- **Client-simulated driving:** when `isLocalInstanceAuthoritative()` (the current name of the boat-era `isControlledByLocalInstance` — `Entity.java:3508` in the decompiled 26.1.2 sources), the driving client runs the physics tick and the engine's standard vehicle-move packet sync propagates position — exactly the mechanism that makes vanilla boats feel responsive. Rider input (forward/strafe) is read the way `AbstractBoat` reads its controlling player's input in this version.
 - Two seats: driver at the front cockpit position, passenger behind; `positionRider` offsets derive from the bbmodel geometry. `getMaxPassengers() = 2` (or the version's equivalent hook).
 - Interaction: right-click boards (driver seat first, then passenger); dismount via the normal sneak-dismount path.
 - Riders take **no fall damage** while seated (the speeder zeroes `fallDistance` for itself and its passengers each tick; note this version uses direct field assignment `entity.fallDistance = 0`).
@@ -132,6 +133,7 @@ All tuning constants live in `LandspeederEntity`; the math lives in a static pur
 
 - `MAX_HULL_HEALTH = 40.0f`, tracked as a synched entity data float (plus the base vehicle class's built-in hurt wobble for feedback).
 - Any damage source hurts it (creative-player punch instant-breaks, mirroring boats). No regeneration — hull health only goes down (YAGNI).
+- **Hull health persists across chunk reloads:** saved/loaded via the version's `ValueInput`/`ValueOutput` save-data hooks (precedent: `NullRiftEntity` in wildwest). Without this, a reload would silently restore full health, contradicting the no-regeneration rule.
 - At ≤ 0: eject all passengers, spawn a burst of `ParticleTypes.LARGE_SMOKE` + `ParticleTypes.CRIT`, play `SoundEvents.IRON_GOLEM_DEATH` (1.3 pitch), drop one landspeeder item (skipped when broken by a creative-mode player, boat-style), discard the entity.
 - Hurt feedback sound: `SoundEvents.IRON_GOLEM_HURT` at 1.2 pitch. No new audio assets anywhere in this feature.
 
@@ -155,9 +157,11 @@ All tuning constants live in `LandspeederEntity`; the math lives in a static pur
 
 ## 6. Bedrock translation
 
-- **Han/Leia:** flow through the existing translator entity pipeline (superclass goal walking picks up the `SwMob` goal set). `HanQuickdrawGoal` and `LeiaRallyGoal` are custom goals → emitted as script goals where the existing machinery supports the pattern; anything unresolvable gets an honest `UNTRANSLATABLE.md` entry. Singleton SavedData behavior is already documented as untranslatable for the other four named characters; Han/Leia join those entries.
-- **Landspeeder:** the translator gains a minimal **vehicle path**: an entity that is not a `Mob` but is registered with ride plumbing is emitted as a Bedrock behavior entity with `minecraft:rideable` (2 seats, driver first), `minecraft:input_ground_controlled`, `minecraft:movement` derived from `MAX_SPEED`, and `minecraft:health` from `MAX_HULL_HEALTH`. Scope guard: this path may key specifically off `LandspeederEntity` rather than generically detecting any vehicle (one known consumer — YAGNI on generalization), but must live in the translator, not as hand-edits to `bedrock-out/`.
-- **Documented Bedrock deviations:** ground-driven instead of hover; no banking/bob visuals; item-place-to-spawn approximated (Bedrock spawn-egg-like item or scripted item use — whichever the existing item pipeline supports); crafting recipe emitted only if the translator already has recipe support, otherwise listed in `UNTRANSLATABLE.md`.
+- **Han/Leia:** flow through the existing translator entity pipeline (superclass goal walking picks up the `SwMob` goal set). `HanQuickdrawGoal` and `LeiaRallyGoal` are custom goals → like the six existing custom goals in `bedrock-out/starwars/behavior_pack/scripts/goals/`, they emit as cache-miss TODO stubs unless a `:translate --with-llm` run is made; either state is recorded honestly in `UNTRANSLATABLE.md`. (Running `--with-llm` to fill all eight stubs is an optional follow-up, not a gate for this feature.)
+- **Singleton honesty fix (pre-existing gap):** `bedrock-out/starwars/UNTRANSLATABLE.md` currently has **no** entry about singleton SavedData uniqueness for the four existing named characters. This expansion adds singleton-uniqueness entries for **all six** named characters (Vader, Luke, Obi-Wan, Boba Fett, Han, Leia) — Bedrock output has no equivalent of the per-server one-alive guarantee.
+- **Landspeeder:** the translator gains a minimal **vehicle path**. Verified current behavior: `EntityAnalyzer` does *not* skip a non-`Mob` `VehicleEntity` subclass — it would emit it as a walking mob (walk navigation, static jump, pushable, no seats). The vehicle path must therefore **replace the default component set**, not layer on top of it: emit `minecraft:rideable` (2 seats, driver first) + `minecraft:input_ground_controlled` + `minecraft:movement` + `minecraft:health`, and suppress the walking-mob defaults. Because the landspeeder has no attributes (the usual source for movement/health components), the path reads `MAX_SPEED` and `MAX_HULL_HEALTH` as static constants from the entity class (the constant-folding machinery already exists). Scope guard: this path may key specifically off `LandspeederEntity` rather than generically detecting any vehicle (one known consumer — YAGNI on generalization), but must live in the translator, not as hand-edits to `bedrock-out/`.
+- **Recipe:** the translator already emits shaped recipes (`RecipeTransform.kt`, `minecraft:recipe_shaped`; six starwars recipes are in `bedrock-out/starwars/behavior_pack/recipes/` today) — the landspeeder recipe **will** be emitted, firmly in scope.
+- **Documented Bedrock deviations:** ground-driven instead of hover; no banking/bob visuals; item-place-to-spawn approximated (Bedrock spawn-egg-like item or scripted item use — whichever the existing item pipeline supports).
 - Regenerate `bedrock-out/starwars/` and commit; **never touch** other modules' `bedrock-out/` trees.
 
 ## 7. Testing
@@ -185,7 +189,9 @@ starwars/src/main/java/com/tweeks/starwars/
   item/LandspeederItem.java
   client/model/ + client/renderer/ for all three new entities
 Modified: ModEntities, Registration, NamedCharacterSpawner, ClientSetup,
-          lang/model/loot/recipe data providers, tools/gen_* scripts.
+          lang/loot/recipe data providers, asset JSON (no model datagen
+          provider exists — models come from the Python tools + hand-authored
+          JSON), tools/gen_* scripts.
 ```
 
 ## 9. Open items intentionally deferred
