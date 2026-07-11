@@ -63,6 +63,14 @@ public final class ModEntities {
             .build(ResourceKey.create(Registries.ENTITY_TYPE,
                 Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "obi_wan"))));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<com.tweeks.starwars.entity.BobaFettEntity>> BOBA_FETT =
+        ENTITY_TYPES.register("boba_fett", () -> EntityType.Builder.<com.tweeks.starwars.entity.BobaFettEntity>of(
+                com.tweeks.starwars.entity.BobaFettEntity::new, MobCategory.MONSTER)
+            .sized(0.6f, 1.95f)
+            .clientTrackingRange(10)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "boba_fett"))));
+
     public static final DeferredHolder<EntityType<?>, EntityType<com.tweeks.starwars.entity.AstromechEntity>> ASTROMECH =
         ENTITY_TYPES.register("astromech", () -> EntityType.Builder.<com.tweeks.starwars.entity.AstromechEntity>of(
                 com.tweeks.starwars.entity.AstromechEntity::new, MobCategory.CREATURE)

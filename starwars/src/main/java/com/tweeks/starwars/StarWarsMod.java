@@ -63,6 +63,8 @@ public class StarWarsMod {
             com.tweeks.starwars.entity.LukeSkywalkerEntity.createAttributes().build());
         event.put(ModEntities.OBI_WAN.get(),
             com.tweeks.starwars.entity.ObiWanEntity.createAttributes().build());
+        event.put(ModEntities.BOBA_FETT.get(),
+            com.tweeks.starwars.entity.BobaFettEntity.createAttributes().build());
         event.put(ModEntities.ASTROMECH.get(),
             com.tweeks.starwars.entity.AstromechEntity.createAttributes().build());
     }

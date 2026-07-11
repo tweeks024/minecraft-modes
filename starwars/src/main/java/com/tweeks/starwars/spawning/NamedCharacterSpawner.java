@@ -2,6 +2,7 @@ package com.tweeks.starwars.spawning;
 
 import com.tweeks.starwars.ModEntities;
 import com.tweeks.starwars.StarWarsMod;
+import com.tweeks.starwars.entity.BobaFettSavedData;
 import com.tweeks.starwars.entity.LukeSavedData;
 import com.tweeks.starwars.entity.NamedCharacterSavedData;
 import com.tweeks.starwars.entity.ObiWanSavedData;
@@ -36,8 +37,8 @@ import java.util.Set;
 
 /**
  * Periodic-tick spawner that keeps at most one of each named character
- * (Vader, Luke, Obi-Wan) alive per server, plus a stormtrooper escort for
- * Vader.
+ * (Vader, Luke, Obi-Wan, Boba Fett) alive per server, plus a stormtrooper
+ * escort for Vader.
  *
  * <p>Approach used: mirrors {@code LawmanVillageSpawner} / {@code
  * AnomalyVillageSpawner} from the wildwest module — a static tick counter
@@ -105,6 +106,8 @@ public final class NamedCharacterSpawner {
         Set.of(Biomes.DESERT, Biomes.BADLANDS, Biomes.PLAINS);
     private static final Set<ResourceKey<Biome>> JEDI_BIOMES =
         Set.of(Biomes.FOREST, Biomes.JUNGLE, Biomes.TAIGA, Biomes.PLAINS);
+    private static final Set<ResourceKey<Biome>> BOBA_FETT_BIOMES =
+        Set.of(Biomes.DESERT, Biomes.BADLANDS);
 
     private static int tickCounter = 0;
 
@@ -126,6 +129,8 @@ public final class NamedCharacterSpawner {
             ModEntities.LUKE_SKYWALKER.get(), JEDI_BIOMES, JEDI_STRUCTURES, false);
         tryRollCharacter(sl, ObiWanSavedData.get(sl.getServer()),
             ModEntities.OBI_WAN.get(), JEDI_BIOMES, JEDI_STRUCTURES, false);
+        tryRollCharacter(sl, BobaFettSavedData.get(sl.getServer()),
+            ModEntities.BOBA_FETT.get(), BOBA_FETT_BIOMES, IMPERIAL_STRUCTURES, false);
     }
 
     /** Core roll, shared by all three characters. */

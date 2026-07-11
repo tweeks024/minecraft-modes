@@ -132,6 +132,22 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
                     .when(LootItemRandomChanceCondition.randomChance(0.25f))
                     .add(LootItem.lootTableItem(Registration.HOLOCRON.get()))));
 
+        // Boba Fett: 2-4 gold_ingot @100% (bounty-hunter payday, no
+        // weight/empty split — always drops) + 50% blaster rifle (30%+
+        // durability) + 25% holocron.
+        this.add(ModEntities.BOBA_FETT.get(),
+            LootTable.lootTable()
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.GOLD_INGOT)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0f, 4.0f)))))
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .when(LootItemRandomChanceCondition.randomChance(0.50f))
+                    .add(LootItem.lootTableItem(Registration.BLASTER_RIFLE.get())
+                        .apply(SetItemDamageFunction.setDamage(UniformGenerator.between(0.0f, 0.7f)))))
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .when(LootItemRandomChanceCondition.randomChance(0.25f))
+                    .add(LootItem.lootTableItem(Registration.HOLOCRON.get()))));
+
         // Astromech: 1-2 iron_nugget @80% + 1-2 redstone @60% (spare parts
         // and power-cell scraps; no weapon/holocron drop — it's a utility
         // droid, not a combatant).
@@ -156,6 +172,7 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
             ModEntities.DARTH_VADER.get(),
             ModEntities.LUKE_SKYWALKER.get(),
             ModEntities.OBI_WAN.get(),
+            ModEntities.BOBA_FETT.get(),
             ModEntities.ASTROMECH.get()
         );
         return BuiltInRegistries.ENTITY_TYPE.stream().filter(known::contains);

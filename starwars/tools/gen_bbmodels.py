@@ -81,6 +81,12 @@ DARTH_VADER_ACCESSORIES = [
     ('chest_panel',  BODY_BONE, (-2.0,  3.0, -2.6, 4, 3, 1),  (56, 54), 0.0),
 ]
 
+BOBA_FETT_ACCESSORIES = [
+    ('helmet_shell', HEAD_BONE, (-4.0, -8.0, -4.0, 8, 8, 8),  (32, 0), 0.6),
+    ('rangefinder',  HEAD_BONE, (3.8, -12.0, -0.5, 1, 4, 1),  (56, 16), 0.0),
+    ('jetpack',      BODY_BONE, (-3.0,  0.5,  2.1, 6, 8, 3),  (44, 32), 0.0),
+]
+
 # Astromech droid: fully custom skeleton (body/head/legs only, no arms) at
 # its own pivots — the exact PartPose.offset values from AstromechModel.java
 # Step 3 — rather than the standard humanoid bone table above.
@@ -124,6 +130,9 @@ MOBS = {
     # Obi-Wan reuses the Jedi Knight's robe_skirt + hood accessory geometry
     # exactly — only the paint differs.
     'obi_wan': HUMANOID_CUBES + JEDI_KNIGHT_ACCESSORIES,
+    # Boba Fett: helmet shell (stormtrooper-style inflated head box),
+    # rangefinder stalk, and a back-mounted jetpack.
+    'boba_fett': HUMANOID_CUBES + BOBA_FETT_ACCESSORIES,
     # Astromech: fully custom skeleton (see ASTROMECH_BONE_DEFS above) —
     # body/head/legs only, no arms.
     'astromech': ASTROMECH_CUBES,

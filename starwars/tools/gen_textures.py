@@ -299,6 +299,60 @@ def paint_astromech(rgba):
         rect(rgba, u0, 26, u0 + 10, 27, ASTRO_JOINT)      # joint row
         rect(rgba, u0, 33, u0 + 10, 35, ASTRO_SILVER_SH)  # foot shade
 
+# Boba Fett: sage-green armor plates over a gray flightsuit, a black T-visor
+# on the green helmet, rust weathering dots, and a back-mounted jetpack with
+# silver nozzles + red shoulder accent stripes.
+BOBA_GREEN     = (0x5A, 0x6E, 0x50, 0xFF)
+BOBA_GREEN_HI  = (0x72, 0x86, 0x66, 0xFF)
+BOBA_GREEN_SH  = (0x44, 0x56, 0x3C, 0xFF)
+BOBA_SUIT      = (0x60, 0x60, 0x5C, 0xFF)
+BOBA_SUIT_SH   = (0x48, 0x48, 0x44, 0xFF)
+BOBA_VISOR     = (0x10, 0x10, 0x12, 0xFF)
+BOBA_RUST      = (0x7A, 0x4A, 0x30, 0xFF)
+BOBA_SILVER    = (0xB0, 0xB4, 0xB8, 0xFF)
+BOBA_RED       = (0xA0, 0x30, 0x28, 0xFF)
+BOBA_RANGEFINDER = (0x30, 0x30, 0x34, 0xFF)
+
+def paint_boba_fett(rgba):
+    fill(rgba, BOBA_SUIT)
+    # Head front (u 8..16, v 8..16): green faceplate with a black T-visor —
+    # a 2px vertical bar down the face center (rows 10..15) crossed by a
+    # 6px horizontal bar (rows 10..11).
+    rect(rgba, 8, 8, 16, 16, BOBA_GREEN)
+    rect(rgba, 11, 10, 13, 15, BOBA_VISOR)   # vertical bar
+    rect(rgba, 9, 10, 15, 11, BOBA_VISOR)    # horizontal bar
+    # Helmet-overlay region (u 32..64, v 0..16): green shell, gloss top,
+    # shaded bottom rim.
+    rect(rgba, 32, 0, 64, 16, BOBA_GREEN)
+    rect(rgba, 32, 0, 64, 1, BOBA_GREEN_HI)
+    rect(rgba, 32, 14, 64, 16, BOBA_GREEN_SH)
+    # Rangefinder UV footprint (56,16)-(60,22): dark-gray strip.
+    rect(rgba, 56, 16, 60, 22, BOBA_RANGEFINDER)
+    # Body (u 16..40, v 16..32): sage-green chest plate over the flightsuit.
+    rect(rgba, 16, 16, 40, 32, BOBA_GREEN)
+    rect(rgba, 16, 16, 40, 17, BOBA_GREEN_HI)
+    rect(rgba, 16, 30, 40, 32, BOBA_GREEN_SH)
+    # Arms/legs: gray flightsuit, shaded lower edge.
+    for (u0, v0) in ((40, 16), (32, 48), (0, 16), (16, 48)):
+        rect(rgba, u0, v0, u0 + 16, v0 + 16, BOBA_SUIT)
+        rect(rgba, u0, v0 + 14, u0 + 16, v0 + 16, BOBA_SUIT_SH)
+    # Arms only: green shoulder plate + red accent stripe.
+    for (u0, v0) in ((40, 16), (32, 48)):
+        rect(rgba, u0, v0, u0 + 16, v0 + 4, BOBA_GREEN)
+        rect(rgba, u0, v0 + 4, u0 + 16, v0 + 5, BOBA_RED)
+    # Jetpack UV footprint (44..62, 32..43): green tanks, silver nozzle
+    # rows, gloss top / shaded bottom.
+    rect(rgba, 44, 32, 62, 43, BOBA_GREEN)
+    rect(rgba, 44, 32, 62, 33, BOBA_GREEN_HI)
+    rect(rgba, 47, 35, 50, 41, BOBA_SILVER)   # left tank nozzle
+    rect(rgba, 56, 35, 59, 41, BOBA_SILVER)   # right tank nozzle
+    rect(rgba, 44, 41, 62, 43, BOBA_GREEN_SH)
+    # Weathering: 4 scattered rust dots on the chest + helmet.
+    rect(rgba, 20, 20, 21, 21, BOBA_RUST)
+    rect(rgba, 34, 24, 35, 25, BOBA_RUST)
+    rect(rgba, 9, 9, 10, 10, BOBA_RUST)
+    rect(rgba, 38, 5, 39, 6, BOBA_RUST)
+
 MOBS = {
     'stormtrooper': paint_stormtrooper,
     'battle_droid': paint_battle_droid,
@@ -307,6 +361,7 @@ MOBS = {
     'luke_skywalker': paint_luke_skywalker,
     'obi_wan': paint_obi_wan,
     'astromech': paint_astromech,
+    'boba_fett': paint_boba_fett,
 }
 
 # Worn-armor equipment layers: standard 64x32 vanilla armor-sheet UV layout
