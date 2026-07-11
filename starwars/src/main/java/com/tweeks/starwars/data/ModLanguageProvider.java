@@ -46,6 +46,10 @@ public class ModLanguageProvider extends LanguageProvider {
         add("force_power.starwars.mind_trick", "Mind Trick");
         add("force_power.starwars.lightning", "Force Lightning");
 
+        add("key.starwars.open_force_picker", "Open Force Picker");
+        add("screen.starwars.force_radial", "Force Powers");
+        add("screen.starwars.force_radial.prompt", "Select Power");
+
         add("death.attack.starwars.blaster_bolt", "%1$s was vaporized");
         add("death.attack.starwars.blaster_bolt.player", "%1$s was vaporized by %2$s");
         add("death.attack.starwars.blaster_bolt.item", "%1$s was vaporized by %2$s using %3$s");

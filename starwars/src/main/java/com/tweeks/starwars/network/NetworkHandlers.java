@@ -18,6 +18,9 @@ public final class NetworkHandlers {
             S2CBlasterTracerPacket.TYPE,
             S2CBlasterTracerPacket.STREAM_CODEC,
             TracerClientHandler::handle);
-        // C2SSelectPowerPacket joins in Milestone 5.
+        reg.playToServer(
+            C2SSelectPowerPacket.TYPE,
+            C2SSelectPowerPacket.STREAM_CODEC,
+            C2SSelectPowerPacket::handle);
     }
 }
