@@ -58,6 +58,22 @@ These goals produced a `// TODO LLM:` stub at `behavior_pack/scripts/goals/<Goal
 - `SwTargetGoal` — cache miss; run :translate --with-llm to translate
 - `VaderChokeGoal` — cache miss; run :translate --with-llm to translate
 
+## Entity goals gated off per-entity
+
+These goals are registered on a shared superclass but gated by a per-entity condition (an anonymous `canUse` override). For the entities below the gate resolved statically closed (or could not be resolved), so the goal was dropped from their Bedrock JSON — for a closed gate this matches the Java behavior, not a loss:
+
+### `BattleDroidEntity`
+
+- MeleeAttackGoal goal gated off for this entity by usesBlaster()
+
+### `BobaFettEntity`
+
+- MeleeAttackGoal goal gated off for this entity by usesBlaster()
+
+### `StormtrooperEntity`
+
+- MeleeAttackGoal goal gated off for this entity by usesBlaster()
+
 ## Item custom behavior
 
 These items override `Item` methods (e.g. `postHurtEnemy`, `useOn`, `hurtEnemy`) with custom logic. Phase 3 (LLM stage) translates these to `behavior_pack/scripts/items/*.ts` event handlers; Phase 2 only emits the static item JSON:
