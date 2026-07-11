@@ -31,6 +31,7 @@ public class DataGenerators {
             output, lookup, builder, Set.of(StarWarsMod.MOD_ID)));
 
         gen.addProvider(true, new ModDamageTypeTagsProvider(output, lookup));
+        gen.addProvider(true, new ModRecipeProvider.Runner(output, lookup));
 
         gen.addProvider(true, new net.minecraft.data.loot.LootTableProvider(
             output,

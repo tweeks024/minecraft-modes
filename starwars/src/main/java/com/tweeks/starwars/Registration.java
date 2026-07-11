@@ -3,6 +3,7 @@ package com.tweeks.starwars;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SpawnEggItem;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -45,6 +46,30 @@ public final class Registration {
     public static final DeferredItem<SpawnEggItem> OBI_WAN_SPAWN_EGG = ITEMS.registerItem(
         "obi_wan_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.OBI_WAN.get()));
 
+    public static final DeferredItem<Item> STORMTROOPER_HELMET = ITEMS.registerItem("stormtrooper_helmet",
+        Item::new,
+        p -> p.humanoidArmor(com.tweeks.starwars.item.StormtrooperArmorMaterials.STORMTROOPER,
+                net.minecraft.world.item.equipment.ArmorType.HELMET)
+              .stacksTo(1));
+
+    public static final DeferredItem<Item> STORMTROOPER_CHESTPLATE = ITEMS.registerItem("stormtrooper_chestplate",
+        Item::new,
+        p -> p.humanoidArmor(com.tweeks.starwars.item.StormtrooperArmorMaterials.STORMTROOPER,
+                net.minecraft.world.item.equipment.ArmorType.CHESTPLATE)
+              .stacksTo(1));
+
+    public static final DeferredItem<Item> STORMTROOPER_LEGGINGS = ITEMS.registerItem("stormtrooper_leggings",
+        Item::new,
+        p -> p.humanoidArmor(com.tweeks.starwars.item.StormtrooperArmorMaterials.STORMTROOPER,
+                net.minecraft.world.item.equipment.ArmorType.LEGGINGS)
+              .stacksTo(1));
+
+    public static final DeferredItem<Item> STORMTROOPER_BOOTS = ITEMS.registerItem("stormtrooper_boots",
+        Item::new,
+        p -> p.humanoidArmor(com.tweeks.starwars.item.StormtrooperArmorMaterials.STORMTROOPER,
+                net.minecraft.world.item.equipment.ArmorType.BOOTS)
+              .stacksTo(1));
+
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> STARWARS_TAB =
         CREATIVE_TABS.register("main", () ->
             CreativeModeTab.builder()
@@ -62,6 +87,10 @@ public final class Registration {
                     output.accept(DARTH_VADER_SPAWN_EGG.get());
                     output.accept(LUKE_SKYWALKER_SPAWN_EGG.get());
                     output.accept(OBI_WAN_SPAWN_EGG.get());
+                    output.accept(STORMTROOPER_HELMET.get());
+                    output.accept(STORMTROOPER_CHESTPLATE.get());
+                    output.accept(STORMTROOPER_LEGGINGS.get());
+                    output.accept(STORMTROOPER_BOOTS.get());
                     // Later tasks append their items here.
                 })
                 .build());

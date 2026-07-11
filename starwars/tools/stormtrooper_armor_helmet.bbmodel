@@ -1,0 +1,151 @@
+{
+  "meta": {
+    "format_version": "5.0",
+    "model_format": "modded_entity",
+    "box_uv": true
+  },
+  "name": "stormtrooper_armor_helmet",
+  "model_identifier": "",
+  "modded_entity_entity_class": "",
+  "modded_entity_version": "1.21",
+  "modded_entity_flip_y": true,
+  "visible_box": [
+    1,
+    1,
+    0
+  ],
+  "variable_placeholders": "",
+  "variable_placeholder_buttons": [],
+  "timeline_setups": [],
+  "unhandled_root_fields": {},
+  "resolution": {
+    "width": 64,
+    "height": 32
+  },
+  "elements": [
+    {
+      "name": "head",
+      "from": [
+        -4,
+        24,
+        -4
+      ],
+      "to": [
+        4,
+        32,
+        4
+      ],
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "autouv": 0,
+      "box_uv": true,
+      "uv_offset": [
+        0,
+        0
+      ],
+      "rotation": null,
+      "rescale": null,
+      "locked": false,
+      "render_order": "default",
+      "export": true,
+      "scope": 0,
+      "allow_mirror_modeling": true,
+      "color": 0,
+      "type": "cube",
+      "uuid": "78b66f7b-37d1-54cf-bba7-fc19e2531d11",
+      "faces": {
+        "north": {
+          "uv": [
+            8,
+            8,
+            16,
+            16
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            0,
+            8,
+            8,
+            16
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            24,
+            8,
+            32,
+            16
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            16,
+            8,
+            24,
+            16
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            16,
+            8,
+            8,
+            0
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            24,
+            8,
+            16,
+            0
+          ],
+          "texture": 0
+        }
+      },
+      "inflate": 1.0
+    }
+  ],
+  "groups": [],
+  "outliner": [
+    "78b66f7b-37d1-54cf-bba7-fc19e2531d11"
+  ],
+  "textures": [
+    {
+      "path": null,
+      "name": "stormtrooper.png",
+      "folder": "entity/equipment/humanoid",
+      "namespace": "starwars",
+      "id": "0",
+      "particle": false,
+      "render_mode": "default",
+      "render_sides": "auto",
+      "frame_time": 1,
+      "frame_order_type": "loop",
+      "frame_order": "",
+      "frame_interpolate": false,
+      "visible": true,
+      "internal": true,
+      "saved": true,
+      "uuid": "6a806535-0f33-5cc5-879f-2d7a81eeccf7",
+      "relative_path": "../src/main/resources/assets/starwars/textures/entity/equipment/humanoid/stormtrooper.png",
+      "use_as_default": false,
+      "layers_enabled": false,
+      "sync_to_project": "",
+      "width": 64,
+      "height": 32,
+      "uv_width": 64,
+      "uv_height": 32,
+      "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAgCAYAAACinX6EAAAAqklEQVR4nO2VMQrAIAxFPYVDj+zcQzn3IA69QFsEoS0FQavfmB94g5PfR0xMCPuhGYMOgIYC0AHQUAA6ABoKQAdAkxWQq9KLvd8iFCBBgLVLJNX9rEKA+g6ggKucWx+oE/A1C9QJmPILZF8ovKo7YHYoAB0ATTcB7zWKfjgFJAFpt5fSWkDrfCbt41LEd0AvAaNCAX8L6DVTKGBUAdKggNqWrRXYGgrICDgBbu8M/oZUQ1QAAAAASUVORK5CYII="
+    }
+  ]
+}

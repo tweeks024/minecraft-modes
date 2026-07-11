@@ -28,23 +28,36 @@ def rect(rgba, x0, y0, x1, y1, color):
             rgba[i + 2] = b
             rgba[i + 3] = a
 
-def write_png(path, rgba):
-    """Write a 64x64 RGBA PNG from a flat byte buffer."""
+def write_png(path, rgba, width=None, height=None):
+    """Write an RGBA PNG from a flat byte buffer. Defaults to the WxH mob
+    canvas; pass width/height explicitly for other sizes (e.g. the 64x32
+    worn-armor equipment sheets)."""
+    w = width if width is not None else W
+    h = height if height is not None else H
     sig = b'\x89PNG\r\n\x1a\n'
     def chunk(tag, data):
         crc = zlib.crc32(tag + data) & 0xffffffff
         return struct.pack('>I', len(data)) + tag + data + struct.pack('>I', crc)
 
-    ihdr = struct.pack('>IIBBBBB', W, H, 8, 6, 0, 0, 0)  # 8-bit RGBA
+    ihdr = struct.pack('>IIBBBBB', w, h, 8, 6, 0, 0, 0)  # 8-bit RGBA
     raw = bytearray()
-    for y in range(H):
+    for y in range(h):
         raw.append(0)  # filter type 'none' per scanline
-        raw.extend(rgba[4*W*y : 4*W*(y+1)])
+        raw.extend(rgba[4*w*y : 4*w*(y+1)])
     idat = zlib.compress(bytes(raw))
     iend = b''
     out = sig + chunk(b'IHDR', ihdr) + chunk(b'IDAT', idat) + chunk(b'IEND', iend)
     with open(path, 'wb') as f:
         f.write(out)
+
+def fill_buf(rgba, color):
+    """Fill an arbitrarily-sized RGBA buffer (not just the WxH mob canvas)."""
+    r, g, b, a = color
+    for i in range(len(rgba) // 4):
+        rgba[4*i + 0] = r
+        rgba[4*i + 1] = g
+        rgba[4*i + 2] = b
+        rgba[4*i + 3] = a
 
 def paint_humanoid_base(rgba, shirt):
     """Lay down the standard humanoid skin: face + arms + body shirt + pants.
@@ -259,6 +272,61 @@ MOBS = {
     'obi_wan': paint_obi_wan,
 }
 
+# Worn-armor equipment layers: standard 64x32 vanilla armor-sheet UV layout
+# (same box UV as the humanoid skin's top half — head 0..32,0..16;
+# body 16..40,16..32; arm 40..56,16..32; leg 0..16,16..32). Uses the same
+# WHITE/WHITE_SH/SUIT_BLACK palette as paint_stormtrooper above.
+ARMOR_W, ARMOR_H = 64, 32
+
+def paint_stormtrooper_armor_layers(humanoid_rgba, leggings_rgba):
+    """Paint the two worn-armor sheets for the stormtrooper equipment asset.
+
+    Layer 1 ("humanoid", assets/.../equipment/humanoid/stormtrooper.png)
+    covers the helmet (head UV block), chestplate (body + arm UV blocks),
+    and boots (leg UV block) — everything except leggings.
+
+    Layer 2 ("humanoid_leggings", .../equipment/humanoid_leggings/
+    stormtrooper.png) covers only the leg UV block, matching the visible
+    extent of craftee's own humanoid_leggings/craftee.png (bbox (0,16)-
+    (16,32) — the waist/body region is left transparent there too).
+    """
+    fill_buf(humanoid_rgba, WHITE)
+
+    # Head block (helmet), UV 0..32,0..16 — front face at 8..16,8..16.
+    rect(humanoid_rgba, 8, 8, 16, 16, WHITE_HI)
+    rect(humanoid_rgba, 9, 10, 11, 11, SUIT_BLACK)   # left eye slit
+    rect(humanoid_rgba, 13, 10, 15, 11, SUIT_BLACK)  # right eye slit
+    rect(humanoid_rgba, 10, 13, 14, 14, GRAY)        # aerator frown
+    rect(humanoid_rgba, 11, 14, 13, 15, SUIT_BLACK)  # chin vent
+    rect(humanoid_rgba, 30, 8, 32, 16, WHITE_SH)     # head right-edge shade
+
+    # Body block (chestplate), UV 16..40,16..32.
+    rect(humanoid_rgba, 16, 16, 40, 17, WHITE_HI)    # chest top highlight
+    rect(humanoid_rgba, 26, 20, 30, 24, GRAY)        # chest control box
+    rect(humanoid_rgba, 20, 26, 36, 28, SUIT_BLACK)  # ab plate seam
+    rect(humanoid_rgba, 16, 30, 40, 32, WHITE_SH)    # body bottom shade
+
+    # Arm block (chestplate sleeves), UV 40..56,16..32.
+    rect(humanoid_rgba, 40, 16, 56, 17, WHITE_HI)    # shoulder highlight
+    rect(humanoid_rgba, 40, 22, 56, 23, SUIT_BLACK)  # elbow seam
+    rect(humanoid_rgba, 40, 30, 56, 32, WHITE_SH)    # wrist shade
+
+    # Leg block (boots), UV 0..16,16..32 — boot cuff seam + sole shading.
+    rect(humanoid_rgba, 0, 16, 16, 17, WHITE_HI)     # thigh top highlight
+    rect(humanoid_rgba, 0, 22, 16, 23, SUIT_BLACK)   # boot cuff seam
+    rect(humanoid_rgba, 0, 23, 16, 32, WHITE_SH)     # boot body, shaded
+    rect(humanoid_rgba, 0, 30, 16, 32, SUIT_BLACK)   # boot sole
+
+    fill_buf(leggings_rgba, (0, 0, 0, 0))  # transparent base
+    # Leg block (leggings), UV 0..16,16..32 — the only region craftee's own
+    # humanoid_leggings sheet paints; the body/waist UV block stays
+    # transparent (the leggings bbmodel's body cube still exists for
+    # correct armor-model geometry, it just renders no pixels there).
+    rect(leggings_rgba, 0, 16, 16, 32, WHITE)
+    rect(leggings_rgba, 0, 16, 16, 17, WHITE_HI)     # thigh top highlight
+    rect(leggings_rgba, 0, 22, 16, 23, SUIT_BLACK)   # knee seam
+    rect(leggings_rgba, 0, 30, 16, 32, WHITE_SH)     # ankle shade
+
 if __name__ == '__main__':
     out_dir = sys.argv[1] if len(sys.argv) > 1 else \
         'starwars/src/main/resources/assets/starwars/textures/entity'
@@ -269,4 +337,17 @@ if __name__ == '__main__':
         out_path = os.path.join(out_dir, f'{name}.png')
         write_png(out_path, rgba)
         print(name)
+
+    humanoid_dir = os.path.join(out_dir, 'equipment', 'humanoid')
+    leggings_dir = os.path.join(out_dir, 'equipment', 'humanoid_leggings')
+    os.makedirs(humanoid_dir, exist_ok=True)
+    os.makedirs(leggings_dir, exist_ok=True)
+    humanoid_rgba = bytearray(ARMOR_W * ARMOR_H * 4)
+    leggings_rgba = bytearray(ARMOR_W * ARMOR_H * 4)
+    paint_stormtrooper_armor_layers(humanoid_rgba, leggings_rgba)
+    write_png(os.path.join(humanoid_dir, 'stormtrooper.png'), humanoid_rgba,
+              width=ARMOR_W, height=ARMOR_H)
+    write_png(os.path.join(leggings_dir, 'stormtrooper.png'), leggings_rgba,
+              width=ARMOR_W, height=ARMOR_H)
+    print('stormtrooper armor layers')
     print('OK')

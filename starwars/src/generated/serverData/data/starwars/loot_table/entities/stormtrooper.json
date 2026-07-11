@@ -53,6 +53,34 @@
         }
       ],
       "rolls": 1.0
+    },
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "chance": 0.1,
+          "condition": "minecraft:random_chance"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "starwars:stormtrooper_helmet"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "starwars:stormtrooper_chestplate"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "starwars:stormtrooper_leggings"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "starwars:stormtrooper_boots"
+        }
+      ],
+      "rolls": 1.0
     }
   ],
   "random_sequence": "starwars:entities/stormtrooper"

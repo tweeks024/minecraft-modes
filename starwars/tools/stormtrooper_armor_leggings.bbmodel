@@ -1,0 +1,335 @@
+{
+  "meta": {
+    "format_version": "5.0",
+    "model_format": "modded_entity",
+    "box_uv": true
+  },
+  "name": "stormtrooper_armor_leggings",
+  "model_identifier": "",
+  "modded_entity_entity_class": "",
+  "modded_entity_version": "1.21",
+  "modded_entity_flip_y": true,
+  "visible_box": [
+    1,
+    1,
+    0
+  ],
+  "variable_placeholders": "",
+  "variable_placeholder_buttons": [],
+  "timeline_setups": [],
+  "unhandled_root_fields": {},
+  "resolution": {
+    "width": 64,
+    "height": 32
+  },
+  "elements": [
+    {
+      "name": "body",
+      "from": [
+        -4,
+        12,
+        -2
+      ],
+      "to": [
+        4,
+        24,
+        2
+      ],
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "autouv": 0,
+      "box_uv": true,
+      "uv_offset": [
+        16,
+        16
+      ],
+      "rotation": null,
+      "rescale": null,
+      "locked": false,
+      "render_order": "default",
+      "export": true,
+      "scope": 0,
+      "allow_mirror_modeling": true,
+      "color": 0,
+      "type": "cube",
+      "uuid": "da6bbe67-9938-582f-94d3-1b5ba45971ec",
+      "faces": {
+        "north": {
+          "uv": [
+            20,
+            20,
+            28,
+            32
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            16,
+            20,
+            20,
+            32
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            32,
+            20,
+            40,
+            32
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            28,
+            20,
+            32,
+            32
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            28,
+            20,
+            20,
+            16
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            36,
+            20,
+            28,
+            16
+          ],
+          "texture": 0
+        }
+      },
+      "inflate": 0.51
+    },
+    {
+      "name": "right_leg",
+      "from": [
+        -3.9,
+        0,
+        -2
+      ],
+      "to": [
+        0.1,
+        12,
+        2
+      ],
+      "origin": [
+        -1.9,
+        12,
+        0
+      ],
+      "autouv": 0,
+      "box_uv": true,
+      "uv_offset": [
+        0,
+        16
+      ],
+      "rotation": null,
+      "rescale": null,
+      "locked": false,
+      "render_order": "default",
+      "export": true,
+      "scope": 0,
+      "allow_mirror_modeling": true,
+      "color": 0,
+      "type": "cube",
+      "uuid": "651479cf-6c69-5f1c-a719-ab970d663b41",
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            20,
+            8.0,
+            32
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            0,
+            20,
+            4,
+            32
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            12.0,
+            20,
+            16.0,
+            32
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            8.0,
+            20,
+            12.0,
+            32
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            8.0,
+            20,
+            4,
+            16
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            12.0,
+            20,
+            8.0,
+            16
+          ],
+          "texture": 0
+        }
+      },
+      "inflate": 0.5
+    },
+    {
+      "name": "left_leg",
+      "from": [
+        -0.1,
+        0,
+        -2
+      ],
+      "to": [
+        3.9,
+        12,
+        2
+      ],
+      "origin": [
+        1.9,
+        12,
+        0
+      ],
+      "autouv": 0,
+      "box_uv": true,
+      "uv_offset": [
+        0,
+        16
+      ],
+      "rotation": null,
+      "rescale": null,
+      "locked": false,
+      "render_order": "default",
+      "export": true,
+      "scope": 0,
+      "allow_mirror_modeling": true,
+      "color": 0,
+      "type": "cube",
+      "uuid": "fc614f73-ddbc-5095-8487-e5842584dd77",
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            20,
+            8.0,
+            32
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            0,
+            20,
+            4,
+            32
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            12.0,
+            20,
+            16.0,
+            32
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            8.0,
+            20,
+            12.0,
+            32
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            8.0,
+            20,
+            4,
+            16
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            12.0,
+            20,
+            8.0,
+            16
+          ],
+          "texture": 0
+        }
+      },
+      "inflate": 0.5
+    }
+  ],
+  "groups": [],
+  "outliner": [
+    "da6bbe67-9938-582f-94d3-1b5ba45971ec",
+    "651479cf-6c69-5f1c-a719-ab970d663b41",
+    "fc614f73-ddbc-5095-8487-e5842584dd77"
+  ],
+  "textures": [
+    {
+      "path": null,
+      "name": "stormtrooper.png",
+      "folder": "entity/equipment/humanoid_leggings",
+      "namespace": "starwars",
+      "id": "0",
+      "particle": false,
+      "render_mode": "default",
+      "render_sides": "auto",
+      "frame_time": 1,
+      "frame_order_type": "loop",
+      "frame_order": "",
+      "frame_interpolate": false,
+      "visible": true,
+      "internal": true,
+      "saved": true,
+      "uuid": "a5b9ec52-1882-57ca-8fa9-dd75f5521086",
+      "relative_path": "../src/main/resources/assets/starwars/textures/entity/equipment/humanoid_leggings/stormtrooper.png",
+      "use_as_default": false,
+      "layers_enabled": false,
+      "sync_to_project": "",
+      "width": 64,
+      "height": 32,
+      "uv_width": 64,
+      "uv_height": 32,
+      "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAgCAYAAACinX6EAAAAV0lEQVR4nO3SMQ3AMAxE0aDIUP5gMhdIhhJwQdzgwe9J3k9fXgsAAAAYp0Ld+2P3fpVc9/6YAAIIMDvA3k8l170/Nv4DBBBAAAEEmBzgnLeS694fmx7gB71Rmh5u0GK2AAAAAElFTkSuQmCC"
+    }
+  ]
+}

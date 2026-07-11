@@ -29,6 +29,10 @@ public class ModLanguageProvider extends LanguageProvider {
         add(com.tweeks.starwars.ModEntities.DARTH_VADER.get(), "Darth Vader");
         add(com.tweeks.starwars.ModEntities.LUKE_SKYWALKER.get(), "Luke Skywalker");
         add(com.tweeks.starwars.ModEntities.OBI_WAN.get(), "Obi-Wan Kenobi");
+        add(com.tweeks.starwars.Registration.STORMTROOPER_HELMET.get(), "Stormtrooper Helmet");
+        add(com.tweeks.starwars.Registration.STORMTROOPER_CHESTPLATE.get(), "Stormtrooper Chestplate");
+        add(com.tweeks.starwars.Registration.STORMTROOPER_LEGGINGS.get(), "Stormtrooper Leggings");
+        add(com.tweeks.starwars.Registration.STORMTROOPER_BOOTS.get(), "Stormtrooper Boots");
         add("subtitle.starwars.blaster_fire", "Blaster fires");
         add("subtitle.starwars.saber_ignite", "Lightsaber ignites");
         add("subtitle.starwars.saber_clash", "Lightsabers clash");

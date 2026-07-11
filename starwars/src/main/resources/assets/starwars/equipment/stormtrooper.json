@@ -1,0 +1,10 @@
+{
+  "layers": {
+    "humanoid": [
+      { "texture": "starwars:stormtrooper" }
+    ],
+    "humanoid_leggings": [
+      { "texture": "starwars:stormtrooper" }
+    ]
+  }
+}

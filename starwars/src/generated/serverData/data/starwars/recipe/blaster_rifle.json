@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "N": "minecraft:iron_nugget",
+    "R": "minecraft:redstone"
+  },
+  "pattern": [
+    "III",
+    " RN"
+  ],
+  "result": {
+    "id": "starwars:blaster_rifle"
+  }
+}

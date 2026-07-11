@@ -252,6 +252,178 @@ def write_bbmodel(out_dir, mob_name, cubes, texture_dir, tex_height=64):
     print(f"  wrote {out_path}")
 
 
+# -----------------------------------------------------------------------------
+# Armor bbmodels — standard armor-overlay geometry (helmet/chestplate/
+# leggings/boots), one bbmodel per piece, following the repo convention set
+# by craftee/tools/craftee_armor_{helmet,chestplate,leggings,boots}.bbmodel:
+# format_version "5.0" (not "4.5"), explicit modded_entity_* root fields,
+# per-face "faces" UV (not the simplified "uv_offset" the mob cubes above
+# use), a flat outliner (no bone groups — armor cubes have no parent bone
+# hierarchy), and a 64x32 resolution (the worn-armor equipment sheet size,
+# not the mob's 64x64 skin). Cube from/to sizes match the vanilla humanoid
+# armor pivots exactly (same coords craftee's own generator uses); unlike
+# craftee, each cube also carries the standard vanilla ArmorModel "inflate"
+# value for its layer (helmet/chestplate/boots outer layer ~1.0, leggings
+# inner layer ~0.5) so the preview matches how the game actually renders
+# worn armor.
+# -----------------------------------------------------------------------------
+
+HEAD_ARMOR_ORIGIN  = [0, 24, 0]
+BODY_ARMOR_ORIGIN  = [0, 24, 0]
+RARM_ARMOR_ORIGIN  = [-5, 22, 0]
+LARM_ARMOR_ORIGIN  = [5, 22, 0]
+RLEG_ARMOR_ORIGIN  = [-1.9, 12, 0]
+LLEG_ARMOR_ORIGIN  = [1.9, 12, 0]
+
+# (name, from, to, origin, uv_offset, inflate)
+STORMTROOPER_HELMET_CUBES = [
+    ("head", [-4, 24, -4], [4, 32, 4], HEAD_ARMOR_ORIGIN, (0, 0), 1.0),
+]
+
+STORMTROOPER_CHESTPLATE_CUBES = [
+    ("body",      [-4, 12, -2], [4, 24, 2],  BODY_ARMOR_ORIGIN, (16, 16), 1.01),
+    ("right_arm", [-8, 12, -2], [-4, 24, 2], RARM_ARMOR_ORIGIN, (40, 16), 1.0),
+    ("left_arm",  [4, 12, -2],  [8, 24, 2],  LARM_ARMOR_ORIGIN, (40, 16), 1.0),
+]
+
+# Leggings cover both the waist (body cube) and both legs, per vanilla
+# ArmorModel LEGGINGS geometry — unlike craftee's own leggings bbmodel
+# (legs only), the task brief calls for the body cube too.
+STORMTROOPER_LEGGINGS_CUBES = [
+    ("body",      [-4, 12, -2],   [4, 24, 2],   BODY_ARMOR_ORIGIN, (16, 16), 0.51),
+    ("right_leg", [-3.9, 0, -2],  [0.1, 12, 2], RLEG_ARMOR_ORIGIN, (0, 16),  0.5),
+    ("left_leg",  [-0.1, 0, -2],  [3.9, 12, 2], LLEG_ARMOR_ORIGIN, (0, 16),  0.5),
+]
+
+STORMTROOPER_BOOTS_CUBES = [
+    ("right_leg", [-3.9, 0, -2], [0.1, 12, 2], RLEG_ARMOR_ORIGIN, (0, 16), 1.0),
+    ("left_leg",  [-0.1, 0, -2], [3.9, 12, 2], LLEG_ARMOR_ORIGIN, (0, 16), 1.0),
+]
+
+# piece_name -> (cubes, equipment texture subfolder)
+ARMOR_PIECES = {
+    'stormtrooper_armor_helmet':     (STORMTROOPER_HELMET_CUBES, 'humanoid'),
+    'stormtrooper_armor_chestplate': (STORMTROOPER_CHESTPLATE_CUBES, 'humanoid'),
+    'stormtrooper_armor_leggings':   (STORMTROOPER_LEGGINGS_CUBES, 'humanoid_leggings'),
+    'stormtrooper_armor_boots':      (STORMTROOPER_BOOTS_CUBES, 'humanoid'),
+}
+
+
+def armor_box_faces(size_w, size_h, size_d, uv_u, uv_v):
+    """Box-UV 6-face map for a cube of size (W, H, D) at uv_offset (U, V).
+    Mirrors craftee/tools/generate_bbmodels.py's box_faces()."""
+    u, v, w, h, d = uv_u, uv_v, size_w, size_h, size_d
+    return {
+        "north": {"uv": [u + d,         v + d, u + d + w,         v + d + h], "texture": 0},
+        "east":  {"uv": [u,             v + d, u + d,             v + d + h], "texture": 0},
+        "south": {"uv": [u + d + w + d, v + d, u + d + w + d + w, v + d + h], "texture": 0},
+        "west":  {"uv": [u + d + w,     v + d, u + d + w + d,     v + d + h], "texture": 0},
+        "up":    {"uv": [u + d + w,     v + d, u + d,             v],         "texture": 0},
+        "down":  {"uv": [u + d + w + w, v + d, u + d + w,         v],         "texture": 0},
+    }
+
+
+def make_armor_cube(piece_name, name, fr, to, origin, uv_offset, inflate=0.0):
+    w = to[0] - fr[0]
+    h = to[1] - fr[1]
+    d = to[2] - fr[2]
+    cube = {
+        "name": name,
+        "from": fr,
+        "to": to,
+        "origin": origin,
+        "autouv": 0,
+        "box_uv": True,
+        "uv_offset": list(uv_offset),
+        "rotation": None,
+        "rescale": None,
+        "locked": False,
+        "render_order": "default",
+        "export": True,
+        "scope": 0,
+        "allow_mirror_modeling": True,
+        "color": 0,
+        "type": "cube",
+        "uuid": det_uuid(f"{piece_name}/cube/{name}"),
+        "faces": armor_box_faces(w, h, d, *uv_offset),
+    }
+    if inflate:
+        cube["inflate"] = inflate
+    return cube
+
+
+def armor_texture_record(piece_name, texture_path, folder):
+    tex_data = ''
+    if os.path.exists(texture_path):
+        with open(texture_path, 'rb') as f:
+            tex_data = 'data:image/png;base64,' + base64.b64encode(f.read()).decode('ascii')
+    rel_path = os.path.relpath(texture_path, start=os.path.dirname(os.path.abspath(__file__)))
+    return {
+        "path": None,
+        "name": "stormtrooper.png",
+        "folder": folder,
+        "namespace": "starwars",
+        "id": "0",
+        "particle": False,
+        "render_mode": "default",
+        "render_sides": "auto",
+        "frame_time": 1,
+        "frame_order_type": "loop",
+        "frame_order": "",
+        "frame_interpolate": False,
+        "visible": True,
+        "internal": True,
+        "saved": True,
+        "uuid": det_uuid(f"{piece_name}/texture"),
+        "relative_path": rel_path.replace("\\", "/"),
+        "use_as_default": False,
+        "layers_enabled": False,
+        "sync_to_project": "",
+        "width": 64,
+        "height": 32,
+        "uv_width": 64,
+        "uv_height": 32,
+        "source": tex_data,
+    }
+
+
+def build_armor_bbmodel(piece_name, cube_specs, texture_path, folder):
+    elements = [make_armor_cube(piece_name, *spec) for spec in cube_specs]
+    outliner = [e["uuid"] for e in elements]
+    return {
+        "meta": {
+            "format_version": "5.0",
+            "model_format": "modded_entity",
+            "box_uv": True,
+        },
+        "name": piece_name,
+        "model_identifier": "",
+        "modded_entity_entity_class": "",
+        "modded_entity_version": "1.21",
+        "modded_entity_flip_y": True,
+        "visible_box": [1, 1, 0],
+        "variable_placeholders": "",
+        "variable_placeholder_buttons": [],
+        "timeline_setups": [],
+        "unhandled_root_fields": {},
+        "resolution": {"width": 64, "height": 32},
+        "elements": elements,
+        "groups": [],
+        "outliner": outliner,
+        "textures": [armor_texture_record(piece_name, texture_path, folder)],
+    }
+
+
+def write_armor_bbmodel(out_dir, piece_name, cube_specs, texture_dir, folder):
+    texture_path = os.path.join(texture_dir, 'equipment', folder, 'stormtrooper.png')
+    bbmodel = build_armor_bbmodel(piece_name, cube_specs, texture_path, folder=f"entity/equipment/{folder}")
+    out_path = os.path.join(out_dir, f"{piece_name}.bbmodel")
+    with open(out_path, 'w') as f:
+        json.dump(bbmodel, f, indent=2)
+        f.write('\n')
+    print(f"  wrote {out_path}")
+
+
 if __name__ == '__main__':
     out_dir = sys.argv[1] if len(sys.argv) > 1 else '.'
     # Look for textures relative to the tools/ dir.
@@ -265,4 +437,7 @@ if __name__ == '__main__':
 
     for mob_name, cubes in MOBS.items():
         write_bbmodel(out_dir, mob_name, cubes, texture_dir)
+
+    for piece_name, (cubes, folder) in ARMOR_PIECES.items():
+        write_armor_bbmodel(out_dir, piece_name, cubes, texture_dir, folder)
     print('OK')

@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "Q": "minecraft:quartz"
+  },
+  "pattern": [
+    "Q Q",
+    "QQQ",
+    "QQQ"
+  ],
+  "result": {
+    "id": "starwars:stormtrooper_chestplate"
+  }
+}

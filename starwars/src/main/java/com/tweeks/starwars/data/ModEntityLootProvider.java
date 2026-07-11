@@ -30,6 +30,7 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
     @Override
     public void generate() {
         // Stormtrooper: 0-2 iron_nugget @60%; 25% blaster rifle drop (30%+ durability).
+        // Third pool: 10% chance, one-of-four equal-weighted armor piece drop.
         this.add(ModEntities.STORMTROOPER.get(),
             LootTable.lootTable()
                 .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
@@ -39,7 +40,13 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
                 .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
                     .when(LootItemRandomChanceCondition.randomChance(0.25f))
                     .add(LootItem.lootTableItem(Registration.BLASTER_RIFLE.get())
-                        .apply(SetItemDamageFunction.setDamage(UniformGenerator.between(0.0f, 0.7f))))));
+                        .apply(SetItemDamageFunction.setDamage(UniformGenerator.between(0.0f, 0.7f)))))
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .when(LootItemRandomChanceCondition.randomChance(0.10f))
+                    .add(LootItem.lootTableItem(Registration.STORMTROOPER_HELMET.get()))
+                    .add(LootItem.lootTableItem(Registration.STORMTROOPER_CHESTPLATE.get()))
+                    .add(LootItem.lootTableItem(Registration.STORMTROOPER_LEGGINGS.get()))
+                    .add(LootItem.lootTableItem(Registration.STORMTROOPER_BOOTS.get()))));
 
         // Battle droid: 1-3 iron_nugget @80%; 15% blaster pistol drop.
         this.add(ModEntities.BATTLE_DROID.get(),
