@@ -17,7 +17,7 @@ class ModDiscoveryTest {
     fun `discovers all sibling NeoForge mods in settings_gradle order`() {
         val ids = ModDiscovery(repoRoot).discover().map { it.modId }
         assertEquals(
-            listOf("securitycore", "securityguard", "thief", "creeperskin", "wildwest", "craftee"),
+            listOf("securitycore", "securityguard", "thief", "creeperskin", "wildwest", "craftee", "starwars"),
             ids,
             "Expected all NeoForge mods in settings.gradle order; the translator module itself must be filtered out",
         )

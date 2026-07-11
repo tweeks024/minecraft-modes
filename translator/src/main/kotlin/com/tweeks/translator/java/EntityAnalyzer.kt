@@ -71,14 +71,21 @@ internal class EntityAnalyzer(
         val registrations = collectEntityRegistrations(sources)
         if (registrations.isEmpty()) return
 
+        // Index every class parsed for this module by simple name. Used to
+        // walk same-module superclasses (goal inheritance) and to resolve
+        // named-constant attribute values from sibling/base classes
+        // (e.g. `SwMobConstants.TROOPER_MAX_HEALTH`). Lookups return null for
+        // classes outside the module (vanilla types), which is where the
+        // superclass walk and constant resolution stop.
         val entityClasses = sources.units.flatMap { it.types }
             .filterIsInstance<ClassOrInterfaceDeclaration>()
             .associateBy { it.nameAsString }
+        val classLookup: (String) -> ClassOrInterfaceDeclaration? = { entityClasses[it] }
 
         for (reg in registrations) {
             val entityClass = entityClasses[reg.entityClassName] ?: continue
             try {
-                analyzeOne(mod, reg, entityClass, outputRoot)
+                analyzeOne(mod, reg, entityClass, classLookup, outputRoot)
             } catch (e: Throwable) {
                 unt.recordPhase2Failure(
                     mod.modId,
@@ -92,6 +99,7 @@ internal class EntityAnalyzer(
         mod: ModDiscovery.DiscoveredMod,
         reg: EntityRegistration,
         entityClass: ClassOrInterfaceDeclaration,
+        classLookup: (String) -> ClassOrInterfaceDeclaration?,
         outputRoot: Path,
     ) {
         // Projectile entities (ThrowableItemProjectile, AbstractArrow, etc.)
@@ -109,8 +117,8 @@ internal class EntityAnalyzer(
             return
         }
 
-        val attrs = readAttributes(entityClass)
-        val goals = GoalMatcher(unt).match(mod.modId, entityClass)
+        val attrs = readAttributes(mod.modId, entityClass, classLookup)
+        val goals = GoalMatcher(unt).match(mod.modId, entityClass, classLookup)
         val securityFamilies = readSecurityFamilies(entityClass)
 
         // Phase 3: route every Medium-bucket goal through the LLM gate. Each
@@ -147,7 +155,7 @@ internal class EntityAnalyzer(
         }
 
         val identifier = "${mod.modId}:${reg.entityId}"
-        val components = buildEntityComponents(reg, attrs, goals, securityFamilies)
+        val components = buildEntityComponents(reg, attrs, goals, securityFamilies, unt, mod.modId)
 
         val entityJson = buildJsonObject {
             put("format_version", target.format_versions.entity)
@@ -234,6 +242,8 @@ internal class EntityAnalyzer(
         attrs: Map<String, Double>,
         goals: GoalMatcher.Result,
         securityFamilies: List<String>,
+        unt: Untranslatable,
+        modId: String,
     ): JsonObject {
         // Use a sorted map so the output is byte-stable regardless of
         // catalog insertion order.
@@ -320,11 +330,20 @@ internal class EntityAnalyzer(
             compareBy({ it.priority }, { it.componentName })
         )
         for (g in sortedGoals) {
-            // Bedrock allows duplicate behavior names with different priorities
-            // by using the same component key; later writes overwrite earlier.
-            // For now we drop duplicates rather than synthesize unique keys —
-            // that matches the typical securityguard / thief use case where
-            // duplicates would collide on intent anyway.
+            // Bedrock entity JSON requires unique component keys. When multiple
+            // Java goals map to the same component name, keep the highest-priority
+            // one (lowest priority value — already iterating in ascending order, so
+            // the first occurrence wins). Record the dropped goals via Untranslatable
+            // so they surface in UNTRANSLATABLE.md instead of silently disappearing.
+            if (sorted.containsKey(g.componentName)) {
+                unt.recordDuplicateBehaviorComponent(
+                    modId = modId,
+                    entityName = reg.entityId,
+                    componentName = g.componentName,
+                    droppedGoalDescription = "priority ${g.priority}",
+                )
+                continue
+            }
             val merged = buildJsonObject {
                 put("priority", JsonPrimitive(g.priority))
                 for ((k, v) in g.body.entries.sortedBy { it.key }) put(k, v)
@@ -386,8 +405,18 @@ internal class EntityAnalyzer(
     /**
      * Parse `static createAttributes()` for `.add(Attributes.X, value)` calls.
      * Returns a map of the Java attribute simple name → numeric value.
+     *
+     * A value is resolved from a plain numeric literal, or from a reference to
+     * a `static final` numeric field — same class, a same-module sibling class
+     * (`SwMobConstants.TROOPER_MAX_HEALTH`), or an inherited constant. When a
+     * value can't be folded to a literal it is recorded on [Untranslatable]
+     * rather than silently dropped.
      */
-    private fun readAttributes(entity: ClassOrInterfaceDeclaration): Map<String, Double> {
+    private fun readAttributes(
+        modId: String,
+        entity: ClassOrInterfaceDeclaration,
+        classLookup: (String) -> ClassOrInterfaceDeclaration?,
+    ): Map<String, Double> {
         val method = entity.methods.firstOrNull { it.nameAsString == "createAttributes" }
             ?: return emptyMap()
         val out = mutableMapOf<String, Double>()
@@ -396,10 +425,77 @@ internal class EntityAnalyzer(
             if (call.arguments.size < 2) continue
             val attrExpr = call.arguments[0]
             val attrName = (attrExpr as? FieldAccessExpr)?.nameAsString ?: continue
-            val value = readDoubleLiteral(call.arguments[1]) ?: continue
+            val value = resolveNumericValue(call.arguments[1], entity, classLookup)
+            if (value == null) {
+                unt.recordEntityAttributeUnresolved(
+                    modId = modId,
+                    entityName = entity.nameAsString,
+                    summary = "attribute `$attrName` value `${call.arguments[1]}` is not a " +
+                        "literal or a resolvable static-final constant",
+                )
+                continue
+            }
             out[attrName] = value
         }
         return out
+    }
+
+    /**
+     * Resolve an attribute value expression to a Double. Handles plain literals
+     * (via [readDoubleLiteral]) and references to `static final` numeric
+     * constants: `SomeClass.FIELD` (a same-module class) and bare `FIELD`
+     * (own class or an inherited constant). Returns null when the reference
+     * can't be folded to a literal — the caller records that on Untranslatable.
+     */
+    private fun resolveNumericValue(
+        expr: Expression,
+        ownerClass: ClassOrInterfaceDeclaration,
+        classLookup: (String) -> ClassOrInterfaceDeclaration?,
+    ): Double? {
+        readDoubleLiteral(expr)?.let { return it }
+        return when (expr) {
+            is FieldAccessExpr -> {
+                // `SwMobConstants.TROOPER_MAX_HEALTH` — scope is the declaring
+                // class's simple name, name is the field.
+                val className = (expr.scope as? com.github.javaparser.ast.expr.NameExpr)
+                    ?.nameAsString ?: return null
+                val cls = classLookup(className) ?: return null
+                resolveConstantField(cls, expr.nameAsString, classLookup, mutableSetOf())
+            }
+            is com.github.javaparser.ast.expr.NameExpr -> {
+                // Bare `FIELD` — own class or inherited from a same-module base.
+                resolveConstantField(ownerClass, expr.nameAsString, classLookup, mutableSetOf())
+            }
+            else -> null
+        }
+    }
+
+    /**
+     * Find a `static final` numeric field named [fieldName] on [cls] (or,
+     * recursively, its same-module superclasses) and fold its initializer to a
+     * literal. Simple constant expressions only (int/double literal, optionally
+     * with unary minus) — no cross-constant expression evaluation.
+     */
+    private fun resolveConstantField(
+        cls: ClassOrInterfaceDeclaration,
+        fieldName: String,
+        classLookup: (String) -> ClassOrInterfaceDeclaration?,
+        visited: MutableSet<String>,
+    ): Double? {
+        if (!visited.add(cls.nameAsString)) return null
+        for (field in cls.fields) {
+            if (!field.isStatic || !field.isFinal) continue
+            for (v in field.variables) {
+                if (v.nameAsString != fieldName) continue
+                val init = v.initializer.orElse(null) ?: return null
+                return readDoubleLiteral(init)
+            }
+        }
+        for (extended in cls.extendedTypes) {
+            val sup = classLookup(extended.nameAsString) ?: continue
+            resolveConstantField(sup, fieldName, classLookup, visited)?.let { return it }
+        }
+        return null
     }
 
     private fun readDoubleLiteral(expr: Expression): Double? {
@@ -648,9 +744,12 @@ internal class EntityAnalyzer(
      * class segment until we find a file.
      */
     private fun findGoalSource(mod: ModDiscovery.DiscoveredMod, goalFqn: String): String? {
-        val candidates = mutableListOf<Path>()
         var fqnTry: String? = goalFqn
         while (fqnTry != null && fqnTry.contains('.')) {
+            // Per-iteration list — must reset each pass, otherwise we re-
+            // scan the previous FQN's paths (which are already known to
+            // miss) and waste IO. Originally declared above the loop.
+            val candidates = mutableListOf<Path>()
             val rel = fqnTry.replace('.', '/') + ".java"
             // Try the mod itself first, then sibling mods discovered in the same
             // repo. We don't have the full discovered list here, so check the
@@ -679,17 +778,16 @@ internal class EntityAnalyzer(
     }
 
     /**
-     * One-line guess at the goal's parent FQN. Custom goals in this repo
-     * extend `net.minecraft.world.entity.ai.goal.Goal`. Vanilla goals from
-     * Mojang's package extend their own siblings — for those we return the
-     * goal FQN's package + ".Goal" as a placeholder.
+     * One-line guess at the goal's parent FQN. Both vanilla and custom goals
+     * in this repo extend `net.minecraft.world.entity.ai.goal.Goal` — there
+     * is no shape today where they don't, so we return the constant. The
+     * [goalFqn] param is retained because callers route it through the
+     * goal-context builder; a future refactor that resolves the real
+     * supertype (e.g. `TargetGoal`) would key off it.
      */
+    @Suppress("UNUSED_PARAMETER")
     private fun inferParentClassFqn(goalFqn: String): String? {
-        return if (goalFqn.startsWith("net.minecraft.world.entity.ai.goal.")) {
-            "net.minecraft.world.entity.ai.goal.Goal"
-        } else {
-            "net.minecraft.world.entity.ai.goal.Goal"
-        }
+        return "net.minecraft.world.entity.ai.goal.Goal"
     }
 
     /** Two-line summary of the owning entity for the LLM prompt. */

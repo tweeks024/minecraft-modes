@@ -138,7 +138,16 @@ class ConfidenceGate(
     /**
      * Compute the cache key for this goal. Spec form (Phase 3 simplification):
      *
-     *     sha256(java_source + prompt_version + model_id + bedrock_api_version)
+     *     sha256(java_source + prompt_version + system_prompt_digest +
+     *            model_id + bedrock_api_version)
+     *
+     * The `system_prompt_digest` is the first 8 hex chars of a SHA-256 over
+     * the concatenated text of every [ClaudeClient.SystemBlock] in the
+     * current [TranslationPrompt]. This way editing a resource file
+     * (`worked-examples.md`, `family-filters.md`, the bundled type
+     * declarations, or the performance-rules preamble) automatically
+     * invalidates every cached translation, even if the author forgets to
+     * bump [TranslationPrompt.PROMPT_VERSION].
      *
      * TODO(phase 4): add `resolved_symbol_closure` (FQN + signature hash for
      * each external method/field the goal references) and
@@ -152,10 +161,24 @@ class ConfidenceGate(
         md.update(0)
         md.update(TranslationPrompt.PROMPT_VERSION.toByteArray(Charsets.UTF_8))
         md.update(0)
+        md.update(systemPromptDigest.toByteArray(Charsets.UTF_8))
+        md.update(0)
         md.update(modelId.toByteArray(Charsets.UTF_8))
         md.update(0)
         md.update(bedrockApiVersion.toByteArray(Charsets.UTF_8))
         return md.digest().joinToString("") { "%02x".format(it) }
+    }
+
+    /**
+     * 8-char SHA-256 prefix of the resolved system-prompt text. Computed
+     * once per gate instance — the prompt is immutable for the lifetime
+     * of the [ConfidenceGate].
+     */
+    private val systemPromptDigest: String by lazy {
+        val concatenated = prompt.systemBlocks().joinToString(" ") { it.text }
+        val digest = MessageDigest.getInstance("SHA-256")
+            .digest(concatenated.toByteArray(Charsets.UTF_8))
+        digest.joinToString("") { "%02x".format(it) }.take(8)
     }
 
     companion object {

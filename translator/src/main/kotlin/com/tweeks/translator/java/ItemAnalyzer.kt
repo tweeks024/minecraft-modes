@@ -183,6 +183,18 @@ internal class ItemAnalyzer(
                 put("protection", JsonPrimitive(armorSlotProtection(reg.armorSlot)))
             }
             components["minecraft:max_stack_size"] = JsonPrimitive(1)
+            // The protection numbers above are hardcoded to vanilla iron-
+            // armor values (HELMET=2, CHESTPLATE=6, LEGGINGS=5, BOOTS=2).
+            // Java mods can declare their own ArmorMaterial with different
+            // protection arrays, but reading that out of the AST is a
+            // separate feature — for now we record the gap so a reviewer
+            // can spot-check the emitted item JSON against the source.
+            unt.recordItemCustomBehavior(
+                mod.modId,
+                reg.itemId,
+                "armor protection emitted as iron-armor defaults (${reg.armorSlot}); " +
+                    "verify against the source ArmorMaterial if the mod customized it.",
+            )
         }
 
         if (reg.fireResistant) {
@@ -229,7 +241,7 @@ internal class ItemAnalyzer(
                             put(
                                 "menu_category",
                                 buildJsonObject {
-                                    put("category", JsonPrimitive(if (reg.spawnEggEntityId != null) "items" else "items"))
+                                    put("category", JsonPrimitive(if (reg.spawnEggEntityId != null) "nature" else "items"))
                                 },
                             )
                         },
@@ -479,7 +491,10 @@ internal class ItemAnalyzer(
     }
 
     private fun armorSlotProtection(javaArmorType: String): Int = when (javaArmorType) {
-        // Java vanilla iron armor protection by slot (same scale as Bedrock):
+        // Java vanilla iron armor protection by slot (same scale as Bedrock).
+        // TODO: read the actual ArmorMaterial from the AST so we don't lie
+        // when a mod customizes protection. Until then, the caller logs an
+        // UNTRANSLATABLE entry so reviewers know the value is approximate.
         "HELMET" -> 2
         "CHESTPLATE" -> 6
         "LEGGINGS" -> 5

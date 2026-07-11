@@ -42,4 +42,33 @@ class UntranslatableTest {
         assertTrue(report.contains("UNTRANSLATABLE — foo")) { report }
         assertTrue(report.contains("- `alpha`")) { report }
     }
+
+    @Test
+    fun `multiple phase 2 failures for one mod are all rendered`() {
+        val unt = Untranslatable()
+        unt.recordPhase2Failure("foo", "first analyzer threw: NPE on EntityFoo")
+        unt.recordPhase2Failure("foo", "second analyzer threw: ClassCastException on ItemBar")
+
+        val report = unt.renderReport("foo")
+        assertTrue(report.contains("Phase 2 analyzer failure")) { report }
+        assertTrue(report.contains("first analyzer threw: NPE on EntityFoo")) { report }
+        assertTrue(report.contains("second analyzer threw: ClassCastException on ItemBar")) { report }
+    }
+
+    @Test
+    fun `duplicate behavior component drop appears in renderReport`() {
+        val unt = Untranslatable()
+        unt.recordDuplicateBehaviorComponent(
+            modId = "foo",
+            entityName = "Guard",
+            componentName = "minecraft:behavior.random_stroll",
+            droppedGoalDescription = "priority 7: RandomStrollGoal",
+        )
+
+        val report = unt.renderReport("foo")
+        assertTrue(report.contains("Duplicate Bedrock behavior components dropped")) { report }
+        assertTrue(report.contains("Guard")) { report }
+        assertTrue(report.contains("minecraft:behavior.random_stroll")) { report }
+        assertTrue(report.contains("priority 7: RandomStrollGoal")) { report }
+    }
 }

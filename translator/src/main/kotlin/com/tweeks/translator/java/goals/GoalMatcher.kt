@@ -14,6 +14,7 @@ import com.github.javaparser.ast.expr.MethodCallExpr
 import com.github.javaparser.ast.expr.NameExpr
 import com.github.javaparser.ast.expr.ObjectCreationExpr
 import com.github.javaparser.ast.expr.StringLiteralExpr
+import com.github.javaparser.ast.expr.SuperExpr
 import com.github.javaparser.ast.expr.UnaryExpr
 import com.github.javaparser.ast.expr.ThisExpr
 import com.tweeks.translator.emit.Untranslatable
@@ -63,11 +64,53 @@ internal class GoalMatcher(private val unt: Untranslatable) {
         val deferred: List<DeferredGoal> = emptyList(),
     )
 
-    fun match(modId: String, entity: ClassOrInterfaceDeclaration): Result {
+    /**
+     * Analyze [entity]'s AI goals, walking same-module superclasses.
+     *
+     * [superclassLookup] maps a simple class name to its declaration if it
+     * lives in the same module (EntityAnalyzer passes the module's parsed
+     * classes). It returns null for classes outside the module (vanilla
+     * `PathfinderMob`, `Monster`, …), which is where the walk stops.
+     *
+     * Merge semantics mirror Java's override rules:
+     *   - A class with no `registerGoals()` inherits its superclass's goals
+     *     wholesale (walk into the superclass).
+     *   - A class that overrides `registerGoals()` uses its own goals; it
+     *     additionally merges the superclass's goals **only if** the override
+     *     calls `super.registerGoals()` (the wildwest HerobrineEntity /
+     *     starwars DarthVader pattern). Without a super-call the override
+     *     fully replaces the inherited goals.
+     */
+    fun match(
+        modId: String,
+        entity: ClassOrInterfaceDeclaration,
+        superclassLookup: (String) -> ClassOrInterfaceDeclaration? = { null },
+    ): Result {
         val components = mutableListOf<MatchedComponent>()
         val deferred = mutableListOf<DeferredGoal>()
+        collectGoals(modId, entity, superclassLookup, components, deferred, mutableSetOf())
+        return Result(components, deferred)
+    }
+
+    /** Recursively gather goals from [entity] and (per merge rules) its superclasses. */
+    private fun collectGoals(
+        modId: String,
+        entity: ClassOrInterfaceDeclaration,
+        superclassLookup: (String) -> ClassOrInterfaceDeclaration?,
+        components: MutableList<MatchedComponent>,
+        deferred: MutableList<DeferredGoal>,
+        visited: MutableSet<String>,
+    ) {
+        // Guard against a cyclic extends chain (shouldn't happen in valid
+        // Java, but a malformed source shouldn't loop forever).
+        if (!visited.add(entity.nameAsString)) return
+
         val registerGoals = entity.methods.firstOrNull { it.nameAsString == "registerGoals" }
-            ?: return Result(emptyList(), emptyList())
+        if (registerGoals == null) {
+            // No override: goals are inherited wholesale from the superclass.
+            walkSuperclasses(modId, entity, superclassLookup, components, deferred, visited)
+            return
+        }
 
         for (call in registerGoals.findAll(MethodCallExpr::class.java)) {
             val outcome = processAddGoalCall(modId, entity, call) ?: continue
@@ -76,7 +119,31 @@ internal class GoalMatcher(private val unt: Untranslatable) {
                 is Outcome.Deferred -> deferred.add(outcome.goal)
             }
         }
-        return Result(components, deferred)
+        // Only merge the superclass's goals when the override chains up.
+        if (callsSuperRegisterGoals(registerGoals)) {
+            walkSuperclasses(modId, entity, superclassLookup, components, deferred, visited)
+        }
+    }
+
+    private fun walkSuperclasses(
+        modId: String,
+        entity: ClassOrInterfaceDeclaration,
+        superclassLookup: (String) -> ClassOrInterfaceDeclaration?,
+        components: MutableList<MatchedComponent>,
+        deferred: MutableList<DeferredGoal>,
+        visited: MutableSet<String>,
+    ) {
+        for (extended in entity.extendedTypes) {
+            val superDecl = superclassLookup(extended.nameAsString) ?: continue
+            collectGoals(modId, superDecl, superclassLookup, components, deferred, visited)
+        }
+    }
+
+    /** True if [method] contains a `super.registerGoals()` call. */
+    private fun callsSuperRegisterGoals(method: MethodDeclaration): Boolean {
+        return method.findAll(MethodCallExpr::class.java).any {
+            it.nameAsString == "registerGoals" && it.scope.orElse(null) is SuperExpr
+        }
     }
 
     /** Distinguish "matched a vanilla goal" from "logged a Medium-bucket deferral". */
@@ -196,6 +263,15 @@ internal class GoalMatcher(private val unt: Untranslatable) {
         // looks novel (HashMap/HashSet/IO), Low; otherwise Medium.
         // Without cross-mod source resolution at this layer, default Medium —
         // Phase 3's LLM will read the source anyway and re-bucket.
+        //
+        // TODO(phase 4): once the source-resolution layer (cf. design spec
+        // section "Cross-mod source resolution") is wired through to this
+        // function, inspect the goal class body for novel-state markers
+        // (NBT serialization, IO, persistent maps, scheduler/calendar
+        // primitives) and return LOW for those. Adding heuristics here
+        // without source resolution would be speculative and could mis-
+        // classify well-known patterns; we prefer to keep MEDIUM as the
+        // safe default and let the LLM stage handle bucket refinement.
         return Untranslatable.GoalBucket.MEDIUM
     }
 
@@ -283,7 +359,19 @@ internal class GoalMatcher(private val unt: Untranslatable) {
     private fun argToLiteral(expr: Expression): VanillaGoalCatalog.LiteralArg? {
         return when (expr) {
             is IntegerLiteralExpr -> VanillaGoalCatalog.LiteralArg.IntArg(expr.asNumber().toInt())
-            is LongLiteralExpr -> VanillaGoalCatalog.LiteralArg.IntArg(expr.asNumber().toInt())
+            is LongLiteralExpr -> {
+                // Bedrock's behavior-component args are 32-bit ints. If a
+                // Java goal passed a `long` literal that fits in Int range
+                // we narrow it; otherwise return null so the goal is
+                // deferred rather than silently truncated to a wrong value
+                // (e.g. 5_000_000_000L would become 705032704).
+                val v = expr.asNumber().toLong()
+                if (v in Int.MIN_VALUE.toLong()..Int.MAX_VALUE.toLong()) {
+                    VanillaGoalCatalog.LiteralArg.IntArg(v.toInt())
+                } else {
+                    null
+                }
+            }
             is DoubleLiteralExpr -> VanillaGoalCatalog.LiteralArg.DoubleArg(expr.asDouble())
             is BooleanLiteralExpr -> VanillaGoalCatalog.LiteralArg.BoolArg(expr.value)
             is StringLiteralExpr -> VanillaGoalCatalog.LiteralArg.StringArg(expr.asString())

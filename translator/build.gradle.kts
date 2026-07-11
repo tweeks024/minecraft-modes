@@ -62,7 +62,7 @@ dependencies {
 // `translator/build/classpaths/<modId>.txt`. The CLI reads
 // `translator.classpathDir` from system properties and walks the files.
 // ---------------------------------------------------------------------
-val modProjects = listOf("securitycore", "securityguard", "creeperskin", "thief")
+val modProjects = listOf("securitycore", "securityguard", "creeperskin", "thief", "wildwest", "craftee")
 
 // Force each sibling mod to evaluate before this script so its
 // `runtimeClasspath` configuration is fully constructed (NeoForge +
@@ -147,12 +147,13 @@ tasks.register<JavaExec>("translate") {
 // configuration DRY. The aggregator `packAddon` depends on every per-mod
 // task — that's the user-facing entry point.
 // ---------------------------------------------------------------------
-val mcaddonModProjects = listOf("securitycore", "securityguard", "creeperskin", "thief")
+val mcaddonModProjects = listOf("securitycore", "securityguard", "creeperskin", "thief", "wildwest", "craftee")
 
-// Mods that bundle securitycore's packs alongside their own. Keep this in
-// sync with `ModMetadata.requiresSecurityCoreFor` — the truth is the same
-// "needs securitycore" relationship on the runtime side.
-val mcaddonRequiresSecurityCore = setOf("securityguard", "thief")
+// Mods that bundle securitycore's packs alongside their own. Each of these
+// has a `modId="securitycore"` line in its neoforge.mods.toml dependencies.
+// (Keep in sync with the toml — runtime ModMetadata.parseSecurityCoreDep is
+// the source of truth at translation time.)
+val mcaddonRequiresSecurityCore = setOf("securityguard", "thief", "wildwest")
 
 val bedrockOutDir = rootProject.layout.projectDirectory.dir("bedrock-out")
 

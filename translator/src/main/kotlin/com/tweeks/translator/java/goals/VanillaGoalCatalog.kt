@@ -153,16 +153,22 @@ internal object VanillaGoalCatalog {
         }
     }
 
+    // Java's DefendVillageTargetGoal targets any non-villager hostile within
+    // village bounds; the Bedrock equivalent's `entity_types` field expects a
+    // list of `{ filters, max_dist }` filter objects, not an empty container.
+    // Emitting `entity_types: {}` triggers a content-error log and a no-op
+    // behavior. Omit the field so Bedrock falls back to its default
+    // village-defender filter set.
     private fun mapDefendVillage(@Suppress("UNUSED_PARAMETER") args: List<LiteralArg>): JsonObject =
         buildJsonObject {
             put("must_reach", JsonPrimitive(true))
-            put("entity_types", buildJsonObject { })
         }
 
+    // Bedrock's hurt_by_target derives the target from the damage event; the
+    // optional `entity_types` field, if present, must be a filter-object list.
+    // We have no Java-side type list to translate so omit the field entirely.
     private fun mapHurtByTarget(@Suppress("UNUSED_PARAMETER") args: List<LiteralArg>): JsonObject =
-        buildJsonObject {
-            put("entity_types", buildJsonObject { })
-        }
+        buildJsonObject { }
 
     private val mappings: Map<String, GoalMapping> = listOf(
         // ----- goalSelector goals -----

@@ -124,15 +124,20 @@ private fun runPipeline(repoRoot: Path, opts: CliOptions, outputRoot: Path) {
     }
     val translationPrompt = TranslationPrompt.load(target)
 
+    // Single `discover()` call, reused for both `mods` (the user-requested
+    // subset) and `allDiscovered` (the cross-mod resolver set). When no
+    // --mod is given, the two are identical; when --mod is given, `mods`
+    // is the singleton subset filtered out of `allDiscovered` below.
+    val allDiscovered = discovery.discover()
     val mods = if (opts.modId != null) {
-        val one = discovery.findById(opts.modId)
+        val one = allDiscovered.firstOrNull { it.modId == opts.modId }
         if (one == null) {
             System.err.println("[translator] mod '${opts.modId}' not found in settings.gradle, or has no src/main/{java,resources}.")
             exitProcess(2)
         }
         listOf(one)
     } else {
-        discovery.discover()
+        allDiscovered
     }
 
     if (mods.isEmpty()) {
@@ -150,7 +155,8 @@ private fun runPipeline(repoRoot: Path, opts: CliOptions, outputRoot: Path) {
 
     // Phase 2a Java pipeline foundation. The full discovered list is
     // needed so [JavaSourceLoader] can wire sibling mods' src dirs as
-    // type solvers when we run analysis on a single mod.
+    // type solvers when we run analysis on a single mod. `allDiscovered`
+    // is already populated above (single call) so we just reuse it here.
     val classpathResolver = ClasspathResolver.fromSystemProperties()
     if (!classpathResolver.isAvailable()) {
         System.err.println(
@@ -158,7 +164,6 @@ private fun runPipeline(repoRoot: Path, opts: CliOptions, outputRoot: Path) {
                 "Run via :translator:translate to enable it."
         )
     }
-    val allDiscovered = discovery.discover()
 
     // For --diff mode the temp output is also empty before securitycore's
     // pipeline writes — but securityguard / thief depend on securitycore

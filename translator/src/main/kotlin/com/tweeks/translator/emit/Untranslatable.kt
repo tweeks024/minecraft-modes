@@ -41,7 +41,9 @@ class Untranslatable {
     private val itemCustomBehavior = TreeMap<String, TreeMap<String, String>>()
     private val spawnEggColorsHardcoded = TreeMap<String, TreeMap<String, String>>()
     private val renderControllerAmbiguous = TreeMap<String, TreeMap<String, String>>()
-    private val phase2Failures = TreeMap<String, String>()
+    private val entityAttributesUnresolved = TreeMap<String, TreeMap<String, TreeSet<String>>>()
+    private val phase2Failures = TreeMap<String, MutableList<String>>()
+    private val duplicateBehaviorComponents = TreeMap<String, TreeMap<String, TreeSet<String>>>()
 
     fun recordRecipeCategoryDropped(modId: String, recipeName: String) {
         recipeCategoryDropped.getOrPut(modId) { TreeSet() }.add(recipeName)
@@ -181,12 +183,45 @@ class Untranslatable {
     }
 
     /**
+     * Record an entity attribute whose value the analyzer could not fold to a
+     * literal (neither a numeric literal nor a resolvable `static final`
+     * constant — e.g. a runtime-computed value). [entityName] is the simple
+     * class name; [summary] describes the attribute and its unresolved value.
+     */
+    fun recordEntityAttributeUnresolved(modId: String, entityName: String, summary: String) {
+        entityAttributesUnresolved
+            .getOrPut(modId) { TreeMap() }
+            .getOrPut(entityName) { TreeSet() }
+            .add(summary)
+    }
+
+    /**
      * Record a Phase 2 analyzer that threw on this mod. The CLI catches
      * the exception so other mods continue to translate; this entry
      * tells the user what went wrong.
      */
     fun recordPhase2Failure(modId: String, summary: String) {
-        phase2Failures[modId] = summary
+        phase2Failures.getOrPut(modId) { mutableListOf() }.add(summary)
+    }
+
+    /**
+     * Record an AI goal whose Bedrock behavior component collided with another
+     * goal mapping to the same component name. The first (higher-priority)
+     * goal wins; the rest are dropped from the entity JSON. [entityName] is
+     * the simple class name, [componentName] is the Bedrock behavior key,
+     * and [droppedGoalDescription] identifies the dropped goal (e.g.
+     * "priority 7: RandomStrollGoal").
+     */
+    fun recordDuplicateBehaviorComponent(
+        modId: String,
+        entityName: String,
+        componentName: String,
+        droppedGoalDescription: String,
+    ) {
+        duplicateBehaviorComponents
+            .getOrPut(modId) { TreeMap() }
+            .getOrPut(entityName) { TreeSet() }
+            .add("$componentName ← $droppedGoalDescription")
     }
 
     /** Set of mod ids that have at least one recorded finding. */
@@ -211,7 +246,9 @@ class Untranslatable {
         ids.addAll(itemCustomBehavior.keys)
         ids.addAll(spawnEggColorsHardcoded.keys)
         ids.addAll(renderControllerAmbiguous.keys)
+        ids.addAll(entityAttributesUnresolved.keys)
         ids.addAll(phase2Failures.keys)
+        ids.addAll(duplicateBehaviorComponents.keys)
         return ids
     }
 
@@ -370,12 +407,17 @@ class Untranslatable {
                 (entityGoalsLlmStubbed[modId]?.keys ?: emptySet())
             val unhandled = entities.mapValues { (_, goals) ->
                 goals.filter { (key, deferral) ->
-                    deferral.bucket == GoalBucket.MEDIUM &&
-                        // The deferred key is `<priority>:<fqn>`; the simple
-                        // name is the substringAfterLast('.'), which ignores
-                        // the priority too thanks to the FQN dotted form.
-                        key.substringAfterLast('.') !in handledNames &&
-                        key.substringAfterLast(':').substringAfterLast('.') !in handledNames
+                    // The deferred key format is `<priority>:<fqn>` (priority
+                    // optional). Split once on ':' and take the FQN portion;
+                    // its simple name is the LLM-stage key. Known limitation:
+                    // two goals in different packages with the same simple
+                    // name (e.g. `a.b.Foo` and `c.d.Foo`) will be treated as
+                    // a collision and one will be filtered out here. That's
+                    // fine for the current corpus — Bedrock script paths
+                    // would collide anyway.
+                    val fqn = key.substringAfter(':', missingDelimiterValue = key)
+                    val simpleName = fqn.substringAfterLast('.')
+                    deferral.bucket == GoalBucket.MEDIUM && simpleName !in handledNames
                 }
             }.filterValues { it.isNotEmpty() }
 
@@ -439,11 +481,37 @@ class Untranslatable {
             for ((entityId, summary) in items) sb.append("- `").append(entityId).append("`: ").append(summary).append('\n')
             sb.append('\n')
         }
-        phase2Failures[modId]?.let { summary ->
+        duplicateBehaviorComponents[modId]?.takeIf { it.isNotEmpty() }?.let { entities ->
+            any = true
+            sb.append("## Duplicate Bedrock behavior components dropped\n\n")
+            sb.append("Multiple Java goals mapped to the same Bedrock behavior component name. ")
+            sb.append("Bedrock entity JSON requires unique component keys, so only the highest-priority goal (lowest priority value) is emitted. ")
+            sb.append("The dropped goals are listed here for review — hand-translate them into a script if their behavior is meaningful:\n\n")
+            for ((entityName, drops) in entities) {
+                sb.append("### `").append(entityName).append("`\n\n")
+                for (d in drops) sb.append("- ").append(d).append('\n')
+                sb.append('\n')
+            }
+        }
+        entityAttributesUnresolved[modId]?.takeIf { it.isNotEmpty() }?.let { entities ->
+            any = true
+            sb.append("## Entity attributes not resolved to literals\n\n")
+            sb.append("These `createAttributes()` values are neither numeric literals nor ")
+            sb.append("resolvable `static final` constants (e.g. computed at runtime). ")
+            sb.append("The attribute was dropped from the Bedrock entity JSON — set it by hand if it matters:\n\n")
+            for ((entityName, attrs) in entities) {
+                sb.append("### `").append(entityName).append("`\n\n")
+                for (a in attrs) sb.append("- ").append(a).append('\n')
+                sb.append('\n')
+            }
+        }
+        phase2Failures[modId]?.takeIf { it.isNotEmpty() }?.let { summaries ->
             any = true
             sb.append("## Phase 2 analyzer failure\n\n")
             sb.append("A Phase 2 analyzer (entity / item) threw on this mod. Other mods still translated. Stack-trace summary:\n\n")
-            sb.append("```\n").append(summary).append("\n```\n\n")
+            for (summary in summaries) {
+                sb.append("```\n").append(summary).append("\n```\n\n")
+            }
         }
 
         if (!any) {
