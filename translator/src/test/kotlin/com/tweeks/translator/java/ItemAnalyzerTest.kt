@@ -2,6 +2,8 @@ package com.tweeks.translator.java
 
 import com.tweeks.translator.discover.ModDiscovery
 import com.tweeks.translator.emit.Untranslatable
+import com.tweeks.translator.json.AssetCopier
+import com.tweeks.translator.json.ItemAtlasBuilder
 import com.tweeks.translator.manifest.BedrockTarget
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -9,6 +11,7 @@ import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -220,6 +223,83 @@ class ItemAnalyzerTest {
             "themod:pirate",
             pirate["minecraft:spawn_egg"]!!.jsonObject["type_id"]!!.jsonPrimitive.content,
         )
+    }
+
+    @Test
+    fun `starwars lightsaber select-type item model resolves to a static existing-texture icon`(@TempDir outDir: Path) {
+        // lightsaber.json's client model is a `minecraft:select` on the
+        // starwars:blade_color data component with 4 per-color cases (blue,
+        // green, red, purple) plus a blue fallback. The old behavior
+        // hardcoded the icon to `starwars:lightsaber`, a key item_texture.json
+        // never defines (only the per-color keys exist) — a broken icon.
+        val resolver = ClasspathResolver.fromSystemProperties()
+        assertTrue(resolver.isAvailable())
+        val all = ModDiscovery(repoRoot).discover()
+        val mod = all.first { it.modId == "starwars" }
+        val unt = Untranslatable()
+        // Mirror the real Cli.kt pipeline order: assets are copied before
+        // the Java pipeline runs, so item_texture.json short names exist by
+        // the time ItemAnalyzer resolves an icon/attachable texture.
+        val copyResult = AssetCopier(unt).copy(mod.rootDir, mod.modId, outDir)
+        ItemAtlasBuilder().build(mod.modId, copyResult.itemTextureShortNames, outDir)
+        val sources = JavaSourceLoader(resolver, unt).load(mod, all)
+        ItemAnalyzer(target, unt).analyze(mod, sources, outDir)
+
+        val lightsaber = itemComponents(read(outDir, "starwars/behavior_pack/items/lightsaber.json"))
+        val icon = lightsaber["minecraft:icon"]!!.jsonPrimitive.content
+        assertEquals("starwars:lightsaber_blue", icon)
+
+        // The chosen icon key must actually exist in item_texture.json —
+        // that's the whole point of the fix.
+        val atlas = read(outDir, "starwars/resource_pack/textures/item_texture.json")
+        assertNotNull(atlas["texture_data"]!!.jsonObject[icon]) { "expected $icon in item_texture.json" }
+
+        val report = unt.renderReport("starwars")
+        assertTrue(report.contains("Item model selector not translatable")) { report }
+        assertTrue(report.contains("`lightsaber`")) { report }
+        assertTrue(report.contains("item model selector not translatable — using starwars:lightsaber_blue as static icon")) { report }
+    }
+
+    @Test
+    fun `starwars weapon attachables reference textures that actually exist in the output`(@TempDir outDir: Path) {
+        // blaster_pistol/blaster_rifle/lightsaber attachables all reference
+        // `textures/entity/<itemId>` (no extension), but starwars never
+        // authored entity-view textures for these weapons — only flat item
+        // icons. The fix substitutes the resolved item-icon texture (which
+        // AssetCopier does place in the output) instead of a dangling path.
+        val resolver = ClasspathResolver.fromSystemProperties()
+        assertTrue(resolver.isAvailable())
+        val all = ModDiscovery(repoRoot).discover()
+        val mod = all.first { it.modId == "starwars" }
+        val unt = Untranslatable()
+        val copyResult = AssetCopier(unt).copy(mod.rootDir, mod.modId, outDir)
+        ItemAtlasBuilder().build(mod.modId, copyResult.itemTextureShortNames, outDir)
+        val sources = JavaSourceLoader(resolver, unt).load(mod, all)
+        ItemAnalyzer(target, unt).analyze(mod, sources, outDir)
+
+        fun attachableTexture(itemId: String): String {
+            val attachable = read(outDir, "starwars/resource_pack/attachables/$itemId.json")
+            return attachable["minecraft:attachable"]!!.jsonObject["description"]!!.jsonObject["textures"]!!
+                .jsonObject["default"]!!.jsonPrimitive.content
+        }
+
+        assertEquals("textures/items/blaster_pistol", attachableTexture("blaster_pistol"))
+        assertEquals("textures/items/blaster_rifle", attachableTexture("blaster_rifle"))
+        assertEquals("textures/items/lightsaber_blue", attachableTexture("lightsaber"))
+
+        // Every emitted attachable texture path must resolve to a real PNG
+        // in the output tree — no silent dangling references.
+        for (itemId in listOf("blaster_pistol", "blaster_rifle", "lightsaber")) {
+            val texRelPath = attachableTexture(itemId)
+            val pngPath = outDir.resolve("starwars/resource_pack/$texRelPath.png")
+            assertTrue(pngPath.toFile().exists()) { "expected $pngPath to exist for $itemId's attachable" }
+        }
+
+        val report = unt.renderReport("starwars")
+        assertTrue(report.contains("Attachable held-item texture substituted or missing")) { report }
+        assertTrue(report.contains("`blaster_pistol`")) { report }
+        assertTrue(report.contains("`blaster_rifle`")) { report }
+        assertFalse(report.contains("no item-icon")) { "expected a fallback texture to be found, not a hard miss: $report" }
     }
 
     private fun read(outDir: Path, rel: String): JsonObject {

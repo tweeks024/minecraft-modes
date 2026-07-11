@@ -39,6 +39,8 @@ class Untranslatable {
     private val entityGoalsLlmTranslated = TreeMap<String, TreeMap<String, String>>()
     private val entityGoalsLlmStubbed = TreeMap<String, TreeMap<String, String>>()
     private val itemCustomBehavior = TreeMap<String, TreeMap<String, String>>()
+    private val itemModelSelectorStatic = TreeMap<String, TreeMap<String, String>>()
+    private val attachableTextureFallback = TreeMap<String, TreeMap<String, String>>()
     private val spawnEggColorsHardcoded = TreeMap<String, TreeMap<String, String>>()
     private val renderControllerAmbiguous = TreeMap<String, TreeMap<String, String>>()
     private val entityAttributesUnresolved = TreeMap<String, TreeMap<String, TreeSet<String>>>()
@@ -166,6 +168,27 @@ class Untranslatable {
     }
 
     /**
+     * Record an item whose Java client model is a `minecraft:select`
+     * (component-keyed model, e.g. a data-component-driven blade/dye
+     * color) — Phase 2 doesn't translate the selector itself, so the item
+     * was given a static icon instead (see [summary] for which one).
+     */
+    fun recordItemModelSelectorStatic(modId: String, itemId: String, summary: String) {
+        itemModelSelectorStatic.getOrPut(modId) { TreeMap() }[itemId] = summary
+    }
+
+    /**
+     * Record an item attachable whose conventional `textures/entity/<id>`
+     * texture doesn't exist in the output tree, either because Phase 2
+     * substituted the item's icon texture instead ([summary] says which),
+     * or — if no fallback texture exists either — because the 3D held-item
+     * view will render with a missing texture in Bedrock.
+     */
+    fun recordAttachableTextureFallback(modId: String, itemId: String, summary: String) {
+        attachableTextureFallback.getOrPut(modId) { TreeMap() }[itemId] = summary
+    }
+
+    /**
      * Record a spawn-egg item that received hardcoded base/overlay
      * colors because the Java side computes them at runtime.
      */
@@ -244,6 +267,8 @@ class Untranslatable {
         ids.addAll(entityGoalsLlmTranslated.keys)
         ids.addAll(entityGoalsLlmStubbed.keys)
         ids.addAll(itemCustomBehavior.keys)
+        ids.addAll(itemModelSelectorStatic.keys)
+        ids.addAll(attachableTextureFallback.keys)
         ids.addAll(spawnEggColorsHardcoded.keys)
         ids.addAll(renderControllerAmbiguous.keys)
         ids.addAll(entityAttributesUnresolved.keys)
@@ -464,6 +489,23 @@ class Untranslatable {
             any = true
             sb.append("## Item custom behavior\n\n")
             sb.append("These items override `Item` methods (e.g. `postHurtEnemy`, `useOn`, `hurtEnemy`) with custom logic. Phase 3 (LLM stage) translates these to `behavior_pack/scripts/items/*.ts` event handlers; Phase 2 only emits the static item JSON:\n\n")
+            for ((itemId, summary) in items) sb.append("- `").append(itemId).append("`: ").append(summary).append('\n')
+            sb.append('\n')
+        }
+        itemModelSelectorStatic[modId]?.takeIf { it.isNotEmpty() }?.let { items ->
+            any = true
+            sb.append("## Item model selector not translatable — static icon used\n\n")
+            sb.append("These items use a `minecraft:select` component-keyed client model (e.g. a data-component-driven color). ")
+            sb.append("Phase 2 does not translate the selector; the item was instead given a fixed icon so it isn't a broken/missing texture reference in Bedrock. ")
+            sb.append("If the selected color/state matters in-game, hand-write the swap via Phase 3 scripting:\n\n")
+            for ((itemId, summary) in items) sb.append("- `").append(itemId).append("`: ").append(summary).append('\n')
+            sb.append('\n')
+        }
+        attachableTextureFallback[modId]?.takeIf { it.isNotEmpty() }?.let { items ->
+            any = true
+            sb.append("## Attachable held-item texture substituted or missing\n\n")
+            sb.append("These items have a `resource_pack/attachables/<id>.json` (from a `.bbmodel`) whose conventional " +
+                "`textures/entity/<id>` texture doesn't exist in the output. Verify the 3D held-item view in-game:\n\n")
             for ((itemId, summary) in items) sb.append("- `").append(itemId).append("`: ").append(summary).append('\n')
             sb.append('\n')
         }

@@ -14,15 +14,23 @@ import com.tweeks.translator.discover.ModDiscovery
 import com.tweeks.translator.emit.Untranslatable
 import com.tweeks.translator.json.JsonFormat
 import com.tweeks.translator.manifest.BedrockTarget
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.add
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
+import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.createDirectories
+import kotlin.io.path.isRegularFile
+import kotlin.io.path.readText
 import kotlin.io.path.writeText
 
 /**
@@ -69,8 +77,9 @@ internal class ItemAnalyzer(
 
         for (reg in registrations) {
             try {
-                writeItem(mod, reg, classIndex, classAttrs, classStackSize, classDurability, outputRoot)
-                writeAttachableIfBbmodelExists(mod, reg, outputRoot)
+                val icon = resolveIconBasis(mod, reg)
+                writeItem(mod, reg, icon, classIndex, classAttrs, classStackSize, classDurability, outputRoot)
+                writeAttachableIfBbmodelExists(mod, reg, icon, outputRoot)
             } catch (e: Throwable) {
                 unt.recordPhase2Failure(
                     mod.modId,
@@ -78,6 +87,102 @@ internal class ItemAnalyzer(
                 )
             }
         }
+    }
+
+    /**
+     * The static icon/texture basis for one item: what `minecraft:icon`
+     * should point at, and the `textures/items/<name>` short name backing
+     * it (used both for the icon component and as an attachable-texture
+     * fallback — see [writeAttachableIfBbmodelExists]).
+     */
+    private data class IconBasis(
+        val identifier: String,
+        val textureShortName: String,
+        val selectorNote: String?,
+    )
+
+    /**
+     * Read `assets/<modid>/items/<id>.json` (the Java client item-model
+     * definition) and pick the icon Bedrock should use.
+     *
+     * The common case is a plain `minecraft:model` reference, in which case
+     * the item's own identifier is already a valid `textures/items/<id>`
+     * short name (the two conventionally share a name), matching the prior
+     * (unconditional) behavior.
+     *
+     * When the definition is a `minecraft:select` (a component-keyed model
+     * — e.g. a data-component-driven blade/dye color), the
+     * translator does not attempt full selector translation (out of scope).
+     * Instead it picks the FIRST case's model (falling back to the
+     * `fallback` model if there are no cases), resolves that model's own
+     * texture reference, and uses that as a *static* icon — so the emitted
+     * icon key actually exists in `item_texture.json` instead of being a
+     * bare item-id key nothing defines. [IconBasis.selectorNote] is set so
+     * the caller can record the loss in UNTRANSLATABLE.md.
+     */
+    private fun resolveIconBasis(mod: ModDiscovery.DiscoveredMod, reg: ItemRegistration): IconBasis {
+        val default = IconBasis(
+            identifier = "${mod.modId}:${reg.itemId}",
+            textureShortName = reg.itemId,
+            selectorNote = null,
+        )
+        val itemModelPath = mod.rootDir.resolve("src/main/resources/assets/${mod.modId}/items/${reg.itemId}.json")
+        if (!itemModelPath.isRegularFile()) return default
+
+        val root = runCatching { Json.parseToJsonElement(itemModelPath.readText()).jsonObject }.getOrNull()
+            ?: return default
+        val model = root["model"]?.jsonObject ?: return default
+        if (model["type"]?.jsonPrimitive?.contentOrNull != "minecraft:select") return default
+
+        // First case's model, or the selector's fallback model if there are
+        // no cases (both shapes are `{"type": "minecraft:model", "model": "<ref>"}`).
+        val chosenModel = model["cases"]?.jsonArray?.firstOrNull()?.jsonObject?.get("model")?.jsonObject
+            ?: model["fallback"]?.jsonObject
+            ?: return default
+        val modelRef = chosenModel["model"]?.jsonPrimitive?.contentOrNull ?: return default
+
+        val resolved = resolveTextureFromModelRef(mod, modelRef)
+            // The referenced model file couldn't be read/resolved to a
+            // texture; fall back to the model reference's own last path
+            // segment as a best-effort short name (Java model/texture names
+            // conventionally match for single-texture item models).
+            ?: (modelRef.substringAfter(':').substringAfterLast('/').let {
+                "${mod.modId}:$it" to it
+            })
+
+        return IconBasis(
+            identifier = resolved.first,
+            textureShortName = resolved.second,
+            selectorNote = "item model selector not translatable — using ${resolved.first} as static icon",
+        )
+    }
+
+    /**
+     * Resolve a Java client model reference (e.g. `starwars:item/lightsaber_blue`)
+     * to the texture identifier its own model JSON declares (`textures.0` /
+     * `textures.particle`), returned as (full identifier, short name) —
+     * mirroring how [com.tweeks.translator.json.AssetCopier] names copied
+     * `textures/item/<name>.png` files. Returns null if the model file is
+     * missing or its texture can't be read.
+     */
+    private fun resolveTextureFromModelRef(mod: ModDiscovery.DiscoveredMod, modelRef: String): Pair<String, String>? {
+        val namespace = modelRef.substringBefore(':', missingDelimiterValue = mod.modId)
+        val path = modelRef.substringAfter(':', missingDelimiterValue = modelRef)
+        val modelFile = mod.rootDir.resolve("src/main/resources/assets/$namespace/models/$path.json")
+        if (!modelFile.isRegularFile()) return null
+
+        val modelJson = runCatching { Json.parseToJsonElement(modelFile.readText()).jsonObject }.getOrNull()
+            ?: return null
+        val textures = modelJson["textures"]?.jsonObject ?: return null
+        val texRef = textures["0"]?.jsonPrimitive?.contentOrNull
+            ?: textures["particle"]?.jsonPrimitive?.contentOrNull
+            ?: textures.values.firstOrNull()?.jsonPrimitive?.contentOrNull
+            ?: return null
+
+        val texNamespace = texRef.substringBefore(':', missingDelimiterValue = namespace)
+        val texPath = texRef.substringAfter(':', missingDelimiterValue = texRef)
+        val shortName = texPath.substringAfterLast('/')
+        return "$texNamespace:$shortName" to shortName
     }
 
     /**
@@ -89,15 +194,17 @@ internal class ItemAnalyzer(
     private fun writeAttachableIfBbmodelExists(
         mod: ModDiscovery.DiscoveredMod,
         reg: ItemRegistration,
+        icon: IconBasis,
         outputRoot: Path,
     ) {
         val toolsDir = mod.rootDir.resolve("tools")
-        if (!java.nio.file.Files.isDirectory(toolsDir)) return
+        if (!Files.isDirectory(toolsDir)) return
         val bbmodel = toolsDir.resolve("${reg.itemId}.bbmodel")
-        if (!java.nio.file.Files.isRegularFile(bbmodel)) return
+        if (!bbmodel.isRegularFile()) return
 
         val identifier = "${mod.modId}:${reg.itemId}"
         val geometryName = "geometry.${mod.modId}.${reg.itemId}"
+        val texturePath = resolveAttachableTexture(mod, reg, icon, outputRoot)
         val attachable = buildJsonObject {
             put("format_version", target.format_versions.attachable)
             put(
@@ -114,7 +221,7 @@ internal class ItemAnalyzer(
                             put(
                                 "textures",
                                 buildJsonObject {
-                                    put("default", JsonPrimitive("textures/entity/${reg.itemId}"))
+                                    put("default", JsonPrimitive(texturePath))
                                 },
                             )
                             put(
@@ -137,9 +244,54 @@ internal class ItemAnalyzer(
         outPath.writeText(JsonFormat.PRETTY.encodeToString(JsonElement.serializer(), attachable) + "\n")
     }
 
+    /**
+     * Pick the texture the attachable's `default` material should point at.
+     *
+     * The conventional path is `textures/entity/<itemId>` — a dedicated
+     * 3rd-person/held-item texture authored alongside the `.bbmodel`
+     * (verified against the output tree, since [com.tweeks.translator.json.AssetCopier]
+     * runs before the Java pipeline). When no such texture was authored (as
+     * with the starwars weapon bbmodels, which reuse the flat item-icon
+     * texture), fall back to the already-resolved item icon's
+     * `textures/items/<name>` and record the substitution. If neither
+     * exists, the conventional path is still emitted (unchanged JSON shape)
+     * but the gap is recorded so it isn't silent.
+     */
+    private fun resolveAttachableTexture(
+        mod: ModDiscovery.DiscoveredMod,
+        reg: ItemRegistration,
+        icon: IconBasis,
+        outputRoot: Path,
+    ): String {
+        val entityCandidate = "textures/entity/${reg.itemId}"
+        val rpDir = outputRoot.resolve("${mod.modId}/resource_pack")
+        if (rpDir.resolve("$entityCandidate.png").isRegularFile()) return entityCandidate
+
+        val itemCandidate = "textures/items/${icon.textureShortName}"
+        if (rpDir.resolve("$itemCandidate.png").isRegularFile()) {
+            unt.recordAttachableTextureFallback(
+                mod.modId,
+                reg.itemId,
+                "no dedicated $entityCandidate texture was authored; the attachable falls back to the " +
+                    "item icon texture $itemCandidate for the 3D held-item view — verify visually in-game.",
+            )
+            return itemCandidate
+        }
+
+        unt.recordAttachableTextureFallback(
+            mod.modId,
+            reg.itemId,
+            "referenced texture $entityCandidate does not exist in the output, and no item-icon " +
+                "texture ($itemCandidate) was found as a fallback either; the 3D held-item view will be " +
+                "missing in Bedrock.",
+        )
+        return entityCandidate
+    }
+
     private fun writeItem(
         mod: ModDiscovery.DiscoveredMod,
         reg: ItemRegistration,
+        icon: IconBasis,
         classIndex: Map<String, ClassOrInterfaceDeclaration>,
         classAttrs: Map<String, Double?>,
         classStackSize: Map<String, Int?>,
@@ -149,7 +301,8 @@ internal class ItemAnalyzer(
         val identifier = "${mod.modId}:${reg.itemId}"
 
         val components = sortedMapOf<String, JsonElement>()
-        components["minecraft:icon"] = JsonPrimitive(identifier)
+        components["minecraft:icon"] = JsonPrimitive(icon.identifier)
+        icon.selectorNote?.let { unt.recordItemModelSelectorStatic(mod.modId, reg.itemId, it) }
         // Stack size resolution priority: registration `.stacksTo(N)` →
         // item-class constructor `.stacksTo(N)` → vanilla default 64.
         val stackSize = reg.stackSize ?: classStackSize[reg.itemClassName] ?: 64
