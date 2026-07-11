@@ -19,12 +19,5 @@
     "sounds": [
       { "name": "minecraft:entity.zombie.attack_iron_door", "type": "event", "pitch": 1.7 }
     ]
-  },
-  "saber_hum": {
-    "category": "player",
-    "subtitle": "subtitle.starwars.saber_hum",
-    "sounds": [
-      { "name": "minecraft:block.beacon.ambient", "type": "event", "pitch": 1.4 }
-    ]
   }
 }

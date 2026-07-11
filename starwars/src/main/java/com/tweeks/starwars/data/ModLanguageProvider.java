@@ -24,7 +24,6 @@ public class ModLanguageProvider extends LanguageProvider {
         add("subtitle.starwars.blaster_fire", "Blaster fires");
         add("subtitle.starwars.saber_ignite", "Lightsaber ignites");
         add("subtitle.starwars.saber_clash", "Lightsabers clash");
-        add("subtitle.starwars.saber_hum", "Lightsaber hums");
 
         add("death.attack.starwars.blaster_bolt", "%1$s was vaporized");
         add("death.attack.starwars.blaster_bolt.player", "%1$s was vaporized by %2$s");
