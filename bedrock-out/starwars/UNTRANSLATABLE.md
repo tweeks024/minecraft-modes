@@ -22,6 +22,13 @@ Java→Bedrock vanilla-sound path mapping is best-effort for Phase 1a (the trans
 
 - `minecraft:entity.blaze.shoot` → `entity.blaze.shoot`
 
+## Entity goals stubbed for LLM (cache miss; run :translate --with-llm to translate)
+
+These goals produced a `// TODO LLM:` stub at `behavior_pack/scripts/goals/<GoalClass>.ts`. Either re-run with `--with-llm` (and `ANTHROPIC_API_KEY` set) to fill them in, or hand-translate them:
+
+- `BlasterAttackGoal` — cache miss; run :translate --with-llm to translate
+- `SwTargetGoal` — cache miss; run :translate --with-llm to translate
+
 ## Item custom behavior
 
 These items override `Item` methods (e.g. `postHurtEnemy`, `useOn`, `hurtEnemy`) with custom logic. Phase 3 (LLM stage) translates these to `behavior_pack/scripts/items/*.ts` event handlers; Phase 2 only emits the static item JSON:
