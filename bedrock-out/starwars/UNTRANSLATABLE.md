@@ -17,7 +17,9 @@ Bedrock recipes do not accept Java's datagen-only `category` hint; the field is 
 
 Bedrock has no equivalent of Java's `random_sequence` field; loot rolls use the level RNG instead.
 
+- `entities/astromech.json`
 - `entities/battle_droid.json`
+- `entities/boba_fett.json`
 - `entities/darth_vader.json`
 - `entities/jedi_knight.json`
 - `entities/luke_skywalker.json`
@@ -50,6 +52,7 @@ Java→Bedrock vanilla-sound path mapping is best-effort for Phase 1a (the trans
 These goals produced a `// TODO LLM:` stub at `behavior_pack/scripts/goals/<GoalClass>.ts`. Either re-run with `--with-llm` (and `ANTHROPIC_API_KEY` set) to fill them in, or hand-translate them:
 
 - `BlasterAttackGoal` — cache miss; run :translate --with-llm to translate
+- `BobaJetpackGoal` — cache miss; run :translate --with-llm to translate
 - `LukeLeapGoal` — cache miss; run :translate --with-llm to translate
 - `ObiWanPushGoal` — cache miss; run :translate --with-llm to translate
 - `SwTargetGoal` — cache miss; run :translate --with-llm to translate
@@ -86,7 +89,9 @@ These items have a `resource_pack/attachables/<id>.json` (from a `.bbmodel`) who
 
 These spawn eggs received default base/overlay colors because the Java side computes them at runtime via `EntityType.Builder` defaults. Hand-tune per the source mod's mob palette if the colors look wrong in-game:
 
+- `astromech_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `battle_droid_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
+- `boba_fett_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `darth_vader_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `jedi_knight_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `luke_skywalker_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.

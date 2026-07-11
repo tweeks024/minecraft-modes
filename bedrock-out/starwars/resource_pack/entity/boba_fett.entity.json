@@ -1,0 +1,20 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "starwars:boba_fett",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/boba_fett.png"
+      },
+      "geometry": {
+        "default": "geometry.starwars.boba_fett"
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ]
+    }
+  }
+}

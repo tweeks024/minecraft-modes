@@ -2,6 +2,9 @@
   "resource_pack_name": "starwars",
   "texture_name": "atlas.items",
   "texture_data": {
+    "starwars:astromech_spawn_egg": {
+      "textures": "textures/items/astromech_spawn_egg"
+    },
     "starwars:battle_droid_spawn_egg": {
       "textures": "textures/items/battle_droid_spawn_egg"
     },
@@ -10,6 +13,9 @@
     },
     "starwars:blaster_rifle": {
       "textures": "textures/items/blaster_rifle"
+    },
+    "starwars:boba_fett_spawn_egg": {
+      "textures": "textures/items/boba_fett_spawn_egg"
     },
     "starwars:darth_vader_spawn_egg": {
       "textures": "textures/items/darth_vader_spawn_egg"
