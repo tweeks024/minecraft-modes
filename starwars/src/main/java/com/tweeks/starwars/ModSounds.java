@@ -19,6 +19,10 @@ public final class ModSounds {
     }
 
     public static final DeferredHolder<SoundEvent, SoundEvent> BLASTER_FIRE = register("blaster_fire");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SABER_IGNITE = register("saber_ignite");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SABER_CLASH = register("saber_clash");
+    /** Registered for the interface contract; a continuous hum loop is future work (Milestone 5). */
+    public static final DeferredHolder<SoundEvent, SoundEvent> SABER_HUM = register("saber_hum");
 
     // More sound events land here in later tasks via register("name").
 

@@ -9,7 +9,11 @@
   "item.starwars.battle_droid_spawn_egg": "Battle Droid Spawn Egg",
   "item.starwars.blaster_pistol": "Blaster Pistol",
   "item.starwars.blaster_rifle": "Blaster Rifle",
+  "item.starwars.lightsaber": "Lightsaber",
   "item.starwars.stormtrooper_spawn_egg": "Stormtrooper Spawn Egg",
   "itemGroup.starwars": "Star Wars",
-  "subtitle.starwars.blaster_fire": "Blaster fires"
+  "subtitle.starwars.blaster_fire": "Blaster fires",
+  "subtitle.starwars.saber_clash": "Lightsabers clash",
+  "subtitle.starwars.saber_hum": "Lightsaber hums",
+  "subtitle.starwars.saber_ignite": "Lightsaber ignites"
 }

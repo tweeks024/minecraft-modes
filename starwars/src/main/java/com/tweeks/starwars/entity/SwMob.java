@@ -42,6 +42,12 @@ public abstract class SwMob extends PathfinderMob implements SwCombatant {
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(2, new BlasterAttackGoal(this));
+        this.goalSelector.addGoal(2, new net.minecraft.world.entity.ai.goal.MeleeAttackGoal(this, 1.2, true) {
+            @Override
+            public boolean canUse() { return !SwMob.this.usesBlaster() && super.canUse(); }
+            @Override
+            public boolean canContinueToUse() { return !SwMob.this.usesBlaster() && super.canContinueToUse(); }
+        });
         this.goalSelector.addGoal(7, new WaterAvoidingRandomStrollGoal(this, 0.6));
         this.goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 8.0F));
         this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));

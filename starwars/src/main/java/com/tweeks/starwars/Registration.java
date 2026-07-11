@@ -24,6 +24,9 @@ public final class Registration {
     public static final DeferredItem<com.tweeks.starwars.item.BlasterRifleItem> BLASTER_RIFLE =
         ITEMS.registerItem("blaster_rifle", com.tweeks.starwars.item.BlasterRifleItem::new, p -> p);
 
+    public static final DeferredItem<com.tweeks.starwars.item.LightsaberItem> LIGHTSABER =
+        ITEMS.registerItem("lightsaber", com.tweeks.starwars.item.LightsaberItem::new, p -> p);
+
     public static final DeferredItem<SpawnEggItem> STORMTROOPER_SPAWN_EGG = ITEMS.registerItem(
         "stormtrooper_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.STORMTROOPER.get()));
 
@@ -38,6 +41,9 @@ public final class Registration {
                 .displayItems((params, output) -> {
                     output.accept(BLASTER_PISTOL.get());
                     output.accept(BLASTER_RIFLE.get());
+                    for (com.tweeks.starwars.item.SaberColor color : com.tweeks.starwars.item.SaberColor.values()) {
+                        output.accept(com.tweeks.starwars.item.LightsaberItem.stackWithColor(color));
+                    }
                     output.accept(STORMTROOPER_SPAWN_EGG.get());
                     output.accept(BATTLE_DROID_SPAWN_EGG.get());
                     // Later tasks append their items here.

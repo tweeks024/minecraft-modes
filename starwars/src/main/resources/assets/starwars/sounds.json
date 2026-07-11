@@ -5,5 +5,26 @@
     "sounds": [
       { "name": "minecraft:entity.blaze.shoot", "type": "event", "pitch": 1.6 }
     ]
+  },
+  "saber_ignite": {
+    "category": "player",
+    "subtitle": "subtitle.starwars.saber_ignite",
+    "sounds": [
+      { "name": "minecraft:block.beacon.activate", "type": "event", "pitch": 1.8 }
+    ]
+  },
+  "saber_clash": {
+    "category": "player",
+    "subtitle": "subtitle.starwars.saber_clash",
+    "sounds": [
+      { "name": "minecraft:entity.zombie.attack_iron_door", "type": "event", "pitch": 1.7 }
+    ]
+  },
+  "saber_hum": {
+    "category": "player",
+    "subtitle": "subtitle.starwars.saber_hum",
+    "sounds": [
+      { "name": "minecraft:block.beacon.ambient", "type": "event", "pitch": 1.4 }
+    ]
   }
 }

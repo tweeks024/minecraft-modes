@@ -16,11 +16,15 @@ public class ModLanguageProvider extends LanguageProvider {
 
         add(com.tweeks.starwars.Registration.BLASTER_PISTOL.get(), "Blaster Pistol");
         add(com.tweeks.starwars.Registration.BLASTER_RIFLE.get(), "Blaster Rifle");
+        add(com.tweeks.starwars.Registration.LIGHTSABER.get(), "Lightsaber");
         add(com.tweeks.starwars.Registration.STORMTROOPER_SPAWN_EGG.get(), "Stormtrooper Spawn Egg");
         add(com.tweeks.starwars.Registration.BATTLE_DROID_SPAWN_EGG.get(), "Battle Droid Spawn Egg");
         add(com.tweeks.starwars.ModEntities.STORMTROOPER.get(), "Stormtrooper");
         add(com.tweeks.starwars.ModEntities.BATTLE_DROID.get(), "Battle Droid");
         add("subtitle.starwars.blaster_fire", "Blaster fires");
+        add("subtitle.starwars.saber_ignite", "Lightsaber ignites");
+        add("subtitle.starwars.saber_clash", "Lightsabers clash");
+        add("subtitle.starwars.saber_hum", "Lightsaber hums");
 
         add("death.attack.starwars.blaster_bolt", "%1$s was vaporized");
         add("death.attack.starwars.blaster_bolt.player", "%1$s was vaporized by %2$s");
