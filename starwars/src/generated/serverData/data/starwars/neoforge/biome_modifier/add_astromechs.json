@@ -1,0 +1,13 @@
+{
+  "type": "neoforge:add_spawns",
+  "biomes": [
+    "minecraft:plains",
+    "minecraft:desert"
+  ],
+  "spawners": {
+    "type": "starwars:astromech",
+    "maxCount": 1,
+    "minCount": 1,
+    "weight": 3
+  }
+}

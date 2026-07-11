@@ -15,7 +15,7 @@ public final class EscapePodLayout {
     public static final int SIZE_Y = 4;
     public static final int SIZE_Z = 5;
 
-    public enum Kind { SHELL, FLOOR, CHEST, AIR }
+    public enum Kind { SHELL, FLOOR, CHEST, AIR, ASTROMECH }
 
     public record Placement(int dx, int dy, int dz, Kind kind) {}
 
@@ -42,6 +42,10 @@ public final class EscapePodLayout {
         // Loot chest against the back wall interior.
         out.removeIf(p -> p.dx() == 2 && p.dy() == 1 && p.dz() == 3);
         out.add(new Placement(2, 1, 3, Kind.CHEST));
+        // Astromech marker: interior, near the torn front — the droid that
+        // "spawns nearby" the crash per spec.
+        out.removeIf(p -> p.dx() == 2 && p.dy() == 1 && p.dz() == 1);
+        out.add(new Placement(2, 1, 1, Kind.ASTROMECH));
         return out;
     }
 }

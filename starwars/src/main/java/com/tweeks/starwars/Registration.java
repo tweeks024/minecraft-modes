@@ -49,6 +49,9 @@ public final class Registration {
     public static final DeferredItem<SpawnEggItem> OBI_WAN_SPAWN_EGG = ITEMS.registerItem(
         "obi_wan_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.OBI_WAN.get()));
 
+    public static final DeferredItem<SpawnEggItem> ASTROMECH_SPAWN_EGG = ITEMS.registerItem(
+        "astromech_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.ASTROMECH.get()));
+
     public static final DeferredItem<Item> STORMTROOPER_HELMET = ITEMS.registerItem("stormtrooper_helmet",
         Item::new,
         p -> p.humanoidArmor(com.tweeks.starwars.item.StormtrooperArmorMaterials.STORMTROOPER,
@@ -90,6 +93,7 @@ public final class Registration {
                     output.accept(DARTH_VADER_SPAWN_EGG.get());
                     output.accept(LUKE_SKYWALKER_SPAWN_EGG.get());
                     output.accept(OBI_WAN_SPAWN_EGG.get());
+                    output.accept(ASTROMECH_SPAWN_EGG.get());
                     output.accept(STORMTROOPER_HELMET.get());
                     output.accept(STORMTROOPER_CHESTPLATE.get());
                     output.accept(STORMTROOPER_LEGGINGS.get());

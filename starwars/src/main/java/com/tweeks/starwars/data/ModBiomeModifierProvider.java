@@ -31,6 +31,10 @@ public final class ModBiomeModifierProvider {
         NeoForgeRegistries.Keys.BIOME_MODIFIERS,
         Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "add_jedi_knights"));
 
+    private static final ResourceKey<BiomeModifier> ADD_ASTROMECHS = ResourceKey.create(
+        NeoForgeRegistries.Keys.BIOME_MODIFIERS,
+        Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "add_astromechs"));
+
     public static void bootstrap(BootstrapContext<BiomeModifier> ctx) {
         var biomes = ctx.lookup(Registries.BIOME);
 
@@ -63,5 +67,14 @@ public final class ModBiomeModifierProvider {
             jediBiomes,
             WeightedList.of(java.util.List.of(new Weighted<>(
                 new MobSpawnSettings.SpawnerData(ModEntities.JEDI_KNIGHT.get(), 1, 2), 4)))));
+
+        HolderSet<Biome> astromechBiomes = HolderSet.direct(
+            biomes.getOrThrow(Biomes.PLAINS),
+            biomes.getOrThrow(Biomes.DESERT));
+
+        ctx.register(ADD_ASTROMECHS, new BiomeModifiers.AddSpawnsBiomeModifier(
+            astromechBiomes,
+            WeightedList.of(java.util.List.of(new Weighted<>(
+                new MobSpawnSettings.SpawnerData(ModEntities.ASTROMECH.get(), 1, 1), 3)))));
     }
 }

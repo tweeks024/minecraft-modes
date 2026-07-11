@@ -2,6 +2,7 @@ package com.tweeks.starwars.client;
 
 import com.tweeks.starwars.ModEntities;
 import com.tweeks.starwars.StarWarsMod;
+import com.tweeks.starwars.client.model.AstromechModel;
 import com.tweeks.starwars.client.model.BattleDroidModel;
 import com.tweeks.starwars.client.model.JediKnightModel;
 import com.tweeks.starwars.client.model.LukeModel;
@@ -25,6 +26,7 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.DARTH_VADER.get(), VaderRenderer::new);
         event.registerEntityRenderer(ModEntities.LUKE_SKYWALKER.get(), LukeRenderer::new);
         event.registerEntityRenderer(ModEntities.OBI_WAN.get(), ObiWanRenderer::new);
+        event.registerEntityRenderer(ModEntities.ASTROMECH.get(), AstromechRenderer::new);
     }
 
     @SubscribeEvent
@@ -35,5 +37,6 @@ public final class ClientSetup {
         event.registerLayerDefinition(VaderModel.LAYER_LOCATION, VaderModel::createBodyLayer);
         event.registerLayerDefinition(LukeModel.LAYER_LOCATION, LukeModel::createBodyLayer);
         event.registerLayerDefinition(ObiWanModel.LAYER_LOCATION, ObiWanModel::createBodyLayer);
+        event.registerLayerDefinition(AstromechModel.LAYER_LOCATION, AstromechModel::createBodyLayer);
     }
 }

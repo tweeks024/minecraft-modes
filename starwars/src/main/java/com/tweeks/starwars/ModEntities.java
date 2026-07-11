@@ -63,6 +63,14 @@ public final class ModEntities {
             .build(ResourceKey.create(Registries.ENTITY_TYPE,
                 Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "obi_wan"))));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<com.tweeks.starwars.entity.AstromechEntity>> ASTROMECH =
+        ENTITY_TYPES.register("astromech", () -> EntityType.Builder.<com.tweeks.starwars.entity.AstromechEntity>of(
+                com.tweeks.starwars.entity.AstromechEntity::new, MobCategory.CREATURE)
+            .sized(0.7f, 1.1f)
+            .clientTrackingRange(10)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "astromech"))));
+
     public static void register(IEventBus modEventBus) {
         ENTITY_TYPES.register(modEventBus);
     }

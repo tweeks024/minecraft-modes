@@ -131,6 +131,20 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
                 .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
                     .when(LootItemRandomChanceCondition.randomChance(0.25f))
                     .add(LootItem.lootTableItem(Registration.HOLOCRON.get()))));
+
+        // Astromech: 1-2 iron_nugget @80% + 1-2 redstone @60% (spare parts
+        // and power-cell scraps; no weapon/holocron drop — it's a utility
+        // droid, not a combatant).
+        this.add(ModEntities.ASTROMECH.get(),
+            LootTable.lootTable()
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.IRON_NUGGET).setWeight(80)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0f, 2.0f))))
+                    .add(EmptyLootItem.emptyItem().setWeight(20)))
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.REDSTONE).setWeight(60)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0f, 2.0f))))
+                    .add(EmptyLootItem.emptyItem().setWeight(40))));
     }
 
     @Override
@@ -141,7 +155,8 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
             ModEntities.JEDI_KNIGHT.get(),
             ModEntities.DARTH_VADER.get(),
             ModEntities.LUKE_SKYWALKER.get(),
-            ModEntities.OBI_WAN.get()
+            ModEntities.OBI_WAN.get(),
+            ModEntities.ASTROMECH.get()
         );
         return BuiltInRegistries.ENTITY_TYPE.stream().filter(known::contains);
     }

@@ -41,6 +41,12 @@ public class StarWarsMod {
                 net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 net.minecraft.world.entity.PathfinderMob::checkMobSpawnRules,
                 net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
+            // Astromech is a CREATURE too — same generic mob rule as Jedi Knight.
+            event.register(ModEntities.ASTROMECH.get(),
+                net.minecraft.world.entity.SpawnPlacementTypes.ON_GROUND,
+                net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                net.minecraft.world.entity.PathfinderMob::checkMobSpawnRules,
+                net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
         });
     }
 
@@ -57,5 +63,7 @@ public class StarWarsMod {
             com.tweeks.starwars.entity.LukeSkywalkerEntity.createAttributes().build());
         event.put(ModEntities.OBI_WAN.get(),
             com.tweeks.starwars.entity.ObiWanEntity.createAttributes().build());
+        event.put(ModEntities.ASTROMECH.get(),
+            com.tweeks.starwars.entity.AstromechEntity.createAttributes().build());
     }
 }

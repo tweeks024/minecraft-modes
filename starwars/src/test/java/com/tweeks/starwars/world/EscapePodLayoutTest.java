@@ -14,6 +14,13 @@ class EscapePodLayoutTest {
     }
 
     @Test
+    void exactlyOneAstromechMarker() {
+        long markers = EscapePodLayout.placements().stream()
+            .filter(p -> p.kind() == EscapePodLayout.Kind.ASTROMECH).count();
+        assertEquals(1, markers);
+    }
+
+    @Test
     void allPlacementsInsideDeclaredBounds() {
         for (var p : EscapePodLayout.placements()) {
             assertTrue(p.dx() >= 0 && p.dx() < EscapePodLayout.SIZE_X, p.toString());

@@ -81,6 +81,38 @@ DARTH_VADER_ACCESSORIES = [
     ('chest_panel',  BODY_BONE, (-2.0,  3.0, -2.6, 4, 3, 1),  (56, 54), 0.0),
 ]
 
+# Astromech droid: fully custom skeleton (body/head/legs only, no arms) at
+# its own pivots — the exact PartPose.offset values from AstromechModel.java
+# Step 3 — rather than the standard humanoid bone table above.
+ASTRO_BODY_BONE = (0, 24, 0)
+ASTRO_HEAD_BONE = (0, 10, 0)
+ASTRO_RLEG_BONE = (-5, 12, 0)
+ASTRO_LLEG_BONE = (5, 12, 0)
+
+# (bone_name, origin) pairs, in outliner order — passed as build_bbmodel's
+# bone_defs override since astromech's bone set/pivots don't match the
+# standard humanoid HEAD_BONE/BODY_BONE/.../LLEG_BONE table above.
+ASTROMECH_BONE_DEFS = [
+    ('body', ASTRO_BODY_BONE),
+    ('head', ASTRO_HEAD_BONE),
+    ('right_leg', ASTRO_RLEG_BONE),
+    ('left_leg', ASTRO_LLEG_BONE),
+]
+
+ASTROMECH_CUBES = [
+    ('body',      ASTRO_BODY_BONE, (-4.0, -14.0, -4.0, 8, 10, 8), (0, 20)),
+    ('head',      ASTRO_HEAD_BONE, (-4.0,  -4.0, -4.0, 8, 4, 8),  (0, 0)),
+    ('eye_lens',  ASTRO_HEAD_BONE, (-1.5,  -3.0, -4.5, 3, 2, 1),  (32, 0)),
+    ('right_leg', ASTRO_RLEG_BONE, (-1.0,   0.0, -1.5, 2, 12, 3), (32, 20)),
+    ('left_leg',  ASTRO_LLEG_BONE, (-1.0,   0.0, -1.5, 2, 12, 3), (42, 20)),
+]
+
+# mob_name -> bone_defs override (only needed for mobs whose bone set/pivots
+# aren't the standard humanoid table).
+MOB_BONE_DEFS = {
+    'astromech': ASTROMECH_BONE_DEFS,
+}
+
 MOBS = {
     'stormtrooper': HUMANOID_CUBES + STORMTROOPER_ACCESSORIES,
     'battle_droid': BATTLE_DROID_CUBES,
@@ -92,6 +124,9 @@ MOBS = {
     # Obi-Wan reuses the Jedi Knight's robe_skirt + hood accessory geometry
     # exactly — only the paint differs.
     'obi_wan': HUMANOID_CUBES + JEDI_KNIGHT_ACCESSORIES,
+    # Astromech: fully custom skeleton (see ASTROMECH_BONE_DEFS above) —
+    # body/head/legs only, no arms.
+    'astromech': ASTROMECH_CUBES,
 }
 
 
@@ -142,33 +177,42 @@ def make_bone_group(mob_name, name, origin, child_uuids):
     }
 
 
-def _parent_bone_name(bone_origin):
-    if bone_origin == HEAD_BONE: return 'head'
-    if bone_origin == BODY_BONE: return 'body'
-    if bone_origin == RARM_BONE: return 'right_arm'
-    if bone_origin == LARM_BONE: return 'left_arm'
-    if bone_origin == RLEG_BONE: return 'right_leg'
-    if bone_origin == LLEG_BONE: return 'left_leg'
+# Default (standard humanoid) bone table, as (bone_name, origin) pairs in
+# outliner order — same order as the original hardcoded if/elif chain this
+# replaces, so lookups for the existing mobs are byte-for-byte unchanged
+# (including that HEAD_BONE and BODY_BONE share the same (0, 24, 0) value:
+# 'head' is checked first and wins the match for both, exactly as before).
+DEFAULT_BONE_DEFS = [
+    ('head', HEAD_BONE),
+    ('body', BODY_BONE),
+    ('right_arm', RARM_BONE),
+    ('left_arm', LARM_BONE),
+    ('right_leg', RLEG_BONE),
+    ('left_leg', LLEG_BONE),
+]
+
+
+def _parent_bone_name(bone_origin, bone_defs):
+    for name, origin in bone_defs:
+        if bone_origin == origin:
+            return name
     raise ValueError(bone_origin)
 
 
-def build_bbmodel(mob_name, cubes, texture_path, tex_height=64):
+def build_bbmodel(mob_name, cubes, texture_path, tex_height=64, bone_defs=None):
     """Return the full bbmodel dict for one mob.
 
     `cubes` is a flat list of (name, bone, java, uv[, inflate]) tuples —
     the full cube table for the mob (humanoid cubes + accessories, or a
-    fully custom skeleton).
+    fully custom skeleton). `bone_defs` is an optional (name, origin) list
+    overriding the standard humanoid 6-bone table — required for mobs whose
+    skeleton doesn't match it (see ASTROMECH_BONE_DEFS).
     """
+    if bone_defs is None:
+        bone_defs = DEFAULT_BONE_DEFS
+
     elements = []
-    # bone_name -> [child cube UUID]
-    bone_children = {
-        'head':      [],
-        'body':      [],
-        'right_arm': [],
-        'left_arm':  [],
-        'right_leg': [],
-        'left_leg':  [],
-    }
+    bone_children = {name: [] for name, _ in bone_defs}
 
     for entry in cubes:
         if len(entry) == 5:
@@ -178,15 +222,11 @@ def build_bbmodel(mob_name, cubes, texture_path, tex_height=64):
             inflate = 0.0
         cube = make_cube(name, mob_name, bone, java, uv, inflate)
         elements.append(cube)
-        bone_children[_parent_bone_name(bone)].append(cube["uuid"])
+        bone_children[_parent_bone_name(bone, bone_defs)].append(cube["uuid"])
 
     outliner = [
-        make_bone_group(mob_name, 'head',      HEAD_BONE, bone_children['head']),
-        make_bone_group(mob_name, 'body',      BODY_BONE, bone_children['body']),
-        make_bone_group(mob_name, 'right_arm', RARM_BONE, bone_children['right_arm']),
-        make_bone_group(mob_name, 'left_arm',  LARM_BONE, bone_children['left_arm']),
-        make_bone_group(mob_name, 'right_leg', RLEG_BONE, bone_children['right_leg']),
-        make_bone_group(mob_name, 'left_leg',  LLEG_BONE, bone_children['left_leg']),
+        make_bone_group(mob_name, name, origin, bone_children[name])
+        for name, origin in bone_defs
     ]
 
     # Embed the texture as base64.
@@ -242,9 +282,9 @@ def build_bbmodel(mob_name, cubes, texture_path, tex_height=64):
     }
 
 
-def write_bbmodel(out_dir, mob_name, cubes, texture_dir, tex_height=64):
+def write_bbmodel(out_dir, mob_name, cubes, texture_dir, tex_height=64, bone_defs=None):
     texture_path = os.path.join(texture_dir, f"{mob_name}.png")
-    bbmodel = build_bbmodel(mob_name, cubes, texture_path, tex_height)
+    bbmodel = build_bbmodel(mob_name, cubes, texture_path, tex_height, bone_defs=bone_defs)
     out_path = os.path.join(out_dir, f"{mob_name}.bbmodel")
     with open(out_path, 'w') as f:
         json.dump(bbmodel, f, indent=2)
@@ -436,7 +476,8 @@ if __name__ == '__main__':
     print(f"Texture dir: {texture_dir}")
 
     for mob_name, cubes in MOBS.items():
-        write_bbmodel(out_dir, mob_name, cubes, texture_dir)
+        write_bbmodel(out_dir, mob_name, cubes, texture_dir,
+                       bone_defs=MOB_BONE_DEFS.get(mob_name))
 
     for piece_name, (cubes, folder) in ARMOR_PIECES.items():
         write_armor_bbmodel(out_dir, piece_name, cubes, texture_dir, folder)

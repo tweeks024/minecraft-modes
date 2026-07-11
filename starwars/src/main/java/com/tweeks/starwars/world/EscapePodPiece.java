@@ -1,5 +1,6 @@
 package com.tweeks.starwars.world;
 
+import com.tweeks.starwars.ModEntities;
 import com.tweeks.starwars.StarWarsMod;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
@@ -7,6 +8,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
@@ -65,13 +69,36 @@ public class EscapePodPiece extends ScatteredFeaturePiece {
                 case SHELL -> Blocks.LIGHT_GRAY_CONCRETE.defaultBlockState();
                 case FLOOR -> Blocks.GRAY_CONCRETE.defaultBlockState();
                 case AIR -> Blocks.AIR.defaultBlockState();
-                case CHEST -> null;   // handled below via createChest
+                case CHEST -> null;       // handled below via createChest
+                case ASTROMECH -> null;   // entity spawn below
             };
             if (state != null) {
                 this.placeBlock(level, state, p.dx(), p.dy(), p.dz(), box);
-            } else {
+            } else if (p.kind() == EscapePodLayout.Kind.CHEST) {
                 this.createChest(level, box, random, p.dx(), p.dy(), p.dz(), LOOT);
             }
+        }
+
+        // Astromech: spawn the droid nearby the crash at generation time
+        // (spec: "astromech spawns nearby"). Coordinates are mapped
+        // local->world through the oriented box (getWorldPos), so the
+        // marker rotates/mirrors with the piece — same pattern as the
+        // Task 28 garrison-spawn loop in ImperialOutpostPiece. Skipped if
+        // the marker falls outside the current chunk's box (the piece may
+        // straddle chunk borders).
+        for (var p : EscapePodLayout.placements()) {
+            if (p.kind() != EscapePodLayout.Kind.ASTROMECH) continue;
+            EntityType<? extends Mob> type = ModEntities.ASTROMECH.get();
+            BlockPos worldPos = this.getWorldPos(p.dx(), p.dy(), p.dz());
+            if (!box.isInside(worldPos)) continue;
+            Mob mob = type.create(level.getLevel(), EntitySpawnReason.STRUCTURE);
+            if (mob == null) continue;
+            mob.setPersistenceRequired();
+            mob.snapTo(worldPos.getX() + 0.5, worldPos.getY(), worldPos.getZ() + 0.5,
+                random.nextFloat() * 360.0F, 0.0F);
+            mob.finalizeSpawn(level, level.getCurrentDifficultyAt(mob.blockPosition()),
+                EntitySpawnReason.STRUCTURE, null);
+            level.addFreshEntityWithPassengers(mob);
         }
     }
 }

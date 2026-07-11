@@ -1,0 +1,272 @@
+{
+  "meta": {
+    "format_version": "4.5",
+    "model_format": "modded_entity",
+    "box_uv": true
+  },
+  "name": "astromech",
+  "model_identifier": "",
+  "visible_box": [
+    4,
+    4,
+    0
+  ],
+  "variable_placeholders": "",
+  "variable_placeholder_buttons": [],
+  "unhandled_root_fields": {},
+  "resolution": {
+    "width": 64,
+    "height": 64
+  },
+  "elements": [
+    {
+      "name": "body",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -4.0,
+        28.0,
+        -4.0
+      ],
+      "to": [
+        4.0,
+        38.0,
+        4.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        0,
+        20
+      ],
+      "type": "cube",
+      "uuid": "6a119035-0efe-59f7-89c4-d0ef7e53ca55"
+    },
+    {
+      "name": "head",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -4.0,
+        10.0,
+        -4.0
+      ],
+      "to": [
+        4.0,
+        14.0,
+        4.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        10,
+        0
+      ],
+      "uv_offset": [
+        0,
+        0
+      ],
+      "type": "cube",
+      "uuid": "d388ac16-5d45-504d-94c4-48b509b27ee2"
+    },
+    {
+      "name": "eye_lens",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -1.5,
+        11.0,
+        -4.5
+      ],
+      "to": [
+        1.5,
+        13.0,
+        -3.5
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        10,
+        0
+      ],
+      "uv_offset": [
+        32,
+        0
+      ],
+      "type": "cube",
+      "uuid": "91a87d89-1680-5219-bc28-df3ea24eb590"
+    },
+    {
+      "name": "right_leg",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -6.0,
+        0.0,
+        -1.5
+      ],
+      "to": [
+        -4.0,
+        12.0,
+        1.5
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        -5,
+        12,
+        0
+      ],
+      "uv_offset": [
+        32,
+        20
+      ],
+      "type": "cube",
+      "uuid": "3aa563c9-42c7-562e-aaf1-a4957640f998"
+    },
+    {
+      "name": "left_leg",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        4.0,
+        0.0,
+        -1.5
+      ],
+      "to": [
+        6.0,
+        12.0,
+        1.5
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        5,
+        12,
+        0
+      ],
+      "uv_offset": [
+        42,
+        20
+      ],
+      "type": "cube",
+      "uuid": "75a7441b-0a5e-5b89-87c8-9e4cb0b7fd32"
+    }
+  ],
+  "outliner": [
+    {
+      "name": "body",
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "color": 0,
+      "uuid": "753e7b9e-27b3-5667-9a21-81e14375967f",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "6a119035-0efe-59f7-89c4-d0ef7e53ca55"
+      ]
+    },
+    {
+      "name": "head",
+      "origin": [
+        0,
+        10,
+        0
+      ],
+      "color": 0,
+      "uuid": "6a4e1e83-3743-5f6a-962d-2d45ef8c6c87",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "d388ac16-5d45-504d-94c4-48b509b27ee2",
+        "91a87d89-1680-5219-bc28-df3ea24eb590"
+      ]
+    },
+    {
+      "name": "right_leg",
+      "origin": [
+        -5,
+        12,
+        0
+      ],
+      "color": 0,
+      "uuid": "e3640e16-8273-5886-bcbe-24fdd0b59a3d",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "3aa563c9-42c7-562e-aaf1-a4957640f998"
+      ]
+    },
+    {
+      "name": "left_leg",
+      "origin": [
+        5,
+        12,
+        0
+      ],
+      "color": 0,
+      "uuid": "47b036f2-9c1f-557c-954a-4eb5622704e3",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "75a7441b-0a5e-5b89-87c8-9e4cb0b7fd32"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "path": "/Users/tweeks/code/minecraft-mods/starwars/src/main/resources/assets/starwars/textures/entity/astromech.png",
+      "name": "astromech.png",
+      "folder": "entity",
+      "namespace": "starwars",
+      "id": "0",
+      "particle": false,
+      "render_mode": "default",
+      "render_sides": "auto",
+      "frame_time": 1,
+      "frame_order_type": "loop",
+      "frame_order": "",
+      "frame_interpolate": false,
+      "visible": true,
+      "internal": true,
+      "saved": true,
+      "uuid": "133f17e0-2110-5c89-8de8-024da7064eab",
+      "relative_path": "../src/main/resources/assets/starwars/textures/entity/astromech.png",
+      "use_as_default": false,
+      "layers_enabled": false,
+      "sync_to_project": "",
+      "width": 64,
+      "height": 64,
+      "uv_width": 64,
+      "uv_height": 64,
+      "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAwElEQVR4nO3YsQnCUBCA4YyQMSwtrKwcwTEcx9IyY1haWFhYOEYKJwjC2UmwCAaeHPq+D65JEXI/JPDSbHbHyJy2bV/TZFhsu8gcAWoPkLK0ACOnyy0yJ3t/Aap/BQSoPcD+0EXmZO8vAABQr2F4xD/N7AB9f4/MST9evz/Q+KBSasmpewrwawHGB5mpawII8Nk9l6t10fl6gOq/AQIIIIAAAhQMkP6XWYDkALMfuLTz+RqZk72/AAAAAAAAAFTiCaDNJh0yp4nUAAAAAElFTkSuQmCC"
+    }
+  ]
+}

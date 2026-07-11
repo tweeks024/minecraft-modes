@@ -263,6 +263,42 @@ def paint_obi_wan(rgba):
     rect(rgba, 32, 32, 64, 48, OBIWAN_ROBE)  # robe skirt region (u32.., v32..)
     rect(rgba, 32, 45, 64, 48, OBIWAN_ROBE_S)
 
+# Astromech droid: white body w/ blue vertical panel stripes + vents, blue
+# dome w/ a silver ring band + black eye lens, silver legs w/ a dark joint row.
+ASTRO_WHITE     = (0xE8, 0xE8, 0xEC, 0xFF)
+ASTRO_WHITE_HI  = (0xFA, 0xFA, 0xFC, 0xFF)
+ASTRO_WHITE_SH  = (0xC4, 0xC4, 0xCC, 0xFF)
+ASTRO_BLUE      = (0x28, 0x50, 0xA0, 0xFF)
+ASTRO_BLUE_HI   = (0x40, 0x68, 0xB8, 0xFF)
+ASTRO_VENT      = (0x90, 0x98, 0xA0, 0xFF)
+ASTRO_SILVER    = (0xC0, 0xC8, 0xD0, 0xFF)
+ASTRO_SILVER_SH = (0x90, 0x98, 0xA0, 0xFF)
+ASTRO_JOINT     = (0x30, 0x34, 0x3A, 0xFF)
+ASTRO_LENS      = (0x10, 0x10, 0x10, 0xFF)
+
+def paint_astromech(rgba):
+    fill(rgba, (0, 0, 0, 0))                  # custom UV layout — transparent base
+    # Dome head, UV (0,0)..(32,12): blue dome, silver ring band, black eye lens.
+    rect(rgba, 0, 0, 32, 12, ASTRO_BLUE)
+    rect(rgba, 0, 0, 32, 1, ASTRO_BLUE_HI)      # top gloss
+    rect(rgba, 0, 5, 32, 7, ASTRO_SILVER)       # silver ring band, wraps the dome
+    rect(rgba, 0, 10, 32, 12, ASTRO_SILVER_SH)  # lower dome shade
+    rect(rgba, 32, 0, 35, 3, ASTRO_LENS)        # eye lens
+    # Body, UV (0,20)..(32,38): white with two blue vertical panel stripes + vents.
+    rect(rgba, 0, 20, 32, 38, ASTRO_WHITE)
+    rect(rgba, 0, 20, 32, 21, ASTRO_WHITE_HI)   # top highlight
+    rect(rgba, 0, 36, 32, 38, ASTRO_WHITE_SH)   # bottom shade
+    rect(rgba, 4, 22, 7, 36, ASTRO_BLUE)        # left panel stripe
+    rect(rgba, 25, 22, 28, 36, ASTRO_BLUE)      # right panel stripe
+    rect(rgba, 12, 24, 15, 27, ASTRO_VENT)      # vent rect
+    rect(rgba, 17, 24, 20, 27, ASTRO_VENT)      # vent rect
+    # Legs, UV (32,20).. (one 10x15 footprint per leg): silver w/ a dark joint row.
+    for u0 in (32, 42):
+        rect(rgba, u0, 20, u0 + 10, 35, ASTRO_SILVER)
+        rect(rgba, u0, 20, u0 + 10, 21, ASTRO_WHITE_HI)   # top highlight sliver
+        rect(rgba, u0, 26, u0 + 10, 27, ASTRO_JOINT)      # joint row
+        rect(rgba, u0, 33, u0 + 10, 35, ASTRO_SILVER_SH)  # foot shade
+
 MOBS = {
     'stormtrooper': paint_stormtrooper,
     'battle_droid': paint_battle_droid,
@@ -270,6 +306,7 @@ MOBS = {
     'darth_vader': paint_darth_vader,
     'luke_skywalker': paint_luke_skywalker,
     'obi_wan': paint_obi_wan,
+    'astromech': paint_astromech,
 }
 
 # Worn-armor equipment layers: standard 64x32 vanilla armor-sheet UV layout
