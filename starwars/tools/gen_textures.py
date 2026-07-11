@@ -182,11 +182,48 @@ def paint_darth_vader(rgba):
     rect(rgba, 30, 8, 32, 16, VADER_JOINT)
     rect(rgba, 16, 30, 40, 32, VADER_JOINT)
 
+# Luke Skywalker (ROTJ): near-black tunic w/ subtle gloss highlights, dark
+# trousers with darker boots, sand-blond hair, fair skin + blue eyes, and a
+# tan glove stripe on the right wrist (mechanical hand, post-Bespin).
+LUKE_TUNIC    = (0x1C, 0x1C, 0x20, 0xFF)
+LUKE_TUNIC_HI = (0x30, 0x30, 0x36, 0xFF)
+LUKE_BOOT     = (0x10, 0x10, 0x12, 0xFF)
+LUKE_HAIR     = (0xC8, 0xA8, 0x60, 0xFF)
+LUKE_SKIN     = (0xE8, 0xC0, 0x98, 0xFF)
+LUKE_EYE      = (0x30, 0x60, 0xC0, 0xFF)
+LUKE_GLOVE    = (0x9A, 0x84, 0x60, 0xFF)
+
+def paint_luke_skywalker(rgba):
+    fill(rgba, LUKE_TUNIC)
+    # Head: sand-blond hair on top/sides/back, fair face with a hairline
+    # fringe and blue eyes.
+    rect(rgba, 0, 0, 32, 8, LUKE_HAIR)        # head top: hair
+    rect(rgba, 8, 8, 16, 16, LUKE_SKIN)       # face
+    rect(rgba, 8, 8, 16, 10, LUKE_HAIR)       # hairline
+    rect(rgba, 10, 11, 11, 12, LUKE_EYE)      # left eye
+    rect(rgba, 13, 11, 14, 12, LUKE_EYE)      # right eye
+    # Body: black tunic with a top-edge gloss highlight.
+    rect(rgba, 16, 16, 40, 32, LUKE_TUNIC)
+    rect(rgba, 16, 16, 40, 17, LUKE_TUNIC_HI)
+    # Arms: black tunic sleeves with top gloss highlight; the right arm
+    # (mechanical hand) gets a tan glove stripe on the wrist rows instead of
+    # the usual dark cuff.
+    for (u0, v0) in ((40, 16), (32, 48)):
+        rect(rgba, u0, v0, u0 + 16, v0 + 16, LUKE_TUNIC)
+        rect(rgba, u0, v0, u0 + 16, v0 + 1, LUKE_TUNIC_HI)
+    rect(rgba, 40, 30, 56, 32, LUKE_GLOVE)    # right-arm wrist rows: glove stripe
+    # Legs: black trousers, boots darker on the bottom 4 rows.
+    for (u0, v0) in ((0, 16), (16, 48)):
+        rect(rgba, u0, v0, u0 + 16, v0 + 16, LUKE_TUNIC)
+        rect(rgba, u0, v0, u0 + 16, v0 + 1, LUKE_TUNIC_HI)
+        rect(rgba, u0, v0 + 12, u0 + 16, v0 + 16, LUKE_BOOT)
+
 MOBS = {
     'stormtrooper': paint_stormtrooper,
     'battle_droid': paint_battle_droid,
     'jedi_knight': paint_jedi_knight,
     'darth_vader': paint_darth_vader,
+    'luke_skywalker': paint_luke_skywalker,
 }
 
 if __name__ == '__main__':

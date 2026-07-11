@@ -86,6 +86,9 @@ MOBS = {
     'battle_droid': BATTLE_DROID_CUBES,
     'jedi_knight': HUMANOID_CUBES + JEDI_KNIGHT_ACCESSORIES,
     'darth_vader': HUMANOID_CUBES + DARTH_VADER_ACCESSORIES,
+    # Plain humanoid — no accessory cubes. Luke's black tunic, blond hair,
+    # and glove stripe are painted directly onto the standard UV layout.
+    'luke_skywalker': HUMANOID_CUBES,
 }
 
 

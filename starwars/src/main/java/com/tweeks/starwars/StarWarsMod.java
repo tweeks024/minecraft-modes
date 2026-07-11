@@ -52,5 +52,7 @@ public class StarWarsMod {
             com.tweeks.starwars.entity.JediKnightEntity.createAttributes().build());
         event.put(ModEntities.DARTH_VADER.get(),
             com.tweeks.starwars.entity.DarthVaderEntity.createAttributes().build());
+        event.put(ModEntities.LUKE_SKYWALKER.get(),
+            com.tweeks.starwars.entity.LukeSkywalkerEntity.createAttributes().build());
     }
 }

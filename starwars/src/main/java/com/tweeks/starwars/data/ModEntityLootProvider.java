@@ -80,6 +80,23 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
                 .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
                     .add(LootItem.lootTableItem(Items.OBSIDIAN)
                         .apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0f, 4.0f))))));
+
+        // Luke Skywalker: 1-2 gold_ingot @60% (a hero-tier but not
+        // boss-tier haul). A 30% green-lightsaber drop was planned, but —
+        // same caveat as Darth Vader above — this MC version has no
+        // component-setting loot function (grepped "SetComponents|set_components"
+        // across wildwest/ and craftee/ with no hits), and LightsaberItem
+        // .stackWithColor's color lives in a data component with no setter
+        // loot function to pin it to green — a plain LootItem drop would
+        // render blue (index 0) by default, which is wrong for "Luke's
+        // saber". Falling back to gold-ingot-only per the task brief until a
+        // component-setting loot function exists.
+        this.add(ModEntities.LUKE_SKYWALKER.get(),
+            LootTable.lootTable()
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.GOLD_INGOT).setWeight(60)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0f, 2.0f))))
+                    .add(EmptyLootItem.emptyItem().setWeight(40))));
     }
 
     @Override
@@ -88,7 +105,8 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
             ModEntities.STORMTROOPER.get(),
             ModEntities.BATTLE_DROID.get(),
             ModEntities.JEDI_KNIGHT.get(),
-            ModEntities.DARTH_VADER.get()
+            ModEntities.DARTH_VADER.get(),
+            ModEntities.LUKE_SKYWALKER.get()
         );
         return BuiltInRegistries.ENTITY_TYPE.stream().filter(known::contains);
     }

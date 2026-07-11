@@ -4,6 +4,7 @@ import com.tweeks.starwars.ModEntities;
 import com.tweeks.starwars.StarWarsMod;
 import com.tweeks.starwars.client.model.BattleDroidModel;
 import com.tweeks.starwars.client.model.JediKnightModel;
+import com.tweeks.starwars.client.model.LukeModel;
 import com.tweeks.starwars.client.model.StormtrooperModel;
 import com.tweeks.starwars.client.model.VaderModel;
 import net.neoforged.api.distmarker.Dist;
@@ -21,6 +22,7 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.BATTLE_DROID.get(), BattleDroidRenderer::new);
         event.registerEntityRenderer(ModEntities.JEDI_KNIGHT.get(), JediKnightRenderer::new);
         event.registerEntityRenderer(ModEntities.DARTH_VADER.get(), VaderRenderer::new);
+        event.registerEntityRenderer(ModEntities.LUKE_SKYWALKER.get(), LukeRenderer::new);
     }
 
     @SubscribeEvent
@@ -29,5 +31,6 @@ public final class ClientSetup {
         event.registerLayerDefinition(BattleDroidModel.LAYER_LOCATION, BattleDroidModel::createBodyLayer);
         event.registerLayerDefinition(JediKnightModel.LAYER_LOCATION, JediKnightModel::createBodyLayer);
         event.registerLayerDefinition(VaderModel.LAYER_LOCATION, VaderModel::createBodyLayer);
+        event.registerLayerDefinition(LukeModel.LAYER_LOCATION, LukeModel::createBodyLayer);
     }
 }

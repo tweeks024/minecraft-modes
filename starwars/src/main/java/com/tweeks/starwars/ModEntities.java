@@ -47,6 +47,14 @@ public final class ModEntities {
             .build(ResourceKey.create(Registries.ENTITY_TYPE,
                 Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "darth_vader"))));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<com.tweeks.starwars.entity.LukeSkywalkerEntity>> LUKE_SKYWALKER =
+        ENTITY_TYPES.register("luke_skywalker", () -> EntityType.Builder.<com.tweeks.starwars.entity.LukeSkywalkerEntity>of(
+                com.tweeks.starwars.entity.LukeSkywalkerEntity::new, MobCategory.CREATURE)
+            .sized(0.6f, 1.95f)
+            .clientTrackingRange(10)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "luke_skywalker"))));
+
     public static void register(IEventBus modEventBus) {
         ENTITY_TYPES.register(modEventBus);
     }
