@@ -218,12 +218,45 @@ def paint_luke_skywalker(rgba):
         rect(rgba, u0, v0, u0 + 16, v0 + 1, LUKE_TUNIC_HI)
         rect(rgba, u0, v0 + 12, u0 + 16, v0 + 16, LUKE_BOOT)
 
+# Obi-Wan Kenobi: the Jedi Knight paint job with an older-Jedi palette —
+# auburn-gray hair + full lower-face beard, a lighter cream tunic, and a
+# grayer robe (vs. the Jedi Knight's plain brown robe).
+OBIWAN_TUNIC   = (0xE2, 0xD8, 0xC0, 0xFF)
+OBIWAN_TUNIC_S = (0xBE, 0xB4, 0x9C, 0xFF)
+OBIWAN_ROBE    = (0x74, 0x5C, 0x42, 0xFF)
+OBIWAN_ROBE_S  = (0x58, 0x46, 0x34, 0xFF)
+OBIWAN_HAIR    = (0x8A, 0x6A, 0x4A, 0xFF)
+OBIWAN_BEARD   = (0x7A, 0x5E, 0x42, 0xFF)
+
+def paint_obi_wan(rgba):
+    fill(rgba, OBIWAN_TUNIC)
+    rect(rgba, 0, 0, 32, 8, OBIWAN_HAIR)   # head top: auburn-gray hair
+    rect(rgba, 8, 8, 16, 16, SKIN)         # face
+    rect(rgba, 8, 8, 16, 10, OBIWAN_HAIR)  # hairline
+    rect(rgba, 10, 11, 11, 12, (0x20, 0x30, 0x50, 0xFF))  # eyes
+    rect(rgba, 13, 11, 14, 12, (0x20, 0x30, 0x50, 0xFF))
+    rect(rgba, 8, 13, 16, 16, OBIWAN_BEARD)  # full beard, lower face rows 13..16
+    rect(rgba, 32, 0, 64, 16, OBIWAN_ROBE)   # hood overlay strip
+    rect(rgba, 40, 8, 48, 16, (0, 0, 0, 0))  # hood front opening (transparent)
+    rect(rgba, 16, 16, 40, 32, OBIWAN_TUNIC) # body
+    rect(rgba, 20, 28, 36, 30, BELT)         # belt
+    rect(rgba, 16, 30, 40, 32, OBIWAN_TUNIC_S)
+    for (u0, v0) in ((40, 16), (32, 48)):    # arms: robe sleeves
+        rect(rgba, u0, v0, u0 + 16, v0 + 16, OBIWAN_ROBE)
+        rect(rgba, u0, v0 + 13, u0 + 16, v0 + 16, OBIWAN_ROBE_S)
+    for (u0, v0) in ((0, 16), (16, 48)):     # legs: dark trousers
+        rect(rgba, u0, v0, u0 + 16, v0 + 16, (0x50, 0x46, 0x38, 0xFF))
+        rect(rgba, u0, v0 + 14, u0 + 16, v0 + 16, (0x38, 0x30, 0x26, 0xFF))
+    rect(rgba, 32, 32, 64, 48, OBIWAN_ROBE)  # robe skirt region (u32.., v32..)
+    rect(rgba, 32, 45, 64, 48, OBIWAN_ROBE_S)
+
 MOBS = {
     'stormtrooper': paint_stormtrooper,
     'battle_droid': paint_battle_droid,
     'jedi_knight': paint_jedi_knight,
     'darth_vader': paint_darth_vader,
     'luke_skywalker': paint_luke_skywalker,
+    'obi_wan': paint_obi_wan,
 }
 
 if __name__ == '__main__':

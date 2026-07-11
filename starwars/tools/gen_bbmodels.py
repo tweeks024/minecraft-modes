@@ -89,6 +89,9 @@ MOBS = {
     # Plain humanoid — no accessory cubes. Luke's black tunic, blond hair,
     # and glove stripe are painted directly onto the standard UV layout.
     'luke_skywalker': HUMANOID_CUBES,
+    # Obi-Wan reuses the Jedi Knight's robe_skirt + hood accessory geometry
+    # exactly — only the paint differs.
+    'obi_wan': HUMANOID_CUBES + JEDI_KNIGHT_ACCESSORIES,
 }
 
 

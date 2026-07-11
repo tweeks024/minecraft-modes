@@ -42,6 +42,9 @@ public final class Registration {
     public static final DeferredItem<SpawnEggItem> LUKE_SKYWALKER_SPAWN_EGG = ITEMS.registerItem(
         "luke_skywalker_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.LUKE_SKYWALKER.get()));
 
+    public static final DeferredItem<SpawnEggItem> OBI_WAN_SPAWN_EGG = ITEMS.registerItem(
+        "obi_wan_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.OBI_WAN.get()));
+
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> STARWARS_TAB =
         CREATIVE_TABS.register("main", () ->
             CreativeModeTab.builder()
@@ -58,6 +61,7 @@ public final class Registration {
                     output.accept(JEDI_KNIGHT_SPAWN_EGG.get());
                     output.accept(DARTH_VADER_SPAWN_EGG.get());
                     output.accept(LUKE_SKYWALKER_SPAWN_EGG.get());
+                    output.accept(OBI_WAN_SPAWN_EGG.get());
                     // Later tasks append their items here.
                 })
                 .build());

@@ -55,6 +55,14 @@ public final class ModEntities {
             .build(ResourceKey.create(Registries.ENTITY_TYPE,
                 Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "luke_skywalker"))));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<com.tweeks.starwars.entity.ObiWanEntity>> OBI_WAN =
+        ENTITY_TYPES.register("obi_wan", () -> EntityType.Builder.<com.tweeks.starwars.entity.ObiWanEntity>of(
+                com.tweeks.starwars.entity.ObiWanEntity::new, MobCategory.CREATURE)
+            .sized(0.6f, 1.95f)
+            .clientTrackingRange(10)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "obi_wan"))));
+
     public static void register(IEventBus modEventBus) {
         ENTITY_TYPES.register(modEventBus);
     }

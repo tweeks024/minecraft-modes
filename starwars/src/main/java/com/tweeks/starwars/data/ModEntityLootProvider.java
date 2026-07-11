@@ -97,6 +97,24 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
                     .add(LootItem.lootTableItem(Items.GOLD_INGOT).setWeight(60)
                         .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0f, 2.0f))))
                     .add(EmptyLootItem.emptyItem().setWeight(40))));
+
+        // Obi-Wan Kenobi: 1-2 emerald @60% (a hero-tier but not boss-tier
+        // haul, matching Luke). A blue-lightsaber drop was planned, but —
+        // same caveat as Darth Vader and Luke above — this MC version has no
+        // component-setting loot function (grepped "SetComponents|set_components"
+        // across wildwest/ and craftee/ with no hits), and LightsaberItem
+        // .stackWithColor's color lives in a data component with no setter
+        // loot function to pin it to blue — a plain LootItem drop would
+        // render blue (index 0) by default anyway, which is *coincidentally*
+        // correct here, but the omission is kept consistent with the other
+        // named heroes/villains until a component-setting loot function
+        // exists. Falling back to emerald-only per the task brief.
+        this.add(ModEntities.OBI_WAN.get(),
+            LootTable.lootTable()
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.EMERALD).setWeight(60)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0f, 2.0f))))
+                    .add(EmptyLootItem.emptyItem().setWeight(40))));
     }
 
     @Override
@@ -106,7 +124,8 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
             ModEntities.BATTLE_DROID.get(),
             ModEntities.JEDI_KNIGHT.get(),
             ModEntities.DARTH_VADER.get(),
-            ModEntities.LUKE_SKYWALKER.get()
+            ModEntities.LUKE_SKYWALKER.get(),
+            ModEntities.OBI_WAN.get()
         );
         return BuiltInRegistries.ENTITY_TYPE.stream().filter(known::contains);
     }

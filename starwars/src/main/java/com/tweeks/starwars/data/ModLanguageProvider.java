@@ -22,11 +22,13 @@ public class ModLanguageProvider extends LanguageProvider {
         add(com.tweeks.starwars.Registration.JEDI_KNIGHT_SPAWN_EGG.get(), "Jedi Knight Spawn Egg");
         add(com.tweeks.starwars.Registration.DARTH_VADER_SPAWN_EGG.get(), "Darth Vader Spawn Egg");
         add(com.tweeks.starwars.Registration.LUKE_SKYWALKER_SPAWN_EGG.get(), "Luke Skywalker Spawn Egg");
+        add(com.tweeks.starwars.Registration.OBI_WAN_SPAWN_EGG.get(), "Obi-Wan Kenobi Spawn Egg");
         add(com.tweeks.starwars.ModEntities.STORMTROOPER.get(), "Stormtrooper");
         add(com.tweeks.starwars.ModEntities.BATTLE_DROID.get(), "Battle Droid");
         add(com.tweeks.starwars.ModEntities.JEDI_KNIGHT.get(), "Jedi Knight");
         add(com.tweeks.starwars.ModEntities.DARTH_VADER.get(), "Darth Vader");
         add(com.tweeks.starwars.ModEntities.LUKE_SKYWALKER.get(), "Luke Skywalker");
+        add(com.tweeks.starwars.ModEntities.OBI_WAN.get(), "Obi-Wan Kenobi");
         add("subtitle.starwars.blaster_fire", "Blaster fires");
         add("subtitle.starwars.saber_ignite", "Lightsaber ignites");
         add("subtitle.starwars.saber_clash", "Lightsabers clash");
