@@ -98,3 +98,11 @@ These spawn eggs received default base/overlay colors because the Java side comp
 - `obi_wan_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `stormtrooper_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 
+## Datapack worldgen structures not translatable
+
+Bedrock has no equivalent of Java's procedural `Structure`/`StructurePiece` datapack API — there is no `.nbt`/jigsaw template for these on disk, so there is nothing to translate. These structures (and the biome placement / spacing that controls where they generate) do not appear in Bedrock worldgen; any loot table they place is translated separately and listed elsewhere in this report:
+
+- `escape_pod`: datapack worldgen structure not translatable to Bedrock — escape_pod; garrison/loot behavior lives in the Java piece
+- `imperial_outpost`: datapack worldgen structure not translatable to Bedrock — imperial_outpost; garrison/loot behavior lives in the Java piece
+- `jedi_ruin`: datapack worldgen structure not translatable to Bedrock — jedi_ruin; garrison/loot behavior lives in the Java piece
+
