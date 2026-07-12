@@ -374,11 +374,13 @@ internal class ItemAnalyzer(
                     "verify against the source ArmorMaterial if the mod customized it."
             }
             // Worn-body visuals: Java renders the equipment-asset layers on
-            // the player model; the Bedrock output has no armor attachable,
-            // so nothing renders on the body. True for every modded wearable.
+            // the player model; the Bedrock pack does get the armor geometry
+            // models + equipment textures, but no attachable is emitted to
+            // consume them, so nothing renders on the body. True for every
+            // modded wearable.
             behaviorNotes += "worn-armor visuals are absent on Bedrock — the item equips and protects " +
-                "(minecraft:wearable) but no attachable/equipment geometry is emitted, so nothing " +
-                "renders on the player's body."
+                "(minecraft:wearable); the armor geometry/textures are emitted but no attachable " +
+                "consumes them, so nothing renders on the player's body."
         }
 
         if (reg.fireResistant) {

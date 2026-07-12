@@ -119,7 +119,8 @@ class ItemAnalyzerTest {
 
         val report = unt.renderReport("creeperskin")
         assertFalse(report.contains("iron-armor defaults")) { report }
-        assertTrue(report.contains("worn-armor visuals")) { report }
+        assertTrue(report.contains("worn-armor visuals are absent on Bedrock")) { report }
+        assertTrue(report.contains("the armor geometry/textures are emitted but no attachable consumes them")) { report }
     }
 
     @Test
@@ -428,7 +429,8 @@ class ItemAnalyzerTest {
         // must NOT appear for these items.
         assertFalse(report.contains("iron-armor defaults")) { report }
         // Honesty: functional wearable, but no worn-body visuals on Bedrock.
-        assertTrue(report.contains("worn-armor visuals")) { report }
+        assertTrue(report.contains("worn-armor visuals are absent on Bedrock")) { report }
+        assertTrue(report.contains("the armor geometry/textures are emitted but no attachable consumes them")) { report }
         for (id in listOf("my_helmet", "my_chestplate", "my_leggings", "my_boots")) {
             assertTrue(report.contains("`$id`")) { report }
         }
@@ -466,7 +468,8 @@ class ItemAnalyzerTest {
         assertTrue(report.contains("iron-armor defaults")) { report }
         // The worn-visuals honesty line applies to every wearable item,
         // resolved or not.
-        assertTrue(report.contains("worn-armor visuals")) { report }
+        assertTrue(report.contains("worn-armor visuals are absent on Bedrock")) { report }
+        assertTrue(report.contains("the armor geometry/textures are emitted but no attachable consumes them")) { report }
     }
 
     @Test
