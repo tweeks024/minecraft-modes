@@ -713,11 +713,15 @@ def paint_han_solo_armor_layers(humanoid_rgba, leggings_rgba):
     rect(humanoid_rgba, 8, 0, 13, 8, HAN_CAP_HI)
     rect(humanoid_rgba, 13, 0, 19, 8, HAN_CAP)
     rect(humanoid_rgba, 19, 0, 24, 8, HAN_CAP_DK)
-    # Wraparound sides: y8..16, full x0..32. No face detail cutouts — the
-    # cap doesn't cover the face like a stormtrooper helmet does.
+    # Wraparound sides: y8..16, full x0..32.
     rect(humanoid_rgba, 0, 8, 32, 9, HAN_CAP_HI)    # cap crown highlight
     rect(humanoid_rgba, 0, 9, 32, 15, HAN_CAP)      # cap base band
     rect(humanoid_rgba, 0, 15, 32, 16, HAN_CAP_DK)  # brim band, distinct from base
+    # Front face window (x9..15,y10..15): the cap only covers the crown and
+    # brim, leaving the wearer's face visible — unlike the stormtrooper
+    # helmet, which boxes the whole head. 1px cap brim retained at y8..10
+    # above the window and the y15..16 brim band below stays cap-colored.
+    rect(humanoid_rgba, 9, 10, 15, 15, (0, 0, 0, 0))
 
     # ---- Body block (vest), UV 16..40,16..32 ----
     # Top/bottom faces: y16..19, inset to x20..28.
@@ -730,11 +734,12 @@ def paint_han_solo_armor_layers(humanoid_rgba, leggings_rgba):
     rect(humanoid_rgba, 16, 27, 40, 29, HAN_VEST)     # lower vest
     rect(humanoid_rgba, 16, 29, 40, 30, HAN_VEST_DK)  # vest hem seam
     rect(humanoid_rgba, 16, 30, 40, 32, HAN_BELT)     # waist belt row
-    rect(humanoid_rgba, 26, 30, 30, 32, HAN_BUCKLE)   # belt buckle
+    rect(humanoid_rgba, 22, 30, 26, 32, HAN_BUCKLE)   # belt buckle
     # Open-front column: shirt tone shows through the vest opening,
     # painted last (over the vest fill) so it stays a continuous strip
-    # from collar down to the belt.
-    rect(humanoid_rgba, 26, 21, 30, 30, HAN_SHIRT)
+    # from collar down to the belt. Centered on the front face (x20..28),
+    # not the right/left side faces the wraparound strip also covers.
+    rect(humanoid_rgba, 22, 21, 26, 30, HAN_SHIRT)
 
     # ---- Arm block (sleeve), UV 40..56,16..32 ----
     # Top/bottom faces: y16..19, inset to x44..52.
@@ -748,8 +753,11 @@ def paint_han_solo_armor_layers(humanoid_rgba, leggings_rgba):
     rect(humanoid_rgba, 40, 30, 56, 32, HAN_SHIRT_DIM)  # wrist shade
 
     # ---- Leg block (boots, on the humanoid sheet), UV 0..16,16..32 ----
-    # Boots are ankle-height — transparent above y24, unlike the
-    # stormtrooper's full-leg armor plating.
+    # Top/bottom faces: y16..19, inset to x4..12 (soles visible from below).
+    rect(humanoid_rgba, 4, 16, 8, 20, HAN_BOOT_HI)
+    rect(humanoid_rgba, 8, 16, 12, 20, HAN_BOOT_DK)
+    # Boots are ankle-height — transparent above y24 in the wraparound
+    # strip, unlike the stormtrooper's full-leg armor plating.
     rect(humanoid_rgba, 0, 24, 16, 26, HAN_BOOT_HI)  # boot top highlight
     rect(humanoid_rgba, 0, 26, 16, 30, HAN_BOOT)     # boot body
     rect(humanoid_rgba, 0, 30, 16, 32, HAN_BOOT_DK)  # sole shade
