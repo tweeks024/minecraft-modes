@@ -25,7 +25,10 @@ import net.minecraft.world.phys.Vec3;
  * {@code BlockHitResult}), {@code EntityType#create(Level, EntitySpawnReason)},
  * {@code CollisionGetter#noCollision(Entity, AABB)}, and
  * {@code ItemStack#consume(int, LivingEntity)} all confirmed to exist with
- * these exact signatures against the decompiled sources.
+ * these exact signatures against the decompiled sources. Uses
+ * {@link ClipContext.Fluid#ANY} (matching {@code BoatItem}'s raycast) so the
+ * speeder places on the water surface instead of raycasting through to the
+ * lakebed.
  */
 public class LandspeederItem extends Item {
 
@@ -36,7 +39,7 @@ public class LandspeederItem extends Item {
     @Override
     public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
-        BlockHitResult hit = getPlayerPOVHitResult(level, player, ClipContext.Fluid.NONE);
+        BlockHitResult hit = getPlayerPOVHitResult(level, player, ClipContext.Fluid.ANY);
         if (hit.getType() != HitResult.Type.BLOCK) {
             return InteractionResult.PASS;
         }

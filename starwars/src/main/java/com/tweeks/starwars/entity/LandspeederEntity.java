@@ -13,6 +13,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.InterpolationHandler;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.player.Player;
@@ -57,6 +58,11 @@ public class LandspeederEntity extends VehicleEntity {
 
     /** Signed forward speed (blocks/tick), driver's local frame. Client-side driving state. */
     private double forwardSpeed = 0.0;
+
+    // VERIFY resolved: mirrors decompiled AbstractBoat's own field exactly
+    // (AbstractBoat.java:64) — without it, remote clients snap to synced
+    // positions instead of lerping between them.
+    private final InterpolationHandler interpolation = new InterpolationHandler(this, 3);
 
     public LandspeederEntity(EntityType<? extends LandspeederEntity> type, Level level) {
         super(type, level);
@@ -169,6 +175,7 @@ public class LandspeederEntity extends VehicleEntity {
             this.setDamage(this.getDamage() - 1.0F);
         }
         super.tick();
+        this.interpolation.interpolate();
         if (this.isLocalInstanceAuthoritative()) {
             this.tickDriven();
             this.move(MoverType.SELF, this.getDeltaMovement());
@@ -305,6 +312,15 @@ public class LandspeederEntity extends VehicleEntity {
     @Override
     public boolean isPickable() {
         return !this.isRemoved();
+    }
+
+    // VERIFY resolved: mirrors decompiled AbstractBoat's own override exactly
+    // (AbstractBoat.java:199-202, placed alongside isPickable()) — without
+    // it, remote clients snap to synced positions instead of lerping between
+    // them.
+    @Override
+    public InterpolationHandler getInterpolation() {
+        return this.interpolation;
     }
 
     @Override
