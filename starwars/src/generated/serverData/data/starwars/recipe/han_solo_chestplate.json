@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "L": "minecraft:leather",
+    "N": "minecraft:netherite_ingot"
+  },
+  "pattern": [
+    "L L",
+    "LNL",
+    "LLL"
+  ],
+  "result": {
+    "id": "starwars:han_solo_chestplate"
+  }
+}

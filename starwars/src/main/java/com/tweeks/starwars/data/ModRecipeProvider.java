@@ -81,6 +81,42 @@ public class ModRecipeProvider extends RecipeProvider {
             .define('R', Items.REDSTONE_BLOCK)
             .unlockedBy("has_iron", this.has(Items.IRON_INGOT))
             .save(this.output);
+
+        // Han Solo armor: leather body + one netherite ingot per piece —
+        // netherite-grade stats at netherite-anchored cost (spec §5).
+        ShapedRecipeBuilder.shaped(itemLookup, RecipeCategory.COMBAT, Registration.HAN_SOLO_HELMET.get())
+            .pattern("LNL")
+            .pattern("L L")
+            .define('L', Items.LEATHER)
+            .define('N', Items.NETHERITE_INGOT)
+            .unlockedBy("has_netherite_ingot", this.has(Items.NETHERITE_INGOT))
+            .save(this.output);
+
+        ShapedRecipeBuilder.shaped(itemLookup, RecipeCategory.COMBAT, Registration.HAN_SOLO_CHESTPLATE.get())
+            .pattern("L L")
+            .pattern("LNL")
+            .pattern("LLL")
+            .define('L', Items.LEATHER)
+            .define('N', Items.NETHERITE_INGOT)
+            .unlockedBy("has_netherite_ingot", this.has(Items.NETHERITE_INGOT))
+            .save(this.output);
+
+        ShapedRecipeBuilder.shaped(itemLookup, RecipeCategory.COMBAT, Registration.HAN_SOLO_LEGGINGS.get())
+            .pattern("LNL")
+            .pattern("L L")
+            .pattern("L L")
+            .define('L', Items.LEATHER)
+            .define('N', Items.NETHERITE_INGOT)
+            .unlockedBy("has_netherite_ingot", this.has(Items.NETHERITE_INGOT))
+            .save(this.output);
+
+        ShapedRecipeBuilder.shaped(itemLookup, RecipeCategory.COMBAT, Registration.HAN_SOLO_BOOTS.get())
+            .pattern("N L")
+            .pattern("L L")
+            .define('L', Items.LEATHER)
+            .define('N', Items.NETHERITE_INGOT)
+            .unlockedBy("has_netherite_ingot", this.has(Items.NETHERITE_INGOT))
+            .save(this.output);
     }
 
     public static class Runner extends RecipeProvider.Runner {
