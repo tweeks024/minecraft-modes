@@ -1,6 +1,8 @@
 package com.tweeks.starwars.entity;
 
 import com.tweeks.starwars.entity.vehicle.HoverPhysics;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -8,6 +10,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -16,18 +19,24 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.InterpolationHandler;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.vehicle.DismountHelper;
 import net.minecraft.world.entity.vehicle.VehicleEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The X-34 landspeeder: a two-seat hover vehicle. Not a Mob — no AI, no
@@ -110,6 +119,8 @@ public class LandspeederEntity extends VehicleEntity {
         // (the brief's 2-arg signature does not override anything and would
         // silently fail to be called).
         if (player.isSecondaryUseActive()) return InteractionResult.PASS;
+        // Deliberately does not call super.interact() (VehicleEntity/Entity's
+        // default handles lead-attaching) — the speeder is not leadable.
         if (!this.level().isClientSide()) {
             return player.startRiding(this) ? InteractionResult.CONSUME : InteractionResult.PASS;
         }
@@ -139,8 +150,10 @@ public class LandspeederEntity extends VehicleEntity {
         // matches the brief's usage exactly.
         if (!this.hasPassenger(passenger)) return;
         int index = this.getPassengers().indexOf(passenger);
-        // Side-by-side X-34 cockpit: driver left, passenger right.
-        double lateral = index == 0 ? -0.45 : 0.45;
+        // Side-by-side X-34 cockpit: driver left, passenger right. Offsets
+        // derive from the bbmodel geometry — the modeled seat cubes are
+        // centered at ±0.25 from the hull's local origin.
+        double lateral = index == 0 ? -0.25 : 0.25;
         double yawRad = Math.toRadians(this.getYRot());
         // VERIFY resolved: AbstractBoat.getPassengerAttachmentPoint uses
         // Vec3(0, height, offset).yRot(-yaw) — i.e. a lateral (Z-axis, "side")
@@ -154,6 +167,42 @@ public class LandspeederEntity extends VehicleEntity {
         double oz = Math.sin(yawRad) * lateral;
         move.accept(passenger, this.getX() + ox, this.getY() + 0.35, this.getZ() + oz);
         // Speeder riders keep free look (no clampRotation like AbstractBoat).
+    }
+
+    @Override
+    public Vec3 getDismountLocationForPassenger(LivingEntity passenger) {
+        // VERIFY resolved: mirrors decompiled AbstractBoat#getDismountLocationForPassenger
+        // (AbstractBoat.java:641-669), adapted minimally — no paddle logic to
+        // drop, since this entity has none. Searches for a safe dry-land spot
+        // beside the hull before falling back to Entity's bare default
+        // (directly above the hull), which can strand a dismounting rider
+        // over open water or a void.
+        Vec3 direction = getCollisionHorizontalEscapeVector(
+            this.getBbWidth() * Mth.SQRT_OF_TWO, passenger.getBbWidth(), passenger.getYRot());
+        double targetX = this.getX() + direction.x;
+        double targetZ = this.getZ() + direction.z;
+        BlockPos targetBlockPos = BlockPos.containing(targetX, this.getBoundingBox().maxY, targetZ);
+        BlockPos belowBlockPos = targetBlockPos.below();
+        if (!this.level().isWaterAt(belowBlockPos)) {
+            List<Vec3> targets = new ArrayList<>();
+            double targetFloor = this.level().getBlockFloorHeight(targetBlockPos);
+            if (DismountHelper.isBlockFloorValid(targetFloor)) {
+                targets.add(new Vec3(targetX, targetBlockPos.getY() + targetFloor, targetZ));
+            }
+            double belowFloor = this.level().getBlockFloorHeight(belowBlockPos);
+            if (DismountHelper.isBlockFloorValid(belowFloor)) {
+                targets.add(new Vec3(targetX, belowBlockPos.getY() + belowFloor, targetZ));
+            }
+            for (Pose dismountPose : passenger.getDismountPoses()) {
+                for (Vec3 target : targets) {
+                    if (DismountHelper.canDismountTo(this.level(), target, passenger, dismountPose)) {
+                        passenger.setPose(dismountPose);
+                        return target;
+                    }
+                }
+            }
+        }
+        return super.getDismountLocationForPassenger(passenger);
     }
 
     // ---------- tick / physics ----------
@@ -179,7 +228,19 @@ public class LandspeederEntity extends VehicleEntity {
         if (this.isLocalInstanceAuthoritative()) {
             this.tickDriven();
             this.move(MoverType.SELF, this.getDeltaMovement());
+        } else {
+            // VERIFY resolved: mirrors decompiled AbstractBoat's own else
+            // branch exactly (AbstractBoat.java:245-247) — without it, a
+            // non-authoritative instance keeps whatever delta-movement
+            // fluid/collision pushes accumulated onto it (e.g. from being
+            // shoved by another entity or a flowing-water tick) instead of
+            // zeroing out, which can launch the speeder on rider dismount.
+            this.setDeltaMovement(Vec3.ZERO);
         }
+        // Deliberately omits AbstractBoat's applyEffectsFromBlocks() call —
+        // this is a hover vehicle and intentionally ignores ground-contact
+        // hazards (e.g. magma, powder snow) that a hull skimming above the
+        // ground never touches.
         // Speeders never cause fall damage — per-tick assignment, one-shot
         // fails (see LukeLeapGoal's comment on fallDistance).
         this.fallDistance = 0;
@@ -283,11 +344,15 @@ public class LandspeederEntity extends VehicleEntity {
             this.getX(), this.getY() + 0.5, this.getZ(), 12, 0.8, 0.4, 0.8, 0.1);
         level.playSound(null, this.getX(), this.getY(), this.getZ(),
             SoundEvents.IRON_GOLEM_DEATH, SoundSource.NEUTRAL, 1.0f, 1.3f);
-        if (dropItem) {
-            // VERIFY resolved: Entity#getDropItem() returns Item, and
-            // Entity#spawnAtLocation(ServerLevel, ItemLike) exists (Item
-            // implements ItemLike) — no ItemStack conversion needed.
-            this.spawnAtLocation(level, this.getDropItem());
+        if (dropItem && level.getGameRules().get(GameRules.ENTITY_DROPS)) {
+            // VERIFY resolved: mirrors VehicleEntity.destroy(ServerLevel, Item)
+            // (VehicleEntity.java:68-75) — gate the drop on the ENTITY_DROPS
+            // gamerule (so /gamerule doEntityDrops false suppresses vehicle
+            // drops like every other vehicle) and preserve a custom name onto
+            // the dropped stack via the CUSTOM_NAME data component.
+            ItemStack itemStack = new ItemStack(this.getDropItem());
+            itemStack.set(DataComponents.CUSTOM_NAME, this.getCustomName());
+            this.spawnAtLocation(level, itemStack);
         }
         this.discard();
     }

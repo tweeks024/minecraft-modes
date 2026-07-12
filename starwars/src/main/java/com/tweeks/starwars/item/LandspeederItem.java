@@ -29,6 +29,16 @@ import net.minecraft.world.phys.Vec3;
  * {@link ClipContext.Fluid#ANY} (matching {@code BoatItem}'s raycast) so the
  * speeder places on the water surface instead of raycasting through to the
  * lakebed.
+ *
+ * <p><b>Underwater-raycast trap:</b> when the player's own eye position is
+ * already inside a fluid (e.g. swimming), a {@code Fluid.ANY} clip that
+ * starts inside the fluid volume can return a hit at an interior face of
+ * that same fluid column instead of the surface — the speeder would then
+ * spawn fully submerged, where the hover spring (which only pushes away
+ * from ground/fluid found by a downward scan) holds it there forever. We
+ * reject placement whenever the hit position and the block directly above
+ * it are both fluid, since that can only happen when the whole column —
+ * not just its surface — is submerged.
  */
 public class LandspeederItem extends Item {
 
@@ -52,6 +62,13 @@ public class LandspeederItem extends Item {
             return InteractionResult.FAIL;
         }
         Vec3 pos = hit.getLocation();
+        BlockPos hitBlockPos = BlockPos.containing(pos);
+        if (!sl.getFluidState(hitBlockPos).isEmpty() && !sl.getFluidState(hitBlockPos.above()).isEmpty()) {
+            // Both the hit block and the block above it are fluid — the
+            // whole column is submerged, not just its surface. See the
+            // class javadoc's "underwater-raycast trap" note.
+            return InteractionResult.FAIL;
+        }
         speeder.snapTo(pos.x, pos.y, pos.z, player.getYRot(), 0.0f);
         if (!sl.noCollision(speeder, speeder.getBoundingBox())) {
             return InteractionResult.FAIL;
