@@ -1,5 +1,6 @@
 package com.tweeks.starwars.entity;
 
+import com.tweeks.starwars.entity.ai.LeiaRallyGoal;
 import com.tweeks.starwars.faction.SwFaction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
@@ -12,9 +13,9 @@ import net.minecraft.world.level.Level;
 
 /**
  * Named hero: server-wide singleton (see {@link LeiaSavedData}). Fights with
- * the blaster pistol; rallies nearby allies with a rally goal (added in a
- * later task). No natural spawn placement — only the NamedCharacterSpawner
- * roster and spawn eggs / {@code /summon} bring her into a world.
+ * the blaster pistol; rallies nearby allies with a {@link LeiaRallyGoal}.
+ * No natural spawn placement — only the NamedCharacterSpawner roster and
+ * spawn eggs / {@code /summon} bring her into a world.
  */
 public class PrincessLeiaEntity extends SwMob {
 
@@ -51,8 +52,11 @@ public class PrincessLeiaEntity extends SwMob {
         return new ItemStack(com.tweeks.starwars.Registration.BLASTER_PISTOL.get());
     }
 
-    // registerGoals: Task 6 adds the rally goal. In THIS task, do not
-    // override registerGoals at all — SwMob's goal set suffices.
+    @Override
+    protected void registerGoals() {
+        super.registerGoals();
+        this.goalSelector.addGoal(1, new LeiaRallyGoal(this));
+    }
 
     /**
      * Singleton lifecycle — mirrors {@code LukeSkywalkerEntity} exactly.

@@ -3,6 +3,8 @@ package com.tweeks.starwars.spawning;
 import com.tweeks.starwars.ModEntities;
 import com.tweeks.starwars.StarWarsMod;
 import com.tweeks.starwars.entity.BobaFettSavedData;
+import com.tweeks.starwars.entity.HanSavedData;
+import com.tweeks.starwars.entity.LeiaSavedData;
 import com.tweeks.starwars.entity.LukeSavedData;
 import com.tweeks.starwars.entity.NamedCharacterSavedData;
 import com.tweeks.starwars.entity.ObiWanSavedData;
@@ -37,8 +39,8 @@ import java.util.Set;
 
 /**
  * Periodic-tick spawner that keeps at most one of each named character
- * (Vader, Luke, Obi-Wan, Boba Fett) alive per server, plus a stormtrooper
- * escort for Vader.
+ * (Vader, Luke, Obi-Wan, Boba Fett, Han Solo, Princess Leia) alive per
+ * server, plus a stormtrooper escort for Vader.
  *
  * <p>Approach used: mirrors {@code LawmanVillageSpawner} / {@code
  * AnomalyVillageSpawner} from the wildwest module — a static tick counter
@@ -131,9 +133,13 @@ public final class NamedCharacterSpawner {
             ModEntities.OBI_WAN.get(), JEDI_BIOMES, JEDI_STRUCTURES, false);
         tryRollCharacter(sl, BobaFettSavedData.get(sl.getServer()),
             ModEntities.BOBA_FETT.get(), BOBA_FETT_BIOMES, IMPERIAL_STRUCTURES, false);
+        tryRollCharacter(sl, HanSavedData.get(sl.getServer()),
+            ModEntities.HAN_SOLO.get(), JEDI_BIOMES, JEDI_STRUCTURES, false);
+        tryRollCharacter(sl, LeiaSavedData.get(sl.getServer()),
+            ModEntities.PRINCESS_LEIA.get(), JEDI_BIOMES, JEDI_STRUCTURES, false);
     }
 
-    /** Core roll, shared by all four characters. */
+    /** Core roll, shared by all six characters. */
     private static <T extends SwMob> void tryRollCharacter(
             ServerLevel level,
             NamedCharacterSavedData data,
