@@ -187,10 +187,9 @@ internal class EntityAnalyzer(
     }
 
     /**
-     * Direct or same-module-transitive `extends VehicleEntity`. Symbol
-     * resolution may not be wired (test fixtures), so — like
-     * [isProjectileClass] — this is AST-only: the immediate extended type's
-     * simple name.
+     * Direct `extends VehicleEntity` only. Symbol resolution may not be
+     * wired (test fixtures), so — like [isProjectileClass] — this is
+     * AST-only: the immediate extended type's simple name.
      */
     private fun isVehicleClass(entity: ClassOrInterfaceDeclaration): Boolean =
         entity.extendedTypes.any { it.nameAsString == "VehicleEntity" }
@@ -933,6 +932,51 @@ internal class EntityAnalyzer(
             append("class: `").append(entityClass.nameAsString).append("`\n")
             append("category: `").append(reg.mobCategory).append("`\n")
             append("size: ").append(reg.width).append(" × ").append(reg.height).append('\n')
+        }
+    }
+
+    companion object {
+        /**
+         * The set of `ENTITY_TYPES.register("id", ...)` ids in [sources]
+         * whose Java class directly `extends VehicleEntity` (see
+         * [isVehicleClass]) — a standalone, instance-free lookup so
+         * [com.tweeks.translator.java.ItemAnalyzer] can decide which items
+         * should get a Bedrock `minecraft:entity_placer` component without
+         * depending on the rest of [EntityAnalyzer]'s per-mod pipeline
+         * (target/unt/gate). Keying off entity id rather than reusing
+         * [collectEntityRegistrations] avoids coupling ItemAnalyzer to
+         * EntityAnalyzer's full registration/attribute machinery for what is,
+         * by registration convention (item id == vehicle entity id, e.g.
+         * starwars' "landspeeder"), a much smaller lookup.
+         */
+        internal fun vehicleEntityIds(sources: JavaSourceLoader.ResolvedModSources): Set<String> {
+            val entityClasses = sources.units.flatMap { it.types }
+                .filterIsInstance<ClassOrInterfaceDeclaration>()
+                .associateBy { it.nameAsString }
+
+            val ids = mutableSetOf<String>()
+            for (unit in sources.units) {
+                for (call in unit.findAll(MethodCallExpr::class.java)) {
+                    if (call.nameAsString != "register") continue
+                    val scope = call.scope.orElse(null) ?: continue
+                    if (scope.toString() != "ENTITY_TYPES") continue
+                    if (call.arguments.size < 2) continue
+                    val id = (call.arguments[0] as? com.github.javaparser.ast.expr.StringLiteralExpr)
+                        ?.asString() ?: continue
+
+                    val builderCalls = call.arguments[1].findAll(MethodCallExpr::class.java)
+                    val ofCall = builderCalls.firstOrNull { it.nameAsString == "of" } ?: continue
+                    if (ofCall.arguments.isEmpty()) continue
+                    val entityClassName = ofCall.arguments[0].toString()
+                        .substringBefore("::").substringAfterLast('.')
+
+                    val entityClass = entityClasses[entityClassName] ?: continue
+                    if (entityClass.extendedTypes.any { it.nameAsString == "VehicleEntity" }) {
+                        ids += id
+                    }
+                }
+            }
+            return ids
         }
     }
 }

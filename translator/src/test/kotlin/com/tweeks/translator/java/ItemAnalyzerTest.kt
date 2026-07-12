@@ -302,6 +302,34 @@ class ItemAnalyzerTest {
         assertFalse(report.contains("no item-icon")) { "expected a fallback texture to be found, not a hard miss: $report" }
     }
 
+    @Test
+    fun `landspeeder item gets entity_placer, non-vehicle items do not`(@TempDir outDir: Path) {
+        // LandspeederItem's `use()` spawns a LandspeederEntity (a
+        // VehicleEntity subclass), but nothing about the item registration
+        // itself says so — without minecraft:entity_placer, the crafted item
+        // does nothing when used on Bedrock. Registration.java registers the
+        // item as "landspeeder" and ModEntities.java registers the entity as
+        // "landspeeder" too, so id-matching against EntityAnalyzer's vehicle
+        // classes is how ItemAnalyzer wires this up.
+        val resolver = ClasspathResolver.fromSystemProperties()
+        assertTrue(resolver.isAvailable())
+        val all = ModDiscovery(repoRoot).discover()
+        val mod = all.first { it.modId == "starwars" }
+        val unt = Untranslatable()
+        val sources = JavaSourceLoader(resolver, unt).load(mod, all)
+        ItemAnalyzer(target, unt).analyze(mod, sources, outDir)
+
+        val speeder = itemComponents(read(outDir, "starwars/behavior_pack/items/landspeeder.json"))
+        assertEquals(
+            "starwars:landspeeder",
+            speeder["minecraft:entity_placer"]!!.jsonObject["entity"]!!.jsonPrimitive.content,
+        )
+
+        // A non-vehicle item (e.g. the lightsaber) must not get one.
+        val lightsaber = itemComponents(read(outDir, "starwars/behavior_pack/items/lightsaber.json"))
+        assertFalse(lightsaber.containsKey("minecraft:entity_placer"))
+    }
+
     private fun read(outDir: Path, rel: String): JsonObject {
         val path = outDir.resolve(rel)
         assertTrue(path.toFile().exists()) { "expected $path to exist" }

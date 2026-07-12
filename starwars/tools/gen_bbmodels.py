@@ -334,6 +334,8 @@ def build_bbmodel(mob_name, cubes, texture_path, tex_height=64, bone_defs=None):
     if os.path.exists(texture_path):
         with open(texture_path, 'rb') as f:
             tex_data = 'data:image/png;base64,' + base64.b64encode(f.read()).decode('ascii')
+    else:
+        print(f"WARNING: texture missing for {mob_name}, embedding empty", file=sys.stderr)
 
     texture = {
         "path": os.path.abspath(texture_path),
@@ -497,6 +499,8 @@ def armor_texture_record(piece_name, texture_path, folder):
     if os.path.exists(texture_path):
         with open(texture_path, 'rb') as f:
             tex_data = 'data:image/png;base64,' + base64.b64encode(f.read()).decode('ascii')
+    else:
+        print(f"WARNING: texture missing for {piece_name}, embedding empty", file=sys.stderr)
     rel_path = os.path.relpath(texture_path, start=os.path.dirname(os.path.abspath(__file__)))
     return {
         "path": None,

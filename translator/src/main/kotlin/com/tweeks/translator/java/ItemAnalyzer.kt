@@ -60,6 +60,12 @@ internal class ItemAnalyzer(
         val registrations = collectItemRegistrations(sources)
         if (registrations.isEmpty()) return
 
+        // Items that place a VehicleEntity subclass (e.g. starwars'
+        // landspeeder) need a `minecraft:entity_placer` component so the
+        // crafted item actually spawns something on Bedrock — see
+        // [EntityAnalyzer.vehicleEntityIds].
+        val vehicleEntityIds = EntityAnalyzer.vehicleEntityIds(sources)
+
         // Index item-class declarations so we can detect custom overrides.
         val classIndex = sources.units.flatMap { it.types }
             .filterIsInstance<ClassOrInterfaceDeclaration>()
@@ -78,7 +84,10 @@ internal class ItemAnalyzer(
         for (reg in registrations) {
             try {
                 val icon = resolveIconBasis(mod, reg)
-                writeItem(mod, reg, icon, classIndex, classAttrs, classStackSize, classDurability, outputRoot)
+                writeItem(
+                    mod, reg, icon, classIndex, classAttrs, classStackSize, classDurability,
+                    vehicleEntityIds, outputRoot,
+                )
                 writeAttachableIfBbmodelExists(mod, reg, icon, outputRoot)
             } catch (e: Throwable) {
                 unt.recordPhase2Failure(
@@ -296,6 +305,7 @@ internal class ItemAnalyzer(
         classAttrs: Map<String, Double?>,
         classStackSize: Map<String, Int?>,
         classDurability: Map<String, Int?>,
+        vehicleEntityIds: Set<String>,
         outputRoot: Path,
     ) {
         val identifier = "${mod.modId}:${reg.itemId}"
@@ -352,6 +362,16 @@ internal class ItemAnalyzer(
 
         if (reg.fireResistant) {
             components["minecraft:fire_resistant"] = JsonObject(emptyMap())
+        }
+
+        // Vehicle placer: this item's id matches a VehicleEntity subclass's
+        // registered entity id (e.g. starwars' "landspeeder") — without
+        // `minecraft:entity_placer`, the crafted item does nothing when used
+        // on Bedrock.
+        if (reg.itemId in vehicleEntityIds) {
+            components["minecraft:entity_placer"] = buildJsonObject {
+                put("entity", identifier)
+            }
         }
 
         // Spawn egg.
