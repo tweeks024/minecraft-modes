@@ -7,6 +7,7 @@ import com.tweeks.starwars.client.model.BattleDroidModel;
 import com.tweeks.starwars.client.model.BobaFettModel;
 import com.tweeks.starwars.client.model.HanSoloModel;
 import com.tweeks.starwars.client.model.JediKnightModel;
+import com.tweeks.starwars.client.model.LandspeederModel;
 import com.tweeks.starwars.client.model.LukeModel;
 import com.tweeks.starwars.client.model.ObiWanModel;
 import com.tweeks.starwars.client.model.PrincessLeiaModel;
@@ -33,6 +34,7 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.ASTROMECH.get(), AstromechRenderer::new);
         event.registerEntityRenderer(ModEntities.HAN_SOLO.get(), HanSoloRenderer::new);
         event.registerEntityRenderer(ModEntities.PRINCESS_LEIA.get(), PrincessLeiaRenderer::new);
+        event.registerEntityRenderer(ModEntities.LANDSPEEDER.get(), LandspeederRenderer::new);
     }
 
     @SubscribeEvent
@@ -47,5 +49,6 @@ public final class ClientSetup {
         event.registerLayerDefinition(AstromechModel.LAYER_LOCATION, AstromechModel::createBodyLayer);
         event.registerLayerDefinition(HanSoloModel.LAYER_LOCATION, HanSoloModel::createBodyLayer);
         event.registerLayerDefinition(PrincessLeiaModel.LAYER_LOCATION, PrincessLeiaModel::createBodyLayer);
+        event.registerLayerDefinition(LandspeederModel.LAYER_LOCATION, LandspeederModel::createBodyLayer);
     }
 }
