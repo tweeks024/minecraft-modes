@@ -330,6 +330,33 @@ class ItemAnalyzerTest {
         assertFalse(lightsaber.containsKey("minecraft:entity_placer"))
     }
 
+    @Test
+    fun `vehicle item gets no attachable, a normal item still does`(@TempDir outDir: Path) {
+        // landspeeder.bbmodel exists under starwars/tools/ — before the fix
+        // this made ItemAnalyzer emit an `attachables/landspeeder.json` that
+        // renders the entire 3-block vehicle geometry as the held-item
+        // model. Vehicle items must be suppressed; a normal item with its
+        // own bbmodel (e.g. the lightsaber) must be unaffected.
+        val resolver = ClasspathResolver.fromSystemProperties()
+        assertTrue(resolver.isAvailable())
+        val all = ModDiscovery(repoRoot).discover()
+        val mod = all.first { it.modId == "starwars" }
+        val unt = Untranslatable()
+        val sources = JavaSourceLoader(resolver, unt).load(mod, all)
+        ItemAnalyzer(target, unt).analyze(mod, sources, outDir)
+
+        val speederAttachable = outDir.resolve("starwars/resource_pack/attachables/landspeeder.json")
+        assertFalse(speederAttachable.toFile().exists()) {
+            "vehicle item must not get an attachable: $speederAttachable"
+        }
+
+        val lightsaberAttachable = read(outDir, "starwars/resource_pack/attachables/lightsaber.json")
+        assertEquals(
+            "starwars:lightsaber",
+            lightsaberAttachable["minecraft:attachable"]!!.jsonObject["description"]!!.jsonObject["identifier"]!!.jsonPrimitive.content,
+        )
+    }
+
     private fun read(outDir: Path, rel: String): JsonObject {
         val path = outDir.resolve(rel)
         assertTrue(path.toFile().exists()) { "expected $path to exist" }

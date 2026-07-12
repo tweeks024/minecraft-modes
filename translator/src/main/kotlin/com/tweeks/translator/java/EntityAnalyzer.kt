@@ -256,23 +256,76 @@ internal class EntityAnalyzer(
             put("family_types", buildJsonArray { add(JsonPrimitive("player")) })
             put("interact_text", JsonPrimitive("action.interact.ride"))
             put("seats", buildJsonArray {
+                // ±0.25 matches LandspeederEntity#positionRider's lateral
+                // offset (the modeled seat cubes in the bbmodel geometry).
                 add(buildJsonObject { put("position", buildJsonArray {
-                    add(num(-0.45)); add(num(0.35)); add(num(0.0)) }) })
+                    add(num(-0.25)); add(num(0.35)); add(num(0.0)) }) })
                 add(buildJsonObject { put("position", buildJsonArray {
-                    add(num(0.45)); add(num(0.35)); add(num(0.0)) }) })
+                    add(num(0.25)); add(num(0.35)); add(num(0.0)) }) })
             })
         }
         sorted["minecraft:input_ground_controlled"] = buildJsonObject { }
         sorted["minecraft:movement.basic"] = buildJsonObject { }
 
+        // Loot parity: the Java speeder drops its own item on destruction
+        // (VehicleEntity.destroy / LandspeederEntity#destroySpeeder) — without
+        // a loot table + minecraft:loot component, the Bedrock vehicle drops
+        // nothing when destroyed.
+        writeVehicleLootTable(mod, reg, outputRoot)
+        sorted["minecraft:loot"] = buildJsonObject {
+            put("table", JsonPrimitive("loot_tables/entities/${reg.entityId}.json"))
+        }
+
         unt.recordVehicleApproximated(
             mod.modId, reg.entityId,
             "Java hover physics (spring to 0.5 blocks, water-skimming) has no " +
                 "Bedrock equivalent — emitted as a ground-driven rideable " +
-                "(input_ground_controlled); banking/bob visuals dropped.",
+                "(input_ground_controlled); banking/bob visuals dropped. A " +
+                "single-item loot table now backs minecraft:loot for drop " +
+                "parity with the Java destroy-drop. The item's attachable " +
+                "emission is suppressed for this entity (see ItemAnalyzer) " +
+                "since the full 3-block vehicle geometry would otherwise " +
+                "render as the held-item model.",
         )
 
         writeEntityFiles(mod, reg, JsonObject(sorted), outputRoot)
+    }
+
+    /**
+     * Emit `behavior_pack/loot_tables/entities/<entityId>.json`: a single
+     * guaranteed roll dropping the vehicle's own item, matching the Java
+     * side's hardcoded destroy-drop (`VehicleEntity#getDropItem()`, e.g.
+     * starwars' `LandspeederEntity#destroySpeeder`) that the mob pipeline's
+     * usual `LootTableTransform` never sees — vehicles have no datapack loot
+     * table on the Java side to translate.
+     */
+    private fun writeVehicleLootTable(
+        mod: ModDiscovery.DiscoveredMod,
+        reg: EntityRegistration,
+        outputRoot: Path,
+    ) {
+        val lootJson = buildJsonObject {
+            put("pools", buildJsonArray {
+                add(buildJsonObject {
+                    // Literal 1.0 (not num()'s int-collapsing) to match the
+                    // "rolls": 1.0 float convention every other emitted loot
+                    // table uses (LootTableTransform carries the Java
+                    // datagen's own `1.0` literal through untouched).
+                    put("rolls", JsonPrimitive(1.0))
+                    put("entries", buildJsonArray {
+                        add(buildJsonObject {
+                            put("type", JsonPrimitive("item"))
+                            put("name", JsonPrimitive("${mod.modId}:${reg.entityId}"))
+                        })
+                    })
+                })
+            })
+        }
+        val lootPath = outputRoot.resolve(
+            "${mod.modId}/behavior_pack/loot_tables/entities/${reg.entityId}.json"
+        )
+        lootPath.parent?.createDirectories()
+        lootPath.writeText(JsonFormat.PRETTY.encodeToString(JsonElement.serializer(), lootJson) + "\n")
     }
 
     /**

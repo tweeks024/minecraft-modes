@@ -7,6 +7,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.intOrNull
+import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -400,6 +401,30 @@ class EntityAnalyzerTest {
         assertEquals(0.35, components["minecraft:movement"]!!.jsonObject["value"]!!.jsonPrimitive.content.toDouble())
         assertNotNull(components["minecraft:collision_box"])
         assertNotNull(components["minecraft:physics"])
+
+        // Seat offsets match LandspeederEntity#positionRider's ±0.25 lateral
+        // offset (the modeled seat cubes in the bbmodel geometry).
+        val seats = rideable["seats"]!!.jsonArray
+        assertEquals(2, seats.size)
+        val seatXs = seats.map { it.jsonObject["position"]!!.jsonArray[0].jsonPrimitive.content.toDouble() }
+        assertEquals(setOf(-0.25, 0.25), seatXs.toSet())
+
+        // Loot parity: minecraft:loot points at a single-roll single-item
+        // loot table dropping the vehicle's own item (Java's destroy-drop
+        // has no Bedrock equivalent otherwise).
+        assertEquals(
+            "loot_tables/entities/landspeeder.json",
+            components["minecraft:loot"]!!.jsonObject["table"]!!.jsonPrimitive.content,
+        )
+        val lootPath = outDir.resolve("themod/behavior_pack/loot_tables/entities/landspeeder.json")
+        assertTrue(lootPath.toFile().exists(), "landspeeder loot table must be written")
+        val lootJson = Json.parseToJsonElement(lootPath.readText()) as JsonObject
+        val pools = lootJson["pools"]!!.jsonArray
+        assertEquals(1, pools.size)
+        val entries = pools[0].jsonObject["entries"]!!.jsonArray
+        assertEquals(1, entries.size)
+        assertEquals("item", entries[0].jsonObject["type"]!!.jsonPrimitive.content)
+        assertEquals("themod:landspeeder", entries[0].jsonObject["name"]!!.jsonPrimitive.content)
 
         assertNull(components["minecraft:navigation.walk"])
         assertNull(components["minecraft:jump.static"])

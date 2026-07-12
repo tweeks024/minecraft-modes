@@ -88,7 +88,7 @@ internal class ItemAnalyzer(
                     mod, reg, icon, classIndex, classAttrs, classStackSize, classDurability,
                     vehicleEntityIds, outputRoot,
                 )
-                writeAttachableIfBbmodelExists(mod, reg, icon, outputRoot)
+                writeAttachableIfBbmodelExists(mod, reg, icon, reg.itemId in vehicleEntityIds, outputRoot)
             } catch (e: Throwable) {
                 unt.recordPhase2Failure(
                     mod.modId,
@@ -199,13 +199,22 @@ internal class ItemAnalyzer(
      * `attachable` linking the item identifier to the bbmodel-derived
      * geometry. This replaces the Java-side `client.model.<X>Model.java`
      * the spec calls out as dropped.
+     *
+     * Suppressed when [isVehicleItem] is true: a vehicle's bbmodel is the
+     * full multi-block vehicle geometry (e.g. starwars' 2×0.8-block
+     * landspeeder hull), not a compact held-item model — rendered as an
+     * attachable it would show the entire vehicle floating in the player's
+     * hand. The vehicle already gets its own `minecraft:client_entity`
+     * geometry via [EntityAnalyzer]; the item only needs `entity_placer`.
      */
     private fun writeAttachableIfBbmodelExists(
         mod: ModDiscovery.DiscoveredMod,
         reg: ItemRegistration,
         icon: IconBasis,
+        isVehicleItem: Boolean,
         outputRoot: Path,
     ) {
+        if (isVehicleItem) return
         val toolsDir = mod.rootDir.resolve("tools")
         if (!Files.isDirectory(toolsDir)) return
         val bbmodel = toolsDir.resolve("${reg.itemId}.bbmodel")
