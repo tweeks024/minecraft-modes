@@ -37,6 +37,7 @@ public class ModLanguageProvider extends LanguageProvider {
         add(com.tweeks.starwars.ModEntities.ASTROMECH.get(), "Astromech Droid");
         add(com.tweeks.starwars.ModEntities.HAN_SOLO.get(), "Han Solo");
         add(com.tweeks.starwars.ModEntities.PRINCESS_LEIA.get(), "Princess Leia");
+        add(com.tweeks.starwars.ModEntities.LANDSPEEDER.get(), "Landspeeder");
         add(com.tweeks.starwars.Registration.STORMTROOPER_HELMET.get(), "Stormtrooper Helmet");
         add(com.tweeks.starwars.Registration.STORMTROOPER_CHESTPLATE.get(), "Stormtrooper Chestplate");
         add(com.tweeks.starwars.Registration.STORMTROOPER_LEGGINGS.get(), "Stormtrooper Leggings");

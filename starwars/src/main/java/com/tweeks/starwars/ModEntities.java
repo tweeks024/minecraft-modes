@@ -95,6 +95,14 @@ public final class ModEntities {
             .build(ResourceKey.create(Registries.ENTITY_TYPE,
                 Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "princess_leia"))));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<com.tweeks.starwars.entity.LandspeederEntity>> LANDSPEEDER =
+        ENTITY_TYPES.register("landspeeder", () -> EntityType.Builder.<com.tweeks.starwars.entity.LandspeederEntity>of(
+                com.tweeks.starwars.entity.LandspeederEntity::new, MobCategory.MISC)
+            .sized(2.0f, 0.8f)
+            .clientTrackingRange(10)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "landspeeder"))));
+
     public static void register(IEventBus modEventBus) {
         ENTITY_TYPES.register(modEventBus);
     }

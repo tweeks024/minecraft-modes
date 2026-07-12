@@ -85,6 +85,12 @@ public final class Registration {
                 net.minecraft.world.item.equipment.ArmorType.BOOTS)
               .stacksTo(1));
 
+    // Forward reference for Task 10 (LandspeederEntity): plain Item::new
+    // stub so getDropItem()/getPickResult() compile. Task 11 upgrades this
+    // to a dedicated LandspeederItem.
+    public static final DeferredItem<Item> LANDSPEEDER = ITEMS.registerItem(
+        "landspeeder", Item::new, p -> p.stacksTo(1));
+
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> STARWARS_TAB =
         CREATIVE_TABS.register("main", () ->
             CreativeModeTab.builder()
