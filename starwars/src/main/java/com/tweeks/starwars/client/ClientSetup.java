@@ -5,9 +5,11 @@ import com.tweeks.starwars.StarWarsMod;
 import com.tweeks.starwars.client.model.AstromechModel;
 import com.tweeks.starwars.client.model.BattleDroidModel;
 import com.tweeks.starwars.client.model.BobaFettModel;
+import com.tweeks.starwars.client.model.HanSoloModel;
 import com.tweeks.starwars.client.model.JediKnightModel;
 import com.tweeks.starwars.client.model.LukeModel;
 import com.tweeks.starwars.client.model.ObiWanModel;
+import com.tweeks.starwars.client.model.PrincessLeiaModel;
 import com.tweeks.starwars.client.model.StormtrooperModel;
 import com.tweeks.starwars.client.model.VaderModel;
 import net.neoforged.api.distmarker.Dist;
@@ -29,6 +31,8 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.OBI_WAN.get(), ObiWanRenderer::new);
         event.registerEntityRenderer(ModEntities.BOBA_FETT.get(), BobaFettRenderer::new);
         event.registerEntityRenderer(ModEntities.ASTROMECH.get(), AstromechRenderer::new);
+        event.registerEntityRenderer(ModEntities.HAN_SOLO.get(), HanSoloRenderer::new);
+        event.registerEntityRenderer(ModEntities.PRINCESS_LEIA.get(), PrincessLeiaRenderer::new);
     }
 
     @SubscribeEvent
@@ -41,5 +45,7 @@ public final class ClientSetup {
         event.registerLayerDefinition(ObiWanModel.LAYER_LOCATION, ObiWanModel::createBodyLayer);
         event.registerLayerDefinition(BobaFettModel.LAYER_LOCATION, BobaFettModel::createBodyLayer);
         event.registerLayerDefinition(AstromechModel.LAYER_LOCATION, AstromechModel::createBodyLayer);
+        event.registerLayerDefinition(HanSoloModel.LAYER_LOCATION, HanSoloModel::createBodyLayer);
+        event.registerLayerDefinition(PrincessLeiaModel.LAYER_LOCATION, PrincessLeiaModel::createBodyLayer);
     }
 }
