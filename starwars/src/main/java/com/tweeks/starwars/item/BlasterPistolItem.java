@@ -3,7 +3,10 @@ package com.tweeks.starwars.item;
 import com.tweeks.starwars.Hitscan;
 import com.tweeks.starwars.ModSounds;
 import com.tweeks.starwars.StarWarsDamageTypes;
+import com.tweeks.starwars.entity.ai.QuickdrawState;
+import com.tweeks.starwars.faction.ScoundrelLuck;
 import com.tweeks.starwars.network.S2CBlasterTracerPacket;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -27,6 +30,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Hitscan blaster weapon. Supports armor set bonus (Scoundrel's Luck) that
+ * doubles the first shot against newly acquired targets when wearing full Han Solo set.
+ */
 public class BlasterPistolItem extends Item {
 
     public static final double MAX_RANGE = 20.0;
@@ -103,7 +110,21 @@ public class BlasterPistolItem extends Item {
         if (hit.isPresent()) {
             LivingEntity target = byId.get(hit.get().id());
             target.invulnerableTime = 0;
-            target.hurtServer(serverLevel, blasterSource, this.getDamage());
+            float damage = this.getDamage();
+            // Scoundrel's Luck: a full Han Solo set doubles the first shot
+            // against each newly acquired target — mark only on a landed
+            // hit (misses never consume the ambush). See ScoundrelLuck.
+            if (ScoundrelLuck.isWearingFullHanSoloSet(player)) {
+                QuickdrawState state = ScoundrelLuck.stateFor(player.getUUID());
+                if (state.canAmbush(target.getUUID())) {
+                    damage = 2 * this.getDamage();
+                    state.markAmbushed(target.getUUID());
+                    serverLevel.sendParticles(ParticleTypes.CRIT,
+                        target.getX(), target.getY() + target.getBbHeight() * 0.5, target.getZ(),
+                        8, 0.3, 0.3, 0.3, 0.1);
+                }
+            }
+            target.hurtServer(serverLevel, blasterSource, damage);
             endPoint = target.position().add(0, target.getBbHeight() * 0.5, 0);
         }
 
