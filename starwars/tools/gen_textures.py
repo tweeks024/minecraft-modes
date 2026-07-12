@@ -416,6 +416,7 @@ LEIA_SKIN     = (0xD8, 0xB0, 0x8E, 0xFF)
 LEIA_SKIN_DK  = (0xB6, 0x92, 0x74, 0xFF)
 LEIA_HAIR     = (0x5A, 0x40, 0x30, 0xFF)    # brown hair
 LEIA_HAIR_DK  = (0x42, 0x2E, 0x22, 0xFF)    # bun shadow / parting
+LEIA_HAIR_HI  = (0x74, 0x54, 0x40, 0xFF)    # bun top/outer highlight
 
 def paint_princess_leia(rgba):
     fill(rgba, LEIA_HAIR)
@@ -427,11 +428,14 @@ def paint_princess_leia(rgba):
     rect(rgba, 8, 13, 16, 16, LEIA_SKIN_DK)     # jaw shading
     rect(rgba, 10, 11, 11, 12, (0x20, 0x30, 0x50, 0xFF))  # left eye
     rect(rgba, 13, 11, 14, 12, (0x20, 0x30, 0x50, 0xFF))  # right eye
-    # Side hair buns (UV 56,0 and 56,6): brown hair w/ a darker spiral hint.
+    # Side hair buns (UV 56,0 and 56,6): brown hair base, darker spiral hint
+    # on the inner edge, lighter highlight along the top face row (3 tones).
     rect(rgba, 56, 0, 64, 6, LEIA_HAIR)
-    rect(rgba, 56, 0, 58, 6, LEIA_HAIR_DK)
+    rect(rgba, 56, 0, 58, 6, LEIA_HAIR_DK)     # spiral shadow
+    rect(rgba, 58, 0, 64, 1, LEIA_HAIR_HI)     # top highlight
     rect(rgba, 56, 6, 64, 12, LEIA_HAIR)
-    rect(rgba, 56, 6, 58, 12, LEIA_HAIR_DK)
+    rect(rgba, 56, 6, 58, 12, LEIA_HAIR_DK)    # spiral shadow
+    rect(rgba, 58, 6, 64, 7, LEIA_HAIR_HI)     # top highlight
     # Body: white senatorial robe, vertical fold shadows, under-arm shade,
     # silver-grey belt row at the waist.
     rect(rgba, 16, 16, 40, 32, LEIA_ROBE)
@@ -450,11 +454,14 @@ def paint_princess_leia(rgba):
         rect(rgba, u0, v0, u0 + 16, v0 + 16, LEIA_ROBE)
         rect(rgba, u0, v0, u0 + 16, v0 + 1, LEIA_ROBE_DIM)
         rect(rgba, u0, v0 + 14, u0 + 16, v0 + 16, LEIA_ROBE_DK)
-    # Robe skirt UV block (32,32..64,48): alternating fold columns.
+    # Robe skirt UV block (32,32..64,48): white robe base with narrow fold
+    # columns — a 1px DIM fold every 4px, deepened to DK on every other fold
+    # — so all three robe tones survive in the block.
     rect(rgba, 32, 32, 64, 48, LEIA_ROBE)
-    for x in range(32, 64, 4):
-        rect(rgba, x, 32, x + 2, 48, LEIA_ROBE_DIM)
-        rect(rgba, x + 2, 32, x + 4, 48, LEIA_ROBE_DK)
+    for x in range(34, 64, 4):
+        rect(rgba, x, 32, x + 1, 48, LEIA_ROBE_DIM)
+    for x in range(38, 64, 8):
+        rect(rgba, x, 32, x + 1, 48, LEIA_ROBE_DK)
 
 MOBS = {
     'stormtrooper': paint_stormtrooper,
