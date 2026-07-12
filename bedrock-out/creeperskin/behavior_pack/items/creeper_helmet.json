@@ -13,7 +13,7 @@
       "minecraft:max_stack_size": 1,
       "minecraft:wearable": {
         "slot": "slot.armor.head",
-        "protection": 2
+        "protection": 3
       }
     }
   }
