@@ -85,11 +85,8 @@ public final class Registration {
                 net.minecraft.world.item.equipment.ArmorType.BOOTS)
               .stacksTo(1));
 
-    // Forward reference for Task 10 (LandspeederEntity): plain Item::new
-    // stub so getDropItem()/getPickResult() compile. Task 11 upgrades this
-    // to a dedicated LandspeederItem.
-    public static final DeferredItem<Item> LANDSPEEDER = ITEMS.registerItem(
-        "landspeeder", Item::new, p -> p.stacksTo(1));
+    public static final DeferredItem<com.tweeks.starwars.item.LandspeederItem> LANDSPEEDER =
+        ITEMS.registerItem("landspeeder", com.tweeks.starwars.item.LandspeederItem::new, p -> p);
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> STARWARS_TAB =
         CREATIVE_TABS.register("main", () ->
@@ -117,6 +114,7 @@ public final class Registration {
                     output.accept(STORMTROOPER_LEGGINGS.get());
                     output.accept(STORMTROOPER_BOOTS.get());
                     output.accept(HOLOCRON.get());
+                    output.accept(LANDSPEEDER.get());
                     // Later tasks append their items here.
                 })
                 .build());

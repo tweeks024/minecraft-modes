@@ -72,6 +72,15 @@ public class ModRecipeProvider extends RecipeProvider {
             .define('N', Items.IRON_NUGGET)
             .unlockedBy("has_redstone", this.has(Items.REDSTONE))
             .save(this.output);
+
+        // Landspeeder: hull row + engine (5 iron, 1 redstone block).
+        ShapedRecipeBuilder.shaped(itemLookup, RecipeCategory.TRANSPORTATION, Registration.LANDSPEEDER.get())
+            .pattern("IRI")
+            .pattern("III")
+            .define('I', Items.IRON_INGOT)
+            .define('R', Items.REDSTONE_BLOCK)
+            .unlockedBy("has_iron", this.has(Items.IRON_INGOT))
+            .save(this.output);
     }
 
     public static class Runner extends RecipeProvider.Runner {
