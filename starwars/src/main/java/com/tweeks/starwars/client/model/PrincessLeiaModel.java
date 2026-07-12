@@ -33,11 +33,11 @@ public class PrincessLeiaModel extends HumanoidModel<HumanoidRenderState> {
         MeshDefinition mesh = HumanoidModel.createMesh(CubeDeformation.NONE, 0.0f);
         PartDefinition head = mesh.getRoot().getChild("head");
         head.addOrReplaceChild("bun_right",
-            CubeListBuilder.create().texOffs(56, 0)
+            CubeListBuilder.create().texOffs(54, 0)
                 .addBox(-5.5f, -5.0f, -1.5f, 2, 3, 3),
             PartPose.ZERO);
         head.addOrReplaceChild("bun_left",
-            CubeListBuilder.create().texOffs(56, 6)
+            CubeListBuilder.create().texOffs(54, 6)
                 .addBox(3.5f, -5.0f, -1.5f, 2, 3, 3),
             PartPose.ZERO);
         PartDefinition body = mesh.getRoot().getChild("body");

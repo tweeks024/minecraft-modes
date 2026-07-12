@@ -96,8 +96,8 @@ HAN_SOLO_ACCESSORIES = [
 # Princess Leia: side hair buns modeled as geometry (mandatory silhouette
 # feature, spec §4.4) + the Jedi-style robe skirt for the senatorial gown.
 PRINCESS_LEIA_ACCESSORIES = [
-    ('bun_right',  HEAD_BONE, (-5.5, -5.0, -1.5, 2, 3, 3), (56, 0), 0.0),
-    ('bun_left',   HEAD_BONE, ( 3.5, -5.0, -1.5, 2, 3, 3), (56, 6), 0.0),
+    ('bun_right',  HEAD_BONE, (-5.5, -5.0, -1.5, 2, 3, 3), (54, 0), 0.0),
+    ('bun_left',   HEAD_BONE, ( 3.5, -5.0, -1.5, 2, 3, 3), (54, 6), 0.0),
     ('robe_skirt', BODY_BONE, (-4.5, 12.0, -2.5, 9, 7, 5), (32, 32), 0.0),
 ]
 

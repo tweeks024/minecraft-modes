@@ -216,7 +216,7 @@
         0
       ],
       "uv_offset": [
-        56,
+        54,
         0
       ],
       "type": "cube",
@@ -245,7 +245,7 @@
         0
       ],
       "uv_offset": [
-        56,
+        54,
         6
       ],
       "type": "cube",
@@ -419,7 +419,7 @@
       "height": 64,
       "uv_width": 64,
       "uv_height": 64,
-      "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABKklEQVR4nO3ZsQ2CQBTGcUcxDmAYgTiBhZVzUDmAhYWFEzgClXEAJ7BiAksLF8BIAiEEOOTx7oD7F19CeOTy7pcXrrjFPgzSOWezXmWJdmFtFq4btAXQVAfAdYMAAACAFQBOgSEmwLTYGAOAFCCJz0XyxcrvXG/QGsAy2BaL/Z69A5jqBJhiBLhdota43gAAAAgBkucjleTzftWmrdalXv5OEiNAlyb6ZCgAaQAAQBngHl+zDA3QtC4AvgFIM3kA7ycAgLED9N3gbI5B7wFOx4NqANAGkJ6zNsYYAE0A0wfayRut/hSruFp1AAAAAAAAAAAAAAAAAAAAAAAA4P9I7++17/9NEQOUVV0EAAAAAGDSANr3/6MH8H4CAAAAAAAAmDKA6+t1AIT9fwHQsaL7noLe+wAAAABJRU5ErkJggg=="
+      "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABKklEQVR4nO3ZsQ3CMBCFYUZBDIAyQsQEFFTMkYoBKCgomIARUiEGYAKqTEBJwQJBREoURRCHnC+O4794EsLW6fzpFBeebeMon2JWy0WRZBO3Zua6UW0A0z4AXDcKAAAAqAJwC9icgK5FxxAAbAFk6bFKWbT+n+uDDgYwj9ZV0c/v4AB8m4CuMQJcTklrXB8AAACEANn9lkvyej6+pm2ty3p9nyRGgC5N9IktAGkAAEAZ4Jqei9gG+FUXgNAApPEeIPgJAGDsAH0POJlrMHiAw36nGgC0AaT37BBjDIAmgGmDdspGmx/FJq7WOgAAAAAAAAAAAAAAAAAAAAAAAPB/pO/32u//pogB6qouAgAAAADgNYD2+//oAYKfAAAAAAAAAHwGcP28DoCw/zcghqPztSaO8wAAAABJRU5ErkJggg=="
     }
   ]
 }

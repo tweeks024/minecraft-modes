@@ -428,14 +428,16 @@ def paint_princess_leia(rgba):
     rect(rgba, 8, 13, 16, 16, LEIA_SKIN_DK)     # jaw shading
     rect(rgba, 10, 11, 11, 12, (0x20, 0x30, 0x50, 0xFF))  # left eye
     rect(rgba, 13, 11, 14, 12, (0x20, 0x30, 0x50, 0xFF))  # right eye
-    # Side hair buns (UV 56,0 and 56,6): brown hair base, darker spiral hint
-    # on the inner edge, lighter highlight along the top face row (3 tones).
-    rect(rgba, 56, 0, 64, 6, LEIA_HAIR)
-    rect(rgba, 56, 0, 58, 6, LEIA_HAIR_DK)     # spiral shadow
-    rect(rgba, 58, 0, 64, 1, LEIA_HAIR_HI)     # top highlight
-    rect(rgba, 56, 6, 64, 12, LEIA_HAIR)
-    rect(rgba, 56, 6, 58, 12, LEIA_HAIR_DK)    # spiral shadow
-    rect(rgba, 58, 6, 64, 7, LEIA_HAIR_HI)     # top highlight
+    # Side hair buns (UV 54,0 and 54,6 — a 2x3x3 box unwraps 10px wide, so
+    # u=54 puts the full footprint at 54..64, exactly on the canvas edge):
+    # brown hair base, darker spiral hint on the inner edge, lighter
+    # highlight along the top face row (3 tones).
+    rect(rgba, 54, 0, 64, 6, LEIA_HAIR)
+    rect(rgba, 54, 0, 56, 6, LEIA_HAIR_DK)     # spiral shadow
+    rect(rgba, 56, 0, 64, 1, LEIA_HAIR_HI)     # top highlight
+    rect(rgba, 54, 6, 64, 12, LEIA_HAIR)
+    rect(rgba, 54, 6, 56, 12, LEIA_HAIR_DK)    # spiral shadow
+    rect(rgba, 56, 6, 64, 7, LEIA_HAIR_HI)     # top highlight
     # Body: white senatorial robe, vertical fold shadows, under-arm shade,
     # silver-grey belt row at the waist.
     rect(rgba, 16, 16, 40, 32, LEIA_ROBE)
