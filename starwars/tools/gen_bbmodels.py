@@ -127,10 +127,64 @@ ASTROMECH_CUBES = [
     ('left_leg',  ASTRO_LLEG_BONE, (-1.0,   0.0, -1.5, 2, 12, 3), (42, 20)),
 ]
 
+# Landspeeder: single-bone static vehicle (no limb animation, no arms/legs at
+# all — unlike astromech's body/head/legs skeleton, this is a single 'body'
+# bone). Origin at entity center, Java model-space coords (y-down from the
+# bone-pivot plane, same java_to_bbmodel conversion as every other mob).
+#
+# Y-COORDINATE DEVIATION FROM BRIEF: the brief's jy values (hull 17.0, nose
+# 18.0, windshield 13.0, seats 19.0, turbine_c 15.0, turbine_l/r 16.0) put
+# the model's lowest point (max jy+jh = hull/nose's 22.0) at
+# bbmodel_from_y = 24 - 22.0 = 2.0 — i.e. the hull's underside would render
+# 2.0 blocks above the entity origin, not the ~0.1 the brief's own geometry
+# caution calls for. Verified against the ASTROMECH_CUBES donor: its legs
+# (ASTRO_RLEG_BONE=(-5,12,0), java jy=0.0/jh=12) work out to
+# bbmodel_from_y = 12 - (0+12) = 0 — i.e. astromech's feet sit exactly at
+# the entity origin (y=0), confirming bbmodel y=0 is the ground-contact
+# plane the caution means by "entity origin". To match that convention here,
+# every LANDSPEEDER_CUBES jy below is the brief's jy + 1.9 (dimensions W/H/D
+# and all other values unchanged) — this shifts the lowest point (hull/nose
+# underside) from bbmodel y=2.0 down to bbmodel y=0.1, satisfying the "~0.1
+# blocks above the entity origin" requirement while preserving every cube's
+# relative position (windshield still sits flush on the hull's top, seats
+# and turbines still recess into the hull by the same margins as the brief).
+SPEEDER_BONE = (0, 24, 0)
+
+LANDSPEEDER_BONE_DEFS = [
+    ('body', SPEEDER_BONE),
+]
+
+LANDSPEEDER_CUBES = [
+    # (name, bone, (jx, jy, jz, jw, jh, jd), uv[, inflate])
+    # jy = brief value + 1.9 (see deviation note above). uv offsets are
+    # repacked from the brief's (see UV CAUTION note in gen_textures.py's
+    # paint_landspeeder): the hull's box-uv footprint (16w x5h x26d ->
+    # 2*(26+16)=84 wide x (26+5)=31 tall) itself overflows the 64-wide
+    # canvas by 20px no matter where it's anchored — an unavoidable
+    # consequence of a 26-unit-deep cube on a 64px canvas, recorded as a
+    # known/accepted limitation (the overflow is edge-clamped by the GPU at
+    # render time; since the hull's paint is a broad flat-shaded gradient
+    # rather than fine detail, the clamp is not visually significant) — but
+    # every other cube is repositioned below the hull's exclusive y[0,31)
+    # band so nothing else collides with it or with each other, and
+    # seat_right/turbine_r deliberately reuse seat_left/turbine_l's uv
+    # offset (both pairs are exact mirror-image geometry receiving identical
+    # paint, so sharing the region is intentional, not an accidental clash).
+    ('hull',        SPEEDER_BONE, (-8.0, 18.9, -13.0, 16, 5, 26), (0, 0)),
+    ('nose',        SPEEDER_BONE, (-6.0, 19.9, -19.0, 12, 4, 6),  (0, 45)),
+    ('windshield',  SPEEDER_BONE, (-7.0, 14.9,  -7.0, 14, 4, 1),  (0, 55)),
+    ('seat_left',   SPEEDER_BONE, (-7.0, 20.9,  -4.0, 6, 2, 6),   (36, 45)),
+    ('seat_right',  SPEEDER_BONE, ( 1.0, 20.9,  -4.0, 6, 2, 6),   (36, 45)),
+    ('turbine_c',   SPEEDER_BONE, (-3.0, 16.9,  11.0, 6, 6, 8),   (0, 31)),
+    ('turbine_l',   SPEEDER_BONE, (-10.0, 17.9, 10.0, 5, 5, 9),   (28, 31)),
+    ('turbine_r',   SPEEDER_BONE, ( 5.0, 17.9,  10.0, 5, 5, 9),   (28, 31)),
+]
+
 # mob_name -> bone_defs override (only needed for mobs whose bone set/pivots
 # aren't the standard humanoid table).
 MOB_BONE_DEFS = {
     'astromech': ASTROMECH_BONE_DEFS,
+    'landspeeder': LANDSPEEDER_BONE_DEFS,
 }
 
 MOBS = {
@@ -154,6 +208,9 @@ MOBS = {
     'han_solo': HUMANOID_CUBES + HAN_SOLO_ACCESSORIES,
     # Princess Leia: humanoid + side buns (geometry silhouette) + robe skirt.
     'princess_leia': HUMANOID_CUBES + PRINCESS_LEIA_ACCESSORIES,
+    # Landspeeder: fully custom single-bone skeleton (see LANDSPEEDER_BONE_DEFS
+    # above) — a static vehicle, no arms/legs/animation.
+    'landspeeder': LANDSPEEDER_CUBES,
 }
 
 

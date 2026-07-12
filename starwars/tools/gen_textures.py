@@ -465,6 +465,90 @@ def paint_princess_leia(rgba):
     for x in range(38, 64, 8):
         rect(rgba, x, 32, x + 1, 48, LEIA_ROBE_DK)
 
+# Landspeeder (X-34 silhouette, spec §5.6): sand-orange hull w/ rust
+# weathering blotches, dark open cockpit w/ a lighter seat-cushion tone, a
+# 2-tone blue-gray windshield, and 3-tone gunmetal turbine pods each with a
+# dark circular intake + a light rim highlight.
+#
+# UV CAUTION (per gen_bbmodels.py's LANDSPEEDER_CUBES comment): the hull's
+# box-uv footprint (2*(26+16)=84 wide) itself overflows the 64px canvas by
+# 20px no matter its uv offset — recorded there as an accepted limitation.
+# Every other cube's uv offset was repacked (vs. the task brief's) to fit
+# below the hull's exclusive y[0,31) band with zero overlaps; seat_right and
+# turbine_r deliberately share seat_left/turbine_l's offset (mirror-image
+# geometry, identical paint) rather than each claiming separate canvas space.
+SPEEDER_BODY     = (0xC8, 0x86, 0x4A, 0xFF)  # sand-orange hull
+SPEEDER_BODY_HI  = (0xE0, 0xA6, 0x6A, 0xFF)  # sun-lit top
+SPEEDER_BODY_DK  = (0x9A, 0x64, 0x36, 0xFF)  # underside shadow
+SPEEDER_RUST     = (0x7A, 0x52, 0x30, 0xFF)  # weathering blotches
+SPEEDER_COCKPIT  = (0x2A, 0x2A, 0x30, 0xFF)  # dark cockpit interior / seats
+SPEEDER_SEAT_HI  = (0x44, 0x44, 0x4C, 0xFF)
+SPEEDER_GLASS    = (0xA8, 0xC8, 0xD8, 0xFF)  # windshield
+SPEEDER_GLASS_HI = (0xD0, 0xE8, 0xF0, 0xFF)
+SPEEDER_METAL    = (0x8A, 0x8A, 0x92, 0xFF)  # turbine housings
+SPEEDER_METAL_DK = (0x5A, 0x5A, 0x62, 0xFF)  # turbine intake dark
+SPEEDER_METAL_HI = (0xB4, 0xB4, 0xBC, 0xFF)
+
+def _speeder_circle(rgba, cx, cy, r, color):
+    """Small pixel-circle approximation (nested rows, half-open x ranges)
+    used for the turbine intakes — reads as a dark disc, not a rectangle."""
+    for dy in range(-r, r + 1):
+        # Chord half-width shrinks toward the top/bottom rows.
+        w = int(round((r * r - dy * dy) ** 0.5))
+        if w <= 0:
+            continue
+        rect(rgba, cx - w, cy + dy, cx + w, cy + dy + 1, color)
+
+def paint_landspeeder(rgba):
+    fill(rgba, (0, 0, 0, 0))  # custom UV layout — transparent base
+
+    # Hull, UV (0,0)..(64,31) [footprint overflows to 84 wide — see note
+    # above]: sand-orange base, sun-lit highlight band across the top third,
+    # 4-6 irregular rust weathering blotches, and a dark shadow band across
+    # the bottom third (underside).
+    rect(rgba, 0, 0, 64, 31, SPEEDER_BODY)
+    rect(rgba, 0, 0, 64, 10, SPEEDER_BODY_HI)   # sun-lit top third
+    rect(rgba, 0, 21, 64, 31, SPEEDER_BODY_DK)  # underside shadow, bottom third
+    for (bx, by, bw, bh) in (
+        (6, 3, 2, 2), (18, 6, 2, 1), (33, 2, 1, 2), (47, 5, 2, 2),
+        (10, 24, 2, 1), (40, 25, 1, 2),
+    ):
+        rect(rgba, bx, by, bx + bw, by + bh, SPEEDER_RUST)
+
+    # Nose, UV (0,45)..(36,55): sand-orange wedge continuing the hull tones,
+    # top highlight strip + a couple of weathering flecks.
+    rect(rgba, 0, 45, 36, 55, SPEEDER_BODY)
+    rect(rgba, 0, 45, 36, 48, SPEEDER_BODY_HI)
+    rect(rgba, 0, 52, 36, 55, SPEEDER_BODY_DK)
+    rect(rgba, 15, 49, 17, 50, SPEEDER_RUST)
+
+    # Windshield, UV (0,55)..(30,60): 2-tone glass — lighter top band (sky
+    # reflection), darker base.
+    rect(rgba, 0, 55, 30, 60, SPEEDER_GLASS)
+    rect(rgba, 0, 55, 30, 57, SPEEDER_GLASS_HI)
+
+    # Seats (seat_left/seat_right share this region), UV (36,45)..(60,53):
+    # dark cockpit interior with a lighter seat-cushion highlight row.
+    rect(rgba, 36, 45, 60, 53, SPEEDER_COCKPIT)
+    rect(rgba, 36, 45, 60, 47, SPEEDER_SEAT_HI)
+
+    # Turbine pods: gunmetal housing, rim highlight, dark circular intake.
+    # turbine_c, UV (0,31)..(28,45).
+    rect(rgba, 0, 31, 28, 45, SPEEDER_METAL)
+    rect(rgba, 0, 31, 28, 32, SPEEDER_METAL_HI)   # rim highlight, top edge
+    rect(rgba, 0, 44, 28, 45, SPEEDER_METAL_DK)
+    _speeder_circle(rgba, 14, 38, 5, SPEEDER_METAL_HI)   # rim highlight
+    _speeder_circle(rgba, 14, 38, 4, SPEEDER_METAL_DK)   # dark intake
+    _speeder_circle(rgba, 14, 38, 1, SPEEDER_METAL)      # inner-hub glint
+
+    # turbine_l/turbine_r (shared), UV (28,31)..(56,45).
+    rect(rgba, 28, 31, 56, 45, SPEEDER_METAL)
+    rect(rgba, 28, 31, 56, 32, SPEEDER_METAL_HI)
+    rect(rgba, 28, 44, 56, 45, SPEEDER_METAL_DK)
+    _speeder_circle(rgba, 42, 38, 5, SPEEDER_METAL_HI)   # rim highlight
+    _speeder_circle(rgba, 42, 38, 4, SPEEDER_METAL_DK)   # dark intake
+    _speeder_circle(rgba, 42, 38, 1, SPEEDER_METAL)      # inner-hub glint
+
 MOBS = {
     'stormtrooper': paint_stormtrooper,
     'battle_droid': paint_battle_droid,
@@ -476,6 +560,7 @@ MOBS = {
     'boba_fett': paint_boba_fett,
     'han_solo': paint_han_solo,
     'princess_leia': paint_princess_leia,
+    'landspeeder': paint_landspeeder,
 }
 
 # Worn-armor equipment layers: standard 64x32 vanilla armor-sheet UV layout

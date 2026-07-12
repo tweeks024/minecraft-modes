@@ -1,0 +1,311 @@
+{
+  "meta": {
+    "format_version": "4.5",
+    "model_format": "modded_entity",
+    "box_uv": true
+  },
+  "name": "landspeeder",
+  "model_identifier": "",
+  "visible_box": [
+    4,
+    4,
+    0
+  ],
+  "variable_placeholders": "",
+  "variable_placeholder_buttons": [],
+  "unhandled_root_fields": {},
+  "resolution": {
+    "width": 64,
+    "height": 64
+  },
+  "elements": [
+    {
+      "name": "hull",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -8.0,
+        0.10000000000000142,
+        -13.0
+      ],
+      "to": [
+        8.0,
+        5.100000000000001,
+        13.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        0,
+        0
+      ],
+      "type": "cube",
+      "uuid": "e1709b25-b437-533b-8e58-f59871032c55"
+    },
+    {
+      "name": "nose",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -6.0,
+        0.10000000000000142,
+        -19.0
+      ],
+      "to": [
+        6.0,
+        4.100000000000001,
+        -13.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        0,
+        45
+      ],
+      "type": "cube",
+      "uuid": "75ec137b-9173-51c1-8996-d1fbcc841168"
+    },
+    {
+      "name": "windshield",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -7.0,
+        5.100000000000001,
+        -7.0
+      ],
+      "to": [
+        7.0,
+        9.1,
+        -6.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        0,
+        55
+      ],
+      "type": "cube",
+      "uuid": "6fde2e7c-00ef-539c-b4a9-49eb41d30691"
+    },
+    {
+      "name": "seat_left",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -7.0,
+        1.1000000000000014,
+        -4.0
+      ],
+      "to": [
+        -1.0,
+        3.1000000000000014,
+        2.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        36,
+        45
+      ],
+      "type": "cube",
+      "uuid": "14c42a5c-82bf-5a23-baaa-5980bd02d652"
+    },
+    {
+      "name": "seat_right",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        1.0,
+        1.1000000000000014,
+        -4.0
+      ],
+      "to": [
+        7.0,
+        3.1000000000000014,
+        2.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        36,
+        45
+      ],
+      "type": "cube",
+      "uuid": "5d28f1f8-9ace-5887-9252-6ff50ae62c5b"
+    },
+    {
+      "name": "turbine_c",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -3.0,
+        1.1000000000000014,
+        11.0
+      ],
+      "to": [
+        3.0,
+        7.100000000000001,
+        19.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        0,
+        31
+      ],
+      "type": "cube",
+      "uuid": "236f715d-9e3e-59c1-aaa7-74a745c6af18"
+    },
+    {
+      "name": "turbine_l",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -10.0,
+        1.1000000000000014,
+        10.0
+      ],
+      "to": [
+        -5.0,
+        6.100000000000001,
+        19.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        28,
+        31
+      ],
+      "type": "cube",
+      "uuid": "a6ce3d8e-d884-5030-b34b-10d796b4c46f"
+    },
+    {
+      "name": "turbine_r",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        5.0,
+        1.1000000000000014,
+        10.0
+      ],
+      "to": [
+        10.0,
+        6.100000000000001,
+        19.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        28,
+        31
+      ],
+      "type": "cube",
+      "uuid": "e2618149-1e1a-57b2-937c-abb2f98a5101"
+    }
+  ],
+  "outliner": [
+    {
+      "name": "body",
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "color": 0,
+      "uuid": "4a59e29a-9a92-5089-a6fb-ecb9d43826a5",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "e1709b25-b437-533b-8e58-f59871032c55",
+        "75ec137b-9173-51c1-8996-d1fbcc841168",
+        "6fde2e7c-00ef-539c-b4a9-49eb41d30691",
+        "14c42a5c-82bf-5a23-baaa-5980bd02d652",
+        "5d28f1f8-9ace-5887-9252-6ff50ae62c5b",
+        "236f715d-9e3e-59c1-aaa7-74a745c6af18",
+        "a6ce3d8e-d884-5030-b34b-10d796b4c46f",
+        "e2618149-1e1a-57b2-937c-abb2f98a5101"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "path": "/Users/tweeks/code/minecraft-mods/starwars/src/main/resources/assets/starwars/textures/entity/landspeeder.png",
+      "name": "landspeeder.png",
+      "folder": "entity",
+      "namespace": "starwars",
+      "id": "0",
+      "particle": false,
+      "render_mode": "default",
+      "render_sides": "auto",
+      "frame_time": 1,
+      "frame_order_type": "loop",
+      "frame_order": "",
+      "frame_interpolate": false,
+      "visible": true,
+      "internal": true,
+      "saved": true,
+      "uuid": "d4eb7843-ed7e-5205-b7d5-831f780706df",
+      "relative_path": "../src/main/resources/assets/starwars/textures/entity/landspeeder.png",
+      "use_as_default": false,
+      "layers_enabled": false,
+      "sync_to_project": "",
+      "width": 64,
+      "height": 64,
+      "uv_width": 64,
+      "uv_height": 64,
+      "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABUElEQVR4nO2aLRLCMBCFc56qKk5QxaCQlQyKI3AARCWSAzAcoJIDVCKRSCQ3CFNRREsJA5u+JPt25jM1+/Jl+zNtze24sZox6ABoghCwXebhCWhDTRVMvQAkQZwCvyKxSWICEBMTlIBYoQB0ADSm2c2tZigAHQANBaADoKEAdAA0FIAOgIYC0AHQmMN6ZjVDAegAaL4W0L19QQdWNwG+pVMAeoFoKAAdAA0F1PXZpoxxVVXtbcpQgKSAsTHzFV6in5iAtnFZrt7iQ4JUPxEBnflPgSQlSPYTEzAWxscUSPbzIqA7PpWAf/pxAngNEBDg2pXk7wL9nVH5HBArTgGui03sOAWg/9HpUxQLr1BA6AKyLPfKQAD621yfqAR0H0vUClA/AUkIQL+V7aNewCCg70IvGC7gcn9YBJMvdKzUCzg1V4sAve5XUYB2ASwWS3U9AbyNuoEVlIf2AAAAAElFTkSuQmCC"
+    }
+  ]
+}

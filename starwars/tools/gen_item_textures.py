@@ -265,6 +265,50 @@ def gen_stormtrooper_boots(out_path):
 
     write_png(out_path, rgba)
 
+def gen_landspeeder(out_path):
+    """16x16 side-profile of the X-34 landspeeder (spec §5.6): a sand-orange
+    hull wedge (rows 7-10) with nose tip at the left, an open two-seat
+    cockpit notch cut into the deck with an angled windshield slab at the
+    leading edge, and three gunmetal turbine pods stacked at the rear
+    (right side) each with a dark center. Uses the same SPEEDER_* palette
+    values as gen_textures.py's paint_landspeeder (redeclared locally per
+    this file's existing per-item convention — see module docstring)."""
+    rgba = bytearray(W * H * 4)  # fully transparent
+
+    body     = (0xC8, 0x86, 0x4A, 0xFF)
+    body_hi  = (0xE0, 0xA6, 0x6A, 0xFF)
+    body_dk  = (0x9A, 0x64, 0x36, 0xFF)
+    rust     = (0x7A, 0x52, 0x30, 0xFF)
+    cockpit  = (0x2A, 0x2A, 0x30, 0xFF)
+    glass    = (0xA8, 0xC8, 0xD8, 0xFF)
+    glass_hi = (0xD0, 0xE8, 0xF0, 0xFF)
+    metal    = (0x8A, 0x8A, 0x92, 0xFF)
+    metal_dk = (0x5A, 0x5A, 0x62, 0xFF)
+    metal_hi = (0xB4, 0xB4, 0xBC, 0xFF)
+
+    # Hull wedge, rows 7-10: sand-orange body, top highlight row, underside
+    # shade row, nose tip poking to the left edge, 2 rust weathering flecks.
+    rect(rgba, 2, 7, 14, 8, body_hi)    # top highlight row
+    rect(rgba, 1, 8, 14, 10, body)      # main hull body (nose tip at x=1)
+    rect(rgba, 2, 10, 14, 11, body_dk)  # underside shade row
+    rect(rgba, 5, 8, 6, 9, rust)
+    rect(rgba, 10, 9, 11, 10, rust)
+
+    # Open two-seat cockpit notch cut into the hull deck (rows 5-7), with an
+    # angled windshield slab (2-tone glass) at the leading (left) edge.
+    rect(rgba, 5, 5, 10, 8, cockpit)
+    rect(rgba, 5, 5, 7, 7, glass)
+    rect(rgba, 5, 5, 6, 6, glass_hi)
+
+    # Three rear turbine pods (right side), gunmetal w/ a top-rim highlight
+    # and a dark center intake each — stacked to read as circles in profile.
+    for cy in (6, 9, 12):
+        rect(rgba, 12, cy - 1, 15, cy + 2, metal)
+        rect(rgba, 12, cy - 1, 15, cy, metal_hi)
+        rect(rgba, 13, cy, 14, cy + 1, metal_dk)
+
+    write_png(out_path, rgba)
+
 if __name__ == '__main__':
     out_dir = sys.argv[1] if len(sys.argv) > 1 else '.'
     # blaster_pistol.png / blaster_rifle.png are no longer generated here —
@@ -273,4 +317,5 @@ if __name__ == '__main__':
     gen_stormtrooper_chestplate(os.path.join(out_dir, 'stormtrooper_chestplate.png'))
     gen_stormtrooper_leggings(os.path.join(out_dir, 'stormtrooper_leggings.png'))
     gen_stormtrooper_boots(os.path.join(out_dir, 'stormtrooper_boots.png'))
+    gen_landspeeder(os.path.join(out_dir, 'landspeeder.png'))
     print('OK')
