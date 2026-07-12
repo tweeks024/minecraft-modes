@@ -16,7 +16,7 @@ import net.minecraft.resources.Identifier;
 /**
  * Princess Leia: humanoid skeleton + twin cinnamon-bun cubes on the head
  * (matches princess_leia.bbmodel: (-5.5,-5,-1.5) and (3.5,-5,-1.5) 2x3x3 @
- * UV(56,0)/(56,6)) + a robe-skirt layer cube on the body, same idiom as
+ * UV(54,0)/(54,6)) + a robe-skirt layer cube on the body, same idiom as
  * {@link JediKnightModel}'s robe_skirt ((-4.5,12,-2.5) 9x7x5 @ UV(32,32)).
  */
 public class PrincessLeiaModel extends HumanoidModel<HumanoidRenderState> {
