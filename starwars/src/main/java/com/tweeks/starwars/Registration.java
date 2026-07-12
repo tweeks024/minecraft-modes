@@ -58,6 +58,9 @@ public final class Registration {
     public static final DeferredItem<SpawnEggItem> HAN_SOLO_SPAWN_EGG = ITEMS.registerItem(
         "han_solo_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.HAN_SOLO.get()));
 
+    public static final DeferredItem<SpawnEggItem> PRINCESS_LEIA_SPAWN_EGG = ITEMS.registerItem(
+        "princess_leia_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.PRINCESS_LEIA.get()));
+
     public static final DeferredItem<Item> STORMTROOPER_HELMET = ITEMS.registerItem("stormtrooper_helmet",
         Item::new,
         p -> p.humanoidArmor(com.tweeks.starwars.item.StormtrooperArmorMaterials.STORMTROOPER,
@@ -102,6 +105,7 @@ public final class Registration {
                     output.accept(ASTROMECH_SPAWN_EGG.get());
                     output.accept(BOBA_FETT_SPAWN_EGG.get());
                     output.accept(HAN_SOLO_SPAWN_EGG.get());
+                    output.accept(PRINCESS_LEIA_SPAWN_EGG.get());
                     output.accept(STORMTROOPER_HELMET.get());
                     output.accept(STORMTROOPER_CHESTPLATE.get());
                     output.accept(STORMTROOPER_LEGGINGS.get());

@@ -145,6 +145,18 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
                     .when(LootItemRandomChanceCondition.randomChance(0.25f))
                     .add(LootItem.lootTableItem(Registration.HOLOCRON.get()))));
 
+        // Princess Leia: 1-2 emerald @60% + 25% holocron — hero-tier haul
+        // matching Obi-Wan. Same no-component-setting-loot-function caveat.
+        this.add(ModEntities.PRINCESS_LEIA.get(),
+            LootTable.lootTable()
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.EMERALD).setWeight(60)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0f, 2.0f))))
+                    .add(EmptyLootItem.emptyItem().setWeight(40)))
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .when(LootItemRandomChanceCondition.randomChance(0.25f))
+                    .add(LootItem.lootTableItem(Registration.HOLOCRON.get()))));
+
         // Boba Fett: 2-4 gold_ingot @100% (bounty-hunter payday, no
         // weight/empty split — always drops) + 50% blaster rifle (30%+
         // durability) + 25% holocron.
@@ -187,7 +199,8 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
             ModEntities.OBI_WAN.get(),
             ModEntities.BOBA_FETT.get(),
             ModEntities.ASTROMECH.get(),
-            ModEntities.HAN_SOLO.get()
+            ModEntities.HAN_SOLO.get(),
+            ModEntities.PRINCESS_LEIA.get()
         );
         return BuiltInRegistries.ENTITY_TYPE.stream().filter(known::contains);
     }

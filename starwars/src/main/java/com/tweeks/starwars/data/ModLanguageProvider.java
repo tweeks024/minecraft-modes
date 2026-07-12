@@ -26,6 +26,7 @@ public class ModLanguageProvider extends LanguageProvider {
         add(com.tweeks.starwars.Registration.ASTROMECH_SPAWN_EGG.get(), "Astromech Droid Spawn Egg");
         add(com.tweeks.starwars.Registration.BOBA_FETT_SPAWN_EGG.get(), "Boba Fett Spawn Egg");
         add(com.tweeks.starwars.Registration.HAN_SOLO_SPAWN_EGG.get(), "Han Solo Spawn Egg");
+        add(com.tweeks.starwars.Registration.PRINCESS_LEIA_SPAWN_EGG.get(), "Princess Leia Spawn Egg");
         add(com.tweeks.starwars.ModEntities.STORMTROOPER.get(), "Stormtrooper");
         add(com.tweeks.starwars.ModEntities.BATTLE_DROID.get(), "Battle Droid");
         add(com.tweeks.starwars.ModEntities.JEDI_KNIGHT.get(), "Jedi Knight");
@@ -35,6 +36,7 @@ public class ModLanguageProvider extends LanguageProvider {
         add(com.tweeks.starwars.ModEntities.BOBA_FETT.get(), "Boba Fett");
         add(com.tweeks.starwars.ModEntities.ASTROMECH.get(), "Astromech Droid");
         add(com.tweeks.starwars.ModEntities.HAN_SOLO.get(), "Han Solo");
+        add(com.tweeks.starwars.ModEntities.PRINCESS_LEIA.get(), "Princess Leia");
         add(com.tweeks.starwars.Registration.STORMTROOPER_HELMET.get(), "Stormtrooper Helmet");
         add(com.tweeks.starwars.Registration.STORMTROOPER_CHESTPLATE.get(), "Stormtrooper Chestplate");
         add(com.tweeks.starwars.Registration.STORMTROOPER_LEGGINGS.get(), "Stormtrooper Leggings");

@@ -69,5 +69,7 @@ public class StarWarsMod {
             com.tweeks.starwars.entity.AstromechEntity.createAttributes().build());
         event.put(ModEntities.HAN_SOLO.get(),
             com.tweeks.starwars.entity.HanSoloEntity.createAttributes().build());
+        event.put(ModEntities.PRINCESS_LEIA.get(),
+            com.tweeks.starwars.entity.PrincessLeiaEntity.createAttributes().build());
     }
 }

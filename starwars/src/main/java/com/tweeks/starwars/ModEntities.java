@@ -87,6 +87,14 @@ public final class ModEntities {
             .build(ResourceKey.create(Registries.ENTITY_TYPE,
                 Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "han_solo"))));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<com.tweeks.starwars.entity.PrincessLeiaEntity>> PRINCESS_LEIA =
+        ENTITY_TYPES.register("princess_leia", () -> EntityType.Builder.<com.tweeks.starwars.entity.PrincessLeiaEntity>of(
+                com.tweeks.starwars.entity.PrincessLeiaEntity::new, MobCategory.CREATURE)
+            .sized(0.6f, 1.9f)
+            .clientTrackingRange(10)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "princess_leia"))));
+
     public static void register(IEventBus modEventBus) {
         ENTITY_TYPES.register(modEventBus);
     }
