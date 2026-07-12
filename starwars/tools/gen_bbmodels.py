@@ -87,6 +87,20 @@ BOBA_FETT_ACCESSORIES = [
     ('jetpack',      BODY_BONE, (-3.0,  0.5,  2.1, 6, 8, 3),  (44, 32), 0.0),
 ]
 
+# Han Solo: black vest as an inflated layer over the torso's upper half.
+# The vest is the silhouette feature (spec §3.5).
+HAN_SOLO_ACCESSORIES = [
+    ('vest', BODY_BONE, (-4.0, 0.0, -2.0, 8, 8, 4), (32, 32), 0.25),
+]
+
+# Princess Leia: side hair buns modeled as geometry (mandatory silhouette
+# feature, spec §4.4) + the Jedi-style robe skirt for the senatorial gown.
+PRINCESS_LEIA_ACCESSORIES = [
+    ('bun_right',  HEAD_BONE, (-5.5, -5.0, -1.5, 2, 3, 3), (56, 0), 0.0),
+    ('bun_left',   HEAD_BONE, ( 3.5, -5.0, -1.5, 2, 3, 3), (56, 6), 0.0),
+    ('robe_skirt', BODY_BONE, (-4.5, 12.0, -2.5, 9, 7, 5), (32, 32), 0.0),
+]
+
 # Astromech droid: fully custom skeleton (body/head/legs only, no arms) at
 # its own pivots — the exact PartPose.offset values from AstromechModel.java
 # Step 3 — rather than the standard humanoid bone table above.
@@ -136,6 +150,10 @@ MOBS = {
     # Astromech: fully custom skeleton (see ASTROMECH_BONE_DEFS above) —
     # body/head/legs only, no arms.
     'astromech': ASTROMECH_CUBES,
+    # Han Solo: humanoid + black vest layer over the white shirt.
+    'han_solo': HUMANOID_CUBES + HAN_SOLO_ACCESSORIES,
+    # Princess Leia: humanoid + side buns (geometry silhouette) + robe skirt.
+    'princess_leia': HUMANOID_CUBES + PRINCESS_LEIA_ACCESSORIES,
 }
 
 

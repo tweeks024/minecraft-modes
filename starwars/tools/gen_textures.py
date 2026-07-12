@@ -353,6 +353,109 @@ def paint_boba_fett(rgba):
     rect(rgba, 9, 9, 10, 10, BOBA_RUST)
     rect(rgba, 38, 5, 39, 6, BOBA_RUST)
 
+# Han Solo: off-white shirt under a layered black vest (open front), navy
+# trousers with a Corellian bloodstripe seam, a holstered blaster at the
+# right hip, dark brown hair, and fair skin.
+HAN_SHIRT      = (0xE8, 0xE0, 0xD0, 0xFF)   # off-white shirt
+HAN_SHIRT_DIM  = (0xC9, 0xC0, 0xAE, 0xFF)   # shirt shadow
+HAN_VEST       = (0x2B, 0x2B, 0x2B, 0xFF)   # black vest
+HAN_VEST_HI    = (0x45, 0x45, 0x48, 0xFF)   # vest highlight
+HAN_VEST_DK    = (0x17, 0x17, 0x19, 0xFF)   # vest deep shadow
+HAN_TROUSER    = (0x2E, 0x3A, 0x52, 0xFF)   # navy trousers
+HAN_TROUSER_DK = (0x1F, 0x28, 0x3A, 0xFF)
+HAN_STRIPE     = (0xB0, 0x30, 0x30, 0xFF)   # Corellian bloodstripe (trouser seam)
+HAN_SKIN       = (0xC8, 0x9E, 0x7A, 0xFF)
+HAN_SKIN_DK    = (0xA8, 0x80, 0x60, 0xFF)
+HAN_HAIR       = (0x4A, 0x35, 0x22, 0xFF)   # dark brown hair
+HAN_BELT       = (0x5A, 0x40, 0x28, 0xFF)   # holster belt, right hip detail
+HAN_BUCKLE     = (0x9A, 0x8A, 0x60, 0xFF)
+
+def paint_han_solo(rgba):
+    fill(rgba, HAN_HAIR)
+    # Head: dark brown hair top/sides, fair skin face w/ jaw shading, eyes.
+    rect(rgba, 0, 0, 32, 8, HAN_HAIR)          # head top: hair
+    rect(rgba, 8, 8, 16, 16, HAN_SKIN)         # face
+    rect(rgba, 8, 8, 16, 10, HAN_HAIR)         # hairline
+    rect(rgba, 8, 13, 16, 16, HAN_SKIN_DK)     # jaw shading
+    rect(rgba, 10, 11, 11, 12, (0x20, 0x30, 0x50, 0xFF))  # left eye
+    rect(rgba, 13, 11, 14, 12, (0x20, 0x30, 0x50, 0xFF))  # right eye
+    # Body: off-white shirt with a chest fold shadow, belt row + buckle at
+    # the waist (the vest sits over this as a separate inflated cube).
+    rect(rgba, 16, 16, 40, 32, HAN_SHIRT)
+    rect(rgba, 16, 22, 40, 23, HAN_SHIRT_DIM)  # chest fold line
+    rect(rgba, 16, 30, 40, 32, HAN_BELT)       # waist belt row
+    rect(rgba, 26, 30, 30, 32, HAN_BUCKLE)     # belt buckle
+    # Arms: shirt sleeves with a vest-shoulder-strap peek + elbow fold.
+    for (u0, v0) in ((40, 16), (32, 48)):
+        rect(rgba, u0, v0, u0 + 16, v0 + 16, HAN_SHIRT)
+        rect(rgba, u0, v0, u0 + 16, v0 + 2, HAN_VEST)          # shoulder strap peek
+        rect(rgba, u0, v0 + 6, u0 + 16, v0 + 7, HAN_SHIRT_DIM)  # elbow fold
+    # Legs: navy trousers, inner shadow column, Corellian bloodstripe seam.
+    for (u0, v0) in ((0, 16), (16, 48)):
+        rect(rgba, u0, v0, u0 + 16, v0 + 16, HAN_TROUSER)
+        rect(rgba, u0 + 1, v0, u0 + 3, v0 + 16, HAN_TROUSER_DK)  # inner shadow
+        rect(rgba, u0 + 14, v0, u0 + 15, v0 + 16, HAN_STRIPE)    # bloodstripe
+    # Right hip: holster drop + dark gun grip, over the right leg's top rows.
+    rect(rgba, 0, 16, 2, 19, HAN_BELT)         # holster drop
+    rect(rgba, 0, 19, 1, 20, HAN_VEST_DK)      # gun grip
+    # Vest cube UV block (32,32..56,44): black vest body, highlight on the
+    # top/lapel edge, deep shadow under the arms, and an open-front column
+    # left transparent so the shirt shows through underneath.
+    rect(rgba, 32, 32, 56, 44, HAN_VEST)
+    rect(rgba, 32, 32, 56, 33, HAN_VEST_HI)    # top/lapel highlight
+    rect(rgba, 32, 40, 56, 44, HAN_VEST_DK)    # under-arm deep shadow
+    rect(rgba, 42, 33, 46, 44, (0, 0, 0, 0))   # open front (shirt shows through)
+
+# Princess Leia: white senatorial robe/gown with painted folds, a
+# silver-grey belt, side hair buns (geometry cubes), and fair skin.
+LEIA_ROBE     = (0xF2, 0xEE, 0xE6, 0xFF)    # white senatorial robe
+LEIA_ROBE_DIM = (0xD8, 0xD2, 0xC4, 0xFF)    # robe fold shadow
+LEIA_ROBE_DK  = (0xB8, 0xB0, 0xA0, 0xFF)    # deep fold
+LEIA_BELT     = (0x8A, 0x86, 0x7A, 0xFF)    # silver-grey belt
+LEIA_SKIN     = (0xD8, 0xB0, 0x8E, 0xFF)
+LEIA_SKIN_DK  = (0xB6, 0x92, 0x74, 0xFF)
+LEIA_HAIR     = (0x5A, 0x40, 0x30, 0xFF)    # brown hair
+LEIA_HAIR_DK  = (0x42, 0x2E, 0x22, 0xFF)    # bun shadow / parting
+
+def paint_princess_leia(rgba):
+    fill(rgba, LEIA_HAIR)
+    # Head: brown hair crown w/ a dark center part, skin face, jaw shading, eyes.
+    rect(rgba, 0, 0, 32, 8, LEIA_HAIR)          # head top: hair crown
+    rect(rgba, 8, 8, 16, 16, LEIA_SKIN)         # face
+    rect(rgba, 8, 8, 16, 10, LEIA_HAIR)         # hairline
+    rect(rgba, 11, 8, 13, 16, LEIA_HAIR_DK)     # center part
+    rect(rgba, 8, 13, 16, 16, LEIA_SKIN_DK)     # jaw shading
+    rect(rgba, 10, 11, 11, 12, (0x20, 0x30, 0x50, 0xFF))  # left eye
+    rect(rgba, 13, 11, 14, 12, (0x20, 0x30, 0x50, 0xFF))  # right eye
+    # Side hair buns (UV 56,0 and 56,6): brown hair w/ a darker spiral hint.
+    rect(rgba, 56, 0, 64, 6, LEIA_HAIR)
+    rect(rgba, 56, 0, 58, 6, LEIA_HAIR_DK)
+    rect(rgba, 56, 6, 64, 12, LEIA_HAIR)
+    rect(rgba, 56, 6, 58, 12, LEIA_HAIR_DK)
+    # Body: white senatorial robe, vertical fold shadows, under-arm shade,
+    # silver-grey belt row at the waist.
+    rect(rgba, 16, 16, 40, 32, LEIA_ROBE)
+    rect(rgba, 22, 16, 23, 30, LEIA_ROBE_DIM)   # vertical fold
+    rect(rgba, 30, 16, 31, 30, LEIA_ROBE_DIM)   # vertical fold
+    rect(rgba, 16, 20, 18, 26, LEIA_ROBE_DK)    # under-arm shadow (left)
+    rect(rgba, 38, 20, 40, 26, LEIA_ROBE_DK)    # under-arm shadow (right)
+    rect(rgba, 16, 28, 40, 30, LEIA_BELT)       # waist belt row
+    # Arms: robe sleeves with a top fold + darker fold-shadow line.
+    for (u0, v0) in ((40, 16), (32, 48)):
+        rect(rgba, u0, v0, u0 + 16, v0 + 16, LEIA_ROBE)
+        rect(rgba, u0, v0, u0 + 16, v0 + 1, LEIA_ROBE_DIM)      # top fold
+        rect(rgba, u0, v0 + 6, u0 + 16, v0 + 7, LEIA_ROBE_DK)   # fold shadow
+    # Legs: robe hem continues down, top fold + darker lower shading.
+    for (u0, v0) in ((0, 16), (16, 48)):
+        rect(rgba, u0, v0, u0 + 16, v0 + 16, LEIA_ROBE)
+        rect(rgba, u0, v0, u0 + 16, v0 + 1, LEIA_ROBE_DIM)
+        rect(rgba, u0, v0 + 14, u0 + 16, v0 + 16, LEIA_ROBE_DK)
+    # Robe skirt UV block (32,32..64,48): alternating fold columns.
+    rect(rgba, 32, 32, 64, 48, LEIA_ROBE)
+    for x in range(32, 64, 4):
+        rect(rgba, x, 32, x + 2, 48, LEIA_ROBE_DIM)
+        rect(rgba, x + 2, 32, x + 4, 48, LEIA_ROBE_DK)
+
 MOBS = {
     'stormtrooper': paint_stormtrooper,
     'battle_droid': paint_battle_droid,
@@ -362,6 +465,8 @@ MOBS = {
     'obi_wan': paint_obi_wan,
     'astromech': paint_astromech,
     'boba_fett': paint_boba_fett,
+    'han_solo': paint_han_solo,
+    'princess_leia': paint_princess_leia,
 }
 
 # Worn-armor equipment layers: standard 64x32 vanilla armor-sheet UV layout
