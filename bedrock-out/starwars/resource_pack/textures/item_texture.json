@@ -20,11 +20,17 @@
     "starwars:darth_vader_spawn_egg": {
       "textures": "textures/items/darth_vader_spawn_egg"
     },
+    "starwars:han_solo_spawn_egg": {
+      "textures": "textures/items/han_solo_spawn_egg"
+    },
     "starwars:holocron": {
       "textures": "textures/items/holocron"
     },
     "starwars:jedi_knight_spawn_egg": {
       "textures": "textures/items/jedi_knight_spawn_egg"
+    },
+    "starwars:landspeeder": {
+      "textures": "textures/items/landspeeder"
     },
     "starwars:lightsaber_blue": {
       "textures": "textures/items/lightsaber_blue"
@@ -43,6 +49,9 @@
     },
     "starwars:obi_wan_spawn_egg": {
       "textures": "textures/items/obi_wan_spawn_egg"
+    },
+    "starwars:princess_leia_spawn_egg": {
+      "textures": "textures/items/princess_leia_spawn_egg"
     },
     "starwars:stormtrooper_boots": {
       "textures": "textures/items/stormtrooper_boots"

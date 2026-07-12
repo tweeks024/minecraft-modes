@@ -1,0 +1,20 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "starwars:han_solo",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/han_solo.png"
+      },
+      "geometry": {
+        "default": "geometry.starwars.han_solo"
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ]
+    }
+  }
+}

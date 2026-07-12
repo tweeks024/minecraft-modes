@@ -1,0 +1,20 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "starwars:princess_leia",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/princess_leia.png"
+      },
+      "geometry": {
+        "default": "geometry.starwars.princess_leia"
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ]
+    }
+  }
+}

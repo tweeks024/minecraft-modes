@@ -8,6 +8,7 @@ Bedrock recipes do not accept Java's datagen-only `category` hint; the field is 
 
 - `blaster_pistol`
 - `blaster_rifle`
+- `landspeeder`
 - `stormtrooper_boots`
 - `stormtrooper_chestplate`
 - `stormtrooper_helmet`
@@ -21,9 +22,11 @@ Bedrock has no equivalent of Java's `random_sequence` field; loot rolls use the 
 - `entities/battle_droid.json`
 - `entities/boba_fett.json`
 - `entities/darth_vader.json`
+- `entities/han_solo.json`
 - `entities/jedi_knight.json`
 - `entities/luke_skywalker.json`
 - `entities/obi_wan.json`
+- `entities/princess_leia.json`
 - `entities/stormtrooper.json`
 
 ## Sound `subtitle` dropped
@@ -53,6 +56,8 @@ These goals produced a `// TODO LLM:` stub at `behavior_pack/scripts/goals/<Goal
 
 - `BlasterAttackGoal` — cache miss; run :translate --with-llm to translate
 - `BobaJetpackGoal` — cache miss; run :translate --with-llm to translate
+- `HanQuickdrawGoal` — cache miss; run :translate --with-llm to translate
+- `LeiaRallyGoal` — cache miss; run :translate --with-llm to translate
 - `LukeLeapGoal` — cache miss; run :translate --with-llm to translate
 - `ObiWanPushGoal` — cache miss; run :translate --with-llm to translate
 - `SwTargetGoal` — cache miss; run :translate --with-llm to translate
@@ -70,6 +75,14 @@ These goals are registered on a shared superclass but gated by a per-entity cond
 
 - MeleeAttackGoal goal gated off for this entity by usesBlaster()
 
+### `HanSoloEntity`
+
+- MeleeAttackGoal goal gated off for this entity by usesBlaster()
+
+### `PrincessLeiaEntity`
+
+- MeleeAttackGoal goal gated off for this entity by usesBlaster()
+
 ### `StormtrooperEntity`
 
 - MeleeAttackGoal goal gated off for this entity by usesBlaster()
@@ -80,6 +93,7 @@ These items override `Item` methods (e.g. `postHurtEnemy`, `useOn`, `hurtEnemy`)
 
 - `blaster_pistol`: BlasterPistolItem overrides: use
 - `holocron`: HolocronItem overrides: use
+- `landspeeder`: LandspeederItem overrides: use
 - `lightsaber`: LightsaberItem overrides: use, hurtEnemy
 - `stormtrooper_boots`: armor protection emitted as iron-armor defaults (BOOTS); verify against the source ArmorMaterial if the mod customized it.
 - `stormtrooper_chestplate`: armor protection emitted as iron-armor defaults (CHESTPLATE); verify against the source ArmorMaterial if the mod customized it.
@@ -109,9 +123,11 @@ These spawn eggs received default base/overlay colors because the Java side comp
 - `battle_droid_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `boba_fett_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `darth_vader_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
+- `han_solo_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `jedi_knight_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `luke_skywalker_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `obi_wan_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
+- `princess_leia_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `stormtrooper_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 
 ## Datapack worldgen structures not translatable
@@ -121,4 +137,21 @@ Bedrock has no equivalent of Java's procedural `Structure`/`StructurePiece` data
 - `escape_pod`: datapack worldgen structure not translatable to Bedrock — escape_pod; garrison/loot behavior lives in the Java piece
 - `imperial_outpost`: datapack worldgen structure not translatable to Bedrock — imperial_outpost; garrison/loot behavior lives in the Java piece
 - `jedi_ruin`: datapack worldgen structure not translatable to Bedrock — jedi_ruin; garrison/loot behavior lives in the Java piece
+
+## Vehicles (approximated)
+
+These `VehicleEntity` subclasses are emitted as a ground-driven Bedrock approximation (`minecraft:rideable` + `minecraft:input_ground_controlled`) rather than the mob pipeline's walking-mob defaults. Java-specific hover/vehicle physics have no Bedrock equivalent:
+
+- `landspeeder`: Java hover physics (spring to 0.5 blocks, water-skimming) has no Bedrock equivalent — emitted as a ground-driven rideable (input_ground_controlled); banking/bob visuals dropped.
+
+## Named-character singletons (not enforced on Bedrock)
+
+These entities enforce a one-living-instance-per-server invariant on the Java side via a `*SavedData` class. Bedrock has no SavedData equivalent, so this invariant is not enforced in the translated output — duplicates are possible:
+
+- `boba_fett`: Java enforces one living instance per server via SavedData (finalizeSpawn claim + die/remove clear); Bedrock output has no equivalent — duplicates are possible.
+- `darth_vader`: Java enforces one living instance per server via SavedData (finalizeSpawn claim + die/remove clear); Bedrock output has no equivalent — duplicates are possible.
+- `han_solo`: Java enforces one living instance per server via SavedData (finalizeSpawn claim + die/remove clear); Bedrock output has no equivalent — duplicates are possible.
+- `luke_skywalker`: Java enforces one living instance per server via SavedData (finalizeSpawn claim + die/remove clear); Bedrock output has no equivalent — duplicates are possible.
+- `obi_wan`: Java enforces one living instance per server via SavedData (finalizeSpawn claim + die/remove clear); Bedrock output has no equivalent — duplicates are possible.
+- `princess_leia`: Java enforces one living instance per server via SavedData (finalizeSpawn claim + die/remove clear); Bedrock output has no equivalent — duplicates are possible.
 
