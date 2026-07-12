@@ -357,6 +357,98 @@ class ItemAnalyzerTest {
         )
     }
 
+    @Test
+    fun `item referencing ScoundrelLuck in use() records the set-bonus honesty entry`(@TempDir outDir: Path) {
+        // Mirrors starwars' BlasterPistolItem: a full Han Solo set doubles the
+        // first blaster shot against each new target via ScoundrelLuck, a
+        // server-side Java mechanic with no Bedrock equivalent. This must be
+        // recorded so it surfaces in UNTRANSLATABLE.md, not silently dropped.
+        val registrationSrc = """
+            package com.example.themod;
+            class Registration {
+                public static final Object BLASTER = ITEMS.registerItem(
+                    "blaster", BlasterItem::new, p -> p);
+            }
+        """.trimIndent()
+        val blasterItemSrc = """
+            package com.example.themod;
+            public class BlasterItem extends Item {
+                public BlasterItem(Properties properties) {
+                    super(properties);
+                }
+                @Override
+                public InteractionResult use(Level level, Player player, InteractionHand hand) {
+                    if (ScoundrelLuck.isWearingFullHanSoloSet(player)) {
+                        QuickdrawState state = ScoundrelLuck.stateFor(player.getUUID());
+                    }
+                    return InteractionResult.CONSUME;
+                }
+            }
+        """.trimIndent()
+        val mod = ModDiscovery.DiscoveredMod(modId = "themod", rootDir = outDir.resolve("themodroot"))
+        java.nio.file.Files.createDirectories(mod.rootDir)
+        val parser = com.github.javaparser.JavaParser()
+        val units = listOf(registrationSrc, blasterItemSrc).map { parser.parse(it).result.orElseThrow() }
+        val sources = JavaSourceLoader.ResolvedModSources(
+            mod = mod,
+            units = units,
+            typeSolver = com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver(),
+        )
+
+        val unt = Untranslatable()
+        ItemAnalyzer(target, unt).analyze(mod, sources, outDir)
+
+        val report = unt.renderReport("themod")
+        assertTrue(report.contains("`blaster`")) { report }
+        assertTrue(
+            report.contains(
+                "Scoundrel's Luck set bonus (full Han Solo set doubles the first blaster " +
+                    "shot against each new target) is server-side Java logic — absent on Bedrock.",
+            ),
+        ) { report }
+    }
+
+    @Test
+    fun `item without ScoundrelLuck reference does not record the set-bonus entry`(@TempDir outDir: Path) {
+        val registrationSrc = """
+            package com.example.themod;
+            class Registration {
+                public static final Object BLASTER = ITEMS.registerItem(
+                    "blaster", BlasterItem::new, p -> p);
+            }
+        """.trimIndent()
+        val blasterItemSrc = """
+            package com.example.themod;
+            public class BlasterItem extends Item {
+                public BlasterItem(Properties properties) {
+                    super(properties);
+                }
+                @Override
+                public InteractionResult use(Level level, Player player, InteractionHand hand) {
+                    return InteractionResult.CONSUME;
+                }
+            }
+        """.trimIndent()
+        val mod = ModDiscovery.DiscoveredMod(modId = "themod", rootDir = outDir.resolve("themodroot"))
+        java.nio.file.Files.createDirectories(mod.rootDir)
+        val parser = com.github.javaparser.JavaParser()
+        val units = listOf(registrationSrc, blasterItemSrc).map { parser.parse(it).result.orElseThrow() }
+        val sources = JavaSourceLoader.ResolvedModSources(
+            mod = mod,
+            units = units,
+            typeSolver = com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver(),
+        )
+
+        val unt = Untranslatable()
+        ItemAnalyzer(target, unt).analyze(mod, sources, outDir)
+
+        val report = unt.renderReport("themod")
+        // The plain `use()` override is still recorded (existing custom-
+        // behavior detection), just without the set-bonus honesty sentence.
+        assertTrue(report.contains("overrides: use")) { report }
+        assertFalse(report.contains("Scoundrel's Luck set bonus")) { report }
+    }
+
     private fun read(outDir: Path, rel: String): JsonObject {
         val path = outDir.resolve(rel)
         assertTrue(path.toFile().exists()) { "expected $path to exist" }

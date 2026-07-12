@@ -404,10 +404,25 @@ internal class ItemAnalyzer(
         } ?: emptyList()
         if (overriddenMethods.isNotEmpty()) {
             val names = overriddenMethods.joinToString(", ") { it.nameAsString }
+            val summary = StringBuilder("${reg.itemClassName} overrides: $names")
+            // Scoundrel's Luck set bonus (starwars' Han Solo armor set):
+            // recordItemCustomBehavior keys on itemId with a single summary
+            // per item, so a class already flagged above for its `use()`
+            // override (e.g. BlasterPistolItem) gets the set-bonus honesty
+            // note appended here rather than via a second, overwriting call.
+            // Detected the same way EntityAnalyzer flags SavedData-backed
+            // singletons: an AST scan for the simple name, since there's no
+            // shared type to resolve against across modules.
+            if (itemClass != null && referencesSimpleName(itemClass, "ScoundrelLuck")) {
+                summary.append(
+                    ". Scoundrel's Luck set bonus (full Han Solo set doubles the first blaster " +
+                        "shot against each new target) is server-side Java logic — absent on Bedrock.",
+                )
+            }
             unt.recordItemCustomBehavior(
                 mod.modId,
                 reg.itemId,
-                "${reg.itemClassName} overrides: $names",
+                summary.toString(),
             )
         }
 
@@ -630,6 +645,19 @@ internal class ItemAnalyzer(
     }
 
     // ---------- Helpers ----------
+
+    /**
+     * Does [decl]'s AST reference the given simple name anywhere — as a type
+     * (`ClassOrInterfaceType`, e.g. a field/local declared with that type) or
+     * as a bare name expression (e.g. the scope of a static call like
+     * `ScoundrelLuck.isWearingFullHanSoloSet(...)`)? Same technique as
+     * [EntityAnalyzer]'s SavedData detection: a plain simple-name AST scan,
+     * since the translator doesn't resolve cross-module types.
+     */
+    private fun referencesSimpleName(decl: ClassOrInterfaceDeclaration, simpleName: String): Boolean =
+        decl.findAll(com.github.javaparser.ast.type.ClassOrInterfaceType::class.java)
+            .any { it.nameAsString == simpleName } ||
+            decl.findAll(NameExpr::class.java).any { it.nameAsString == simpleName }
 
     private fun readIntLiteral(expr: Expression): Int? {
         return when (expr) {
