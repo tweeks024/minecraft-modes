@@ -1,5 +1,6 @@
 package com.tweeks.starwars.entity;
 
+import com.tweeks.starwars.entity.ai.HanQuickdrawGoal;
 import com.tweeks.starwars.faction.SwFaction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
@@ -12,7 +13,7 @@ import net.minecraft.world.level.Level;
 
 /**
  * Named hero: server-wide singleton (see {@link HanSavedData}). Fights with
- * the blaster pistol; opens each engagement with HanQuickdrawGoal's
+ * the blaster pistol; opens each engagement with {@link HanQuickdrawGoal}'s
  * "Shoots First" ambush. No natural spawn placement — only the
  * NamedCharacterSpawner roster and spawn eggs / {@code /summon} bring him
  * into a world.
@@ -50,8 +51,11 @@ public class HanSoloEntity extends SwMob {
         return new ItemStack(com.tweeks.starwars.Registration.BLASTER_PISTOL.get());
     }
 
-    // registerGoals: Task 3 adds HanQuickdrawGoal at priority 1. In THIS
-    // task, do not override registerGoals at all — SwMob's goal set suffices.
+    @Override
+    protected void registerGoals() {
+        super.registerGoals();
+        this.goalSelector.addGoal(1, new HanQuickdrawGoal(this));
+    }
 
     /**
      * Singleton lifecycle — mirrors {@code LukeSkywalkerEntity} exactly.
