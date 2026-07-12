@@ -427,6 +427,9 @@ internal class ItemAnalyzer(
             // Detected the same way EntityAnalyzer flags SavedData-backed
             // singletons: an AST scan for the simple name, since there's no
             // shared type to resolve against across modules.
+            // TODO: the set-bonus note only fires when the class also overrides a
+            // CUSTOM_BEHAVIOR_OVERRIDES method (e.g. inherited-use subclasses like
+            // BlasterRifleItem are missed).
             if (itemClass != null && referencesSimpleName(itemClass, "ScoundrelLuck")) {
                 summary.append(
                     ". Scoundrel's Luck set bonus (full Han Solo set doubles the first blaster " +
