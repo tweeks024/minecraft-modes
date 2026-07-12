@@ -56,6 +56,34 @@ class UntranslatableTest {
     }
 
     @Test
+    fun `vehicle approximated finding appears in its own section`() {
+        val unt = Untranslatable()
+        unt.recordVehicleApproximated(
+            "starwars", "landspeeder",
+            "Java hover physics has no Bedrock equivalent — emitted as ground-driven rideable.",
+        )
+
+        val report = unt.renderReport("starwars")
+        assertTrue(report.contains("Vehicles (approximated)")) { report }
+        assertTrue(report.contains("landspeeder")) { report }
+        assertTrue(report.contains("hover physics")) { report }
+    }
+
+    @Test
+    fun `named-character singleton finding appears in its own section`() {
+        val unt = Untranslatable()
+        unt.recordNamedCharacterSingleton(
+            "starwars", "vader",
+            "Java enforces one living instance per server via SavedData; Bedrock has no equivalent.",
+        )
+
+        val report = unt.renderReport("starwars")
+        assertTrue(report.contains("Named-character singletons")) { report }
+        assertTrue(report.contains("vader")) { report }
+        assertTrue(report.contains("SavedData")) { report }
+    }
+
+    @Test
     fun `duplicate behavior component drop appears in renderReport`() {
         val unt = Untranslatable()
         unt.recordDuplicateBehaviorComponent(

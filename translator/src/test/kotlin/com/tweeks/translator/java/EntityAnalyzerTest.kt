@@ -338,4 +338,178 @@ class EntityAnalyzerTest {
             "Expected projectile reference in untranslatable report: $report"
         }
     }
+
+    @Test
+    fun `vehicle entity emits rideable not walking mob`(@TempDir outDir: Path) {
+        // Synthetic starwars-style landspeeder: extends VehicleEntity (not
+        // Mob), has no createAttributes()/registerGoals() at all — the usual
+        // mob pipeline would emit a walking-mob JSON with no seats. Instead
+        // it must be routed to the vehicle branch: rideable, ground-input
+        // controlled, health/movement folded from the entity's own
+        // MAX_HULL_HEALTH and the sibling HoverPhysics.MAX_SPEED constants.
+        val registrationSrc = """
+            package com.example.themod;
+            import net.minecraft.world.entity.MobCategory;
+            class ModEntities {
+                public static final Object LANDSPEEDER = ENTITY_TYPES.register("landspeeder",
+                    () -> EntityType.Builder.<LandspeederEntity>of(LandspeederEntity::new, MobCategory.MISC)
+                        .sized(2.0f, 0.8f)
+                        .build("themod:landspeeder"));
+            }
+        """.trimIndent()
+        val entitySrc = """
+            package com.example.themod;
+            import net.minecraft.world.entity.EntityType;
+            import net.minecraft.world.entity.vehicle.VehicleEntity;
+            import net.minecraft.world.level.Level;
+            public class LandspeederEntity extends VehicleEntity {
+                public static final float MAX_HULL_HEALTH = 40.0f;
+                public LandspeederEntity(EntityType<? extends LandspeederEntity> type, Level level) { super(type, level); }
+            }
+        """.trimIndent()
+        val hoverPhysicsSrc = """
+            package com.example.themod;
+            public final class HoverPhysics {
+                public static final double MAX_SPEED = 0.7;
+            }
+        """.trimIndent()
+        val mod = ModDiscovery.DiscoveredMod(modId = "themod", rootDir = outDir.resolve("themodroot"))
+        java.nio.file.Files.createDirectories(mod.rootDir)
+
+        val parser = com.github.javaparser.JavaParser()
+        val units = listOf(registrationSrc, entitySrc, hoverPhysicsSrc).map { parser.parse(it).result.orElseThrow() }
+        val sources = JavaSourceLoader.ResolvedModSources(
+            mod = mod,
+            units = units,
+            typeSolver = com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver(),
+        )
+
+        val unt = Untranslatable()
+        EntityAnalyzer(target, unt).analyze(mod, sources, outDir)
+
+        val behaviorPath = outDir.resolve("themod/behavior_pack/entities/landspeeder.json")
+        assertTrue(behaviorPath.toFile().exists(), "landspeeder behavior JSON must be written")
+
+        val parsed = Json.parseToJsonElement(behaviorPath.readText()) as JsonObject
+        val components = parsed["minecraft:entity"]!!.jsonObject["components"]!!.jsonObject
+
+        val rideable = components["minecraft:rideable"]!!.jsonObject
+        assertEquals(2, rideable["seat_count"]!!.jsonPrimitive.intOrNull)
+        assertNotNull(components["minecraft:input_ground_controlled"])
+        assertEquals(40, components["minecraft:health"]!!.jsonObject["value"]!!.jsonPrimitive.intOrNull)
+        assertEquals(0.35, components["minecraft:movement"]!!.jsonObject["value"]!!.jsonPrimitive.content.toDouble())
+        assertNotNull(components["minecraft:collision_box"])
+        assertNotNull(components["minecraft:physics"])
+
+        assertNull(components["minecraft:navigation.walk"])
+        assertNull(components["minecraft:jump.static"])
+        assertTrue(components.keys.none { it.startsWith("minecraft:behavior.") }) {
+            "vehicle must not carry walking-mob behavior components: ${components.keys}"
+        }
+    }
+
+    @Test
+    fun `vehicle without resolvable constants records untranslatable and omits components`(@TempDir outDir: Path) {
+        // Same vehicle shape as above, minus the MAX_HULL_HEALTH / MAX_SPEED
+        // constants — the folded health/movement components must be absent
+        // rather than emitted with a bogus value, and the analyzer must
+        // record why on Untranslatable instead of silently dropping them.
+        val registrationSrc = """
+            package com.example.themod;
+            import net.minecraft.world.entity.MobCategory;
+            class ModEntities {
+                public static final Object LANDSPEEDER = ENTITY_TYPES.register("landspeeder",
+                    () -> EntityType.Builder.<LandspeederEntity>of(LandspeederEntity::new, MobCategory.MISC)
+                        .sized(2.0f, 0.8f)
+                        .build("themod:landspeeder"));
+            }
+        """.trimIndent()
+        val entitySrc = """
+            package com.example.themod;
+            import net.minecraft.world.entity.EntityType;
+            import net.minecraft.world.entity.vehicle.VehicleEntity;
+            import net.minecraft.world.level.Level;
+            public class LandspeederEntity extends VehicleEntity {
+                public LandspeederEntity(EntityType<? extends LandspeederEntity> type, Level level) { super(type, level); }
+            }
+        """.trimIndent()
+        val mod = ModDiscovery.DiscoveredMod(modId = "themod", rootDir = outDir.resolve("themodroot"))
+        java.nio.file.Files.createDirectories(mod.rootDir)
+
+        val parser = com.github.javaparser.JavaParser()
+        val units = listOf(registrationSrc, entitySrc).map { parser.parse(it).result.orElseThrow() }
+        val sources = JavaSourceLoader.ResolvedModSources(
+            mod = mod,
+            units = units,
+            typeSolver = com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver(),
+        )
+
+        val unt = Untranslatable()
+        EntityAnalyzer(target, unt).analyze(mod, sources, outDir)
+
+        val behaviorPath = outDir.resolve("themod/behavior_pack/entities/landspeeder.json")
+        assertTrue(behaviorPath.toFile().exists())
+
+        val parsed = Json.parseToJsonElement(behaviorPath.readText()) as JsonObject
+        val components = parsed["minecraft:entity"]!!.jsonObject["components"]!!.jsonObject
+
+        assertNull(components["minecraft:health"])
+        assertNull(components["minecraft:movement"])
+
+        val report = unt.renderReport("themod")
+        assertTrue(report.contains("LandspeederEntity")) { report }
+        assertTrue(report.contains("not statically resolvable")) { report }
+    }
+
+    @Test
+    fun `saved data referencing mob records named-character singleton entry`(@TempDir outDir: Path) {
+        // The six starwars named characters (Vader, Luke, Obi-Wan, Boba Fett,
+        // Han, Leia) each enforce a one-per-server singleton via a
+        // `*SavedData` class. Bedrock output has no equivalent — the
+        // analyzer must record this honestly instead of staying silent.
+        val registrationSrc = """
+            package com.example.themod;
+            import net.minecraft.world.entity.MobCategory;
+            class ModEntities {
+                public static final Object VADER = ENTITY_TYPES.register("vader",
+                    () -> EntityType.Builder.<VaderEntity>of(VaderEntity::new, MobCategory.MONSTER)
+                        .sized(0.6f, 1.95f)
+                        .build("themod:vader"));
+            }
+        """.trimIndent()
+        val entitySrc = """
+            package com.example.themod;
+            import net.minecraft.world.entity.EntityType;
+            import net.minecraft.world.entity.monster.Monster;
+            import net.minecraft.world.level.Level;
+            import net.minecraft.world.level.ServerLevelAccessor;
+            public class VaderEntity extends Monster {
+                public VaderEntity(EntityType<? extends VaderEntity> type, Level level) { super(type, level); }
+                @Override
+                public void finalizeSpawn(ServerLevelAccessor level) {
+                    VaderSavedData.get(level).claim(this);
+                }
+            }
+        """.trimIndent()
+        val mod = ModDiscovery.DiscoveredMod(modId = "themod", rootDir = outDir.resolve("themodroot"))
+        java.nio.file.Files.createDirectories(mod.rootDir)
+
+        val parser = com.github.javaparser.JavaParser()
+        val units = listOf(registrationSrc, entitySrc).map { parser.parse(it).result.orElseThrow() }
+        val sources = JavaSourceLoader.ResolvedModSources(
+            mod = mod,
+            units = units,
+            typeSolver = com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver(),
+        )
+
+        val unt = Untranslatable()
+        EntityAnalyzer(target, unt).analyze(mod, sources, outDir)
+
+        val behaviorPath = outDir.resolve("themod/behavior_pack/entities/vader.json")
+        assertTrue(behaviorPath.toFile().exists(), "vader behavior JSON must still be written")
+
+        val report = unt.renderReport("themod")
+        assertTrue(report.contains("Named-character singleton", ignoreCase = true)) { report }
+        assertTrue(report.contains("vader") || report.contains("VaderEntity")) { report }
+    }
 }

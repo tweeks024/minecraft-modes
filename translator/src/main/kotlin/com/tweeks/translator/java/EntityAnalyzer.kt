@@ -117,9 +117,37 @@ internal class EntityAnalyzer(
             return
         }
 
+        // Vehicles (non-Mob VehicleEntity subclasses, e.g. starwars'
+        // landspeeder) must NOT flow through the mob pipeline — it would
+        // emit a walking mob with no seats. Emit a rideable,
+        // player-input-driven approximation instead and return.
+        if (isVehicleClass(entityClass)) {
+            emitVehicle(mod, reg, entityClass, classLookup, outputRoot)
+            return
+        }
+
         val attrs = readAttributes(mod.modId, entityClass, classLookup)
         val goals = GoalMatcher(unt).match(mod.modId, entityClass, classLookup)
         val securityFamilies = readSecurityFamilies(entityClass)
+
+        // Named-character singletons: a mob whose class references a
+        // *SavedData type is (in this repo) a one-per-server character.
+        // Bedrock has no SavedData equivalent — record honestly.
+        val referencesSavedData = entityClass
+            .findAll(com.github.javaparser.ast.type.ClassOrInterfaceType::class.java)
+            .any { it.nameAsString.endsWith("SavedData") } ||
+            entityClass.findAll(MethodCallExpr::class.java).any { call ->
+                (call.scope.orElse(null) as? com.github.javaparser.ast.expr.NameExpr)
+                    ?.nameAsString?.endsWith("SavedData") == true
+            }
+        if (referencesSavedData) {
+            unt.recordNamedCharacterSingleton(
+                mod.modId, reg.entityId,
+                "Java enforces one living instance per server via SavedData " +
+                    "(finalizeSpawn claim + die/remove clear); Bedrock output has " +
+                    "no equivalent — duplicates are possible.",
+            )
+        }
 
         // Phase 3: route every Medium-bucket goal through the LLM gate. Each
         // route call writes either cache-hit JS or a TODO stub to
@@ -154,8 +182,113 @@ internal class EntityAnalyzer(
             }
         }
 
-        val identifier = "${mod.modId}:${reg.entityId}"
         val components = buildEntityComponents(reg, attrs, goals, securityFamilies, unt, mod.modId)
+        writeEntityFiles(mod, reg, components, outputRoot)
+    }
+
+    /**
+     * Direct or same-module-transitive `extends VehicleEntity`. Symbol
+     * resolution may not be wired (test fixtures), so — like
+     * [isProjectileClass] — this is AST-only: the immediate extended type's
+     * simple name.
+     */
+    private fun isVehicleClass(entity: ClassOrInterfaceDeclaration): Boolean =
+        entity.extendedTypes.any { it.nameAsString == "VehicleEntity" }
+
+    /**
+     * Emit a `VehicleEntity` subclass (e.g. starwars' landspeeder) as a
+     * ground-driven Bedrock approximation instead of routing it through the
+     * mob pipeline (which would emit a walking mob with no seats — vehicles
+     * have no `createAttributes()`/`registerGoals()` for that pipeline to
+     * read anyway).
+     */
+    private fun emitVehicle(
+        mod: ModDiscovery.DiscoveredMod,
+        reg: EntityRegistration,
+        entityClass: ClassOrInterfaceDeclaration,
+        classLookup: (String) -> ClassOrInterfaceDeclaration?,
+        outputRoot: Path,
+    ) {
+        val sorted = sortedMapOf<String, JsonElement>()
+
+        sorted["minecraft:type_family"] = buildJsonObject {
+            put("family", buildJsonArray {
+                add(JsonPrimitive(reg.entityId))
+                add(JsonPrimitive("vehicle"))
+            })
+        }
+        sorted["minecraft:collision_box"] = buildJsonObject {
+            put("width", num(roundTo4(reg.width.toDouble())))
+            put("height", num(roundTo4(reg.height.toDouble())))
+        }
+        sorted["minecraft:physics"] = buildJsonObject { }
+        sorted["minecraft:pushable"] = buildJsonObject {
+            put("is_pushable", JsonPrimitive(false))
+            put("is_pushable_by_piston", JsonPrimitive(true))
+        }
+
+        // Hull health from the entity's own MAX_HULL_HEALTH constant (the
+        // vehicle has no attributes — the usual attrs path can't fire).
+        val hull = resolveConstantField(entityClass, "MAX_HULL_HEALTH", classLookup, mutableSetOf())
+        if (hull != null) {
+            sorted["minecraft:health"] = buildJsonObject {
+                put("value", num(hull))
+                put("max", num(hull))
+            }
+        }
+        // Bedrock movement.value is a walk-speed-like scalar, not
+        // blocks/tick — halve the Java top speed as the documented mapping.
+        val maxSpeed = resolveConstantField(
+            classLookup("HoverPhysics") ?: entityClass, "MAX_SPEED", classLookup, mutableSetOf())
+        if (maxSpeed != null) {
+            sorted["minecraft:movement"] = buildJsonObject {
+                put("value", num(roundTo4(maxSpeed / 2.0)))
+            }
+        }
+        if (hull == null || maxSpeed == null) {
+            unt.recordEntityAttributeUnresolved(
+                mod.modId, entityClass.nameAsString,
+                "vehicle constants MAX_HULL_HEALTH/MAX_SPEED not statically resolvable",
+            )
+        }
+
+        sorted["minecraft:rideable"] = buildJsonObject {
+            put("seat_count", JsonPrimitive(2))
+            put("family_types", buildJsonArray { add(JsonPrimitive("player")) })
+            put("interact_text", JsonPrimitive("action.interact.ride"))
+            put("seats", buildJsonArray {
+                add(buildJsonObject { put("position", buildJsonArray {
+                    add(num(-0.45)); add(num(0.35)); add(num(0.0)) }) })
+                add(buildJsonObject { put("position", buildJsonArray {
+                    add(num(0.45)); add(num(0.35)); add(num(0.0)) }) })
+            })
+        }
+        sorted["minecraft:input_ground_controlled"] = buildJsonObject { }
+        sorted["minecraft:movement.basic"] = buildJsonObject { }
+
+        unt.recordVehicleApproximated(
+            mod.modId, reg.entityId,
+            "Java hover physics (spring to 0.5 blocks, water-skimming) has no " +
+                "Bedrock equivalent — emitted as a ground-driven rideable " +
+                "(input_ground_controlled); banking/bob visuals dropped.",
+        )
+
+        writeEntityFiles(mod, reg, JsonObject(sorted), outputRoot)
+    }
+
+    /**
+     * Write `behavior_pack/entities/<id>.json` and
+     * `resource_pack/entity/<id>.entity.json` for one entity. Shared by the
+     * mob pipeline ([analyzeOne]'s tail) and [emitVehicle] — the only
+     * difference between the two callers is how [components] was built.
+     */
+    private fun writeEntityFiles(
+        mod: ModDiscovery.DiscoveredMod,
+        reg: EntityRegistration,
+        components: JsonObject,
+        outputRoot: Path,
+    ) {
+        val identifier = "${mod.modId}:${reg.entityId}"
 
         val entityJson = buildJsonObject {
             put("format_version", target.format_versions.entity)

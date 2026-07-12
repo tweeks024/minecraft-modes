@@ -48,6 +48,8 @@ class Untranslatable {
     private val datapackWorldgenStructures = TreeMap<String, TreeMap<String, String>>()
     private val phase2Failures = TreeMap<String, MutableList<String>>()
     private val duplicateBehaviorComponents = TreeMap<String, TreeMap<String, TreeSet<String>>>()
+    private val vehiclesApproximated = TreeMap<String, TreeMap<String, String>>()
+    private val namedCharacterSingletons = TreeMap<String, TreeMap<String, String>>()
 
     fun recordRecipeCategoryDropped(modId: String, recipeName: String) {
         recipeCategoryDropped.getOrPut(modId) { TreeSet() }.add(recipeName)
@@ -278,6 +280,29 @@ class Untranslatable {
             .add("$componentName ← $droppedGoalDescription")
     }
 
+    /**
+     * Record a `VehicleEntity` subclass emitted as a ground-driven Bedrock
+     * approximation (rideable + input_ground_controlled) rather than a
+     * walking mob. [entityId] is the Bedrock entity id (e.g. `landspeeder`);
+     * [summary] explains what was dropped/approximated (hover physics,
+     * banking/bob visuals, etc.).
+     */
+    fun recordVehicleApproximated(modId: String, entityId: String, summary: String) {
+        vehiclesApproximated.getOrPut(modId) { TreeMap() }[entityId] = summary
+    }
+
+    /**
+     * Record a mob whose class references a `*SavedData` type — in this
+     * repo that means it's a one-per-server named-character singleton
+     * (finalizeSpawn claim + die/remove clear). Bedrock output has no
+     * SavedData equivalent, so duplicates are possible; record this
+     * honestly rather than staying silent. [entityId] is the Bedrock
+     * entity id (e.g. `vader`).
+     */
+    fun recordNamedCharacterSingleton(modId: String, entityId: String, summary: String) {
+        namedCharacterSingletons.getOrPut(modId) { TreeMap() }[entityId] = summary
+    }
+
     /** Set of mod ids that have at least one recorded finding. */
     fun modsWithFindings(): Set<String> {
         val ids = TreeSet<String>()
@@ -307,6 +332,8 @@ class Untranslatable {
         ids.addAll(datapackWorldgenStructures.keys)
         ids.addAll(phase2Failures.keys)
         ids.addAll(duplicateBehaviorComponents.keys)
+        ids.addAll(vehiclesApproximated.keys)
+        ids.addAll(namedCharacterSingletons.keys)
         return ids
     }
 
@@ -603,6 +630,24 @@ class Untranslatable {
             for ((structureId, summary) in items) {
                 sb.append("- `").append(structureId).append("`: ").append(summary).append('\n')
             }
+            sb.append('\n')
+        }
+        vehiclesApproximated[modId]?.takeIf { it.isNotEmpty() }?.let { items ->
+            any = true
+            sb.append("## Vehicles (approximated)\n\n")
+            sb.append("These `VehicleEntity` subclasses are emitted as a ground-driven Bedrock approximation " +
+                "(`minecraft:rideable` + `minecraft:input_ground_controlled`) rather than the mob pipeline's " +
+                "walking-mob defaults. Java-specific hover/vehicle physics have no Bedrock equivalent:\n\n")
+            for ((entityId, summary) in items) sb.append("- `").append(entityId).append("`: ").append(summary).append('\n')
+            sb.append('\n')
+        }
+        namedCharacterSingletons[modId]?.takeIf { it.isNotEmpty() }?.let { items ->
+            any = true
+            sb.append("## Named-character singletons (not enforced on Bedrock)\n\n")
+            sb.append("These entities enforce a one-living-instance-per-server invariant on the Java side via a " +
+                "`*SavedData` class. Bedrock has no SavedData equivalent, so this invariant is not enforced in " +
+                "the translated output — duplicates are possible:\n\n")
+            for ((entityId, summary) in items) sb.append("- `").append(entityId).append("`: ").append(summary).append('\n')
             sb.append('\n')
         }
         phase2Failures[modId]?.takeIf { it.isNotEmpty() }?.let { summaries ->
