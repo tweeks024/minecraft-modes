@@ -758,13 +758,15 @@ def paint_han_solo_armor_layers(humanoid_rgba, leggings_rgba):
     # Top/bottom faces: y16..19, inset to x4..12.
     rect(leggings_rgba, 4, 16, 8, 20, HAN_TROUSER)
     rect(leggings_rgba, 8, 16, 12, 20, HAN_TROUSER_DK)
-    # Wraparound: y20..32, full x0..16 — thigh/shin base, inner shadow
-    # column, 1px bloodstripe column, darker ankle cuff.
+    # Wraparound: y20..32, full x0..16 — horizontal bands first (thigh/shin
+    # base, darker ankle cuff), then the full-height overlay columns (inner
+    # shadow, bloodstripe) so the stripe runs the full leg height instead of
+    # being clipped by the cuff rows.
     rect(leggings_rgba, 0, 20, 16, 21, HAN_TROUSER)     # thigh top highlight
     rect(leggings_rgba, 0, 21, 16, 30, HAN_TROUSER)     # thigh/shin base
+    rect(leggings_rgba, 0, 30, 16, 32, HAN_TROUSER_DK)  # ankle cuff, darker
     rect(leggings_rgba, 1, 20, 3, 32, HAN_TROUSER_DK)   # inner shadow column
     rect(leggings_rgba, 14, 20, 15, 32, HAN_STRIPE)     # bloodstripe column
-    rect(leggings_rgba, 0, 30, 16, 32, HAN_TROUSER_DK)  # ankle cuff, darker
 
 if __name__ == '__main__':
     out_dir = sys.argv[1] if len(sys.argv) > 1 else \
