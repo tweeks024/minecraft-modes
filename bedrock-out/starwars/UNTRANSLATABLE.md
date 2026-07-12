@@ -8,6 +8,10 @@ Bedrock recipes do not accept Java's datagen-only `category` hint; the field is 
 
 - `blaster_pistol`
 - `blaster_rifle`
+- `han_solo_boots`
+- `han_solo_chestplate`
+- `han_solo_helmet`
+- `han_solo_leggings`
 - `landspeeder`
 - `stormtrooper_boots`
 - `stormtrooper_chestplate`
@@ -91,14 +95,18 @@ These goals are registered on a shared superclass but gated by a per-entity cond
 
 These items override `Item` methods (e.g. `postHurtEnemy`, `useOn`, `hurtEnemy`) with custom logic. Phase 3 (LLM stage) translates these to `behavior_pack/scripts/items/*.ts` event handlers; Phase 2 only emits the static item JSON:
 
-- `blaster_pistol`: BlasterPistolItem overrides: use
+- `blaster_pistol`: BlasterPistolItem overrides: use. Scoundrel's Luck set bonus (full Han Solo set doubles the first blaster shot against each new target) is server-side Java logic — absent on Bedrock.
+- `han_solo_boots`: worn-armor visuals are absent on Bedrock — the item equips and protects (minecraft:wearable) but no attachable/equipment geometry is emitted, so nothing renders on the player's body.
+- `han_solo_chestplate`: worn-armor visuals are absent on Bedrock — the item equips and protects (minecraft:wearable) but no attachable/equipment geometry is emitted, so nothing renders on the player's body.
+- `han_solo_helmet`: worn-armor visuals are absent on Bedrock — the item equips and protects (minecraft:wearable) but no attachable/equipment geometry is emitted, so nothing renders on the player's body.
+- `han_solo_leggings`: worn-armor visuals are absent on Bedrock — the item equips and protects (minecraft:wearable) but no attachable/equipment geometry is emitted, so nothing renders on the player's body.
 - `holocron`: HolocronItem overrides: use
 - `landspeeder`: LandspeederItem overrides: use
 - `lightsaber`: LightsaberItem overrides: use, hurtEnemy
-- `stormtrooper_boots`: armor protection emitted as iron-armor defaults (BOOTS); verify against the source ArmorMaterial if the mod customized it.
-- `stormtrooper_chestplate`: armor protection emitted as iron-armor defaults (CHESTPLATE); verify against the source ArmorMaterial if the mod customized it.
-- `stormtrooper_helmet`: armor protection emitted as iron-armor defaults (HELMET); verify against the source ArmorMaterial if the mod customized it.
-- `stormtrooper_leggings`: armor protection emitted as iron-armor defaults (LEGGINGS); verify against the source ArmorMaterial if the mod customized it.
+- `stormtrooper_boots`: worn-armor visuals are absent on Bedrock — the item equips and protects (minecraft:wearable) but no attachable/equipment geometry is emitted, so nothing renders on the player's body.
+- `stormtrooper_chestplate`: worn-armor visuals are absent on Bedrock — the item equips and protects (minecraft:wearable) but no attachable/equipment geometry is emitted, so nothing renders on the player's body.
+- `stormtrooper_helmet`: worn-armor visuals are absent on Bedrock — the item equips and protects (minecraft:wearable) but no attachable/equipment geometry is emitted, so nothing renders on the player's body.
+- `stormtrooper_leggings`: worn-armor visuals are absent on Bedrock — the item equips and protects (minecraft:wearable) but no attachable/equipment geometry is emitted, so nothing renders on the player's body.
 
 ## Item model selector not translatable — static icon used
 

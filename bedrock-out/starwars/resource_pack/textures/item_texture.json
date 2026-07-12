@@ -20,6 +20,18 @@
     "starwars:darth_vader_spawn_egg": {
       "textures": "textures/items/darth_vader_spawn_egg"
     },
+    "starwars:han_solo_boots": {
+      "textures": "textures/items/han_solo_boots"
+    },
+    "starwars:han_solo_chestplate": {
+      "textures": "textures/items/han_solo_chestplate"
+    },
+    "starwars:han_solo_helmet": {
+      "textures": "textures/items/han_solo_helmet"
+    },
+    "starwars:han_solo_leggings": {
+      "textures": "textures/items/han_solo_leggings"
+    },
     "starwars:han_solo_spawn_egg": {
       "textures": "textures/items/han_solo_spawn_egg"
     },
