@@ -88,6 +88,34 @@ public final class Registration {
     public static final DeferredItem<com.tweeks.starwars.item.LandspeederItem> LANDSPEEDER =
         ITEMS.registerItem("landspeeder", com.tweeks.starwars.item.LandspeederItem::new, p -> p);
 
+    public static final DeferredItem<Item> HAN_SOLO_HELMET = ITEMS.registerItem("han_solo_helmet",
+        Item::new,
+        p -> p.humanoidArmor(com.tweeks.starwars.item.HanSoloArmorMaterials.HAN_SOLO,
+                net.minecraft.world.item.equipment.ArmorType.HELMET)
+              .stacksTo(1)
+              .fireResistant());
+
+    public static final DeferredItem<Item> HAN_SOLO_CHESTPLATE = ITEMS.registerItem("han_solo_chestplate",
+        Item::new,
+        p -> p.humanoidArmor(com.tweeks.starwars.item.HanSoloArmorMaterials.HAN_SOLO,
+                net.minecraft.world.item.equipment.ArmorType.CHESTPLATE)
+              .stacksTo(1)
+              .fireResistant());
+
+    public static final DeferredItem<Item> HAN_SOLO_LEGGINGS = ITEMS.registerItem("han_solo_leggings",
+        Item::new,
+        p -> p.humanoidArmor(com.tweeks.starwars.item.HanSoloArmorMaterials.HAN_SOLO,
+                net.minecraft.world.item.equipment.ArmorType.LEGGINGS)
+              .stacksTo(1)
+              .fireResistant());
+
+    public static final DeferredItem<Item> HAN_SOLO_BOOTS = ITEMS.registerItem("han_solo_boots",
+        Item::new,
+        p -> p.humanoidArmor(com.tweeks.starwars.item.HanSoloArmorMaterials.HAN_SOLO,
+                net.minecraft.world.item.equipment.ArmorType.BOOTS)
+              .stacksTo(1)
+              .fireResistant());
+
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> STARWARS_TAB =
         CREATIVE_TABS.register("main", () ->
             CreativeModeTab.builder()
@@ -115,6 +143,10 @@ public final class Registration {
                     output.accept(STORMTROOPER_BOOTS.get());
                     output.accept(HOLOCRON.get());
                     output.accept(LANDSPEEDER.get());
+                    output.accept(HAN_SOLO_HELMET.get());
+                    output.accept(HAN_SOLO_CHESTPLATE.get());
+                    output.accept(HAN_SOLO_LEGGINGS.get());
+                    output.accept(HAN_SOLO_BOOTS.get());
                     // Later tasks append their items here.
                 })
                 .build());

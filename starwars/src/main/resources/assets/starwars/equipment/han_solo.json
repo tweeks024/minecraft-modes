@@ -1,0 +1,10 @@
+{
+  "layers": {
+    "humanoid": [
+      { "texture": "starwars:han_solo" }
+    ],
+    "humanoid_leggings": [
+      { "texture": "starwars:han_solo" }
+    ]
+  }
+}
