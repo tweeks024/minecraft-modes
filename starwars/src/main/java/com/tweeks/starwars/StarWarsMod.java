@@ -67,5 +67,7 @@ public class StarWarsMod {
             com.tweeks.starwars.entity.BobaFettEntity.createAttributes().build());
         event.put(ModEntities.ASTROMECH.get(),
             com.tweeks.starwars.entity.AstromechEntity.createAttributes().build());
+        event.put(ModEntities.HAN_SOLO.get(),
+            com.tweeks.starwars.entity.HanSoloEntity.createAttributes().build());
     }
 }
