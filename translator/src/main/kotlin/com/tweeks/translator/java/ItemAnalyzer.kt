@@ -348,25 +348,37 @@ internal class ItemAnalyzer(
             components["minecraft:hand_equipped"] = JsonPrimitive(true)
         }
 
-        // Armor wearable mapping (creeperskin):
+        // Per-item honesty notes, recorded once at the end of this method:
+        // Untranslatable.recordItemCustomBehavior keys on itemId with a
+        // single summary per item, so separate calls would overwrite each
+        // other (armor note vs. overrides note).
+        val behaviorNotes = mutableListOf<String>()
+
+        // Armor wearable mapping (creeperskin, starwars):
         if (reg.armorSlot != null) {
+            // Fold the piece's real defense value out of the mod's own
+            // ArmorMaterial-holder class (`DEFENSE = Map.of(ArmorType.X, n, ...)`).
+            // Falls back to vanilla iron-armor values (HELMET=2, CHESTPLATE=6,
+            // LEGGINGS=5, BOOTS=2) only when the material can't be statically
+            // resolved — e.g. it lives outside the mod's sources.
+            val resolvedProtection = reg.armorMaterialClass
+                ?.let { classIndex[it] }
+                ?.let { readArmorDefense(it, reg.armorSlot) }
             components["minecraft:wearable"] = buildJsonObject {
                 put("slot", JsonPrimitive(armorSlotToWearableSlot(reg.armorSlot)))
-                put("protection", JsonPrimitive(armorSlotProtection(reg.armorSlot)))
+                put("protection", JsonPrimitive(resolvedProtection ?: armorSlotProtection(reg.armorSlot)))
             }
             components["minecraft:max_stack_size"] = JsonPrimitive(1)
-            // The protection numbers above are hardcoded to vanilla iron-
-            // armor values (HELMET=2, CHESTPLATE=6, LEGGINGS=5, BOOTS=2).
-            // Java mods can declare their own ArmorMaterial with different
-            // protection arrays, but reading that out of the AST is a
-            // separate feature — for now we record the gap so a reviewer
-            // can spot-check the emitted item JSON against the source.
-            unt.recordItemCustomBehavior(
-                mod.modId,
-                reg.itemId,
-                "armor protection emitted as iron-armor defaults (${reg.armorSlot}); " +
-                    "verify against the source ArmorMaterial if the mod customized it.",
-            )
+            if (resolvedProtection == null) {
+                behaviorNotes += "armor protection emitted as iron-armor defaults (${reg.armorSlot}); " +
+                    "verify against the source ArmorMaterial if the mod customized it."
+            }
+            // Worn-body visuals: Java renders the equipment-asset layers on
+            // the player model; the Bedrock output has no armor attachable,
+            // so nothing renders on the body. True for every modded wearable.
+            behaviorNotes += "worn-armor visuals are absent on Bedrock — the item equips and protects " +
+                "(minecraft:wearable) but no attachable/equipment geometry is emitted, so nothing " +
+                "renders on the player's body."
         }
 
         if (reg.fireResistant) {
@@ -419,11 +431,10 @@ internal class ItemAnalyzer(
                         "shot against each new target) is server-side Java logic — absent on Bedrock.",
                 )
             }
-            unt.recordItemCustomBehavior(
-                mod.modId,
-                reg.itemId,
-                summary.toString(),
-            )
+            behaviorNotes += summary.toString()
+        }
+        if (behaviorNotes.isNotEmpty()) {
+            unt.recordItemCustomBehavior(mod.modId, reg.itemId, behaviorNotes.joinToString(" "))
         }
 
         val itemJson = buildJsonObject {
@@ -462,6 +473,11 @@ internal class ItemAnalyzer(
         val durability: Int?,
         val attackDamage: Double?,
         val armorSlot: String?,
+        /** Simple name of the ArmorMaterial-holder class from
+         *  `.humanoidArmor(<Class>.<CONSTANT>, ...)`, when present. Resolved
+         *  against the mod's own sources to fold the material's real
+         *  `DEFENSE` values into `minecraft:wearable.protection`. */
+        val armorMaterialClass: String?,
         val fireResistant: Boolean,
         val spawnEggEntityId: String?,
     )
@@ -529,11 +545,26 @@ internal class ItemAnalyzer(
                         entityIdsByConstant[constantName]
                     }
 
-                // Armor: `.humanoidArmor(<material>, ArmorType.HELMET)`
-                val armorSlot = builderCalls
-                    .firstOrNull { it.nameAsString == "humanoidArmor" }
+                // Armor: `.humanoidArmor(<MaterialClass>.<CONSTANT>, ArmorType.HELMET)`
+                val armorCall = builderCalls.firstOrNull { it.nameAsString == "humanoidArmor" }
+                val armorSlot = armorCall
                     ?.arguments?.getOrNull(1)?.let { armorArg ->
                         (armorArg as? FieldAccessExpr)?.nameAsString
+                    }
+                // Simple name of the material-holder class: the last scope
+                // segment of the material constant reference. Handles both
+                // `CreeperArmorMaterials.CREEPER` (NameExpr scope) and the
+                // fully-qualified starwars shape
+                // `com.tweeks.starwars.item.HanSoloArmorMaterials.HAN_SOLO`
+                // (chained FieldAccessExpr scope).
+                val armorMaterialClass = armorCall
+                    ?.arguments?.firstOrNull()?.let { matArg ->
+                        when (val sc = (matArg as? FieldAccessExpr)?.scope) {
+                            is NameExpr -> sc.nameAsString
+                            is FieldAccessExpr -> sc.nameAsString
+                            null -> null
+                            else -> sc.toString().substringAfterLast('.')
+                        }
                     }
 
                 val fireResistant = builderCalls.any { it.nameAsString == "fireResistant" }
@@ -555,6 +586,7 @@ internal class ItemAnalyzer(
                         durability = durability,
                         attackDamage = attackDamage,
                         armorSlot = armorSlot,
+                        armorMaterialClass = armorMaterialClass,
                         fireResistant = fireResistant,
                         spawnEggEntityId = spawnEggEntityId,
                     )
@@ -605,6 +637,34 @@ internal class ItemAnalyzer(
             if (call.nameAsString != "durability") continue
             val v = call.arguments.firstOrNull()?.let { readIntLiteral(it) }
             if (v != null) return v
+        }
+        return null
+    }
+
+    /**
+     * Fold one piece's defense value out of an ArmorMaterial-holder class:
+     * find its `DEFENSE` field initialized with
+     * `Map.of(ArmorType.BOOTS, 3, ArmorType.LEGGINGS, 6, ...)` and return
+     * the integer paired with [armorType] (e.g. `HELMET`). Returns null when
+     * the field, the `Map.of` shape, or the requested type key is absent —
+     * the caller then falls back to iron-armor defaults and records the gap.
+     */
+    private fun readArmorDefense(decl: ClassOrInterfaceDeclaration, armorType: String): Int? {
+        for (fd in decl.findAll(com.github.javaparser.ast.body.FieldDeclaration::class.java)) {
+            val defenseVar = fd.variables.firstOrNull { it.nameAsString == "DEFENSE" } ?: continue
+            val call = defenseVar.initializer.orElse(null) as? MethodCallExpr ?: continue
+            if (call.nameAsString != "of") continue
+            // `Map.of` args alternate key, value.
+            var i = 0
+            while (i + 1 < call.arguments.size) {
+                val keyName = when (val key = call.arguments[i]) {
+                    is FieldAccessExpr -> key.nameAsString
+                    is NameExpr -> key.nameAsString
+                    else -> key.toString().substringAfterLast('.')
+                }
+                if (keyName == armorType) return readIntLiteral(call.arguments[i + 1])
+                i += 2
+            }
         }
         return null
     }

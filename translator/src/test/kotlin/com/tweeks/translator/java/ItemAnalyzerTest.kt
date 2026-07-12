@@ -109,6 +109,17 @@ class ItemAnalyzerTest {
             "slot.armor.feet",
             boots["minecraft:wearable"]!!.jsonObject["slot"]!!.jsonPrimitive.content,
         )
+
+        // CreeperArmorMaterials.DEFENSE is netherite-grade (3/8/6/3) — the
+        // folded values, not the old hardcoded iron defaults (2/6/5/2).
+        assertEquals(3, helmet["minecraft:wearable"]!!.jsonObject["protection"]!!.jsonPrimitive.intOrNull)
+        assertEquals(8, chest["minecraft:wearable"]!!.jsonObject["protection"]!!.jsonPrimitive.intOrNull)
+        assertEquals(6, legs["minecraft:wearable"]!!.jsonObject["protection"]!!.jsonPrimitive.intOrNull)
+        assertEquals(3, boots["minecraft:wearable"]!!.jsonObject["protection"]!!.jsonPrimitive.intOrNull)
+
+        val report = unt.renderReport("creeperskin")
+        assertFalse(report.contains("iron-armor defaults")) { report }
+        assertTrue(report.contains("worn-armor visuals")) { report }
     }
 
     @Test
@@ -355,6 +366,107 @@ class ItemAnalyzerTest {
             "starwars:lightsaber",
             lightsaberAttachable["minecraft:attachable"]!!.jsonObject["description"]!!.jsonObject["identifier"]!!.jsonPrimitive.content,
         )
+    }
+
+    @Test
+    fun `armor protection folds the ArmorMaterial DEFENSE map per piece`(@TempDir outDir: Path) {
+        // Mirrors starwars' HanSoloArmorMaterials: a netherite-grade DEFENSE
+        // map (helmet 3 / chest 8 / legs 6 / boots 3). Before the fix, every
+        // modded armor piece was emitted with hardcoded iron-armor defaults
+        // (2/6/5/2), silently under-powering any non-iron-tier set on Bedrock.
+        val materialsSrc = """
+            package com.example.themod;
+            public final class MyArmorMaterials {
+                private static final Map<ArmorType, Integer> DEFENSE = Map.of(
+                    ArmorType.BOOTS,      3,
+                    ArmorType.LEGGINGS,   6,
+                    ArmorType.CHESTPLATE, 8,
+                    ArmorType.HELMET,     3,
+                    ArmorType.BODY,       19);
+                public static final ArmorMaterial MY = new ArmorMaterial(
+                    37, DEFENSE, 15, null, 3.0F, 0.1F, null, null);
+            }
+        """.trimIndent()
+        val registrationSrc = """
+            package com.example.themod;
+            class Registration {
+                public static final Object HELMET = ITEMS.registerItem("my_helmet",
+                    Item::new, p -> p.humanoidArmor(MyArmorMaterials.MY, ArmorType.HELMET));
+                public static final Object CHESTPLATE = ITEMS.registerItem("my_chestplate",
+                    Item::new, p -> p.humanoidArmor(com.example.themod.MyArmorMaterials.MY,
+                        net.minecraft.world.item.equipment.ArmorType.CHESTPLATE));
+                public static final Object LEGGINGS = ITEMS.registerItem("my_leggings",
+                    Item::new, p -> p.humanoidArmor(MyArmorMaterials.MY, ArmorType.LEGGINGS));
+                public static final Object BOOTS = ITEMS.registerItem("my_boots",
+                    Item::new, p -> p.humanoidArmor(MyArmorMaterials.MY, ArmorType.BOOTS));
+            }
+        """.trimIndent()
+        val mod = ModDiscovery.DiscoveredMod(modId = "themod", rootDir = outDir.resolve("themodroot"))
+        java.nio.file.Files.createDirectories(mod.rootDir)
+        val parser = com.github.javaparser.JavaParser()
+        val units = listOf(materialsSrc, registrationSrc).map { parser.parse(it).result.orElseThrow() }
+        val sources = JavaSourceLoader.ResolvedModSources(
+            mod = mod,
+            units = units,
+            typeSolver = com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver(),
+        )
+
+        val unt = Untranslatable()
+        ItemAnalyzer(target, unt).analyze(mod, sources, outDir)
+
+        fun protection(itemId: String): Int? =
+            itemComponents(read(outDir, "themod/behavior_pack/items/$itemId.json"))["minecraft:wearable"]!!
+                .jsonObject["protection"]!!.jsonPrimitive.intOrNull
+
+        assertEquals(3, protection("my_helmet"))
+        assertEquals(8, protection("my_chestplate"))
+        assertEquals(6, protection("my_leggings"))
+        assertEquals(3, protection("my_boots"))
+
+        val report = unt.renderReport("themod")
+        // Resolved statically — the stale "verify against the source" hedge
+        // must NOT appear for these items.
+        assertFalse(report.contains("iron-armor defaults")) { report }
+        // Honesty: functional wearable, but no worn-body visuals on Bedrock.
+        assertTrue(report.contains("worn-armor visuals")) { report }
+        for (id in listOf("my_helmet", "my_chestplate", "my_leggings", "my_boots")) {
+            assertTrue(report.contains("`$id`")) { report }
+        }
+    }
+
+    @Test
+    fun `armor protection falls back to iron defaults when the material cannot be resolved`(@TempDir outDir: Path) {
+        // The material class lives outside the mod's sources (or has no
+        // readable DEFENSE map) — keep the old defaults and the old honest
+        // UNTRANSLATABLE entry for exactly this case.
+        val registrationSrc = """
+            package com.example.themod;
+            class Registration {
+                public static final Object HELMET = ITEMS.registerItem("my_helmet",
+                    Item::new, p -> p.humanoidArmor(VanillaMaterials.IRON, ArmorType.HELMET));
+            }
+        """.trimIndent()
+        val mod = ModDiscovery.DiscoveredMod(modId = "themod", rootDir = outDir.resolve("themodroot"))
+        java.nio.file.Files.createDirectories(mod.rootDir)
+        val parser = com.github.javaparser.JavaParser()
+        val units = listOf(registrationSrc).map { parser.parse(it).result.orElseThrow() }
+        val sources = JavaSourceLoader.ResolvedModSources(
+            mod = mod,
+            units = units,
+            typeSolver = com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver(),
+        )
+
+        val unt = Untranslatable()
+        ItemAnalyzer(target, unt).analyze(mod, sources, outDir)
+
+        val helmet = itemComponents(read(outDir, "themod/behavior_pack/items/my_helmet.json"))
+        assertEquals(2, helmet["minecraft:wearable"]!!.jsonObject["protection"]!!.jsonPrimitive.intOrNull)
+
+        val report = unt.renderReport("themod")
+        assertTrue(report.contains("iron-armor defaults")) { report }
+        // The worn-visuals honesty line applies to every wearable item,
+        // resolved or not.
+        assertTrue(report.contains("worn-armor visuals")) { report }
     }
 
     @Test
