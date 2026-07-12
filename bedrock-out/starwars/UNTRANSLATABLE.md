@@ -142,7 +142,7 @@ Bedrock has no equivalent of Java's procedural `Structure`/`StructurePiece` data
 
 These `VehicleEntity` subclasses are emitted as a ground-driven Bedrock approximation (`minecraft:rideable` + `minecraft:input_ground_controlled`) rather than the mob pipeline's walking-mob defaults. Java-specific hover/vehicle physics have no Bedrock equivalent:
 
-- `landspeeder`: Java hover physics (spring to 0.5 blocks, water-skimming) has no Bedrock equivalent — emitted as a ground-driven rideable (input_ground_controlled); banking/bob visuals dropped.
+- `landspeeder`: Java hover physics (spring to 0.5 blocks, water-skimming) has no Bedrock equivalent — emitted as a ground-driven rideable (input_ground_controlled); banking/bob visuals dropped. A single-item loot table now backs minecraft:loot for drop parity with the Java destroy-drop. The item's attachable emission is suppressed for this entity (see ItemAnalyzer) since the full 3-block vehicle geometry would otherwise render as the held-item model.
 
 ## Named-character singletons (not enforced on Bedrock)
 

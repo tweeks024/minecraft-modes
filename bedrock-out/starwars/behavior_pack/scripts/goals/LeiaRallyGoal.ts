@@ -38,7 +38,19 @@ import java.util.List;
 public class LeiaRallyGoal extends Goal {
 
     private final SwMob mob;
+    // Deliberately not persisted (no save/load) — a chunk reload resets this
+    // to the initial "ready" value, re-arming the pulse early. Accepted: the
+    // rally is a minor combat buff, not something worth NBT plumbing for.
     private long lastPulseGameTime = -RallyMath.RALLY_INTERVAL_TICKS;
+
+    /**
+     * Ally list computed by {@link #canUse} (via {@link #combatNearby}) and
+     * reused by {@link #start} so the same tick doesn't re-scan the
+     * bounding-box query twice. Cleared in {@link #stop} and after
+     * consumption in {@link #start} so a stale list can never leak into a
+     * later tick's {@link #combatNearby} check.
+     */
+    private List<LivingEntity> cachedAllies;
 
     public LeiaRallyGoal(SwMob mob) {
         this.mob = mob;
@@ -60,7 +72,12 @@ public class LeiaRallyGoal extends Goal {
     @Override
     public void start() {
         ServerLevel sl = (ServerLevel) mob.level();
-        for (LivingEntity ally : findEligibleAllies(sl)) {
+        // Reuse the list combatNearby() already computed rather than
+        // re-scanning. cachedAllies is only null here when canUse() took the
+        // `mob.getTarget() != null` early-return branch, which never needed
+        // to compute the ally list in the first place.
+        List<LivingEntity> allies = cachedAllies != null ? cachedAllies : findEligibleAllies(sl);
+        for (LivingEntity ally : allies) {
             ally.addEffect(new MobEffectInstance(MobEffects.RESISTANCE,
                 RallyMath.RALLY_DURATION_TICKS, 0));
             ally.addEffect(new MobEffectInstance(MobEffects.REGENERATION,
@@ -78,12 +95,19 @@ public class LeiaRallyGoal extends Goal {
         sl.playSound(null, mob.getX(), mob.getY(), mob.getZ(),
             SoundEvents.BEACON_ACTIVATE, SoundSource.NEUTRAL, 0.8f, 1.4f);
         this.lastPulseGameTime = sl.getGameTime();
+        this.cachedAllies = null;
+    }
+
+    @Override
+    public void stop() {
+        this.cachedAllies = null;
     }
 
     /** Combat nearby = Leia has a target, or an eligible ally mob does. */
     private boolean combatNearby(ServerLevel sl) {
         if (mob.getTarget() != null) return true;
-        for (LivingEntity ally : findEligibleAllies(sl)) {
+        cachedAllies = findEligibleAllies(sl);
+        for (LivingEntity ally : cachedAllies) {
             if (ally instanceof Mob m && m.getTarget() != null) return true;
         }
         return false;

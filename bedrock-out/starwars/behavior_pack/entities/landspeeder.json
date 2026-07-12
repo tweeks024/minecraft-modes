@@ -16,6 +16,9 @@
         "max": 40
       },
       "minecraft:input_ground_controlled": {},
+      "minecraft:loot": {
+        "table": "loot_tables/entities/landspeeder.json"
+      },
       "minecraft:movement": {
         "value": 0.35
       },
@@ -34,14 +37,14 @@
         "seats": [
           {
             "position": [
-              -0.45,
+              -0.25,
               0.35,
               0
             ]
           },
           {
             "position": [
-              0.45,
+              0.25,
               0.35,
               0
             ]
