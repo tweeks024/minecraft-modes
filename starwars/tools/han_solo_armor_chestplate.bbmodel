@@ -1,0 +1,335 @@
+{
+  "meta": {
+    "format_version": "5.0",
+    "model_format": "modded_entity",
+    "box_uv": true
+  },
+  "name": "han_solo_armor_chestplate",
+  "model_identifier": "",
+  "modded_entity_entity_class": "",
+  "modded_entity_version": "1.21",
+  "modded_entity_flip_y": true,
+  "visible_box": [
+    1,
+    1,
+    0
+  ],
+  "variable_placeholders": "",
+  "variable_placeholder_buttons": [],
+  "timeline_setups": [],
+  "unhandled_root_fields": {},
+  "resolution": {
+    "width": 64,
+    "height": 32
+  },
+  "elements": [
+    {
+      "name": "body",
+      "from": [
+        -4,
+        12,
+        -2
+      ],
+      "to": [
+        4,
+        24,
+        2
+      ],
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "autouv": 0,
+      "box_uv": true,
+      "uv_offset": [
+        16,
+        16
+      ],
+      "rotation": null,
+      "rescale": null,
+      "locked": false,
+      "render_order": "default",
+      "export": true,
+      "scope": 0,
+      "allow_mirror_modeling": true,
+      "color": 0,
+      "type": "cube",
+      "uuid": "7453fa7b-bcca-5ee8-b627-744fad5325bd",
+      "faces": {
+        "north": {
+          "uv": [
+            20,
+            20,
+            28,
+            32
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            16,
+            20,
+            20,
+            32
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            32,
+            20,
+            40,
+            32
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            28,
+            20,
+            32,
+            32
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            28,
+            20,
+            20,
+            16
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            36,
+            20,
+            28,
+            16
+          ],
+          "texture": 0
+        }
+      },
+      "inflate": 1.01
+    },
+    {
+      "name": "right_arm",
+      "from": [
+        -8,
+        12,
+        -2
+      ],
+      "to": [
+        -4,
+        24,
+        2
+      ],
+      "origin": [
+        -5,
+        22,
+        0
+      ],
+      "autouv": 0,
+      "box_uv": true,
+      "uv_offset": [
+        40,
+        16
+      ],
+      "rotation": null,
+      "rescale": null,
+      "locked": false,
+      "render_order": "default",
+      "export": true,
+      "scope": 0,
+      "allow_mirror_modeling": true,
+      "color": 0,
+      "type": "cube",
+      "uuid": "57cd20f9-5538-56f1-b640-0609c954efb7",
+      "faces": {
+        "north": {
+          "uv": [
+            44,
+            20,
+            48,
+            32
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            40,
+            20,
+            44,
+            32
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            52,
+            20,
+            56,
+            32
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            48,
+            20,
+            52,
+            32
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            48,
+            20,
+            44,
+            16
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            52,
+            20,
+            48,
+            16
+          ],
+          "texture": 0
+        }
+      },
+      "inflate": 1.0
+    },
+    {
+      "name": "left_arm",
+      "from": [
+        4,
+        12,
+        -2
+      ],
+      "to": [
+        8,
+        24,
+        2
+      ],
+      "origin": [
+        5,
+        22,
+        0
+      ],
+      "autouv": 0,
+      "box_uv": true,
+      "uv_offset": [
+        40,
+        16
+      ],
+      "rotation": null,
+      "rescale": null,
+      "locked": false,
+      "render_order": "default",
+      "export": true,
+      "scope": 0,
+      "allow_mirror_modeling": true,
+      "color": 0,
+      "type": "cube",
+      "uuid": "9a94bfbf-5813-54b9-bf28-31902293c7bc",
+      "faces": {
+        "north": {
+          "uv": [
+            44,
+            20,
+            48,
+            32
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            40,
+            20,
+            44,
+            32
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            52,
+            20,
+            56,
+            32
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            48,
+            20,
+            52,
+            32
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            48,
+            20,
+            44,
+            16
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            52,
+            20,
+            48,
+            16
+          ],
+          "texture": 0
+        }
+      },
+      "inflate": 1.0
+    }
+  ],
+  "groups": [],
+  "outliner": [
+    "7453fa7b-bcca-5ee8-b627-744fad5325bd",
+    "57cd20f9-5538-56f1-b640-0609c954efb7",
+    "9a94bfbf-5813-54b9-bf28-31902293c7bc"
+  ],
+  "textures": [
+    {
+      "path": null,
+      "name": "han_solo.png",
+      "folder": "entity/equipment/humanoid",
+      "namespace": "starwars",
+      "id": "0",
+      "particle": false,
+      "render_mode": "default",
+      "render_sides": "auto",
+      "frame_time": 1,
+      "frame_order_type": "loop",
+      "frame_order": "",
+      "frame_interpolate": false,
+      "visible": true,
+      "internal": true,
+      "saved": true,
+      "uuid": "40e965fe-fe5d-5e2c-bd38-ecaadfdfadd7",
+      "relative_path": "../src/main/resources/assets/starwars/textures/entity/equipment/humanoid/han_solo.png",
+      "use_as_default": false,
+      "layers_enabled": false,
+      "sync_to_project": "",
+      "width": 64,
+      "height": 32,
+      "uv_width": 64,
+      "uv_height": 32,
+      "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAgCAYAAACinX6EAAAA40lEQVR4nGNgIABSvIz+o2MvUyWs2FhFDAMTMn/Qg9EAGA2A0QAYDYDRABgNgGEcANg8SE880P5nwBWb9MID7f/RABgNgNEAGA2AkR0A2OpueuKB9j/Vgaurx39kLC4uiYIpNf/Fgwv/kfHJA+tQMDX8QBEYDYDRABhhAYDuYWpjbW1tijDNA4BYh6DHHKUeGzEBgK6PVDwaAIRAXoDJf0rwaAAM9QAIsVL5TwlGr+ZwYXSHEasPvZojFdM8AEZ8ChjxAUDrLEDzALDSkPhPCY5y0CAKz+pKQMHE6qN5GTDSAwAAoONThf8tE1AAAAAASUVORK5CYII="
+    }
+  ]
+}

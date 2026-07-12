@@ -1,0 +1,335 @@
+{
+  "meta": {
+    "format_version": "5.0",
+    "model_format": "modded_entity",
+    "box_uv": true
+  },
+  "name": "han_solo_armor_leggings",
+  "model_identifier": "",
+  "modded_entity_entity_class": "",
+  "modded_entity_version": "1.21",
+  "modded_entity_flip_y": true,
+  "visible_box": [
+    1,
+    1,
+    0
+  ],
+  "variable_placeholders": "",
+  "variable_placeholder_buttons": [],
+  "timeline_setups": [],
+  "unhandled_root_fields": {},
+  "resolution": {
+    "width": 64,
+    "height": 32
+  },
+  "elements": [
+    {
+      "name": "body",
+      "from": [
+        -4,
+        12,
+        -2
+      ],
+      "to": [
+        4,
+        24,
+        2
+      ],
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "autouv": 0,
+      "box_uv": true,
+      "uv_offset": [
+        16,
+        16
+      ],
+      "rotation": null,
+      "rescale": null,
+      "locked": false,
+      "render_order": "default",
+      "export": true,
+      "scope": 0,
+      "allow_mirror_modeling": true,
+      "color": 0,
+      "type": "cube",
+      "uuid": "4412fd29-9af4-58de-b654-cc9bbb44c8ad",
+      "faces": {
+        "north": {
+          "uv": [
+            20,
+            20,
+            28,
+            32
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            16,
+            20,
+            20,
+            32
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            32,
+            20,
+            40,
+            32
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            28,
+            20,
+            32,
+            32
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            28,
+            20,
+            20,
+            16
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            36,
+            20,
+            28,
+            16
+          ],
+          "texture": 0
+        }
+      },
+      "inflate": 0.51
+    },
+    {
+      "name": "right_leg",
+      "from": [
+        -3.9,
+        0,
+        -2
+      ],
+      "to": [
+        0.1,
+        12,
+        2
+      ],
+      "origin": [
+        -1.9,
+        12,
+        0
+      ],
+      "autouv": 0,
+      "box_uv": true,
+      "uv_offset": [
+        0,
+        16
+      ],
+      "rotation": null,
+      "rescale": null,
+      "locked": false,
+      "render_order": "default",
+      "export": true,
+      "scope": 0,
+      "allow_mirror_modeling": true,
+      "color": 0,
+      "type": "cube",
+      "uuid": "6d91d48d-53c2-515b-bd19-ed794de29d33",
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            20,
+            8.0,
+            32
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            0,
+            20,
+            4,
+            32
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            12.0,
+            20,
+            16.0,
+            32
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            8.0,
+            20,
+            12.0,
+            32
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            8.0,
+            20,
+            4,
+            16
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            12.0,
+            20,
+            8.0,
+            16
+          ],
+          "texture": 0
+        }
+      },
+      "inflate": 0.5
+    },
+    {
+      "name": "left_leg",
+      "from": [
+        -0.1,
+        0,
+        -2
+      ],
+      "to": [
+        3.9,
+        12,
+        2
+      ],
+      "origin": [
+        1.9,
+        12,
+        0
+      ],
+      "autouv": 0,
+      "box_uv": true,
+      "uv_offset": [
+        0,
+        16
+      ],
+      "rotation": null,
+      "rescale": null,
+      "locked": false,
+      "render_order": "default",
+      "export": true,
+      "scope": 0,
+      "allow_mirror_modeling": true,
+      "color": 0,
+      "type": "cube",
+      "uuid": "3e29e1af-9fb2-57e1-b223-27c775d6386f",
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            20,
+            8.0,
+            32
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            0,
+            20,
+            4,
+            32
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            12.0,
+            20,
+            16.0,
+            32
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            8.0,
+            20,
+            12.0,
+            32
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            8.0,
+            20,
+            4,
+            16
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            12.0,
+            20,
+            8.0,
+            16
+          ],
+          "texture": 0
+        }
+      },
+      "inflate": 0.5
+    }
+  ],
+  "groups": [],
+  "outliner": [
+    "4412fd29-9af4-58de-b654-cc9bbb44c8ad",
+    "6d91d48d-53c2-515b-bd19-ed794de29d33",
+    "3e29e1af-9fb2-57e1-b223-27c775d6386f"
+  ],
+  "textures": [
+    {
+      "path": null,
+      "name": "han_solo.png",
+      "folder": "entity/equipment/humanoid_leggings",
+      "namespace": "starwars",
+      "id": "0",
+      "particle": false,
+      "render_mode": "default",
+      "render_sides": "auto",
+      "frame_time": 1,
+      "frame_order_type": "loop",
+      "frame_order": "",
+      "frame_interpolate": false,
+      "visible": true,
+      "internal": true,
+      "saved": true,
+      "uuid": "a69cb8c7-412e-5bad-892b-f823b4740e61",
+      "relative_path": "../src/main/resources/assets/starwars/textures/entity/equipment/humanoid_leggings/han_solo.png",
+      "use_as_default": false,
+      "layers_enabled": false,
+      "sync_to_project": "",
+      "width": 64,
+      "height": 32,
+      "uv_width": 64,
+      "uv_height": 32,
+      "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAgCAYAAACinX6EAAAAYUlEQVR4nO3WMQqAMAxA0d7E1Uk69xie1BsqONUOghTJkPcgdE3+1FIAAACA9La2n/0sa3tM9H6/E0CAZAH6I8fj3+ao9X6j958mgAACCCCAAAIIkDbA+NX9OtH7T8se4AJrj3Yon0pLMAAAAABJRU5ErkJggg=="
+    }
+  ]
+}

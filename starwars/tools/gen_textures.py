@@ -681,6 +681,91 @@ def paint_stormtrooper_armor_layers(humanoid_rgba, leggings_rgba):
     rect(leggings_rgba, 0, 25, 16, 30, WHITE_SH)     # shin (darker than thigh)
     rect(leggings_rgba, 0, 30, 16, 32, GRAY)         # ankle cuff, darker
 
+# Han Solo worn-armor palette additions (reuses HAN_SHIRT/HAN_SHIRT_DIM/
+# HAN_VEST*/HAN_TROUSER*/HAN_STRIPE/HAN_BELT/HAN_BUCKLE from paint_han_solo
+# above) plus cap and boot tones.
+HAN_CAP      = (0x4A, 0x35, 0x22, 0xFF)   # dark-brown cap (reuses HAN_HAIR tone)
+HAN_CAP_HI   = (0x64, 0x4A, 0x32, 0xFF)
+HAN_CAP_DK   = (0x33, 0x24, 0x16, 0xFF)
+HAN_BOOT     = (0x54, 0x3A, 0x24, 0xFF)   # brown boots
+HAN_BOOT_HI  = (0x6E, 0x50, 0x34, 0xFF)
+HAN_BOOT_DK  = (0x3A, 0x28, 0x18, 0xFF)
+
+def paint_han_solo_armor_layers(humanoid_rgba, leggings_rgba):
+    """Worn-armor sheets for the Han Solo equipment asset. Same sampled
+    UV extents as paint_stormtrooper_armor_layers (that function's region
+    comments are the authoritative map — copy its rect() extents exactly,
+    substituting palettes):
+      humanoid sheet — head block: HAN_CAP 3-tone cap with HAN_CAP_DK
+        band row; body block: HAN_VEST over HAN_SHIRT with the open-front
+        column (shirt tone showing through center), HAN_BELT+HAN_BUCKLE
+        waist rows; arm block: HAN_SHIRT sleeves with HAN_VEST shoulder
+        strap rows and HAN_SHIRT_DIM elbow fold; leg block (BOOTS on this
+        sheet): HAN_BOOT 3-tone on the lower rows only, transparent above.
+      leggings sheet — leg block only: HAN_TROUSER 3-tone with the 1px
+        HAN_STRIPE bloodstripe column and HAN_TROUSER_DK inner shadow.
+    Every region: 3+ tones (art gate)."""
+    fill_buf(humanoid_rgba, (0, 0, 0, 0))
+    fill_buf(leggings_rgba, (0, 0, 0, 0))
+
+    # ---- Head block (cap), UV 0..32,0..16 ----
+    # Top/bottom faces: y0..7, inset to x8..24, 3-tone gradient.
+    rect(humanoid_rgba, 8, 0, 13, 8, HAN_CAP_HI)
+    rect(humanoid_rgba, 13, 0, 19, 8, HAN_CAP)
+    rect(humanoid_rgba, 19, 0, 24, 8, HAN_CAP_DK)
+    # Wraparound sides: y8..16, full x0..32. No face detail cutouts — the
+    # cap doesn't cover the face like a stormtrooper helmet does.
+    rect(humanoid_rgba, 0, 8, 32, 9, HAN_CAP_HI)    # cap crown highlight
+    rect(humanoid_rgba, 0, 9, 32, 15, HAN_CAP)      # cap base band
+    rect(humanoid_rgba, 0, 15, 32, 16, HAN_CAP_DK)  # brim band, distinct from base
+
+    # ---- Body block (vest), UV 16..40,16..32 ----
+    # Top/bottom faces: y16..19, inset to x20..28.
+    rect(humanoid_rgba, 20, 16, 24, 20, HAN_VEST_HI)
+    rect(humanoid_rgba, 24, 16, 28, 20, HAN_VEST_DK)
+    # Wraparound: y20..32, full x16..40.
+    rect(humanoid_rgba, 16, 20, 40, 21, HAN_VEST_HI)  # shoulder/lapel highlight
+    rect(humanoid_rgba, 16, 21, 40, 26, HAN_VEST)     # vest base
+    rect(humanoid_rgba, 16, 26, 40, 27, HAN_VEST_DK)  # vest seam line
+    rect(humanoid_rgba, 16, 27, 40, 29, HAN_VEST)     # lower vest
+    rect(humanoid_rgba, 16, 29, 40, 30, HAN_VEST_DK)  # vest hem seam
+    rect(humanoid_rgba, 16, 30, 40, 32, HAN_BELT)     # waist belt row
+    rect(humanoid_rgba, 26, 30, 30, 32, HAN_BUCKLE)   # belt buckle
+    # Open-front column: shirt tone shows through the vest opening,
+    # painted last (over the vest fill) so it stays a continuous strip
+    # from collar down to the belt.
+    rect(humanoid_rgba, 26, 21, 30, 30, HAN_SHIRT)
+
+    # ---- Arm block (sleeve), UV 40..56,16..32 ----
+    # Top/bottom faces: y16..19, inset to x44..52.
+    rect(humanoid_rgba, 44, 16, 48, 20, HAN_SHIRT)
+    rect(humanoid_rgba, 48, 16, 52, 20, HAN_SHIRT_DIM)
+    # Wraparound: y20..32, full x40..56.
+    rect(humanoid_rgba, 40, 20, 56, 22, HAN_VEST)       # vest shoulder strap peek
+    rect(humanoid_rgba, 40, 22, 56, 26, HAN_SHIRT)      # upper sleeve
+    rect(humanoid_rgba, 40, 26, 56, 27, HAN_SHIRT_DIM)  # elbow fold
+    rect(humanoid_rgba, 40, 27, 56, 30, HAN_SHIRT)      # forearm
+    rect(humanoid_rgba, 40, 30, 56, 32, HAN_SHIRT_DIM)  # wrist shade
+
+    # ---- Leg block (boots, on the humanoid sheet), UV 0..16,16..32 ----
+    # Boots are ankle-height — transparent above y24, unlike the
+    # stormtrooper's full-leg armor plating.
+    rect(humanoid_rgba, 0, 24, 16, 26, HAN_BOOT_HI)  # boot top highlight
+    rect(humanoid_rgba, 0, 26, 16, 30, HAN_BOOT)     # boot body
+    rect(humanoid_rgba, 0, 30, 16, 32, HAN_BOOT_DK)  # sole shade
+
+    # ---- Leggings sheet: leg block only, UV 0..16,16..32 ----
+    # Top/bottom faces: y16..19, inset to x4..12.
+    rect(leggings_rgba, 4, 16, 8, 20, HAN_TROUSER)
+    rect(leggings_rgba, 8, 16, 12, 20, HAN_TROUSER_DK)
+    # Wraparound: y20..32, full x0..16 — thigh/shin base, inner shadow
+    # column, 1px bloodstripe column, darker ankle cuff.
+    rect(leggings_rgba, 0, 20, 16, 21, HAN_TROUSER)     # thigh top highlight
+    rect(leggings_rgba, 0, 21, 16, 30, HAN_TROUSER)     # thigh/shin base
+    rect(leggings_rgba, 1, 20, 3, 32, HAN_TROUSER_DK)   # inner shadow column
+    rect(leggings_rgba, 14, 20, 15, 32, HAN_STRIPE)     # bloodstripe column
+    rect(leggings_rgba, 0, 30, 16, 32, HAN_TROUSER_DK)  # ankle cuff, darker
+
 if __name__ == '__main__':
     out_dir = sys.argv[1] if len(sys.argv) > 1 else \
         'starwars/src/main/resources/assets/starwars/textures/entity'
@@ -704,4 +789,13 @@ if __name__ == '__main__':
     write_png(os.path.join(leggings_dir, 'stormtrooper.png'), leggings_rgba,
               width=ARMOR_W, height=ARMOR_H)
     print('stormtrooper armor layers')
+
+    humanoid_rgba = bytearray(ARMOR_W * ARMOR_H * 4)
+    leggings_rgba = bytearray(ARMOR_W * ARMOR_H * 4)
+    paint_han_solo_armor_layers(humanoid_rgba, leggings_rgba)
+    write_png(os.path.join(humanoid_dir, 'han_solo.png'), humanoid_rgba,
+              width=ARMOR_W, height=ARMOR_H)
+    write_png(os.path.join(leggings_dir, 'han_solo.png'), leggings_rgba,
+              width=ARMOR_W, height=ARMOR_H)
+    print('han solo armor layers')
     print('OK')

@@ -265,6 +265,121 @@ def gen_stormtrooper_boots(out_path):
 
     write_png(out_path, rgba)
 
+# Han Solo armor palette — matches gen_textures.py's paint_han_solo_armor_layers.
+HAN_CAP        = (0x4A, 0x35, 0x22, 0xFF)
+HAN_CAP_HI     = (0x64, 0x4A, 0x32, 0xFF)
+HAN_CAP_DK     = (0x33, 0x24, 0x16, 0xFF)
+HAN_SHIRT      = (0xE8, 0xE0, 0xD0, 0xFF)
+HAN_VEST       = (0x2B, 0x2B, 0x2B, 0xFF)
+HAN_VEST_HI    = (0x45, 0x45, 0x48, 0xFF)
+HAN_VEST_DK    = (0x17, 0x17, 0x19, 0xFF)
+HAN_TROUSER    = (0x2E, 0x3A, 0x52, 0xFF)
+HAN_TROUSER_DK = (0x1F, 0x28, 0x3A, 0xFF)
+HAN_STRIPE     = (0xB0, 0x30, 0x30, 0xFF)
+HAN_BELT       = (0x5A, 0x40, 0x28, 0xFF)
+HAN_BOOT       = (0x54, 0x3A, 0x24, 0xFF)
+HAN_BOOT_HI    = (0x6E, 0x50, 0x34, 0xFF)
+HAN_BOOT_DK    = (0x3A, 0x28, 0x18, 0xFF)
+
+
+def gen_han_solo_helmet(out_path):
+    """Cap silhouette (same dome shape as the stormtrooper helmet icon,
+    minus the T-visor cutout — Han's cap doesn't cover the face) with a
+    3-tone brown gradient and a darker brim band across the front."""
+    rgba = bytearray(W * H * 4)  # fully transparent
+
+    segs = [
+        (2,  [(5, 11)]),
+        (3,  [(4, 12)]),
+        (4,  [(3, 13)]),
+        (5,  [(2, 14)]),
+        (6,  [(2, 14)]),
+        (7,  [(2, 14)]),
+        (8,  [(2, 14)]),
+        (9,  [(2, 14)]),
+        (10, [(2, 14)]),
+        (11, [(3, 13)]),
+        (12, [(4, 12)]),
+        (13, [(5, 11)]),
+    ]
+    outline_and_fill(rgba, segs, base=HAN_CAP, hi=HAN_CAP_HI, sh=HAN_CAP_DK,
+                      hi_rows={2, 3, 4}, sh_rows={11, 12, 13})
+
+    # Brim band across the front of the cap.
+    rect(rgba, 3, 9, 13, 10, HAN_CAP_DK)
+
+    write_png(out_path, rgba)
+
+def gen_han_solo_chestplate(out_path):
+    """Vest silhouette (same shoulder-notched torso shape as the
+    stormtrooper chestplate icon) in black over an off-white open-front
+    shirt column down the middle."""
+    rgba = bytearray(W * H * 4)  # fully transparent
+
+    segs = [
+        (2,  [(6, 10)]),           # collar
+        (3,  [(3, 7), (9, 13)]),   # shoulder pads, split by the collar notch
+        (4,  [(3, 13)]),
+        (5,  [(3, 13)]),
+        (6,  [(3, 13)]),
+        (7,  [(3, 13)]),
+        (8,  [(3, 13)]),
+        (9,  [(3, 13)]),
+        (10, [(3, 13)]),
+        (11, [(4, 12)]),
+        (12, [(4, 12)]),
+        (13, [(5, 11)]),           # waist taper
+    ]
+    outline_and_fill(rgba, segs, base=HAN_VEST, hi=HAN_VEST_HI, sh=HAN_VEST_DK,
+                      hi_rows={2, 3, 4}, sh_rows={10, 11, 12, 13})
+
+    # Open-front shirt column, painted over the vest fill.
+    rect(rgba, 7, 5, 9, 12, HAN_SHIRT)
+
+    write_png(out_path, rgba)
+
+def gen_han_solo_leggings(out_path):
+    """Two legs joined at a belt band, navy trousers with a red Corellian
+    bloodstripe column running down the outer seam of each leg."""
+    rgba = bytearray(W * H * 4)  # fully transparent
+
+    belt_segs = [
+        (2, [(5, 11)]),
+        (3, [(3, 13)]),
+    ]
+    outline_and_fill(rgba, belt_segs, base=HAN_BELT)
+
+    leg_segs = [(y, [(3, 7), (9, 13)]) for y in range(4, 14)]
+    outline_and_fill(rgba, leg_segs, base=HAN_TROUSER, sh=HAN_TROUSER_DK,
+                      sh_rows=set(range(9, 14)))
+
+    # Bloodstripe columns, one per leg.
+    rect(rgba, 4, 4, 5, 14, HAN_STRIPE)
+    rect(rgba, 11, 4, 12, 14, HAN_STRIPE)
+
+    write_png(out_path, rgba)
+
+def gen_han_solo_boots(out_path):
+    """Two boot shapes (same silhouette as the stormtrooper boots icon), a
+    3-tone brown gradient with a darker sole line."""
+    rgba = bytearray(W * H * 4)  # fully transparent
+
+    cuff_segs = [
+        (2, [(1, 8), (9, 16)]),
+        (3, [(1, 8), (9, 16)]),
+    ]
+    outline_and_fill(rgba, cuff_segs, base=HAN_BOOT, hi=HAN_BOOT_HI,
+                      hi_rows={2, 3})
+
+    body_segs = [(y, [(2, 7), (10, 15)]) for y in range(4, 12)]
+    outline_and_fill(rgba, body_segs, base=HAN_BOOT, sh=HAN_BOOT_DK,
+                      sh_rows={9, 10, 11})
+
+    sole_segs = [(12, [(2, 7), (10, 15)])]
+    outline_and_fill(rgba, sole_segs, base=HAN_BOOT_DK)  # sole line, darkest brown
+
+    write_png(out_path, rgba)
+
 def gen_landspeeder(out_path):
     """16x16 side-profile of the X-34 landspeeder (spec §5.6): a sand-orange
     hull wedge (rows 7-10) with nose tip at the left, an open two-seat
@@ -317,5 +432,9 @@ if __name__ == '__main__':
     gen_stormtrooper_chestplate(os.path.join(out_dir, 'stormtrooper_chestplate.png'))
     gen_stormtrooper_leggings(os.path.join(out_dir, 'stormtrooper_leggings.png'))
     gen_stormtrooper_boots(os.path.join(out_dir, 'stormtrooper_boots.png'))
+    gen_han_solo_helmet(os.path.join(out_dir, 'han_solo_helmet.png'))
+    gen_han_solo_chestplate(os.path.join(out_dir, 'han_solo_chestplate.png'))
+    gen_han_solo_leggings(os.path.join(out_dir, 'han_solo_leggings.png'))
+    gen_han_solo_boots(os.path.join(out_dir, 'han_solo_boots.png'))
     gen_landspeeder(os.path.join(out_dir, 'landspeeder.png'))
     print('OK')

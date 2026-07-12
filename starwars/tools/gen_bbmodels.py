@@ -442,12 +442,18 @@ STORMTROOPER_BOOTS_CUBES = [
     ("left_leg",  [-0.1, 0, -2], [3.9, 12, 2], LLEG_ARMOR_ORIGIN, (0, 16), 1.0),
 ]
 
-# piece_name -> (cubes, equipment texture subfolder)
+# piece_name -> (cubes, equipment texture subfolder, texture file)
 ARMOR_PIECES = {
-    'stormtrooper_armor_helmet':     (STORMTROOPER_HELMET_CUBES, 'humanoid'),
-    'stormtrooper_armor_chestplate': (STORMTROOPER_CHESTPLATE_CUBES, 'humanoid'),
-    'stormtrooper_armor_leggings':   (STORMTROOPER_LEGGINGS_CUBES, 'humanoid_leggings'),
-    'stormtrooper_armor_boots':      (STORMTROOPER_BOOTS_CUBES, 'humanoid'),
+    'stormtrooper_armor_helmet':     (STORMTROOPER_HELMET_CUBES, 'humanoid', 'stormtrooper.png'),
+    'stormtrooper_armor_chestplate': (STORMTROOPER_CHESTPLATE_CUBES, 'humanoid', 'stormtrooper.png'),
+    'stormtrooper_armor_leggings':   (STORMTROOPER_LEGGINGS_CUBES, 'humanoid_leggings', 'stormtrooper.png'),
+    'stormtrooper_armor_boots':      (STORMTROOPER_BOOTS_CUBES, 'humanoid', 'stormtrooper.png'),
+    # Han Solo set reuses the stormtrooper cube tables (same worn
+    # silhouette) with the han_solo equipment texture.
+    'han_solo_armor_helmet':     (STORMTROOPER_HELMET_CUBES, 'humanoid', 'han_solo.png'),
+    'han_solo_armor_chestplate': (STORMTROOPER_CHESTPLATE_CUBES, 'humanoid', 'han_solo.png'),
+    'han_solo_armor_leggings':   (STORMTROOPER_LEGGINGS_CUBES, 'humanoid_leggings', 'han_solo.png'),
+    'han_solo_armor_boots':      (STORMTROOPER_BOOTS_CUBES, 'humanoid', 'han_solo.png'),
 }
 
 
@@ -494,7 +500,7 @@ def make_armor_cube(piece_name, name, fr, to, origin, uv_offset, inflate=0.0):
     return cube
 
 
-def armor_texture_record(piece_name, texture_path, folder):
+def armor_texture_record(piece_name, texture_path, folder, texture_basename='stormtrooper.png'):
     tex_data = ''
     if os.path.exists(texture_path):
         with open(texture_path, 'rb') as f:
@@ -504,7 +510,7 @@ def armor_texture_record(piece_name, texture_path, folder):
     rel_path = os.path.relpath(texture_path, start=os.path.dirname(os.path.abspath(__file__)))
     return {
         "path": None,
-        "name": "stormtrooper.png",
+        "name": texture_basename,
         "folder": folder,
         "namespace": "starwars",
         "id": "0",
@@ -531,7 +537,7 @@ def armor_texture_record(piece_name, texture_path, folder):
     }
 
 
-def build_armor_bbmodel(piece_name, cube_specs, texture_path, folder):
+def build_armor_bbmodel(piece_name, cube_specs, texture_path, folder, texture_basename='stormtrooper.png'):
     elements = [make_armor_cube(piece_name, *spec) for spec in cube_specs]
     outliner = [e["uuid"] for e in elements]
     return {
@@ -554,13 +560,14 @@ def build_armor_bbmodel(piece_name, cube_specs, texture_path, folder):
         "elements": elements,
         "groups": [],
         "outliner": outliner,
-        "textures": [armor_texture_record(piece_name, texture_path, folder)],
+        "textures": [armor_texture_record(piece_name, texture_path, folder, texture_basename)],
     }
 
 
-def write_armor_bbmodel(out_dir, piece_name, cube_specs, texture_dir, folder):
-    texture_path = os.path.join(texture_dir, 'equipment', folder, 'stormtrooper.png')
-    bbmodel = build_armor_bbmodel(piece_name, cube_specs, texture_path, folder=f"entity/equipment/{folder}")
+def write_armor_bbmodel(out_dir, piece_name, cube_specs, texture_dir, folder, texture_basename='stormtrooper.png'):
+    texture_path = os.path.join(texture_dir, 'equipment', folder, texture_basename)
+    bbmodel = build_armor_bbmodel(piece_name, cube_specs, texture_path, folder=f"entity/equipment/{folder}",
+                                   texture_basename=texture_basename)
     out_path = os.path.join(out_dir, f"{piece_name}.bbmodel")
     with open(out_path, 'w') as f:
         json.dump(bbmodel, f, indent=2)
@@ -583,6 +590,6 @@ if __name__ == '__main__':
         write_bbmodel(out_dir, mob_name, cubes, texture_dir,
                        bone_defs=MOB_BONE_DEFS.get(mob_name))
 
-    for piece_name, (cubes, folder) in ARMOR_PIECES.items():
-        write_armor_bbmodel(out_dir, piece_name, cubes, texture_dir, folder)
+    for piece_name, (cubes, folder, texture_basename) in ARMOR_PIECES.items():
+        write_armor_bbmodel(out_dir, piece_name, cubes, texture_dir, folder, texture_basename)
     print('OK')
