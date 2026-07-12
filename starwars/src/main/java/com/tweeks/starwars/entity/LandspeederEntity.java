@@ -154,6 +154,20 @@ public class LandspeederEntity extends VehicleEntity {
 
     @Override
     public void tick() {
+        // VERIFY resolved: decompiled AbstractBoat#tick decays the
+        // VehicleEntity hurt/damage wobble fields by 1 per tick before the
+        // super.tick() call (AbstractBoat.java:223-228) — without this,
+        // hurtServer()'s setHurtTime(10)/setDamage(+=amount*10) would leave
+        // a permanent shake and unbounded damage once a renderer reads
+        // them. Mirrored here since LandspeederEntity has no boat-specific
+        // super to inherit the decay from (VehicleEntity itself doesn't
+        // decay these fields — only AbstractBoat's own tick() does).
+        if (this.getHurtTime() > 0) {
+            this.setHurtTime(this.getHurtTime() - 1);
+        }
+        if (this.getDamage() > 0.0F) {
+            this.setDamage(this.getDamage() - 1.0F);
+        }
         super.tick();
         if (this.isLocalInstanceAuthoritative()) {
             this.tickDriven();
@@ -238,9 +252,13 @@ public class LandspeederEntity extends VehicleEntity {
         // synced fields (registered via the super.defineSynchedData() call
         // above), purely for renderer shake — independent of our hull-health
         // field. Drive them the same way VehicleEntity's own default
-        // hurtServer does so a future boat-style renderer gets the wobble.
+        // hurtServer does (including markHurt(), which that default calls
+        // and this override — being a full replacement, not a super call —
+        // otherwise would have silently dropped) so the renderer's hurt
+        // wobble behaves identically to a boat's.
         this.setHurtDir(-this.getHurtDir());
         this.setHurtTime(10);
+        this.markHurt();
         this.setDamage(this.getDamage() + amount * 10.0F);
         level.playSound(null, this.getX(), this.getY(), this.getZ(),
             SoundEvents.IRON_GOLEM_HURT, SoundSource.NEUTRAL, 1.0f, 1.2f);

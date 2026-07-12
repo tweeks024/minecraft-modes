@@ -20,7 +20,7 @@
   },
   "elements": [
     {
-      "name": "hull",
+      "name": "hull_front",
       "rescale": false,
       "locked": false,
       "mirror_uv": false,
@@ -28,6 +28,35 @@
         -8.0,
         0.10000000000000142,
         -13.0
+      ],
+      "to": [
+        8.0,
+        5.100000000000001,
+        0.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        0,
+        0
+      ],
+      "type": "cube",
+      "uuid": "fc116892-fee3-5a64-a271-698d897b4afe"
+    },
+    {
+      "name": "hull_rear",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -8.0,
+        0.10000000000000142,
+        0.0
       ],
       "to": [
         8.0,
@@ -43,10 +72,10 @@
       ],
       "uv_offset": [
         0,
-        0
+        18
       ],
       "type": "cube",
-      "uuid": "e1709b25-b437-533b-8e58-f59871032c55"
+      "uuid": "008fc921-9d04-5f53-b0e5-d374d28beada"
     },
     {
       "name": "nose",
@@ -71,8 +100,8 @@
         0
       ],
       "uv_offset": [
-        0,
-        45
+        28,
+        36
       ],
       "type": "cube",
       "uuid": "75ec137b-9173-51c1-8996-d1fbcc841168"
@@ -100,8 +129,8 @@
         0
       ],
       "uv_offset": [
-        0,
-        55
+        28,
+        54
       ],
       "type": "cube",
       "uuid": "6fde2e7c-00ef-539c-b4a9-49eb41d30691"
@@ -129,8 +158,8 @@
         0
       ],
       "uv_offset": [
-        36,
-        45
+        28,
+        46
       ],
       "type": "cube",
       "uuid": "14c42a5c-82bf-5a23-baaa-5980bd02d652"
@@ -158,8 +187,8 @@
         0
       ],
       "uv_offset": [
-        36,
-        45
+        28,
+        46
       ],
       "type": "cube",
       "uuid": "5d28f1f8-9ace-5887-9252-6ff50ae62c5b"
@@ -188,7 +217,7 @@
       ],
       "uv_offset": [
         0,
-        31
+        36
       ],
       "type": "cube",
       "uuid": "236f715d-9e3e-59c1-aaa7-74a745c6af18"
@@ -216,8 +245,8 @@
         0
       ],
       "uv_offset": [
-        28,
-        31
+        0,
+        50
       ],
       "type": "cube",
       "uuid": "a6ce3d8e-d884-5030-b34b-10d796b4c46f"
@@ -245,8 +274,8 @@
         0
       ],
       "uv_offset": [
-        28,
-        31
+        0,
+        50
       ],
       "type": "cube",
       "uuid": "e2618149-1e1a-57b2-937c-abb2f98a5101"
@@ -268,7 +297,8 @@
       "visibility": true,
       "autouv": 0,
       "children": [
-        "e1709b25-b437-533b-8e58-f59871032c55",
+        "fc116892-fee3-5a64-a271-698d897b4afe",
+        "008fc921-9d04-5f53-b0e5-d374d28beada",
         "75ec137b-9173-51c1-8996-d1fbcc841168",
         "6fde2e7c-00ef-539c-b4a9-49eb41d30691",
         "14c42a5c-82bf-5a23-baaa-5980bd02d652",
@@ -305,7 +335,7 @@
       "height": 64,
       "uv_width": 64,
       "uv_height": 64,
-      "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABUElEQVR4nO2aLRLCMBCFc56qKk5QxaCQlQyKI3AARCWSAzAcoJIDVCKRSCQ3CFNRREsJA5u+JPt25jM1+/Jl+zNtze24sZox6ABoghCwXebhCWhDTRVMvQAkQZwCvyKxSWICEBMTlIBYoQB0ADSm2c2tZigAHQANBaADoKEAdAA0FIAOgIYC0AHQmMN6ZjVDAegAaL4W0L19QQdWNwG+pVMAeoFoKAAdAA0F1PXZpoxxVVXtbcpQgKSAsTHzFV6in5iAtnFZrt7iQ4JUPxEBnflPgSQlSPYTEzAWxscUSPbzIqA7PpWAf/pxAngNEBDg2pXk7wL9nVH5HBArTgGui03sOAWg/9HpUxQLr1BA6AKyLPfKQAD621yfqAR0H0vUClA/AUkIQL+V7aNewCCg70IvGC7gcn9YBJMvdKzUCzg1V4sAve5XUYB2ASwWS3U9AbyNuoEVlIf2AAAAAElFTkSuQmCC"
+      "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABjklEQVR4nO2YIQ4CMRBFOQ8KxQlQBIVEEhRH4AAIJJIDEA6A5ABIJBKJ5AYlIWmyoRS27ez8lv5JvllB5r8d2j/bu+2Xpgb1fIVuLFsAq+ngJXTjVUyABui/BBAypVkDSAGXDOC8HpsaRAAEQAAEQACfarcYmhpEAKkAbOhAG+EEEAAByAJALzRa+hsAsatz5wC0viBlCyB3EQABeAq9pMCXIXRjBEAABEAAUADoJQW+DKEbKwYAvwiBJAWdAEoFICUvgOPxZDSFXoqcJWmz2RpNoQ0TQAoA31iH/AY6EToJMcT8bDb/qBAIKc3aLKIOwL7pbwDaQkC/8WgAPvOhU4A2LALAPo8BgM4DTj7QngC04WgAUmcA2nAUAMlbYDSadCpv5PVV28abk5CSA4oGIKF+f9CpggH8OtyklR0A7W0wOwDV/wUIQPkWKBaAVA643B8QJQGQTILFApDaBQ7nK0SiAOzzagFUOQFSZ4C3EVRp3wJov061bbw5CSk5AO3XqZDmJYT265T2Noj2+15PCzzE2BzkhkcAAAAASUVORK5CYII="
     }
   ]
 }

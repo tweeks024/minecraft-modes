@@ -156,28 +156,44 @@ LANDSPEEDER_BONE_DEFS = [
 
 LANDSPEEDER_CUBES = [
     # (name, bone, (jx, jy, jz, jw, jh, jd), uv[, inflate])
-    # jy = brief value + 1.9 (see deviation note above). uv offsets are
-    # repacked from the brief's (see UV CAUTION note in gen_textures.py's
-    # paint_landspeeder): the hull's box-uv footprint (16w x5h x26d ->
-    # 2*(26+16)=84 wide x (26+5)=31 tall) itself overflows the 64-wide
-    # canvas by 20px no matter where it's anchored — an unavoidable
-    # consequence of a 26-unit-deep cube on a 64px canvas, recorded as a
-    # known/accepted limitation (the overflow is edge-clamped by the GPU at
-    # render time; since the hull's paint is a broad flat-shaded gradient
-    # rather than fine detail, the clamp is not visually significant) — but
-    # every other cube is repositioned below the hull's exclusive y[0,31)
-    # band so nothing else collides with it or with each other, and
+    # jy = brief value + 1.9 (see deviation note above).
+    #
+    # HULL SPLIT (Task 13 carry-over from Task 12 review): the original
+    # single 16w x5h x26d hull cube has a box-uv footprint of
+    # 2*(16+26)=84 wide x (5+26)=31 tall — 20px wider than the 64px canvas,
+    # unfixable by repositioning. Fixed by splitting the hull along its
+    # z-depth (the long/overflowing axis) into hull_front (negative z, nose
+    # side) and hull_rear (positive z, turbine side), each 16w x5h x13d ->
+    # footprint 2*(16+13)=58 wide x (5+13)=18 tall, which fits the 64px
+    # canvas with 6px of horizontal slack. The two cubes are seamless
+    # (hull_front's z range [-13,0) exactly abuts hull_rear's [0,13),
+    # reconstructing the original hull's full [-13,13] extent with identical
+    # x/y) — paint_landspeeder() paints both uv blocks with continuous
+    # banding+rust so the seam is not visible in practice.
+    #
+    # Splitting costs 2*h=10 extra px of stacked height (36 for both hull
+    # pieces vs. 31 for the one it replaced), which no longer leaves room to
+    # simply stack the other 5 uv blocks below it (14+10+5=29 needed,
+    # 64-36=28 available — 1px short). Fixed with a genuine 2-column pack
+    # below the two hull rows (y=[36,64), the full remaining 28px band):
+    # left column x=[0,28) stacks turbine_c then turbine_l/turbine_r
+    # (28x14 each, exactly fills the 28px column); right column x=[28,64)
+    # stacks nose (36 wide - exactly fills the column), then seat_left/
+    # seat_right (24 wide), then windshield (30 wide), total 10+8+5=23 of
+    # the 28px column (5px slack). Verified non-overlapping and fully
+    # on-canvas below (all rects strictly within x<=64, y<=64).
     # seat_right/turbine_r deliberately reuse seat_left/turbine_l's uv
     # offset (both pairs are exact mirror-image geometry receiving identical
     # paint, so sharing the region is intentional, not an accidental clash).
-    ('hull',        SPEEDER_BONE, (-8.0, 18.9, -13.0, 16, 5, 26), (0, 0)),
-    ('nose',        SPEEDER_BONE, (-6.0, 19.9, -19.0, 12, 4, 6),  (0, 45)),
-    ('windshield',  SPEEDER_BONE, (-7.0, 14.9,  -7.0, 14, 4, 1),  (0, 55)),
-    ('seat_left',   SPEEDER_BONE, (-7.0, 20.9,  -4.0, 6, 2, 6),   (36, 45)),
-    ('seat_right',  SPEEDER_BONE, ( 1.0, 20.9,  -4.0, 6, 2, 6),   (36, 45)),
-    ('turbine_c',   SPEEDER_BONE, (-3.0, 16.9,  11.0, 6, 6, 8),   (0, 31)),
-    ('turbine_l',   SPEEDER_BONE, (-10.0, 17.9, 10.0, 5, 5, 9),   (28, 31)),
-    ('turbine_r',   SPEEDER_BONE, ( 5.0, 17.9,  10.0, 5, 5, 9),   (28, 31)),
+    ('hull_front',  SPEEDER_BONE, (-8.0, 18.9, -13.0, 16, 5, 13), (0, 0)),
+    ('hull_rear',   SPEEDER_BONE, (-8.0, 18.9,   0.0, 16, 5, 13), (0, 18)),
+    ('nose',        SPEEDER_BONE, (-6.0, 19.9, -19.0, 12, 4, 6),  (28, 36)),
+    ('windshield',  SPEEDER_BONE, (-7.0, 14.9,  -7.0, 14, 4, 1),  (28, 54)),
+    ('seat_left',   SPEEDER_BONE, (-7.0, 20.9,  -4.0, 6, 2, 6),   (28, 46)),
+    ('seat_right',  SPEEDER_BONE, ( 1.0, 20.9,  -4.0, 6, 2, 6),   (28, 46)),
+    ('turbine_c',   SPEEDER_BONE, (-3.0, 16.9,  11.0, 6, 6, 8),   (0, 36)),
+    ('turbine_l',   SPEEDER_BONE, (-10.0, 17.9, 10.0, 5, 5, 9),   (0, 50)),
+    ('turbine_r',   SPEEDER_BONE, ( 5.0, 17.9,  10.0, 5, 5, 9),   (0, 50)),
 ]
 
 # mob_name -> bone_defs override (only needed for mobs whose bone set/pivots

@@ -470,13 +470,17 @@ def paint_princess_leia(rgba):
 # 2-tone blue-gray windshield, and 3-tone gunmetal turbine pods each with a
 # dark circular intake + a light rim highlight.
 #
-# UV CAUTION (per gen_bbmodels.py's LANDSPEEDER_CUBES comment): the hull's
-# box-uv footprint (2*(26+16)=84 wide) itself overflows the 64px canvas by
-# 20px no matter its uv offset — recorded there as an accepted limitation.
-# Every other cube's uv offset was repacked (vs. the task brief's) to fit
-# below the hull's exclusive y[0,31) band with zero overlaps; seat_right and
-# turbine_r deliberately share seat_left/turbine_l's offset (mirror-image
-# geometry, identical paint) rather than each claiming separate canvas space.
+# UV LAYOUT (per gen_bbmodels.py's LANDSPEEDER_CUBES comment): the original
+# single hull cube's box-uv footprint (2*(26+16)=84 wide) overflowed the
+# 64px canvas by 20px — fixed (Task 13) by splitting it into hull_front +
+# hull_rear (58x18 footprint each), painted here as two independent uv
+# blocks with matching banding+rust so the seam between them (invisible —
+# they abut seamlessly in world space) doesn't read as a visual break. The
+# other 5 uv blocks are packed into the remaining y=[36,64) band in two
+# columns (turbines left, nose/seats/windshield right) with zero overlaps;
+# seat_right and turbine_r deliberately share seat_left/turbine_l's offset
+# (mirror-image geometry, identical paint) rather than each claiming
+# separate canvas space.
 SPEEDER_BODY     = (0xC8, 0x86, 0x4A, 0xFF)  # sand-orange hull
 SPEEDER_BODY_HI  = (0xE0, 0xA6, 0x6A, 0xFF)  # sun-lit top
 SPEEDER_BODY_DK  = (0x9A, 0x64, 0x36, 0xFF)  # underside shadow
@@ -502,52 +506,60 @@ def _speeder_circle(rgba, cx, cy, r, color):
 def paint_landspeeder(rgba):
     fill(rgba, (0, 0, 0, 0))  # custom UV layout — transparent base
 
-    # Hull, UV (0,0)..(64,31) [footprint overflows to 84 wide — see note
-    # above]: sand-orange base, sun-lit highlight band across the top third,
-    # 4-6 irregular rust weathering blotches, and a dark shadow band across
-    # the bottom third (underside).
-    rect(rgba, 0, 0, 64, 31, SPEEDER_BODY)
-    rect(rgba, 0, 0, 64, 10, SPEEDER_BODY_HI)   # sun-lit top third
-    rect(rgba, 0, 21, 64, 31, SPEEDER_BODY_DK)  # underside shadow, bottom third
-    for (bx, by, bw, bh) in (
-        (6, 3, 2, 2), (18, 6, 2, 1), (33, 2, 1, 2), (47, 5, 2, 2),
-        (10, 24, 2, 1), (40, 25, 1, 2),
-    ):
+    # Hull front, UV (0,0)..(58,18): sand-orange base, sun-lit highlight
+    # band across the top third, a dark shadow band across the bottom third
+    # (underside), and rust weathering blotches. Painted with the exact same
+    # banding treatment as hull_rear below so the seam between the two
+    # cubes (invisible in world space — they abut exactly at z=0) doesn't
+    # read as a visual break either.
+    rect(rgba, 0, 0, 58, 18, SPEEDER_BODY)
+    rect(rgba, 0, 0, 58, 6, SPEEDER_BODY_HI)    # sun-lit top third
+    rect(rgba, 0, 12, 58, 18, SPEEDER_BODY_DK)  # underside shadow, bottom third
+    for (bx, by, bw, bh) in ((6, 2, 2, 1), (33, 3, 1, 2), (47, 4, 2, 2), (10, 14, 2, 1)):
         rect(rgba, bx, by, bx + bw, by + bh, SPEEDER_RUST)
 
-    # Nose, UV (0,45)..(36,55): sand-orange wedge continuing the hull tones,
-    # top highlight strip + a couple of weathering flecks.
-    rect(rgba, 0, 45, 36, 55, SPEEDER_BODY)
-    rect(rgba, 0, 45, 36, 48, SPEEDER_BODY_HI)
-    rect(rgba, 0, 52, 36, 55, SPEEDER_BODY_DK)
-    rect(rgba, 15, 49, 17, 50, SPEEDER_RUST)
-
-    # Windshield, UV (0,55)..(30,60): 2-tone glass — lighter top band (sky
-    # reflection), darker base.
-    rect(rgba, 0, 55, 30, 60, SPEEDER_GLASS)
-    rect(rgba, 0, 55, 30, 57, SPEEDER_GLASS_HI)
-
-    # Seats (seat_left/seat_right share this region), UV (36,45)..(60,53):
-    # dark cockpit interior with a lighter seat-cushion highlight row.
-    rect(rgba, 36, 45, 60, 53, SPEEDER_COCKPIT)
-    rect(rgba, 36, 45, 60, 47, SPEEDER_SEAT_HI)
+    # Hull rear, UV (0,18)..(58,36): same treatment as hull_front, shifted.
+    rect(rgba, 0, 18, 58, 36, SPEEDER_BODY)
+    rect(rgba, 0, 18, 58, 24, SPEEDER_BODY_HI)
+    rect(rgba, 0, 30, 58, 36, SPEEDER_BODY_DK)
+    for (bx, by, bw, bh) in ((18, 20, 2, 1), (44, 19, 1, 2), (10, 32, 2, 1), (40, 33, 1, 2)):
+        rect(rgba, bx, by, bx + bw, by + bh, SPEEDER_RUST)
 
     # Turbine pods: gunmetal housing, rim highlight, dark circular intake.
-    # turbine_c, UV (0,31)..(28,45).
-    rect(rgba, 0, 31, 28, 45, SPEEDER_METAL)
-    rect(rgba, 0, 31, 28, 32, SPEEDER_METAL_HI)   # rim highlight, top edge
-    rect(rgba, 0, 44, 28, 45, SPEEDER_METAL_DK)
-    _speeder_circle(rgba, 14, 38, 5, SPEEDER_METAL_HI)   # rim highlight
-    _speeder_circle(rgba, 14, 38, 4, SPEEDER_METAL_DK)   # dark intake
-    _speeder_circle(rgba, 14, 38, 1, SPEEDER_METAL)      # inner-hub glint
+    # Left column of the post-hull-split layout, x=[0,28).
+    # turbine_c, UV (0,36)..(28,50).
+    rect(rgba, 0, 36, 28, 50, SPEEDER_METAL)
+    rect(rgba, 0, 36, 28, 37, SPEEDER_METAL_HI)   # rim highlight, top edge
+    rect(rgba, 0, 49, 28, 50, SPEEDER_METAL_DK)
+    _speeder_circle(rgba, 14, 43, 5, SPEEDER_METAL_HI)   # rim highlight
+    _speeder_circle(rgba, 14, 43, 4, SPEEDER_METAL_DK)   # dark intake
+    _speeder_circle(rgba, 14, 43, 1, SPEEDER_METAL)      # inner-hub glint
 
-    # turbine_l/turbine_r (shared), UV (28,31)..(56,45).
-    rect(rgba, 28, 31, 56, 45, SPEEDER_METAL)
-    rect(rgba, 28, 31, 56, 32, SPEEDER_METAL_HI)
-    rect(rgba, 28, 44, 56, 45, SPEEDER_METAL_DK)
-    _speeder_circle(rgba, 42, 38, 5, SPEEDER_METAL_HI)   # rim highlight
-    _speeder_circle(rgba, 42, 38, 4, SPEEDER_METAL_DK)   # dark intake
-    _speeder_circle(rgba, 42, 38, 1, SPEEDER_METAL)      # inner-hub glint
+    # turbine_l/turbine_r (shared), UV (0,50)..(28,64).
+    rect(rgba, 0, 50, 28, 64, SPEEDER_METAL)
+    rect(rgba, 0, 50, 28, 51, SPEEDER_METAL_HI)
+    rect(rgba, 0, 63, 28, 64, SPEEDER_METAL_DK)
+    _speeder_circle(rgba, 14, 57, 5, SPEEDER_METAL_HI)   # rim highlight
+    _speeder_circle(rgba, 14, 57, 4, SPEEDER_METAL_DK)   # dark intake
+    _speeder_circle(rgba, 14, 57, 1, SPEEDER_METAL)      # inner-hub glint
+
+    # Right column of the post-hull-split layout, x=[28,64).
+    # Nose, UV (28,36)..(64,46): sand-orange wedge continuing the hull
+    # tones, top highlight strip + a couple of weathering flecks.
+    rect(rgba, 28, 36, 64, 46, SPEEDER_BODY)
+    rect(rgba, 28, 36, 64, 39, SPEEDER_BODY_HI)
+    rect(rgba, 28, 43, 64, 46, SPEEDER_BODY_DK)
+    rect(rgba, 43, 40, 45, 41, SPEEDER_RUST)
+
+    # Seats (seat_left/seat_right share this region), UV (28,46)..(52,54):
+    # dark cockpit interior with a lighter seat-cushion highlight row.
+    rect(rgba, 28, 46, 52, 54, SPEEDER_COCKPIT)
+    rect(rgba, 28, 46, 52, 48, SPEEDER_SEAT_HI)
+
+    # Windshield, UV (28,54)..(58,59): 2-tone glass — lighter top band (sky
+    # reflection), darker base.
+    rect(rgba, 28, 54, 58, 59, SPEEDER_GLASS)
+    rect(rgba, 28, 54, 58, 56, SPEEDER_GLASS_HI)
 
 MOBS = {
     'stormtrooper': paint_stormtrooper,
