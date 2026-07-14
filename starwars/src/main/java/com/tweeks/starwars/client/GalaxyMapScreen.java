@@ -54,13 +54,16 @@ public class GalaxyMapScreen extends Screen {
             Planet planet = planets[i];
             boolean visited = (data.visitedMask() & (1 << i)) != 0;
             int cx = rowX + i * spacing;
-            int color = PLANET_COLORS[i % PLANET_COLORS.length];
-            int body = visited ? color : dim(color);
-            int half = 9;
+            int half = 11;
 
+            // Charted worlds show their globe; uncharted ones a dim silhouette.
             graphics.fill(cx - half - 1, discY - half - 1, cx + half + 1, discY + half + 1,
-                visited ? 0xFFDDDDDD : 0xFF303030);
-            graphics.fill(cx - half, discY - half, cx + half, discY + half, body);
+                visited ? 0x88FFFFFF : 0x66000000);
+            if (visited) {
+                PlanetIcons.draw(graphics, planet, cx, discY, half);
+            } else {
+                graphics.fill(cx - half, discY - half, cx + half, discY + half, dim(PLANET_COLORS[i % PLANET_COLORS.length]));
+            }
 
             graphics.centeredText(this.font, Component.translatable(planet.translationKey()),
                 cx, discY + half + 6, visited ? 0xFFFFFFFF : 0xFF808080);

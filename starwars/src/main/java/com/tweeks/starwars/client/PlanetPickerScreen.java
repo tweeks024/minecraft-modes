@@ -20,17 +20,7 @@ public class PlanetPickerScreen extends Screen {
 
     private static final double DEADZONE_PX = 18.0;
     private static final int OUTER_RADIUS_PX = 95;
-    private static final int DISC_HALF_PX = 13;
-
-    private static final int[] WEDGE_COLORS = {
-        0xFFE8A33D, // TATOOINE — twin-sun amber
-        0xFF57B86B, // ANDOR — highland green
-        0xFF8E6BE8, // CORUSCANT — dusk violet
-        0xFF6B8E4E, // DAGOBAH — swamp green
-        0xFFA8D8F0, // HOTH — glacier blue
-        0xFF6E7178, // DEATH_STAR — imperial gray
-        0xFF4D9BE8, // HOME — overworld blue
-    };
+    private static final int DISC_HALF_PX = 15;
 
     private final BlockPos gateOrigin;
     private final boolean axisX;
@@ -69,14 +59,16 @@ public class PlanetPickerScreen extends Screen {
             int discCx = cx + (int) (Math.cos(angle) * OUTER_RADIUS_PX);
             int discCy = cy + (int) (Math.sin(angle) * OUTER_RADIUS_PX);
 
-            int outline = (i == hoveredWedge) ? 0xFFFFFFFF : 0xFF202020;
+            // A round glow ring behind the globe, brightened on hover.
+            boolean hovered = i == hoveredWedge;
+            int ring = hovered ? 0xFFFFFFFF : 0x66000000;
             graphics.fill(discCx - DISC_HALF_PX - 2, discCy - DISC_HALF_PX - 2,
-                          discCx + DISC_HALF_PX + 2, discCy + DISC_HALF_PX + 2, outline);
-            graphics.fill(discCx - DISC_HALF_PX, discCy - DISC_HALF_PX,
-                          discCx + DISC_HALF_PX, discCy + DISC_HALF_PX, WEDGE_COLORS[i]);
+                          discCx + DISC_HALF_PX + 2, discCy + DISC_HALF_PX + 2, ring);
+            PlanetIcons.draw(graphics, planet, discCx, discCy, DISC_HALF_PX);
 
             Component label = Component.translatable(planet.translationKey());
-            graphics.centeredText(this.font, label, discCx, discCy + DISC_HALF_PX + 4, 0xFFFFFFFF);
+            int labelColor = hovered ? 0xFFFFFFFF : 0xFFCCCCCC;
+            graphics.centeredText(this.font, label, discCx, discCy + DISC_HALF_PX + 4, labelColor);
         }
 
         Component prompt = Component.translatable("screen.starwars.planet_radial.prompt");
