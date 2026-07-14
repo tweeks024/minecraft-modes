@@ -158,6 +158,10 @@ public class StarWarsMod {
             com.tweeks.starwars.entity.JediKnightEntity.createAttributes().build());
         event.put(ModEntities.DARTH_VADER.get(),
             com.tweeks.starwars.entity.DarthVaderEntity.createAttributes().build());
+        // Darth Maul is a named singleton — attributes only, NO spawn
+        // placement (the named-character spawner brings him in).
+        event.put(ModEntities.DARTH_MAUL.get(),
+            com.tweeks.starwars.entity.DarthMaulEntity.createAttributes().build());
         event.put(ModEntities.LUKE_SKYWALKER.get(),
             com.tweeks.starwars.entity.LukeSkywalkerEntity.createAttributes().build());
         event.put(ModEntities.OBI_WAN.get(),

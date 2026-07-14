@@ -82,6 +82,33 @@ LIGHTSABER_CUBES = [
     ('blade',   (7.25, 9, 7.25),  (8.75, 24, 8.75), 'blade'),
 ]
 
+# ─── Saberstaff (Maul's double-bladed saber) palette + cubes ─────────────
+# Red-only, single self-contained model (NOT a color-select like the
+# lightsaber). A long CHROME central hilt with black grip bands, an emitter
+# ring at BOTH ends, and an opposed RED blade projecting from each end.
+# Reuses the single saber's 16x16 3-region atlas: 'hilt' (grip), 'hilt_dark'
+# (both emitters), 'blade' (both blades).
+CHROME         = (0xC2, 0xC6, 0xD0, 0xFF)  # bright chrome/silver grip
+CHROME_HI      = (0xE4, 0xE8, 0xF0, 0xFF)  # lit chrome edge
+CHROME_SH      = (0x8A, 0x8E, 0x98, 0xFF)  # shaded chrome edge
+GRIP_BAND      = (0x18, 0x18, 0x1C, 0xFF)  # black grip bands
+EMITTER        = (0x4A, 0x4A, 0x52, 0xFF)  # emitter ring metal (both ends)
+EMITTER_HI     = (0x66, 0x66, 0x70, 0xFF)
+EMITTER_SH     = (0x24, 0x24, 0x2A, 0xFF)
+SABERSTAFF_RED = (0xFF, 0x20, 0x20)        # blade (matches SABER_COLORS 'red')
+
+# Cube coords model-pixel space, y up. Symmetric about y=8 (item-box center)
+# so it reads as a double-ended weapon: central metal (emitter+grip+emitter)
+# spans y2.5..13.5 (~2x the single saber's 5-long grip); a 10-long blade
+# projects from each end (y13.5..23.5 up, y-7.5..2.5 down).
+SABERSTAFF_CUBES = [
+    ('blade_bot',   (7.25, -7.5, 7.25), (8.75, 2.5, 8.75),  'blade'),
+    ('emitter_bot', (6.5, 2.5, 6.5),    (9.5, 4.0, 9.5),    'hilt_dark'),
+    ('grip',        (7.0, 4.0, 7.0),    (9.0, 12.0, 9.0),   'hilt'),
+    ('emitter_top', (6.5, 12.0, 6.5),   (9.5, 13.5, 9.5),   'hilt_dark'),
+    ('blade_top',   (7.25, 13.5, 7.25), (8.75, 23.5, 8.75), 'blade'),
+]
+
 BLASTER_PISTOL_CUBES = [
     ('body',   (6, 5, 4),   (10, 8, 13),  'metal'),
     ('barrel', (7, 6, 13),  (9, 7.5, 16), 'metal_dark'),
@@ -255,6 +282,39 @@ def paint_saber_texture(blade_rgb):
     draw.rectangle((0, 0, 15, 0), fill=lighten(blade, 0x30))
     draw.rectangle((0, 8, 15, 8), fill=darken(blade, 0x40))
     draw.rectangle((7, 0, 8, 8), fill=WHITE_HOT)
+
+    return img
+
+
+def paint_saberstaff_texture():
+    """16x16 (same 3-region atlas as the single saber): dark emitter rings
+    (shared by both ends), a chrome grip with black grip bands, and a red
+    blade (bright red + white-hot core + lighter-red glow edges) shared by
+    both opposed blades. 3+ tones per region."""
+    img = Image.new('RGBA', (SABER_TEXTURE_SIZE, SABER_TEXTURE_SIZE), TRANSPARENT)
+    draw = ImageDraw.Draw(img)
+
+    # 'hilt_dark' region: emitter rings at both ends.
+    draw.rectangle((0, 9, 7, 15), fill=EMITTER)
+    draw.rectangle((0, 9, 7, 9), fill=EMITTER_HI)
+    draw.rectangle((0, 15, 7, 15), fill=EMITTER_SH)
+    draw.rectangle((0, 12, 7, 12), fill=EMITTER_SH)     # ring groove line
+
+    # 'hilt' region: chrome grip with black grip bands.
+    draw.rectangle((8, 9, 15, 15), fill=CHROME)
+    draw.rectangle((8, 9, 15, 9), fill=CHROME_HI)
+    draw.rectangle((8, 15, 15, 15), fill=CHROME_SH)
+    for x in (9, 11, 13):
+        draw.line(((x, 10), (x, 14)), fill=GRIP_BAND)   # black grip bands
+
+    # 'blade' region: red blade — bright red, white-hot core, lighter-red glow.
+    blade = (SABERSTAFF_RED[0], SABERSTAFF_RED[1], SABERSTAFF_RED[2], 0xFF)
+    draw.rectangle((0, 0, 15, 8), fill=blade)
+    draw.rectangle((0, 0, 15, 0), fill=lighten(blade, 0x30))   # top glow edge
+    draw.rectangle((0, 8, 15, 8), fill=darken(blade, 0x40))    # base edge
+    draw.rectangle((0, 0, 0, 8), fill=lighten(blade, 0x40))    # left glow edge
+    draw.rectangle((15, 0, 15, 8), fill=lighten(blade, 0x40))  # right glow edge
+    draw.rectangle((7, 0, 8, 8), fill=WHITE_HOT)               # white-hot core
 
     return img
 
@@ -543,6 +603,18 @@ def build_lightsaber_item_json():
     }
 
 
+def build_saberstaff_item_json():
+    """Plain model selector — the saberstaff is red-only (no per-instance
+    blade-color variant), so unlike items/lightsaber.json it is NOT a
+    minecraft:select; it points straight at the single model."""
+    return {
+        "model": {
+            "type": "minecraft:model",
+            "model": "starwars:item/saberstaff",
+        }
+    }
+
+
 def build_holocron_item_json():
     """Plain model selector — the holocron has no per-instance visual variant."""
     return {
@@ -607,6 +679,25 @@ def main():
     write_json(os.path.join(tools_dir, 'lightsaber.bbmodel'), bbmodel)
 
     write_json(os.path.join(items_dir, 'lightsaber.json'), build_lightsaber_item_json())
+
+    # ── Saberstaff: double-bladed, red-only, single self-contained model. ──
+    saberstaff_tex = paint_saberstaff_texture()
+    saberstaff_tex_path = os.path.join(textures_dir, 'saberstaff.png')
+    saberstaff_tex.save(saberstaff_tex_path)
+    print(f"  wrote {saberstaff_tex_path}")
+
+    saberstaff_model = build_model_json(
+        'saberstaff', SABERSTAFF_CUBES, UV_REGIONS_SABER,
+        SABER_TEXTURE_SIZE, 'starwars:item/saberstaff')
+    write_json(os.path.join(models_dir, 'saberstaff.json'), saberstaff_model)
+
+    saberstaff_bbmodel = build_bbmodel(
+        'saberstaff', SABERSTAFF_CUBES, UV_REGIONS_SABER, saberstaff_tex,
+        '../src/main/resources/assets/starwars/textures/item/saberstaff.png',
+        SABER_TEXTURE_SIZE, 'starwars:saberstaff')
+    write_json(os.path.join(tools_dir, 'saberstaff.bbmodel'), saberstaff_bbmodel)
+
+    write_json(os.path.join(items_dir, 'saberstaff.json'), build_saberstaff_item_json())
 
     # ── Blaster pistol ──
     pistol_tex = paint_blaster_texture(include_wood=False)

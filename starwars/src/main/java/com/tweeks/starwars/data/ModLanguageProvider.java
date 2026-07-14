@@ -17,6 +17,7 @@ public class ModLanguageProvider extends LanguageProvider {
         add(com.tweeks.starwars.Registration.BLASTER_PISTOL.get(), "Blaster Pistol");
         add(com.tweeks.starwars.Registration.BLASTER_RIFLE.get(), "Blaster Rifle");
         add(com.tweeks.starwars.Registration.LIGHTSABER.get(), "Lightsaber");
+        add(com.tweeks.starwars.Registration.SABERSTAFF.get(), "Saberstaff");
         add(com.tweeks.starwars.Registration.STORMTROOPER_SPAWN_EGG.get(), "Stormtrooper Spawn Egg");
         add(com.tweeks.starwars.Registration.BATTLE_DROID_SPAWN_EGG.get(), "Battle Droid Spawn Egg");
         add(com.tweeks.starwars.Registration.JEDI_KNIGHT_SPAWN_EGG.get(), "Jedi Knight Spawn Egg");
@@ -31,6 +32,8 @@ public class ModLanguageProvider extends LanguageProvider {
         add(com.tweeks.starwars.ModEntities.BATTLE_DROID.get(), "Battle Droid");
         add(com.tweeks.starwars.ModEntities.JEDI_KNIGHT.get(), "Jedi Knight");
         add(com.tweeks.starwars.ModEntities.DARTH_VADER.get(), "Darth Vader");
+        add(com.tweeks.starwars.ModEntities.DARTH_MAUL.get(), "Darth Maul");
+        add(com.tweeks.starwars.Registration.DARTH_MAUL_SPAWN_EGG.get(), "Darth Maul Spawn Egg");
         add(com.tweeks.starwars.ModEntities.LUKE_SKYWALKER.get(), "Luke Skywalker");
         add(com.tweeks.starwars.ModEntities.OBI_WAN.get(), "Obi-Wan Kenobi");
         add(com.tweeks.starwars.ModEntities.BOBA_FETT.get(), "Boba Fett");

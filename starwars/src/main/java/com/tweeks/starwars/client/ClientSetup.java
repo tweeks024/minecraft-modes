@@ -18,6 +18,7 @@ import com.tweeks.starwars.client.model.JawaModel;
 import com.tweeks.starwars.client.model.JediKnightModel;
 import com.tweeks.starwars.client.model.LandspeederModel;
 import com.tweeks.starwars.client.model.LukeModel;
+import com.tweeks.starwars.client.model.MaulModel;
 import com.tweeks.starwars.client.model.ObiWanModel;
 import com.tweeks.starwars.client.model.PrincessLeiaModel;
 import com.tweeks.starwars.client.model.ProbeDroidModel;
@@ -46,6 +47,7 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.BATTLE_DROID.get(), BattleDroidRenderer::new);
         event.registerEntityRenderer(ModEntities.JEDI_KNIGHT.get(), JediKnightRenderer::new);
         event.registerEntityRenderer(ModEntities.DARTH_VADER.get(), VaderRenderer::new);
+        event.registerEntityRenderer(ModEntities.DARTH_MAUL.get(), MaulRenderer::new);
         event.registerEntityRenderer(ModEntities.LUKE_SKYWALKER.get(), LukeRenderer::new);
         event.registerEntityRenderer(ModEntities.OBI_WAN.get(), ObiWanRenderer::new);
         event.registerEntityRenderer(ModEntities.BOBA_FETT.get(), BobaFettRenderer::new);
@@ -82,6 +84,7 @@ public final class ClientSetup {
         event.registerLayerDefinition(BattleDroidModel.LAYER_LOCATION, BattleDroidModel::createBodyLayer);
         event.registerLayerDefinition(JediKnightModel.LAYER_LOCATION, JediKnightModel::createBodyLayer);
         event.registerLayerDefinition(VaderModel.LAYER_LOCATION, VaderModel::createBodyLayer);
+        event.registerLayerDefinition(MaulModel.LAYER_LOCATION, MaulModel::createBodyLayer);
         event.registerLayerDefinition(LukeModel.LAYER_LOCATION, LukeModel::createBodyLayer);
         event.registerLayerDefinition(ObiWanModel.LAYER_LOCATION, ObiWanModel::createBodyLayer);
         event.registerLayerDefinition(BobaFettModel.LAYER_LOCATION, BobaFettModel::createBodyLayer);

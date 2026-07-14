@@ -81,6 +81,31 @@ DARTH_VADER_ACCESSORIES = [
     ('chest_panel',  BODY_BONE, (-2.0,  3.0, -2.6, 4, 3, 1),  (56, 54), 0.0),
 ]
 
+# Darth Maul: standard humanoid rig + a crown of ten Zabrak HORNS on the head
+# bone. The horns are extra CUBES on the head bone (not separate bones), so
+# they stay axis-aligned — the "outward" crown read comes from ringing the
+# 8x8 head-top rim, not per-cube rotation (a HumanoidModel addBox cube cannot
+# carry its own rotation; the parallel Java MaulModel adds these as head
+# children via addBox with the SAME texOffs + args). Head top is world-y 32;
+# a horn of height h sits on the rim with jy=-(8+h) (java_to_bbmodel then puts
+# its base at world-y 32, rising h above). Ring walks the rim perimeter (head
+# spans jx,jz in [-4,4]): 6 tall (1x3x1) + 4 short (1x2x1), symmetric about
+# x=0. UVs pack the free head-overlay region (u>=32, v<16). Must match
+# gen_textures.py MAUL_HORNS + the Java MaulModel EXACTLY.
+# (name, HEAD_BONE, (jx, jy, jz, jw, jh, jd), uv_offset)
+MAUL_ACCESSORIES = [
+    ('horn_fl',  HEAD_BONE, (-4, -10, -4, 1, 2, 1), (32, 0)),   # front-left corner
+    ('horn_fml', HEAD_BONE, (-2, -11, -4, 1, 3, 1), (36, 0)),   # front-mid-left
+    ('horn_fmr', HEAD_BONE, ( 1, -11, -4, 1, 3, 1), (40, 0)),   # front-mid-right
+    ('horn_fr',  HEAD_BONE, ( 3, -10, -4, 1, 2, 1), (44, 0)),   # front-right corner
+    ('horn_sr',  HEAD_BONE, ( 3, -11, -1, 1, 3, 1), (48, 0)),   # right side
+    ('horn_br',  HEAD_BONE, ( 3, -10,  3, 1, 2, 1), (52, 0)),   # back-right corner
+    ('horn_bmr', HEAD_BONE, ( 1, -11,  3, 1, 3, 1), (56, 0)),   # back-mid-right
+    ('horn_bml', HEAD_BONE, (-2, -11,  3, 1, 3, 1), (60, 0)),   # back-mid-left
+    ('horn_bl',  HEAD_BONE, (-4, -10,  3, 1, 2, 1), (32, 5)),   # back-left corner
+    ('horn_sl',  HEAD_BONE, (-4, -11, -1, 1, 3, 1), (36, 5)),   # left side
+]
+
 BOBA_FETT_ACCESSORIES = [
     ('helmet_shell', HEAD_BONE, (-4.0, -8.0, -4.0, 8, 8, 8),  (32, 0), 0.6),
     ('rangefinder',  HEAD_BONE, (3.8, -12.0, -0.5, 1, 4, 1),  (56, 16), 0.0),
@@ -724,6 +749,8 @@ MOBS = {
     'battle_droid': BATTLE_DROID_CUBES,
     'jedi_knight': HUMANOID_CUBES + JEDI_KNIGHT_ACCESSORIES,
     'darth_vader': HUMANOID_CUBES + DARTH_VADER_ACCESSORIES,
+    # Darth Maul: humanoid + a crown of 10 Zabrak horns on the head bone.
+    'darth_maul': HUMANOID_CUBES + MAUL_ACCESSORIES,
     # Plain humanoid — no accessory cubes. Luke's black tunic, blond hair,
     # and glove stripe are painted directly onto the standard UV layout.
     'luke_skywalker': HUMANOID_CUBES,

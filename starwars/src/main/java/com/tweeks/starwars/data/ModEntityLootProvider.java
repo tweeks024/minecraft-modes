@@ -91,6 +91,18 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
                     .when(LootItemRandomChanceCondition.randomChance(0.25f))
                     .add(LootItem.lootTableItem(Registration.HOLOCRON.get()))));
 
+        // Darth Maul: Sith scraps, and — the prize — his double-bladed
+        // saberstaff on a 20% drop. Beating the boss is the fast path to the
+        // weapon (the other being red kyber from Mustafar).
+        this.add(ModEntities.DARTH_MAUL.get(),
+            LootTable.lootTable()
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.REDSTONE)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0f, 4.0f)))))
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .when(LootItemRandomChanceCondition.randomChance(0.20f))
+                    .add(LootItem.lootTableItem(Registration.SABERSTAFF.get()))));
+
         // Luke Skywalker: 1-2 gold_ingot @60% (a hero-tier but not
         // boss-tier haul). A 30% green-lightsaber drop was planned, but —
         // same caveat as Darth Vader above — this MC version has no
@@ -343,6 +355,7 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
             ModEntities.BATTLE_DROID.get(),
             ModEntities.JEDI_KNIGHT.get(),
             ModEntities.DARTH_VADER.get(),
+            ModEntities.DARTH_MAUL.get(),
             ModEntities.LUKE_SKYWALKER.get(),
             ModEntities.OBI_WAN.get(),
             ModEntities.BOBA_FETT.get(),

@@ -106,6 +106,9 @@ public final class Registration {
     public static final DeferredItem<com.tweeks.starwars.item.LightsaberItem> LIGHTSABER =
         ITEMS.registerItem("lightsaber", com.tweeks.starwars.item.LightsaberItem::new, p -> p);
 
+    public static final DeferredItem<com.tweeks.starwars.item.SaberstaffItem> SABERSTAFF =
+        ITEMS.registerItem("saberstaff", com.tweeks.starwars.item.SaberstaffItem::new, p -> p);
+
     public static final DeferredItem<com.tweeks.starwars.item.HolocronItem> HOLOCRON =
         ITEMS.registerItem("holocron", com.tweeks.starwars.item.HolocronItem::new, p -> p);
 
@@ -120,6 +123,9 @@ public final class Registration {
 
     public static final DeferredItem<SpawnEggItem> DARTH_VADER_SPAWN_EGG = ITEMS.registerItem(
         "darth_vader_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.DARTH_VADER.get()));
+
+    public static final DeferredItem<SpawnEggItem> DARTH_MAUL_SPAWN_EGG = ITEMS.registerItem(
+        "darth_maul_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.DARTH_MAUL.get()));
 
     public static final DeferredItem<SpawnEggItem> LUKE_SKYWALKER_SPAWN_EGG = ITEMS.registerItem(
         "luke_skywalker_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.LUKE_SKYWALKER.get()));
@@ -265,10 +271,12 @@ public final class Registration {
                     for (com.tweeks.starwars.item.SaberColor color : com.tweeks.starwars.item.SaberColor.values()) {
                         output.accept(com.tweeks.starwars.item.LightsaberItem.stackWithColor(color));
                     }
+                    output.accept(SABERSTAFF.get());
                     output.accept(STORMTROOPER_SPAWN_EGG.get());
                     output.accept(BATTLE_DROID_SPAWN_EGG.get());
                     output.accept(JEDI_KNIGHT_SPAWN_EGG.get());
                     output.accept(DARTH_VADER_SPAWN_EGG.get());
+                    output.accept(DARTH_MAUL_SPAWN_EGG.get());
                     output.accept(LUKE_SKYWALKER_SPAWN_EGG.get());
                     output.accept(OBI_WAN_SPAWN_EGG.get());
                     output.accept(ASTROMECH_SPAWN_EGG.get());

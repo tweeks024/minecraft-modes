@@ -16,6 +16,9 @@ public final class ModRecipeSerializers {
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<KyberSaberRecipe>> KYBER_SABER =
         SERIALIZERS.register("kyber_saber", () -> KyberSaberRecipe.SERIALIZER);
 
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<SaberstaffRecipe>> SABERSTAFF =
+        SERIALIZERS.register("saberstaff", () -> SaberstaffRecipe.SERIALIZER);
+
     private ModRecipeSerializers() {
     }
 

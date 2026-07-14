@@ -116,6 +116,10 @@ public final class NamedCharacterSpawner {
     /** Yoda waits in the Dagobah marsh, near his hut when one is close. */
     private static final Set<ResourceKey<Biome>> YODA_BIOMES = Set.of(
         com.tweeks.starwars.world.planet.PlanetBiomes.DAGOBAH_SWAMP);
+    /** Maul hunts across all of Tatooine. */
+    private static final Set<ResourceKey<Biome>> MAUL_BIOMES = Set.of(
+        com.tweeks.starwars.world.planet.PlanetBiomes.DUNE_SEA,
+        com.tweeks.starwars.world.planet.PlanetBiomes.JUNDLAND_WASTES);
 
     private static int tickCounter = 0;
 
@@ -144,6 +148,9 @@ public final class NamedCharacterSpawner {
         if (tatooine != null) {
             tryRollCharacter(tatooine, BobaFettSavedData.get(server),
                 ModEntities.BOBA_FETT.get(), BOBA_FETT_BIOMES, IMPERIAL_STRUCTURES, false);
+            // Maul stalks the dunes where he once hunted the Jedi.
+            tryRollCharacter(tatooine, com.tweeks.starwars.entity.MaulSavedData.get(server),
+                ModEntities.DARTH_MAUL.get(), MAUL_BIOMES, IMPERIAL_STRUCTURES, false);
         }
         ServerLevel dagobah = server.getLevel(
             com.tweeks.starwars.world.planet.Planet.DAGOBAH.levelKey());
