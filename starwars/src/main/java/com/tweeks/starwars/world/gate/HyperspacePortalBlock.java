@@ -10,7 +10,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.InsideBlockEffectApplier;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
@@ -31,9 +30,9 @@ import org.jspecify.annotations.Nullable;
 /**
  * The hyperspace film inside an ignited gate frame. Carries its destination
  * in block state ({@link #PLANET}); riding the vanilla {@link Portal}
- * plumbing gives us transition delays, portal cooldowns and safe re-entry
- * semantics for free. The film dissolves nether-portal-style when its iron
- * frame is broken.
+ * plumbing gives us instant pass-through transit, portal cooldowns and safe
+ * re-entry semantics for free. The film dissolves nether-portal-style when
+ * its iron frame is broken.
  */
 public class HyperspacePortalBlock extends Block implements Portal {
     private static final org.slf4j.Logger LOGGER = com.mojang.logging.LogUtils.getLogger();
@@ -43,9 +42,6 @@ public class HyperspacePortalBlock extends Block implements Portal {
 
     private static final VoxelShape X_SHAPE = Block.box(0.0, 0.0, 6.0, 16.0, 16.0, 10.0);
     private static final VoxelShape Z_SHAPE = Block.box(6.0, 0.0, 0.0, 10.0, 16.0, 16.0);
-
-    private static final int PLAYER_TRANSITION_TICKS = 20;
-    private static final int MOB_TRANSITION_TICKS = 40;
 
     public HyperspacePortalBlock(Properties properties) {
         super(properties);
@@ -77,10 +73,10 @@ public class HyperspacePortalBlock extends Block implements Portal {
         }
     }
 
-    @Override
-    public int getPortalTransitionTime(ServerLevel level, Entity entity) {
-        return entity instanceof Player ? PLAYER_TRANSITION_TICKS : MOB_TRANSITION_TICKS;
-    }
+    // No getPortalTransitionTime override: the Portal default of 0 means
+    // instant, End-portal-style transit — passing through the film is
+    // enough. Re-entry bounce is still impossible because arrival applies
+    // the vanilla portal cooldown, which refreshes while standing inside.
 
     @Override
     public @Nullable TeleportTransition getPortalDestination(ServerLevel currentLevel, Entity entity, BlockPos portalEntryPos) {
