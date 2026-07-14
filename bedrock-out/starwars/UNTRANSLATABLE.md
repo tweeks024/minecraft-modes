@@ -8,6 +8,7 @@ Bedrock recipes do not accept Java's datagen-only `category` hint; the field is 
 
 - `blaster_pistol`
 - `blaster_rifle`
+- `bounty_terminal`
 - `galaxy_map`
 - `han_solo_boots`
 - `han_solo_chestplate`
@@ -178,6 +179,7 @@ These items override `Item` methods (e.g. `postHurtEnemy`, `useOn`, `hurtEnemy`)
 The translator has no Bedrock block emitter. These Java block registrations (`BLOCKS.registerBlock` / `BLOCKS.registerSimpleBlock`) have no Bedrock counterpart in the output — the block does not exist on the Bedrock side, and any mechanic built on it is absent:
 
 - `blue_kyber_ore`: custom block 'blue_kyber_ore' not translated — translator has no Bedrock block emitter (block class Block)
+- `bounty_terminal`: custom block 'bounty_terminal' not translated — translator has no Bedrock block emitter (block class BountyTerminalBlock)
 - `green_kyber_ore`: custom block 'green_kyber_ore' not translated — translator has no Bedrock block emitter (block class Block)
 - `hyperspace_portal`: custom block 'hyperspace_portal' not translated — translator has no Bedrock block emitter; portal/teleport behavior impossible without a scripting harness (block class HyperspacePortalBlock)
 - `purple_kyber_ore`: custom block 'purple_kyber_ore' not translated — translator has no Bedrock block emitter (block class Block)

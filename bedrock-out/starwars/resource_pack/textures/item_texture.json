@@ -35,6 +35,9 @@
     "starwars:chewbacca_spawn_egg": {
       "textures": "textures/items/chewbacca_spawn_egg"
     },
+    "starwars:credit": {
+      "textures": "textures/items/credit"
+    },
     "starwars:darth_vader_spawn_egg": {
       "textures": "textures/items/darth_vader_spawn_egg"
     },
