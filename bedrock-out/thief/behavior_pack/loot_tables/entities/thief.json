@@ -2,7 +2,6 @@
   "pools": [
     {
       "rolls": 1.0,
-      "bonus_rolls": 0.0,
       "entries": [
         {
           "type": "item",
@@ -24,7 +23,6 @@
     },
     {
       "rolls": 1.0,
-      "bonus_rolls": 0.0,
       "entries": [
         {
           "type": "item",
@@ -50,7 +48,6 @@
     },
     {
       "rolls": 1.0,
-      "bonus_rolls": 0.0,
       "entries": [
         {
           "type": "item",

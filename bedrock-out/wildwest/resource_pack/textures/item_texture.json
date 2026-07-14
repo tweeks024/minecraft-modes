@@ -1,0 +1,99 @@
+{
+  "resource_pack_name": "wildwest",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "wildwest:anomaly_spawn_egg": {
+      "textures": "textures/items/anomaly_spawn_egg"
+    },
+    "wildwest:anomaly_tooth": {
+      "textures": "textures/items/anomaly_tooth"
+    },
+    "wildwest:bandit_knife": {
+      "textures": "textures/items/bandit_knife"
+    },
+    "wildwest:bandit_leader_spawn_egg": {
+      "textures": "textures/items/bandit_leader_spawn_egg"
+    },
+    "wildwest:bandit_spawn_egg": {
+      "textures": "textures/items/bandit_spawn_egg"
+    },
+    "wildwest:billy_club": {
+      "textures": "textures/items/billy_club"
+    },
+    "wildwest:bullet": {
+      "textures": "textures/items/bullet"
+    },
+    "wildwest:captain_pistol": {
+      "textures": "textures/items/captain_pistol"
+    },
+    "wildwest:cursed_tome": {
+      "textures": "textures/items/cursed_tome"
+    },
+    "wildwest:deputy_spawn_egg": {
+      "textures": "textures/items/deputy_spawn_egg"
+    },
+    "wildwest:flintlock_pistol": {
+      "textures": "textures/items/flintlock_pistol"
+    },
+    "wildwest:grim_reaper_spawn_egg": {
+      "textures": "textures/items/grim_reaper_spawn_egg"
+    },
+    "wildwest:herobrine_spawn_egg": {
+      "textures": "textures/items/herobrine_spawn_egg"
+    },
+    "wildwest:infinity_gauntlet": {
+      "textures": "textures/items/infinity_gauntlet"
+    },
+    "wildwest:meteor_staff": {
+      "textures": "textures/items/meteor_staff"
+    },
+    "wildwest:meteor_staff_gui": {
+      "textures": "textures/items/meteor_staff_gui"
+    },
+    "wildwest:null_spawn_egg": {
+      "textures": "textures/items/null_spawn_egg"
+    },
+    "wildwest:pirate_captain_spawn_egg": {
+      "textures": "textures/items/pirate_captain_spawn_egg"
+    },
+    "wildwest:pirate_spawn_egg": {
+      "textures": "textures/items/pirate_spawn_egg"
+    },
+    "wildwest:pistol": {
+      "textures": "textures/items/pistol"
+    },
+    "wildwest:piston_gauntlet": {
+      "textures": "textures/items/piston_gauntlet"
+    },
+    "wildwest:rapier": {
+      "textures": "textures/items/rapier"
+    },
+    "wildwest:reaper_scythe": {
+      "textures": "textures/items/reaper_scythe"
+    },
+    "wildwest:rifle": {
+      "textures": "textures/items/rifle"
+    },
+    "wildwest:sherrif_spawn_egg": {
+      "textures": "textures/items/sherrif_spawn_egg"
+    },
+    "wildwest:skeleton_pirate_spawn_egg": {
+      "textures": "textures/items/skeleton_pirate_spawn_egg"
+    },
+    "wildwest:steve_stacker_spawn_egg": {
+      "textures": "textures/items/steve_stacker_spawn_egg"
+    },
+    "wildwest:tainted_vial": {
+      "textures": "textures/items/tainted_vial"
+    },
+    "wildwest:the_agent_spawn_egg": {
+      "textures": "textures/items/the_agent_spawn_egg"
+    },
+    "wildwest:void_mark": {
+      "textures": "textures/items/void_mark"
+    },
+    "wildwest:walker_spawn_egg": {
+      "textures": "textures/items/walker_spawn_egg"
+    }
+  }
+}

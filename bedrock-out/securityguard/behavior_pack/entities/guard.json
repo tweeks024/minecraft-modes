@@ -12,12 +12,10 @@
       },
       "minecraft:behavior.defend_village_target": {
         "priority": 1,
-        "entity_types": {},
         "must_reach": true
       },
       "minecraft:behavior.hurt_by_target": {
-        "priority": 2,
-        "entity_types": {}
+        "priority": 2
       },
       "minecraft:behavior.look_at_player": {
         "priority": 8,
@@ -38,7 +36,8 @@
         "priority": 8
       },
       "minecraft:behavior.random_stroll": {
-        "priority": 7,
+        "priority": 4,
+        "interval": 240,
         "speed_multiplier": 0.6
       },
       "minecraft:can_climb": {},

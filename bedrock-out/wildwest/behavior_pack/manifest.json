@@ -1,0 +1,47 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Wild West (Behavior Pack)",
+    "description": "Adds wild-west themed mobs and items. Phase 1 ships a six-shooter pistol and\na bolt-action rifle.",
+    "uuid": "e0c662ea-7610-56b0-9b06-4bd448de866c",
+    "version": [
+      1,
+      0,
+      0
+    ],
+    "min_engine_version": [
+      1,
+      21,
+      80
+    ]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "963c5a92-431b-5ec9-8ae3-b1b42af4515c",
+      "version": [
+        1,
+        0,
+        0
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "ee5d2675-6a4d-5596-922f-b46e8b12ef9c",
+      "version": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "uuid": "8cbe1225-3a59-5939-ac01-d69cf7308da0",
+      "version": [
+        1,
+        0,
+        0
+      ]
+    }
+  ]
+}

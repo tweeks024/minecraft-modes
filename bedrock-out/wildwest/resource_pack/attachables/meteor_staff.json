@@ -1,0 +1,20 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:attachable": {
+    "description": {
+      "identifier": "wildwest:meteor_staff",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/items/meteor_staff_gui"
+      },
+      "geometry": {
+        "default": "geometry.wildwest.meteor_staff"
+      },
+      "render_controllers": [
+        "controller.render.item_default"
+      ]
+    }
+  }
+}

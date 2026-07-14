@@ -1,0 +1,74 @@
+{
+  "pools": [
+    {
+      "rolls": 3.0,
+      "entries": [
+        {
+          "type": "item",
+          "name": "minecraft:emerald",
+          "weight": 10,
+          "functions": [
+            {
+              "count": {
+                "max": 4,
+                "min": 1,
+                "type": "uniform"
+              },
+              "function": "set_count"
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "minecraft:gold_ingot",
+          "weight": 8,
+          "functions": [
+            {
+              "count": {
+                "max": 3,
+                "min": 1,
+                "type": "uniform"
+              },
+              "function": "set_count"
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "minecraft:gunpowder",
+          "weight": 8,
+          "functions": [
+            {
+              "count": {
+                "max": 5,
+                "min": 2,
+                "type": "uniform"
+              },
+              "function": "set_count"
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "minecraft:string",
+          "weight": 10,
+          "functions": [
+            {
+              "count": {
+                "max": 6,
+                "min": 2,
+                "type": "uniform"
+              },
+              "function": "set_count"
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "wildwest:rapier",
+          "weight": 1
+        }
+      ]
+    }
+  ]
+}

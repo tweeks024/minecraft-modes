@@ -1,0 +1,73 @@
+{
+  "format_version": "1.21.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "wildwest:redstone_golem",
+      "is_spawnable": true,
+      "is_summonable": true
+    },
+    "components": {
+      "minecraft:attack": {
+        "damage": 10
+      },
+      "minecraft:behavior.float": {
+        "priority": 0,
+        "sink_with_passengers": true
+      },
+      "minecraft:behavior.hurt_by_target": {
+        "priority": 1
+      },
+      "minecraft:behavior.melee_attack": {
+        "priority": 3,
+        "speed_multiplier": 1,
+        "track_target": true
+      },
+      "minecraft:behavior.move_towards_target": {
+        "priority": 4,
+        "speed_multiplier": 0.9,
+        "within_radius": 32
+      },
+      "minecraft:behavior.random_look_around": {
+        "priority": 5
+      },
+      "minecraft:can_climb": {},
+      "minecraft:collision_box": {
+        "width": 1.4,
+        "height": 2.7
+      },
+      "minecraft:follow_range": {
+        "value": 48,
+        "max": 48
+      },
+      "minecraft:health": {
+        "value": 280,
+        "max": 280
+      },
+      "minecraft:jump.static": {},
+      "minecraft:knockback_resistance": {
+        "value": 1
+      },
+      "minecraft:movement": {
+        "value": 0.22
+      },
+      "minecraft:movement.basic": {},
+      "minecraft:navigation.walk": {
+        "can_pass_doors": true,
+        "can_walk": true
+      },
+      "minecraft:physics": {},
+      "minecraft:pushable": {
+        "is_pushable": true,
+        "is_pushable_by_piston": true
+      },
+      "minecraft:type_family": {
+        "family": [
+          "redstone_golem",
+          "monster",
+          "mob"
+        ]
+      }
+    },
+    "events": {}
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "format_version": "1.21.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "wildwest:null",
+      "is_spawnable": true,
+      "is_summonable": true
+    },
+    "components": {
+      "minecraft:attack": {
+        "damage": 0
+      },
+      "minecraft:behavior.look_at_player": {
+        "priority": 8,
+        "look_distance": 32,
+        "probability": 0.02
+      },
+      "minecraft:behavior.random_look_around": {
+        "priority": 8
+      },
+      "minecraft:can_climb": {},
+      "minecraft:collision_box": {
+        "width": 0.6,
+        "height": 1.95
+      },
+      "minecraft:follow_range": {
+        "value": 64,
+        "max": 64
+      },
+      "minecraft:health": {
+        "value": 240,
+        "max": 240
+      },
+      "minecraft:jump.static": {},
+      "minecraft:knockback_resistance": {
+        "value": 1
+      },
+      "minecraft:movement": {
+        "value": 0.2
+      },
+      "minecraft:movement.basic": {},
+      "minecraft:navigation.walk": {
+        "can_pass_doors": true,
+        "can_walk": true
+      },
+      "minecraft:physics": {},
+      "minecraft:pushable": {
+        "is_pushable": true,
+        "is_pushable_by_piston": true
+      },
+      "minecraft:type_family": {
+        "family": [
+          "null",
+          "monster",
+          "mob"
+        ]
+      }
+    },
+    "events": {}
+  }
+}

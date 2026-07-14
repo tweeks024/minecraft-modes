@@ -7,7 +7,7 @@
         "default": "entity_alphatest"
       },
       "textures": {
-        "default": "textures/entity/thief_revealed.png"
+        "default": "textures/entity/thief_disguised.png"
       },
       "geometry": {
         "default": "geometry.humanoid"

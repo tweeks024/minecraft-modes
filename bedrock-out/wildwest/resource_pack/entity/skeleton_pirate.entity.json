@@ -1,0 +1,20 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "wildwest:skeleton_pirate",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/skeleton_pirate.png"
+      },
+      "geometry": {
+        "default": "geometry.wildwest.skeleton_pirate"
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ]
+    }
+  }
+}

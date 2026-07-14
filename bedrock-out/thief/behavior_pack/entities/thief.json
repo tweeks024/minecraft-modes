@@ -15,8 +15,7 @@
         "sink_with_passengers": true
       },
       "minecraft:behavior.hurt_by_target": {
-        "priority": 1,
-        "entity_types": {}
+        "priority": 1
       },
       "minecraft:behavior.look_at_player": {
         "priority": 7,

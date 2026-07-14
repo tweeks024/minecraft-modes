@@ -1,0 +1,65 @@
+{
+  "format_version": "1.21.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "wildwest:scythe_skeleton",
+      "is_spawnable": true,
+      "is_summonable": true
+    },
+    "components": {
+      "minecraft:behavior.float": {
+        "priority": 0,
+        "sink_with_passengers": true
+      },
+      "minecraft:behavior.look_at_player": {
+        "priority": 6,
+        "look_distance": 8,
+        "probability": 0.02
+      },
+      "minecraft:behavior.melee_attack": {
+        "priority": 2,
+        "speed_multiplier": 1.1,
+        "track_target": true
+      },
+      "minecraft:behavior.random_stroll": {
+        "priority": 5,
+        "avoid_water": true,
+        "speed_multiplier": 0.8
+      },
+      "minecraft:can_climb": {},
+      "minecraft:collision_box": {
+        "width": 0.6,
+        "height": 1.99
+      },
+      "minecraft:follow_range": {
+        "value": 32,
+        "max": 32
+      },
+      "minecraft:health": {
+        "value": 20,
+        "max": 20
+      },
+      "minecraft:jump.static": {},
+      "minecraft:movement": {
+        "value": 0.27
+      },
+      "minecraft:movement.basic": {},
+      "minecraft:navigation.walk": {
+        "can_pass_doors": true,
+        "can_walk": true
+      },
+      "minecraft:physics": {},
+      "minecraft:pushable": {
+        "is_pushable": true,
+        "is_pushable_by_piston": true
+      },
+      "minecraft:type_family": {
+        "family": [
+          "scythe_skeleton",
+          "mob"
+        ]
+      }
+    },
+    "events": {}
+  }
+}

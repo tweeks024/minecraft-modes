@@ -1,0 +1,15 @@
+{
+  "format_version": "1.21.0",
+  "minecraft:item": {
+    "description": {
+      "identifier": "wildwest:tainted_vial",
+      "menu_category": {
+        "category": "items"
+      }
+    },
+    "components": {
+      "minecraft:icon": "wildwest:tainted_vial",
+      "minecraft:max_stack_size": 16
+    }
+  }
+}

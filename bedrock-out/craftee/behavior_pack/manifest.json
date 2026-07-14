@@ -1,0 +1,39 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Craftee (Behavior Pack)",
+    "description": "Craftee armor — netherite-tier 4-piece set with a content-creator\nfilmstrip motif. Wear all four pieces for a mobility set bonus:\n+20% movement speed, +0.30 jump strength, and +0.50 step height\n(auto-step over single-block obstacles).\nCrafted via a Craftee Upgrade Smithing Template (1 netherite scrap +\n8 paper → 2 templates) applied to diamond armor with a netherite ingot.",
+    "uuid": "ec9a2635-2b6c-538b-a7ae-e7a80fa22034",
+    "version": [
+      1,
+      0,
+      0
+    ],
+    "min_engine_version": [
+      1,
+      21,
+      80
+    ]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "eb582685-158a-518c-84ff-410a60bd67c8",
+      "version": [
+        1,
+        0,
+        0
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "f331b5dc-8097-5f7f-92eb-fc33f623a677",
+      "version": [
+        1,
+        0,
+        0
+      ]
+    }
+  ]
+}

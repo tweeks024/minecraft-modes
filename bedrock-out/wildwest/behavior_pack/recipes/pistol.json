@@ -1,0 +1,27 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "wildwest:pistol"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "I  ",
+      "IW ",
+      " W "
+    ],
+    "key": {
+      "I": {
+        "item": "minecraft:iron_ingot"
+      },
+      "W": {
+        "item": "minecraft:oak_planks"
+      }
+    },
+    "result": {
+      "item": "wildwest:pistol"
+    }
+  }
+}

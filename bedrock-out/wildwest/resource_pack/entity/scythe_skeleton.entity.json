@@ -1,0 +1,20 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "wildwest:scythe_skeleton",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/anomaly.png"
+      },
+      "geometry": {
+        "default": "geometry.wildwest.scythe_skeleton"
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ]
+    }
+  }
+}

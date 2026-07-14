@@ -1,0 +1,35 @@
+{
+  "format_version": "1.21.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "wildwest:null_rift",
+      "is_spawnable": true,
+      "is_summonable": true
+    },
+    "components": {
+      "minecraft:can_climb": {},
+      "minecraft:collision_box": {
+        "width": 3,
+        "height": 3
+      },
+      "minecraft:jump.static": {},
+      "minecraft:movement.basic": {},
+      "minecraft:navigation.walk": {
+        "can_pass_doors": true,
+        "can_walk": true
+      },
+      "minecraft:physics": {},
+      "minecraft:pushable": {
+        "is_pushable": true,
+        "is_pushable_by_piston": true
+      },
+      "minecraft:type_family": {
+        "family": [
+          "null_rift",
+          "mob"
+        ]
+      }
+    },
+    "events": {}
+  }
+}

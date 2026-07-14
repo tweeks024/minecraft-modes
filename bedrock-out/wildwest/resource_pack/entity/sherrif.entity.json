@@ -1,0 +1,20 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "wildwest:sherrif",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/sherrif.png"
+      },
+      "geometry": {
+        "default": "geometry.wildwest.sherrif"
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ]
+    }
+  }
+}

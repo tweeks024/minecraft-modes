@@ -1,0 +1,20 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "wildwest:grim_reaper",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/grim_reaper.png"
+      },
+      "geometry": {
+        "default": "geometry.wildwest.grim_reaper"
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ]
+    }
+  }
+}

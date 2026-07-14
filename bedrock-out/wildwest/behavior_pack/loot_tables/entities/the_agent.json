@@ -1,0 +1,22 @@
+{
+  "pools": [
+    {
+      "rolls": 1.0,
+      "entries": [
+        {
+          "type": "item",
+          "name": "minecraft:diamond_block"
+        }
+      ]
+    },
+    {
+      "rolls": 1.0,
+      "entries": [
+        {
+          "type": "item",
+          "name": "wildwest:cursed_tome"
+        }
+      ]
+    }
+  ]
+}

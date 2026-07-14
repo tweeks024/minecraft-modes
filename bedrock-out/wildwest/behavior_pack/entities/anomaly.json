@@ -6,109 +6,29 @@
       "is_spawnable": true,
       "is_summonable": true
     },
-    "component_groups": {
-      "wildwest:disguised": {
-        "minecraft:type_family": {
-          "family": [
-            "wildwest_anomaly",
-            "villager",
-            "mob"
-          ]
-        },
-        "minecraft:movement": {
-          "value": 0.2
-        },
-        "minecraft:damage_sensor": {
-          "triggers": [
-            {
-              "cause": "all",
-              "damage_multiplier": 0.75
-            }
-          ]
-        },
-        "minecraft:behavior.random_stroll": {
-          "priority": 5,
-          "speed_multiplier": 0.6
-        },
-        "minecraft:behavior.random_look_around": {
-          "priority": 7
-        },
-        "minecraft:interact": {
-          "interactions": [
-            {
-              "on_interact": {
-                "filters": {
-                  "test": "is_family",
-                  "subject": "other",
-                  "value": "player"
-                },
-                "event": "wildwest:reveal",
-                "target": "self"
-              },
-              "play_sounds": "entity.anomaly.reveal"
-            }
-          ]
-        }
-      },
-      "wildwest:revealed": {
-        "minecraft:type_family": {
-          "family": [
-            "wildwest_anomaly",
-            "monster",
-            "mob"
-          ]
-        },
-        "minecraft:movement": {
-          "value": 0.3
-        },
-        "minecraft:attack": {
-          "damage": 8
-        },
-        "minecraft:behavior.melee_attack": {
-          "priority": 1,
-          "speed_multiplier": 1.0,
-          "track_target": true
-        },
-        "minecraft:behavior.nearest_attackable_target": {
-          "priority": 2,
-          "must_see": true,
-          "entity_types": [
-            {
-              "filters": {
-                "test": "is_family",
-                "subject": "other",
-                "value": "player"
-              },
-              "max_dist": 24
-            }
-          ]
-        },
-        "minecraft:behavior.random_stroll": {
-          "priority": 6,
-          "speed_multiplier": 1.0
-        },
-        "minecraft:behavior.hurt_by_target": {
-          "priority": 0
-        }
-      }
-    },
     "components": {
-      "minecraft:health": {
-        "value": 40,
-        "max": 40
+      "minecraft:behavior.float": {
+        "priority": 0,
+        "sink_with_passengers": true
       },
-      "minecraft:knockback_resistance": {
-        "value": 0.0
+      "minecraft:behavior.look_at_player": {
+        "priority": 6,
+        "look_distance": 8,
+        "probability": 0.02
       },
+      "minecraft:behavior.random_look_around": {
+        "priority": 7
+      },
+      "minecraft:behavior.random_stroll": {
+        "priority": 5,
+        "avoid_water": true,
+        "speed_multiplier": 0.6
+      },
+      "minecraft:can_climb": {},
       "minecraft:collision_box": {
         "width": 0.6,
         "height": 1.95
       },
-      "minecraft:follow_range": {
-        "value": 24,
-        "max": 24
-      },
-      "minecraft:can_climb": {},
       "minecraft:jump.static": {},
       "minecraft:movement.basic": {},
       "minecraft:navigation.walk": {
@@ -120,43 +40,14 @@
         "is_pushable": true,
         "is_pushable_by_piston": true
       },
-      "minecraft:loot": {
-        "table": "loot_tables/entities/anomaly.json"
-      },
-      "minecraft:nameable": {}
-    },
-    "events": {
-      "minecraft:entity_spawned": {
-        "add": {
-          "component_groups": [
-            "wildwest:disguised"
-          ]
-        }
-      },
-      "wildwest:reveal": {
-        "remove": {
-          "component_groups": [
-            "wildwest:disguised"
-          ]
-        },
-        "add": {
-          "component_groups": [
-            "wildwest:revealed"
-          ]
-        }
-      },
-      "wildwest:re_disguise": {
-        "remove": {
-          "component_groups": [
-            "wildwest:revealed"
-          ]
-        },
-        "add": {
-          "component_groups": [
-            "wildwest:disguised"
-          ]
-        }
+      "minecraft:type_family": {
+        "family": [
+          "anomaly",
+          "monster",
+          "mob"
+        ]
       }
-    }
+    },
+    "events": {}
   }
 }

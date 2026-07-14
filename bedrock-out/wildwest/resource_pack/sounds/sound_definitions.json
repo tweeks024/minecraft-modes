@@ -10,6 +10,42 @@
         }
       ]
     },
+    "wildwest:entity.anomaly.bite": {
+      "category": "neutral",
+      "sounds": [
+        {
+          "name": "sounds/entity/anomaly/bite",
+          "stream": false
+        }
+      ]
+    },
+    "wildwest:entity.anomaly.death": {
+      "category": "neutral",
+      "sounds": [
+        {
+          "name": "sounds/entity/anomaly/death",
+          "stream": false
+        }
+      ]
+    },
+    "wildwest:entity.anomaly.hurt": {
+      "category": "neutral",
+      "sounds": [
+        {
+          "name": "sounds/entity/anomaly/hurt",
+          "stream": false
+        }
+      ]
+    },
+    "wildwest:entity.anomaly.reveal": {
+      "category": "neutral",
+      "sounds": [
+        {
+          "name": "sounds/entity/anomaly/reveal",
+          "stream": false
+        }
+      ]
+    },
     "wildwest:pistol_fire": {
       "category": "neutral",
       "sounds": [
@@ -27,22 +63,6 @@
           "stream": false
         }
       ]
-    },
-    "entity.anomaly.reveal": {
-      "category": "hostile",
-      "sounds": [ "sounds/entity/anomaly/reveal" ]
-    },
-    "entity.anomaly.hurt": {
-      "category": "hostile",
-      "sounds": [ "sounds/entity/anomaly/hurt" ]
-    },
-    "entity.anomaly.death": {
-      "category": "hostile",
-      "sounds": [ "sounds/entity/anomaly/death" ]
-    },
-    "entity.anomaly.bite": {
-      "category": "hostile",
-      "sounds": [ "sounds/entity/anomaly/bite" ]
     }
   }
 }

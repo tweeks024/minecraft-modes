@@ -1,0 +1,20 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "wildwest:pirate_captain",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/pirate_captain.png"
+      },
+      "geometry": {
+        "default": "geometry.wildwest.pirate_captain"
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ]
+    }
+  }
+}

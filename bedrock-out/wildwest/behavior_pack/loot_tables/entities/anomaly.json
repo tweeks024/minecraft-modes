@@ -8,8 +8,12 @@
           "name": "minecraft:emerald",
           "functions": [
             {
-              "function": "set_count",
-              "count": { "min": 1, "max": 3 }
+              "count": {
+                "max": 3,
+                "min": 1,
+                "type": "uniform"
+              },
+              "function": "set_count"
             }
           ]
         }
@@ -23,8 +27,12 @@
           "name": "wildwest:anomaly_tooth",
           "functions": [
             {
-              "function": "set_count",
-              "count": { "min": 0, "max": 2 }
+              "count": {
+                "max": 2,
+                "min": 0,
+                "type": "uniform"
+              },
+              "function": "set_count"
             }
           ]
         }

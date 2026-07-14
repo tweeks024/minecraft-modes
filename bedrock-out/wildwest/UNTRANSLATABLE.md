@@ -8,6 +8,7 @@ Bedrock recipes do not accept Java's datagen-only `category` hint; the field is 
 
 - `bandit_knife`
 - `billy_club`
+- `infinity_gauntlet`
 - `pistol`
 - `rifle`
 - `tainted_vial`
@@ -18,6 +19,7 @@ Bedrock has no equivalent of Java's `random_sequence` field; loot rolls use the 
 
 - `entities/bandit.json`
 - `entities/bandit_leader.json`
+- `entities/crab.json`
 - `entities/deputy.json`
 - `entities/sherrif.json`
 
@@ -27,6 +29,10 @@ Bedrock's subtitle system is structurally different (per-locale text vs. a trans
 Subtitles for these events were dropped:
 
 - `bolt_cycle`
+- `entity.anomaly.bite`
+- `entity.anomaly.death`
+- `entity.anomaly.hurt`
+- `entity.anomaly.reveal`
 - `pistol_fire`
 - `rifle_fire`
 
@@ -43,15 +49,6 @@ These top-level categories under `assets/wildwest/textures/` are not mapped to B
 
 - `mob_effect`
 
-## Entity goals translated by LLM (cache hit)
-
-These goals were translated from Java to Bedrock JS via the Phase 3 LLM stage. The committed JS lives at `behavior_pack/scripts/goals/<GoalClass>.ts`. Cache key is shown for debugging — see `translator/.cache/llm/<key>.json`:
-
-- `HerobrineLightningGoal` — cache key `f6038c794c2ffd484860a127e71a33bf8bfacbc202356350d55ef9d2a68454ee`
-- `HerobrineMeleeGoal` — cache key `25cccd6fd1b3d2fa37fedbbdad600c5b707d0a326ed4aa98e4832cbe357fc6b2`
-- `HerobrineMeteorGoal` — cache key `0723b94972aa748ae4b4261eec5aa366fc9f360dd01639c8106010dcbe076d1a`
-- `NearestAttackableTargetGoal` — cache key `de024045de23a36762a794a3f6daef8ad37d2d3550337ad8f1b9bda71efd770d`
-
 ## Entity goals stubbed for LLM (cache miss; run :translate --with-llm to translate)
 
 These goals produced a `// TODO LLM:` stub at `behavior_pack/scripts/goals/<GoalClass>.ts`. Either re-run with `--with-llm` (and `ANTHROPIC_API_KEY` set) to fill them in, or hand-translate them:
@@ -61,8 +58,45 @@ These goals produced a `// TODO LLM:` stub at `behavior_pack/scripts/goals/<Goal
 - `AgentMeleeGoal` — cache miss; run :translate --with-llm to translate
 - `AgentTargetGoal` — cache miss; run :translate --with-llm to translate
 - `AgentTeleportGoal` — cache miss; run :translate --with-llm to translate
+- `BreedGoal` — cache miss; run :translate --with-llm to translate
 - `CannonOperateGoal` — cache miss; run :translate --with-llm to translate
+- `FollowLeaderGoal` — cache miss; run :translate --with-llm to translate
+- `FollowParentGoal` — cache miss; run :translate --with-llm to translate
+- `GrimReaperRaiseDeadGoal` — cache miss; run :translate --with-llm to translate
+- `GrimReaperSoulLiftGoal` — cache miss; run :translate --with-llm to translate
+- `HerobrineLightningGoal` — cache miss; run :translate --with-llm to translate
+- `HerobrineMeleeGoal` — cache miss; run :translate --with-llm to translate
+- `HerobrineMeteorGoal` — cache miss; run :translate --with-llm to translate
 - `HerobrineTeleportGoal` — cache miss; run :translate --with-llm to translate
+- `LawmanTargetGoal` — cache miss; run :translate --with-llm to translate
+- `LeaderTargetCopyGoal` — cache miss; run :translate --with-llm to translate
+- `NearestAttackableTargetGoal` — cache miss; run :translate --with-llm to translate
+- `NullDriftGoal` — cache miss; run :translate --with-llm to translate
+- `NullRiftGoal` — cache miss; run :translate --with-llm to translate
+- `OutlawTargetGoal` — cache miss; run :translate --with-llm to translate
+- `RedstoneGolemGroundSlamGoal` — cache miss; run :translate --with-llm to translate
+- `RedstoneGolemThrowBombGoal` — cache miss; run :translate --with-llm to translate
+- `ResetUniversalAngerTargetGoal` — cache miss; run :translate --with-llm to translate
+- `RevealedOnlyHurtByTargetGoal` — cache miss; run :translate --with-llm to translate
+- `RevealedOnlyMeleeGoal` — cache miss; run :translate --with-llm to translate
+- `RevealedOnlyTargetGoal` — cache miss; run :translate --with-llm to translate
+- `ScytheSkeletonFollowOwnerGoal` — cache miss; run :translate --with-llm to translate
+- `ScytheSkeletonMineOreGoal` — cache miss; run :translate --with-llm to translate
+- `ScytheSkeletonTargetHostilesGoal` — cache miss; run :translate --with-llm to translate
+- `TemptGoal` — cache miss; run :translate --with-llm to translate
+- `WildWestMeleeAttackGoal` — cache miss; run :translate --with-llm to translate
+- `WildWestRangedAttackGoal` — cache miss; run :translate --with-llm to translate
+
+## Entity goals stubbed for human (Low bucket)
+
+These goals were classified Low — novel logic that Phase 3's LLM stage doesn't attempt to translate. Hand-write the Bedrock equivalent:
+
+### `CrabEntity`
+
+- `<unknown>` — non-constructor goal expression
+    ```java
+    this.targetSelector.addGoal(1, new HurtByTargetGoal(this).setAlertOthers())
+    ```
 
 ## Item custom behavior
 
@@ -71,21 +105,42 @@ These items override `Item` methods (e.g. `postHurtEnemy`, `useOn`, `hurtEnemy`)
 - `bandit_knife`: BanditKnifeItem overrides: hurtEnemy
 - `billy_club`: BillyClubItem overrides: hurtEnemy
 - `cursed_tome`: CursedTomeItem overrides: use
+- `grim_reaper_spawn_egg`: GrimReaperSpawnEggItem overrides: useOn
 - `herobrine_spawn_egg`: HerobrineSpawnEggItem overrides: useOn
+- `infinity_gauntlet`: InfinityGauntletItem overrides: use
 - `meteor_staff`: MeteorStaffItem overrides: use
+- `null_spawn_egg`: NullSpawnEggItem overrides: useOn
 - `pistol`: PistolItem overrides: use
+- `piston_gauntlet`: PistonGauntletItem overrides: use
+- `reaper_scythe`: ReaperScytheItem overrides: use
 - `rifle`: RifleItem overrides: use, inventoryTick
 - `tainted_vial`: TaintedVialItem overrides: use
 - `the_agent_spawn_egg`: AgentSpawnEggItem overrides: useOn
+- `void_mark`: VoidMarkItem overrides: use
+
+## Item model selector not translatable — static icon used
+
+These items use a `minecraft:select` component-keyed client model (e.g. a data-component-driven color). Phase 2 does not translate the selector; the item was instead given a fixed icon so it isn't a broken/missing texture reference in Bedrock. If the selected color/state matters in-game, hand-write the swap via Phase 3 scripting:
+
+- `meteor_staff`: item model selector not translatable — using wildwest:meteor_staff_gui as static icon
+
+## Attachable held-item texture substituted or missing
+
+These items have a `resource_pack/attachables/<id>.json` (from a `.bbmodel`) whose conventional `textures/entity/<id>` texture doesn't exist in the output. Verify the 3D held-item view in-game:
+
+- `meteor_staff`: no dedicated textures/entity/meteor_staff texture was authored; the attachable falls back to the item icon texture textures/items/meteor_staff_gui for the 3D held-item view — verify visually in-game.
 
 ## Spawn egg colors hardcoded
 
 These spawn eggs received default base/overlay colors because the Java side computes them at runtime via `EntityType.Builder` defaults. Hand-tune per the source mod's mob palette if the colors look wrong in-game:
 
+- `anomaly_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `bandit_leader_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `bandit_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `deputy_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
+- `grim_reaper_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `herobrine_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
+- `null_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `pirate_captain_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `pirate_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `sherrif_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
@@ -98,35 +153,55 @@ These spawn eggs received default base/overlay colors because the Java side comp
 
 The Java entity renderer is too complex to parse statically. Phase 2 fell back to a heuristic geometry/texture name. Verify visually in-game and adjust the emitted `<entity_id>.entity.json` if wrong:
 
+- `crab`: no bbmodel matched id 'crab'; defaulted to 'geometry.humanoid'.
+- `null`: no bbmodel matched id 'null'; defaulted to 'geometry.humanoid'.
+- `null_rift`: no bbmodel matched id 'null_rift'; defaulted to 'geometry.humanoid'.
+- `redstone_golem`: no bbmodel matched id 'redstone_golem'; defaulted to 'geometry.humanoid'.
 - `steve_stacker`: no bbmodel matched id 'steve_stacker'; defaulted to 'geometry.humanoid'.
 - `the_agent_clone`: no bbmodel matched id 'the_agent_clone'; defaulted to 'geometry.humanoid'.
+
+## Entity attributes not resolved to literals
+
+These `createAttributes()` values are neither numeric literals nor resolvable `static final` constants (e.g. computed at runtime). The attribute was dropped from the Bedrock entity JSON — set it by hand if it matters:
+
+### `AnomalyEntity`
+
+- attribute `ATTACK_DAMAGE` value `ATTACK_DAMAGE` is not a literal or a resolvable static-final constant
+- attribute `FOLLOW_RANGE` value `FOLLOW_RANGE` is not a literal or a resolvable static-final constant
+- attribute `KNOCKBACK_RESISTANCE` value `KNOCKBACK_RESISTANCE` is not a literal or a resolvable static-final constant
+- attribute `MAX_HEALTH` value `MAX_HEALTH` is not a literal or a resolvable static-final constant
+- attribute `MOVEMENT_SPEED` value `SPEED_DISGUISED` is not a literal or a resolvable static-final constant
+
+## Named-character singletons (not enforced on Bedrock)
+
+These entities enforce a one-living-instance-per-server invariant on the Java side via a `*SavedData` class. Bedrock has no SavedData equivalent, so this invariant is not enforced in the translated output — duplicates are possible:
+
+- `grim_reaper`: Java enforces one living instance per server via SavedData (finalizeSpawn claim + die/remove clear); Bedrock output has no equivalent — duplicates are possible.
+- `herobrine`: Java enforces one living instance per server via SavedData (finalizeSpawn claim + die/remove clear); Bedrock output has no equivalent — duplicates are possible.
+- `null`: Java enforces one living instance per server via SavedData (finalizeSpawn claim + die/remove clear); Bedrock output has no equivalent — duplicates are possible.
+- `the_agent`: Java enforces one living instance per server via SavedData (finalizeSpawn claim + die/remove clear); Bedrock output has no equivalent — duplicates are possible.
 
 ## Phase 2 analyzer failure
 
 A Phase 2 analyzer (entity / item) threw on this mod. Other mods still translated. Stack-trace summary:
 
 ```
+Entity BulletEntity (bullet) is a projectile (extends ThrowableItemProjectile / AbstractArrow / Projectile) — skipped; Bedrock has no automatic projectile-from-Java translation.
+```
+
+```
+Entity MeteorEntity (meteor) is a projectile (extends ThrowableItemProjectile / AbstractArrow / Projectile) — skipped; Bedrock has no automatic projectile-from-Java translation.
+```
+
+```
+Entity CannonballEntity (cannonball) is a projectile (extends ThrowableItemProjectile / AbstractArrow / Projectile) — skipped; Bedrock has no automatic projectile-from-Java translation.
+```
+
+```
 Entity TaintedVialEntity (tainted_vial_projectile) is a projectile (extends ThrowableItemProjectile / AbstractArrow / Projectile) — skipped; Bedrock has no automatic projectile-from-Java translation.
 ```
 
-## Anomaly
-
-- **Re-disguise condition** is approximated on Bedrock: Java tracks
-  `getTarget() == null && (tickCount - lastHurtByMobTimestamp) > DAMAGE_GRACE_TICKS`.
-  Bedrock script API exposes no target accessor, but it DOES expose
-  `world.afterEvents.entityHurt`, so the script tracks last-hurt-tick
-  per-Anomaly and resets the re-disguise countdown on recent damage.
-  The remaining divergence: if an Anomaly is revealed and has a target
-  but isn't taking damage (e.g., player kiting just outside its reach),
-  the Java version stays revealed but Bedrock will re-disguise after
-  10 s. Considered acceptable.
-- **Disguised damage resist** uses `minecraft:damage_sensor.damage_multiplier=0.75`
-  in the disguised component group rather than an event-bus listener.
-  Functionally equivalent; just a different API surface.
-- **Bleed DoT is not replicated.** Java applies a `wildwest:anomaly_bleed`
-  MobEffect on every successful melee hit (1 dmg/sec × 4s). The Bedrock
-  port has no equivalent — bites do flat damage with no follow-up DoT.
-  Consequently there's no `effect.wildwest.anomaly_bleed` Bedrock lang
-  entry, and the Bedrock Anomaly is slightly less dangerous than the
-  Java version.
+```
+Entity RedstoneBombEntity (redstone_bomb) is a projectile (extends ThrowableItemProjectile / AbstractArrow / Projectile) — skipped; Bedrock has no automatic projectile-from-Java translation.
+```
 

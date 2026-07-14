@@ -1,0 +1,39 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "wildwest:infinity_gauntlet"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "SDS",
+      "N*N",
+      "HTH"
+    ],
+    "key": {
+      "*": {
+        "item": "minecraft:nether_star"
+      },
+      "D": {
+        "item": "minecraft:wither_skeleton_skull"
+      },
+      "H": {
+        "item": "minecraft:heart_of_the_sea"
+      },
+      "N": {
+        "item": "minecraft:netherite_block"
+      },
+      "S": {
+        "item": "minecraft:echo_shard"
+      },
+      "T": {
+        "item": "minecraft:totem_of_undying"
+      }
+    },
+    "result": {
+      "item": "wildwest:infinity_gauntlet"
+    }
+  }
+}

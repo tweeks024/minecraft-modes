@@ -1,0 +1,28 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "craftee:craftee_upgrade_smithing_template"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "PPP",
+      "PNP",
+      "PPP"
+    ],
+    "key": {
+      "N": {
+        "item": "minecraft:netherite_scrap"
+      },
+      "P": {
+        "item": "minecraft:paper"
+      }
+    },
+    "result": {
+      "item": "craftee:craftee_upgrade_smithing_template",
+      "count": 2
+    }
+  }
+}

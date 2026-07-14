@@ -1,0 +1,41 @@
+{
+  "pools": [
+    {
+      "rolls": 1.0,
+      "entries": [
+        {
+          "type": "item",
+          "name": "minecraft:gold_block"
+        }
+      ]
+    },
+    {
+      "rolls": 1.0,
+      "entries": [
+        {
+          "type": "item",
+          "name": "minecraft:emerald",
+          "functions": [
+            {
+              "count": {
+                "max": 3,
+                "min": 0,
+                "type": "uniform"
+              },
+              "function": "set_count"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1.0,
+      "entries": [
+        {
+          "type": "item",
+          "name": "minecraft:map"
+        }
+      ]
+    }
+  ]
+}

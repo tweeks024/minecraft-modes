@@ -1,0 +1,20 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "wildwest:bandit_leader",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/bandit_leader.png"
+      },
+      "geometry": {
+        "default": "geometry.wildwest.bandit_leader"
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ]
+    }
+  }
+}

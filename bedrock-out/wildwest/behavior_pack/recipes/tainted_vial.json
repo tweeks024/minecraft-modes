@@ -1,0 +1,25 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shapeless": {
+    "description": {
+      "identifier": "wildwest:tainted_vial"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "ingredients": [
+      {
+        "item": "minecraft:rotten_flesh"
+      },
+      {
+        "item": "minecraft:glass_bottle"
+      },
+      {
+        "item": "minecraft:gunpowder"
+      }
+    ],
+    "result": {
+      "item": "wildwest:tainted_vial"
+    }
+  }
+}

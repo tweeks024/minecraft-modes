@@ -58,3 +58,11 @@ These spawn eggs received default base/overlay colors because the Java side comp
 
 - `guard_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 
+## Duplicate Bedrock behavior components dropped
+
+Multiple Java goals mapped to the same Bedrock behavior component name. Bedrock entity JSON requires unique component keys, so only the highest-priority goal (lowest priority value) is emitted. The dropped goals are listed here for review — hand-translate them into a script if their behavior is meaningful:
+
+### `guard`
+
+- minecraft:behavior.random_stroll ← priority 7
+

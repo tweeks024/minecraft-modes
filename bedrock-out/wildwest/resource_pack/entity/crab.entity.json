@@ -7,26 +7,14 @@
         "default": "entity_alphatest"
       },
       "textures": {
-        "default": "textures/entity/crab"
+        "default": "textures/entity/crab.png"
       },
       "geometry": {
-        "default": "geometry.wildwest.crab"
-      },
-      "animations": {
-        "pinch": "animation.crab.pinch"
-      },
-      "scripts": {
-        "animate": [
-          { "pinch": "query.actor_count > 0" }
-        ]
+        "default": "geometry.humanoid"
       },
       "render_controllers": [
         "controller.render.default"
-      ],
-      "spawn_egg": {
-        "base_color": "#c43c2a",
-        "overlay_color": "#3a1610"
-      }
+      ]
     }
   }
 }

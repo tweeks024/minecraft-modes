@@ -1,0 +1,39 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Wild West (Resource Pack)",
+    "description": "Adds wild-west themed mobs and items. Phase 1 ships a six-shooter pistol and\na bolt-action rifle.",
+    "uuid": "ee5d2675-6a4d-5596-922f-b46e8b12ef9c",
+    "version": [
+      1,
+      0,
+      0
+    ],
+    "min_engine_version": [
+      1,
+      21,
+      80
+    ]
+  },
+  "modules": [
+    {
+      "type": "resources",
+      "uuid": "c996efd4-6bc0-554c-ae26-3f57dd9c9564",
+      "version": [
+        1,
+        0,
+        0
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "e0c662ea-7610-56b0-9b06-4bd448de866c",
+      "version": [
+        1,
+        0,
+        0
+      ]
+    }
+  ]
+}

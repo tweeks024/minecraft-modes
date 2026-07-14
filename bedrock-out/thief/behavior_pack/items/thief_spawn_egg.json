@@ -4,7 +4,7 @@
     "description": {
       "identifier": "thief:thief_spawn_egg",
       "menu_category": {
-        "category": "items"
+        "category": "nature"
       }
     },
     "components": {

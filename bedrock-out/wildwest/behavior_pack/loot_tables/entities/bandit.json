@@ -1,0 +1,83 @@
+{
+  "pools": [
+    {
+      "rolls": 1.0,
+      "entries": [
+        {
+          "type": "item",
+          "name": "wildwest:bandit_knife",
+          "weight": 25
+        },
+        {
+          "type": "empty",
+          "weight": 75
+        }
+      ]
+    },
+    {
+      "rolls": 1.0,
+      "entries": [
+        {
+          "type": "item",
+          "name": "minecraft:gold_ingot",
+          "weight": 30
+        },
+        {
+          "type": "empty",
+          "weight": 70
+        }
+      ]
+    },
+    {
+      "rolls": 1.0,
+      "entries": [
+        {
+          "type": "item",
+          "name": "minecraft:string",
+          "weight": 50,
+          "functions": [
+            {
+              "add": false,
+              "count": {
+                "max": 2.0,
+                "min": 0.0,
+                "type": "uniform"
+              },
+              "function": "set_count"
+            }
+          ]
+        },
+        {
+          "type": "empty",
+          "weight": 50
+        }
+      ]
+    },
+    {
+      "rolls": 1.0,
+      "conditions": [
+        {
+          "chance": 0.5,
+          "condition": "random_chance"
+        }
+      ],
+      "entries": [
+        {
+          "type": "item",
+          "name": "wildwest:pistol",
+          "functions": [
+            {
+              "add": false,
+              "damage": {
+                "max": 0.7,
+                "min": 0.0,
+                "type": "uniform"
+              },
+              "function": "set_damage"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

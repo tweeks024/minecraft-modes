@@ -1,0 +1,18 @@
+{
+  "pools": [
+    {
+      "rolls": 1.0,
+      "conditions": [
+        {
+          "condition": "survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "item",
+          "name": "wildwest:cannon"
+        }
+      ]
+    }
+  ]
+}

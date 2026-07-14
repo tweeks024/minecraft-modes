@@ -1,0 +1,21 @@
+{
+  "resource_pack_name": "craftee",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "craftee:craftee_boots": {
+      "textures": "textures/items/craftee_boots"
+    },
+    "craftee:craftee_chestplate": {
+      "textures": "textures/items/craftee_chestplate"
+    },
+    "craftee:craftee_helmet": {
+      "textures": "textures/items/craftee_helmet"
+    },
+    "craftee:craftee_leggings": {
+      "textures": "textures/items/craftee_leggings"
+    },
+    "craftee:craftee_upgrade_smithing_template": {
+      "textures": "textures/items/craftee_upgrade_smithing_template"
+    }
+  }
+}
