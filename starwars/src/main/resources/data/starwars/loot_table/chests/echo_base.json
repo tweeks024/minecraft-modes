@@ -19,6 +19,13 @@
           "functions": [ { "function": "minecraft:set_count",
                            "count": { "type": "minecraft:uniform", "min": 4, "max": 8 } } ] }
       ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        { "type": "minecraft:item", "name": "starwars:xwing", "weight": 3 },
+        { "type": "minecraft:empty", "weight": 17 }
+      ]
     }
   ]
 }

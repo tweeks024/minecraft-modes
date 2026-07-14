@@ -81,7 +81,7 @@ public class MosEisleyPiece extends ScatteredFeaturePiece {
                 case LANTERN -> Blocks.LANTERN.defaultBlockState();
                 case DOOR_AIR, AIR -> Blocks.AIR.defaultBlockState();
                 case LAMP, VAPORATOR, TABLE, CHEST_CANTINA, CHEST_DOCKING -> null; // handled below
-                case JAWA, STORMTROOPER, ASTROMECH -> Blocks.AIR.defaultBlockState(); // carve air so street life doesn't suffocate on slopes; entity spawn below
+                case JAWA, STORMTROOPER, ASTROMECH, BAND_DROID -> Blocks.AIR.defaultBlockState(); // carve air so street life doesn't suffocate on slopes; entity spawn below
             };
             if (state != null) {
                 this.placeBlock(level, state, p.dx(), p.dy(), p.dz(), box);
@@ -134,6 +134,7 @@ public class MosEisleyPiece extends ScatteredFeaturePiece {
                 case JAWA -> ModEntities.JAWA.get();
                 case STORMTROOPER -> ModEntities.STORMTROOPER.get();
                 case ASTROMECH -> ModEntities.ASTROMECH.get();
+                case BAND_DROID -> ModEntities.BAND_DROID.get();
                 default -> null;
             };
             if (type == null) continue;

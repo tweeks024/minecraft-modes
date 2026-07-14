@@ -35,5 +35,9 @@ public final class NetworkHandlers {
             C2SSelectPlanetPacket.TYPE,
             C2SSelectPlanetPacket.STREAM_CODEC,
             C2SSelectPlanetPacket::handle);
+        reg.playToClient(
+            S2CGalaxyMapPacket.TYPE,
+            S2CGalaxyMapPacket.STREAM_CODEC,
+            (pkt, ctx) -> com.tweeks.starwars.client.GalaxyMapClientHandler.handle(pkt, ctx));
     }
 }

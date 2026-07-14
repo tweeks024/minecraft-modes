@@ -1,0 +1,336 @@
+{
+  "meta": {
+    "format_version": "4.5",
+    "model_format": "modded_entity",
+    "box_uv": true
+  },
+  "name": "speeder_bike",
+  "model_identifier": "",
+  "visible_box": [
+    4,
+    4,
+    0
+  ],
+  "variable_placeholders": "",
+  "variable_placeholder_buttons": [],
+  "unhandled_root_fields": {},
+  "resolution": {
+    "width": 64,
+    "height": 64
+  },
+  "elements": [
+    {
+      "name": "chassis",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -3,
+        6,
+        -9
+      ],
+      "to": [
+        3,
+        10,
+        9
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        6,
+        0
+      ],
+      "uv_offset": [
+        0,
+        0
+      ],
+      "type": "cube",
+      "uuid": "07b73abb-2d14-54f8-ac59-96911437779d"
+    },
+    {
+      "name": "seat",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -2,
+        10,
+        1
+      ],
+      "to": [
+        2,
+        12,
+        7
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        10,
+        4
+      ],
+      "uv_offset": [
+        0,
+        22
+      ],
+      "type": "cube",
+      "uuid": "575a8011-e6f1-5b38-bfb4-a74c66b0fe3c"
+    },
+    {
+      "name": "vane_left",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -4,
+        6,
+        -11
+      ],
+      "to": [
+        -2,
+        8,
+        -5
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        -2,
+        8,
+        -9
+      ],
+      "uv_offset": [
+        20,
+        22
+      ],
+      "type": "cube",
+      "uuid": "cdd727fe-c0e2-59a3-9fd4-ed4176d42a63"
+    },
+    {
+      "name": "vane_right",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        2,
+        6,
+        -11
+      ],
+      "to": [
+        4,
+        8,
+        -5
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        2,
+        8,
+        -9
+      ],
+      "uv_offset": [
+        36,
+        22
+      ],
+      "type": "cube",
+      "uuid": "641d61b9-816b-5d39-9e4f-7924fe296b1f"
+    },
+    {
+      "name": "rail_left",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -4,
+        5,
+        -2
+      ],
+      "to": [
+        -3,
+        6,
+        6
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        -3,
+        6,
+        0
+      ],
+      "uv_offset": [
+        0,
+        30
+      ],
+      "type": "cube",
+      "uuid": "129b97ce-9644-567d-8394-e7d693b20068"
+    },
+    {
+      "name": "rail_right",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        3,
+        5,
+        -2
+      ],
+      "to": [
+        4,
+        6,
+        6
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        3,
+        6,
+        0
+      ],
+      "uv_offset": [
+        18,
+        30
+      ],
+      "type": "cube",
+      "uuid": "b9be74ed-e218-541b-8c29-cdbb66e98c72"
+    }
+  ],
+  "outliner": [
+    {
+      "name": "chassis",
+      "origin": [
+        0,
+        6,
+        0
+      ],
+      "color": 0,
+      "uuid": "efb9ae3e-20b8-5e17-9a92-c868a2b30baa",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "07b73abb-2d14-54f8-ac59-96911437779d"
+      ]
+    },
+    {
+      "name": "seat",
+      "origin": [
+        0,
+        10,
+        4
+      ],
+      "color": 0,
+      "uuid": "58988e52-abfa-56c7-879a-8bcd068d65fe",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "575a8011-e6f1-5b38-bfb4-a74c66b0fe3c"
+      ]
+    },
+    {
+      "name": "vane_left",
+      "origin": [
+        -2,
+        8,
+        -9
+      ],
+      "color": 0,
+      "uuid": "2c69227d-6d09-57f3-bd55-95dc3bdcd92a",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "cdd727fe-c0e2-59a3-9fd4-ed4176d42a63"
+      ]
+    },
+    {
+      "name": "vane_right",
+      "origin": [
+        2,
+        8,
+        -9
+      ],
+      "color": 0,
+      "uuid": "06c1a78a-6d35-56e8-8fc3-18342f4f27f9",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "641d61b9-816b-5d39-9e4f-7924fe296b1f"
+      ]
+    },
+    {
+      "name": "rail_left",
+      "origin": [
+        -3,
+        6,
+        0
+      ],
+      "color": 0,
+      "uuid": "8367045a-54ee-50b8-9fda-642896e3b868",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "129b97ce-9644-567d-8394-e7d693b20068"
+      ]
+    },
+    {
+      "name": "rail_right",
+      "origin": [
+        3,
+        6,
+        0
+      ],
+      "color": 0,
+      "uuid": "334314d8-a3ac-56e9-8347-564ae6596aaf",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "b9be74ed-e218-541b-8c29-cdbb66e98c72"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "path": "/home/tweeks/code/minecraft-modes/starwars/src/main/resources/assets/starwars/textures/entity/speeder_bike.png",
+      "name": "speeder_bike.png",
+      "folder": "entity",
+      "namespace": "starwars",
+      "id": "0",
+      "particle": false,
+      "render_mode": "default",
+      "render_sides": "auto",
+      "frame_time": 1,
+      "frame_order_type": "loop",
+      "frame_order": "",
+      "frame_interpolate": false,
+      "visible": true,
+      "internal": true,
+      "saved": true,
+      "uuid": "432d77c3-ef79-577f-8250-ed03d339124e",
+      "relative_path": "../src/main/resources/assets/starwars/textures/entity/speeder_bike.png",
+      "use_as_default": false,
+      "layers_enabled": false,
+      "sync_to_project": "",
+      "width": 64,
+      "height": 64,
+      "uv_width": 64,
+      "uv_height": 64,
+      "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABC0lEQVR4nO2XPwrCMBhHewART+AgziIODp0cxLEH8AgOTp7AwaGTZ/IIDo7iTSIpRGJpkTZfTdq8Bz9oSpqkLx/9kyRCnLKleuXbT0w7302L6LY51pGaNxgQgAAEICBqAcfNXDWJ7/WKE30FIAABCEBA1AJ4DcZeAQhAQE8F2IvWDye7XZXQ+jgLuB0Wqhw9cdX5EPs4C9inM9XnIKAr0vVK2ZmMR19pOt798VQ658u1yL+vbwwCWgowC/UV7wJ+iRl8BdSBgFAFlG/UNb17BpR31jVmh3xFrDIM+iemTcl3NU5nSBkPZuekiKYC6kAAAhCAgEELkP4Qco1vHwAAAAAAAAAAAAAAAIPlDfdFIzuHYsexAAAAAElFTkSuQmCC"
+    }
+  ]
+}

@@ -1,0 +1,591 @@
+{
+  "meta": {
+    "format_version": "4.5",
+    "model_format": "modded_entity",
+    "box_uv": true
+  },
+  "name": "xwing",
+  "model_identifier": "",
+  "visible_box": [
+    4,
+    4,
+    0
+  ],
+  "variable_placeholders": "",
+  "variable_placeholder_buttons": [],
+  "unhandled_root_fields": {},
+  "resolution": {
+    "width": 128,
+    "height": 128
+  },
+  "elements": [
+    {
+      "name": "fuselage",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -3,
+        8,
+        -13
+      ],
+      "to": [
+        3,
+        14,
+        13
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        8,
+        0
+      ],
+      "uv_offset": [
+        0,
+        0
+      ],
+      "type": "cube",
+      "uuid": "86cdd622-4ff7-5909-b0c3-8234390e015e"
+    },
+    {
+      "name": "nose",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -2,
+        9,
+        -23
+      ],
+      "to": [
+        2,
+        13,
+        -13
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        9,
+        -13
+      ],
+      "uv_offset": [
+        64,
+        0
+      ],
+      "type": "cube",
+      "uuid": "fcedaa8e-05ad-5b14-ac03-a07128d12c31"
+    },
+    {
+      "name": "cockpit",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -2,
+        14,
+        -3
+      ],
+      "to": [
+        2,
+        17,
+        3
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        14,
+        0
+      ],
+      "uv_offset": [
+        64,
+        14
+      ],
+      "type": "cube",
+      "uuid": "bb4791b9-8930-5f6f-985a-8a428a879d93"
+    },
+    {
+      "name": "wing_tl",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -17,
+        13.0,
+        3
+      ],
+      "to": [
+        -3,
+        14.0,
+        13
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        -3,
+        13.5,
+        8
+      ],
+      "uv_offset": [
+        0,
+        32
+      ],
+      "type": "cube",
+      "uuid": "2ab65743-628c-50c1-b7c2-7259fe073e00"
+    },
+    {
+      "name": "wing_tr",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        3,
+        13.0,
+        3
+      ],
+      "to": [
+        17,
+        14.0,
+        13
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        3,
+        13.5,
+        8
+      ],
+      "uv_offset": [
+        0,
+        43
+      ],
+      "type": "cube",
+      "uuid": "a6a3bb08-7f4b-5225-a486-45c68d598903"
+    },
+    {
+      "name": "wing_bl",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -17,
+        8.0,
+        3
+      ],
+      "to": [
+        -3,
+        9.0,
+        13
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        -3,
+        8.5,
+        8
+      ],
+      "uv_offset": [
+        0,
+        54
+      ],
+      "type": "cube",
+      "uuid": "f3c16ef8-2c2c-5a0e-bf9e-a799a8aa0ce6"
+    },
+    {
+      "name": "wing_br",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        3,
+        8.0,
+        3
+      ],
+      "to": [
+        17,
+        9.0,
+        13
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        3,
+        8.5,
+        8
+      ],
+      "uv_offset": [
+        0,
+        65
+      ],
+      "type": "cube",
+      "uuid": "6c71ed89-e513-5f0a-ab96-07d458b6a4d2"
+    },
+    {
+      "name": "engine_tl",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -6,
+        12,
+        3
+      ],
+      "to": [
+        -3,
+        15,
+        11
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        -3,
+        12,
+        3
+      ],
+      "uv_offset": [
+        0,
+        76
+      ],
+      "type": "cube",
+      "uuid": "8d66a866-cf91-5373-abd1-1889e98318ff"
+    },
+    {
+      "name": "engine_tr",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        3,
+        12,
+        3
+      ],
+      "to": [
+        6,
+        15,
+        11
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        3,
+        12,
+        3
+      ],
+      "uv_offset": [
+        22,
+        76
+      ],
+      "type": "cube",
+      "uuid": "c0d0fa86-b1e3-5c9e-af33-f373260cb681"
+    },
+    {
+      "name": "engine_bl",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -6,
+        7,
+        3
+      ],
+      "to": [
+        -3,
+        10,
+        11
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        -3,
+        7,
+        3
+      ],
+      "uv_offset": [
+        44,
+        76
+      ],
+      "type": "cube",
+      "uuid": "c298297e-ce84-5217-8d8d-bcc51266e830"
+    },
+    {
+      "name": "engine_br",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        3,
+        7,
+        3
+      ],
+      "to": [
+        6,
+        10,
+        11
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        3,
+        7,
+        3
+      ],
+      "uv_offset": [
+        66,
+        76
+      ],
+      "type": "cube",
+      "uuid": "3d79053c-3c7e-5932-8730-1725d9127e8a"
+    }
+  ],
+  "outliner": [
+    {
+      "name": "fuselage",
+      "origin": [
+        0,
+        8,
+        0
+      ],
+      "color": 0,
+      "uuid": "81da7d3f-53ef-52ed-8e3b-f96f678bed9a",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "86cdd622-4ff7-5909-b0c3-8234390e015e"
+      ]
+    },
+    {
+      "name": "nose",
+      "origin": [
+        0,
+        9,
+        -13
+      ],
+      "color": 0,
+      "uuid": "6a285b8e-bcab-5ac6-802f-909fde6c9bca",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "fcedaa8e-05ad-5b14-ac03-a07128d12c31"
+      ]
+    },
+    {
+      "name": "cockpit",
+      "origin": [
+        0,
+        14,
+        0
+      ],
+      "color": 0,
+      "uuid": "587fa2d2-5192-51a7-8051-a94e2d236ed5",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "bb4791b9-8930-5f6f-985a-8a428a879d93"
+      ]
+    },
+    {
+      "name": "wing_tl",
+      "origin": [
+        -3,
+        13.5,
+        8
+      ],
+      "rotation": [
+        0,
+        0,
+        12.5
+      ],
+      "color": 0,
+      "uuid": "c50e61cd-ae51-521f-be54-0c1ced4cc4c6",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "2ab65743-628c-50c1-b7c2-7259fe073e00"
+      ]
+    },
+    {
+      "name": "wing_tr",
+      "origin": [
+        3,
+        13.5,
+        8
+      ],
+      "rotation": [
+        0,
+        0,
+        12.5
+      ],
+      "color": 0,
+      "uuid": "f890eb47-5a7f-5d22-abf5-e9b7fdeaee86",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "a6a3bb08-7f4b-5225-a486-45c68d598903"
+      ]
+    },
+    {
+      "name": "wing_bl",
+      "origin": [
+        -3,
+        8.5,
+        8
+      ],
+      "rotation": [
+        0,
+        0,
+        -12.5
+      ],
+      "color": 0,
+      "uuid": "9e91f2e0-e065-5f0e-9de0-fbe26d9af020",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "f3c16ef8-2c2c-5a0e-bf9e-a799a8aa0ce6"
+      ]
+    },
+    {
+      "name": "wing_br",
+      "origin": [
+        3,
+        8.5,
+        8
+      ],
+      "rotation": [
+        0,
+        0,
+        -12.5
+      ],
+      "color": 0,
+      "uuid": "15898f7d-a2df-5ea1-9da8-3e71ee3b0ad2",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "6c71ed89-e513-5f0a-ab96-07d458b6a4d2"
+      ]
+    },
+    {
+      "name": "engine_tl",
+      "origin": [
+        -3,
+        12,
+        3
+      ],
+      "color": 0,
+      "uuid": "b2180a73-577f-5752-959f-3b664cefcd87",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "8d66a866-cf91-5373-abd1-1889e98318ff"
+      ]
+    },
+    {
+      "name": "engine_tr",
+      "origin": [
+        3,
+        12,
+        3
+      ],
+      "color": 0,
+      "uuid": "319bc2a6-7dbf-592d-a345-0febd8eb3ed7",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "c0d0fa86-b1e3-5c9e-af33-f373260cb681"
+      ]
+    },
+    {
+      "name": "engine_bl",
+      "origin": [
+        -3,
+        7,
+        3
+      ],
+      "color": 0,
+      "uuid": "ff2b375d-ce53-5da3-8d85-9a06826ed830",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "c298297e-ce84-5217-8d8d-bcc51266e830"
+      ]
+    },
+    {
+      "name": "engine_br",
+      "origin": [
+        3,
+        7,
+        3
+      ],
+      "color": 0,
+      "uuid": "9f142ec1-5e4f-5a3a-8d8d-f04e442fb347",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "3d79053c-3c7e-5932-8730-1725d9127e8a"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "path": "/home/tweeks/code/minecraft-modes/starwars/src/main/resources/assets/starwars/textures/entity/xwing.png",
+      "name": "xwing.png",
+      "folder": "entity",
+      "namespace": "starwars",
+      "id": "0",
+      "particle": false,
+      "render_mode": "default",
+      "render_sides": "auto",
+      "frame_time": 1,
+      "frame_order_type": "loop",
+      "frame_order": "",
+      "frame_interpolate": false,
+      "visible": true,
+      "internal": true,
+      "saved": true,
+      "uuid": "5096e564-dda9-508f-a663-ac8dbfcf900c",
+      "relative_path": "../src/main/resources/assets/starwars/textures/entity/xwing.png",
+      "use_as_default": false,
+      "layers_enabled": false,
+      "sync_to_project": "",
+      "width": 128,
+      "height": 128,
+      "uv_width": 128,
+      "uv_height": 128,
+      "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAACe0lEQVR4nO3asS5EQRjFcU+hUomIKESlEJWoRClKUXkGEZXHEJUHUIpa7REUChGVSrQjWxBu9u5dydw58835/5JTbYy5M2fv3h0WFjI5v7hMs17//HhP03J/dzs1ueaVy9C81fOTowDmKIA5CmAuagEm8y6ZUtdVXNQCzKvZO0Dpd0BtmXedmi1ALtwBzEUtwMPmRiqZUtdVHAWgACEL0DevsVLquuamfghT5/XlqWjU+z2aqHeAvt8/VkpdV3EUgAKELMDV9U3KmVLzrk7UAvTpbuzi0uqfqOeXjfohTJ2+dbEpQC6t3QEOTs7SrKjnV53WCrC8vpVmRT2/6lAAc1EL0Pc0P1SAZr4FqB/C1Bna6P9GvZ8yUe8A3af77wxtdN/PlZp3daIWAJlQAHMUICj1Q5g66vWXK/338NqiXn859Qaoo15/OfUGqKNef7nS/xBRW9TrL6d+CFNHvf5hTBar+xXueX/vT7qvT36Gd2YjphWg+z/vFKBhFMAcBTBHAcxRAHMUwBwFMEcBzFGARqmPYjnKDYKjYHN8BJijAOYogDkKYI4CmKMA5iiAOQpgjgI0Sn2Uy1FwEBwFm+MjwBwFMEcBzFEAcxTAHAUwRwHMUQBzFKBR6qNcjoKD4CjYHB8B5iiAOQpgjgKYowDmKIA5CmCOApijAI1SH+VyFFy5w6Pj9J238/WfMG6ecasXbUGjjVu97oWnx9NRFtR13OpFW9Bo41Yv2oJGG7d60RY02rjVi/ZQFW3c6kVb0Gjjyv2+MJI/6v0dtL2zm8h4Ue/voOWVtUTGi3p/AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEMQXBI0Bxa2ciY4AAAAASUVORK5CYII="
+    }
+  ]
+}

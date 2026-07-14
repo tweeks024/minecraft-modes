@@ -3,6 +3,8 @@ package com.tweeks.starwars.client;
 import com.tweeks.starwars.ModEntities;
 import com.tweeks.starwars.StarWarsMod;
 import com.tweeks.starwars.client.model.AstromechModel;
+import com.tweeks.starwars.client.model.AtAtModel;
+import com.tweeks.starwars.client.model.BandDroidModel;
 import com.tweeks.starwars.client.model.BanthaModel;
 import com.tweeks.starwars.client.model.BattleDroidModel;
 import com.tweeks.starwars.client.model.BobaFettModel;
@@ -17,8 +19,11 @@ import com.tweeks.starwars.client.model.ObiWanModel;
 import com.tweeks.starwars.client.model.PrincessLeiaModel;
 import com.tweeks.starwars.client.model.ProbeDroidModel;
 import com.tweeks.starwars.client.model.RebelTrooperModel;
+import com.tweeks.starwars.client.model.SpeederBikeModel;
 import com.tweeks.starwars.client.model.StormtrooperModel;
 import com.tweeks.starwars.client.model.TauntaunModel;
+import com.tweeks.starwars.client.model.TieFighterModel;
+import com.tweeks.starwars.client.model.XwingModel;
 import com.tweeks.starwars.client.model.TuskenRaiderModel;
 import com.tweeks.starwars.client.model.VaderModel;
 import com.tweeks.starwars.client.model.WampaModel;
@@ -56,6 +61,12 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.DRAGONSNAKE.get(), DragonsnakeRenderer::new);
         event.registerEntityRenderer(ModEntities.BOGWING.get(), BogwingRenderer::new);
         event.registerEntityRenderer(ModEntities.YODA.get(), YodaRenderer::new);
+        // wave 3
+        event.registerEntityRenderer(ModEntities.SPEEDER_BIKE.get(), SpeederBikeRenderer::new);
+        event.registerEntityRenderer(ModEntities.XWING.get(), XwingRenderer::new);
+        event.registerEntityRenderer(ModEntities.TIE_FIGHTER.get(), TieFighterRenderer::new);
+        event.registerEntityRenderer(ModEntities.AT_AT.get(), AtAtRenderer::new);
+        event.registerEntityRenderer(ModEntities.BAND_DROID.get(), BandDroidRenderer::new);
     }
 
     @SubscribeEvent
@@ -82,5 +93,11 @@ public final class ClientSetup {
         event.registerLayerDefinition(DragonsnakeModel.LAYER_LOCATION, DragonsnakeModel::createBodyLayer);
         event.registerLayerDefinition(BogwingModel.LAYER_LOCATION, BogwingModel::createBodyLayer);
         event.registerLayerDefinition(YodaModel.LAYER_LOCATION, YodaModel::createBodyLayer);
+        // wave 3
+        event.registerLayerDefinition(SpeederBikeModel.LAYER_LOCATION, SpeederBikeModel::createBodyLayer);
+        event.registerLayerDefinition(XwingModel.LAYER_LOCATION, XwingModel::createBodyLayer);
+        event.registerLayerDefinition(TieFighterModel.LAYER_LOCATION, TieFighterModel::createBodyLayer);
+        event.registerLayerDefinition(AtAtModel.LAYER_LOCATION, AtAtModel::createBodyLayer);
+        event.registerLayerDefinition(BandDroidModel.LAYER_LOCATION, BandDroidModel::createBodyLayer);
     }
 }

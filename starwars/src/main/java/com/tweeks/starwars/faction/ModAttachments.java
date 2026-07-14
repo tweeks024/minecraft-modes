@@ -29,6 +29,14 @@ public final class ModAttachments {
                 .serialize(PacifyAttachment.CODEC, attachment -> attachment != null)
                 .build());
 
+    /** Which planets a player has set foot on — drives the galaxy map. */
+    public static final DeferredHolder<AttachmentType<?>, AttachmentType<com.tweeks.starwars.world.planet.VisitedPlanets>> VISITED_PLANETS =
+        ATTACHMENTS.register("visited_planets",
+            () -> AttachmentType.<com.tweeks.starwars.world.planet.VisitedPlanets>builder(() -> null)
+                .serialize(com.tweeks.starwars.world.planet.VisitedPlanets.CODEC, attachment -> attachment != null)
+                .copyOnDeath()
+                .build());
+
     public static void register(IEventBus modEventBus) {
         ATTACHMENTS.register(modEventBus);
     }

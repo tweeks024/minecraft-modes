@@ -1186,6 +1186,239 @@ def paint_yoda(rgba):
         rect(rgba, u0, 20, u0 + 8, 21, YODA_ROBE_SH)
         rect(rgba, u0, 21, u0 + 8, 22, YODA_SKIN)   # bare feet
 
+# -----------------------------------------------------------------------------
+# Wave-3 vehicles/creatures. Box-UV offsets match gen_bbmodels.py's *_CUBES
+# tables exactly. Every region goes through shade_box (base + top highlight +
+# bottom shade = 3 tones) before details, meeting the finished-art bar.
+# -----------------------------------------------------------------------------
+
+# speeder_bike (64x64): burnt-orange + brown swoop-bike chassis (74-Z vibe),
+# silver steering vanes, black saddle, rust weathering.
+# UV: chassis 6x4x18 @(0,0); seat 4x2x6 @(0,22); vane_left/right 2x2x6
+# @(20,22)/(36,22); rail_left/right 1x1x8 @(0,30)/(18,30).
+SB_ORANGE    = (0xC2, 0x6A, 0x2E, 0xFF)   # burnt orange
+SB_ORANGE_HI = (0xE0, 0x8A, 0x44, 0xFF)
+SB_ORANGE_SH = (0x8A, 0x46, 0x1E, 0xFF)
+SB_BROWN     = (0x5A, 0x3A, 0x22, 0xFF)   # brown chassis accents
+SB_BROWN_HI  = (0x74, 0x4E, 0x30, 0xFF)
+SB_SILVER    = (0xB4, 0xB8, 0xC0, 0xFF)   # vanes
+SB_SILVER_HI = (0xD2, 0xD6, 0xDE, 0xFF)
+SB_SILVER_SH = (0x82, 0x86, 0x90, 0xFF)
+SB_SEAT      = (0x1E, 0x1C, 0x1A, 0xFF)   # black saddle
+SB_SEAT_HI   = (0x3A, 0x36, 0x32, 0xFF)
+SB_SEAT_SH   = (0x10, 0x0E, 0x0C, 0xFF)
+SB_RUST      = (0x6E, 0x40, 0x24, 0xFF)   # weathering streaks
+
+def paint_speeder_bike(rgba):
+    fill(rgba, (0, 0, 0, 0))
+    # Chassis 6x4x18 @(0,0): burnt-orange hull, brown belly band, rust flecks,
+    # brown deck panel seams.
+    shade_box(rgba, W, 0, 0, 6, 4, 18, SB_ORANGE, SB_ORANGE_HI, SB_ORANGE_SH)
+    rect(rgba, 0, 20, 48, 22, SB_BROWN)            # brown lower band (strip)
+    for zx in range(18, 30, 4):                    # brown deck panel seams (up face)
+        rect(rgba, zx, 0, zx + 1, 18, SB_BROWN_HI)
+    speckle(rgba, W, 18, 0, 30, 18, SB_RUST, mod=7, salt=41)   # deck rust
+    speckle(rgba, W, 0, 18, 48, 20, SB_RUST, mod=9, salt=42)   # side weathering
+    # Seat 4x2x6 @(0,22): black saddle w/ faint sheen.
+    shade_box(rgba, W, 0, 22, 4, 2, 6, SB_SEAT, SB_SEAT_HI, SB_SEAT_SH)
+    # Vanes 2x2x6 @(20,22)/(36,22): silver steering fins, bright length rim.
+    for u0 in (20, 36):
+        shade_box(rgba, W, u0, 22, 2, 2, 6, SB_SILVER, SB_SILVER_HI, SB_SILVER_SH)
+        rect(rgba, u0, 24, u0 + 16, 25, SB_SILVER_HI)
+    # Rails 1x1x8 @(0,30)/(18,30): dark-brown footrails w/ a silver cap line.
+    for u0 in (0, 18):
+        shade_box(rgba, W, u0, 30, 1, 1, 8, SB_BROWN, SB_BROWN_HI, SB_SEAT_SH)
+        rect(rgba, u0 + 2, 31, u0 + 16, 32, SB_SILVER_SH)
+
+# band_droid (64x64): polished copper/bronze protocol-droid body, dark
+# faceplate w/ two round cyan lens eyes, brass horn instrument.
+# UV: head 6x6x6 @(0,0) + antenna 1x3x1 @(24,0); body 6x8x4 @(0,16);
+# right_arm/left_arm 2x8x2 @(24,16)/(32,16); right_leg/left_leg 2x6x2
+# @(0,32)/(12,32); horn 2x2x5 @(40,0).
+BD_COPPER    = (0xB0, 0x6A, 0x38, 0xFF)   # polished copper/bronze
+BD_COPPER_HI = (0xD8, 0x92, 0x54, 0xFF)
+BD_COPPER_SH = (0x82, 0x48, 0x24, 0xFF)
+BD_BRONZE    = (0x6E, 0x40, 0x22, 0xFF)   # dark bronze seams
+BD_FACE      = (0x1E, 0x18, 0x14, 0xFF)   # dark faceplate
+BD_FACE_HI   = (0x34, 0x2C, 0x24, 0xFF)
+BD_LENS      = (0x4A, 0xC8, 0xD8, 0xFF)   # round lens eyes
+BD_LENS_HOT  = (0xCE, 0xF4, 0xF8, 0xFF)
+BD_BRASS     = (0xC8, 0xA0, 0x40, 0xFF)   # brass horn
+BD_BRASS_HI  = (0xE6, 0xC4, 0x66, 0xFF)
+BD_BRASS_SH  = (0x8E, 0x6E, 0x28, 0xFF)
+
+def paint_band_droid(rgba):
+    fill(rgba, (0, 0, 0, 0))
+    # Head 6x6x6 @(0,0): copper dome; dark faceplate + two cyan lens eyes on
+    # the front face (strip cols 6..12, rows 6..12).
+    shade_box(rgba, W, 0, 0, 6, 6, 6, BD_COPPER, BD_COPPER_HI, BD_COPPER_SH)
+    rect(rgba, 6, 8, 12, 12, BD_FACE)              # dark faceplate
+    rect(rgba, 6, 8, 12, 9, BD_FACE_HI)            # brow highlight
+    rect(rgba, 7, 9, 8, 11, BD_LENS)               # left lens
+    rect(rgba, 10, 9, 11, 11, BD_LENS)             # right lens
+    rect(rgba, 7, 9, 8, 10, BD_LENS_HOT)           # lens glints
+    rect(rgba, 10, 9, 11, 10, BD_LENS_HOT)
+    # Antenna 1x3x1 @(24,0): brass stub.
+    shade_box(rgba, W, 24, 0, 1, 3, 1, BD_BRASS, BD_BRASS_HI, BD_BRASS_SH)
+    # Body 6x8x4 @(0,16): copper torso w/ bronze chest panel + vent seams.
+    shade_box(rgba, W, 0, 16, 6, 8, 4, BD_COPPER, BD_COPPER_HI, BD_COPPER_SH)
+    rect(rgba, 4, 22, 16, 24, BD_BRONZE)           # chest panel (front strip)
+    rect(rgba, 4, 25, 16, 26, BD_BRONZE)           # vent seam
+    rect(rgba, 4, 27, 16, 28, BD_BRONZE)           # vent seam
+    # Arms 2x8x2 @(24,16)/(32,16): copper w/ bronze shoulder + brass wrist ring.
+    for u0 in (24, 32):
+        shade_box(rgba, W, u0, 16, 2, 8, 2, BD_COPPER, BD_COPPER_HI, BD_COPPER_SH)
+        rect(rgba, u0, 18, u0 + 8, 19, BD_BRONZE)
+        rect(rgba, u0, 23, u0 + 8, 24, BD_BRASS)
+    # Legs 2x6x2 @(0,32)/(12,32): copper w/ dark foot rows.
+    for u0 in (0, 12):
+        shade_box(rgba, W, u0, 32, 2, 6, 2, BD_COPPER, BD_COPPER_HI, BD_COPPER_SH)
+        rect(rgba, u0, 38, u0 + 8, 40, BD_BRONZE)
+    # Horn 2x2x5 @(40,0): brass instrument w/ a length highlight + bell shade.
+    shade_box(rgba, W, 40, 0, 2, 2, 5, BD_BRASS, BD_BRASS_HI, BD_BRASS_SH)
+    rect(rgba, 40, 2, 54, 3, BD_BRASS_HI)
+    rect(rgba, 52, 2, 54, 4, BD_BRASS_SH)
+
+# xwing (128x128): off-white hull w/ RED squadron stripes on the wings + nose,
+# gray panel lines, dark canopy glass, orange engine glow at the rears.
+# UV: fuselage 6x6x26 @(0,0); nose 4x4x10 @(64,0); cockpit 4x3x6 @(64,14);
+# wing_tl/tr/bl/br 14x1x10 @(0,32)/(0,43)/(0,54)/(0,65); engine_tl/tr/bl/br
+# 3x3x8 @(0,76)/(22,76)/(44,76)/(66,76).
+XW_WHITE     = (0xE6, 0xE4, 0xDC, 0xFF)   # off-white hull
+XW_WHITE_HI  = (0xF6, 0xF4, 0xEE, 0xFF)
+XW_WHITE_SH  = (0xB8, 0xB6, 0xAE, 0xFF)
+XW_GRAY      = (0x7A, 0x7C, 0x82, 0xFF)   # panel lines
+XW_RED       = (0xC2, 0x30, 0x2E, 0xFF)   # squadron stripes
+XW_RED_HI    = (0xE0, 0x4A, 0x44, 0xFF)
+XW_GLASS     = (0x22, 0x2A, 0x36, 0xFF)   # dark canopy
+XW_GLASS_HI  = (0x4C, 0x60, 0x78, 0xFF)
+XW_GLASS_DK  = (0x16, 0x1C, 0x26, 0xFF)
+XW_FRAME     = (0x9A, 0x9C, 0xA2, 0xFF)   # canopy frame
+XW_ENGINE    = (0x3A, 0x3C, 0x42, 0xFF)   # engine housing
+XW_ENGINE_HI = (0x54, 0x56, 0x5E, 0xFF)
+XW_ENGINE_SH = (0x22, 0x24, 0x28, 0xFF)
+XW_GLOW      = (0xE8, 0x7A, 0x2A, 0xFF)   # engine glow orange
+XW_GLOW_HOT  = (0xFF, 0xCC, 0x66, 0xFF)
+
+def paint_xwing(rgba):
+    bw = 128
+    fill_buf(rgba, (0, 0, 0, 0))
+    # Fuselage 6x6x26 @(0,0): off-white hull w/ gray panel seams + greebles.
+    shade_box(rgba, bw, 0, 0, 6, 6, 26, XW_WHITE, XW_WHITE_HI, XW_WHITE_SH)
+    for zx in range(6, 32, 5):
+        rectb(rgba, bw, 0, zx, 64, zx + 1, XW_GRAY)
+    speckle(rgba, bw, 12, 0, 24, 26, XW_GRAY, mod=13, salt=43)
+    # Nose 4x4x10 @(64,0): white w/ a red squadron stripe + gray panel line.
+    shade_box(rgba, bw, 64, 0, 4, 4, 10, XW_WHITE, XW_WHITE_HI, XW_WHITE_SH)
+    rectb(rgba, bw, 64, 8, 92, 10, XW_RED)
+    rectb(rgba, bw, 64, 4, 92, 5, XW_GRAY)
+    # Cockpit 4x3x6 @(64,14): dark canopy glass, light frame, reflection.
+    shade_box(rgba, bw, 64, 14, 4, 3, 6, XW_GLASS, XW_FRAME, XW_GLASS_DK)
+    rectb(rgba, bw, 70, 17, 78, 23, XW_GLASS)      # glass front face
+    rectb(rgba, bw, 70, 17, 78, 18, XW_GLASS_HI)   # canopy reflection
+    rectb(rgba, bw, 64, 14, 84, 15, XW_FRAME)      # frame top edge
+    # Wings 14x1x10: white w/ a bold red stripe down the up face + gray panel
+    # lines and a gray trailing edge on the strip.
+    for v0 in (32, 43, 54, 65):
+        shade_box(rgba, bw, 0, v0, 14, 1, 10, XW_WHITE, XW_WHITE_HI, XW_WHITE_SH)
+        rectb(rgba, bw, 15, v0, 19, v0 + 10, XW_RED)       # red squadron stripe
+        rectb(rgba, bw, 15, v0, 19, v0 + 1, XW_RED_HI)
+        rectb(rgba, bw, 10, v0, 11, v0 + 10, XW_GRAY)      # inboard panel line
+        rectb(rgba, bw, 23, v0, 24, v0 + 10, XW_GRAY)      # outboard panel line
+        rectb(rgba, bw, 0, v0 + 10, 48, v0 + 11, XW_GRAY)  # trailing edge (strip)
+    # Engines 3x3x8: dark housings w/ an orange glow on the rear (down) face.
+    for u0 in (0, 22, 44, 66):
+        shade_box(rgba, bw, u0, 76, 3, 3, 8, XW_ENGINE, XW_ENGINE_HI, XW_ENGINE_SH)
+        rectb(rgba, bw, u0 + 11, 76, u0 + 14, 84, XW_GLOW)
+        rectb(rgba, bw, u0 + 12, 78, u0 + 13, 82, XW_GLOW_HOT)
+
+# tie_fighter (128x64): gunmetal-gray cockpit ball + pylons, BLACK solar
+# panels w/ a dark-gray hex/rib lattice, red-tinted viewport.
+# UV: ball 8x8x8 @(0,0); window 4x4x1 @(32,0); pylon_left/right 4x2x2
+# @(32,5)/(44,5); panel_left/right 1x16x14 @(0,16)/(30,16).
+TF_METAL      = (0x60, 0x64, 0x6C, 0xFF)  # gunmetal
+TF_METAL_HI   = (0x82, 0x86, 0x90, 0xFF)
+TF_METAL_SH   = (0x44, 0x47, 0x4E, 0xFF)
+TF_PANEL      = (0x14, 0x15, 0x18, 0xFF)  # black solar panels
+TF_PANEL_HI   = (0x2E, 0x30, 0x36, 0xFF)  # dark-gray ribs
+TF_PANEL_EDGE = (0x0A, 0x0A, 0x0C, 0xFF)  # panel frame
+TF_WINDOW     = (0x9A, 0x28, 0x22, 0xFF)  # red-tinted viewport
+TF_WINDOW_HI  = (0xC6, 0x44, 0x3A, 0xFF)
+TF_WINDOW_DK  = (0x5E, 0x18, 0x14, 0xFF)
+
+def paint_tie_fighter(rgba):
+    bw = 128
+    fill_buf(rgba, (0, 0, 0, 0))
+    # Ball 8x8x8 @(0,0): gunmetal cockpit; front face (cols 8..16, rows 8..16)
+    # holds a dark window recess ring around the red viewport.
+    shade_box(rgba, bw, 0, 0, 8, 8, 8, TF_METAL, TF_METAL_HI, TF_METAL_SH)
+    rectb(rgba, bw, 9, 9, 15, 15, TF_PANEL)        # recess ring
+    rectb(rgba, bw, 10, 10, 14, 14, TF_WINDOW)     # red viewport
+    rectb(rgba, bw, 10, 10, 14, 11, TF_WINDOW_HI)  # top reflection
+    rectb(rgba, bw, 11, 11, 13, 13, TF_WINDOW_DK)  # pupil recess
+    # Window cube 4x4x1 @(32,0): standalone red viewport plate.
+    shade_box(rgba, bw, 32, 0, 4, 4, 1, TF_WINDOW, TF_WINDOW_HI, TF_WINDOW_DK)
+    rectb(rgba, bw, 33, 1, 41, 4, TF_WINDOW)
+    # Pylons 4x2x2 @(32,5)/(44,5): short gunmetal struts.
+    for u0 in (32, 44):
+        shade_box(rgba, bw, u0, 5, 4, 2, 2, TF_METAL, TF_METAL_HI, TF_METAL_SH)
+    # Panels 1x16x14 @(0,16)/(30,16): black solar wings w/ a dark-gray rib
+    # lattice (vertical ribs + horizontal cross-bars) on the big strip faces.
+    for u0 in (0, 30):
+        shade_box(rgba, bw, u0, 16, 1, 16, 14, TF_PANEL, TF_PANEL_HI, TF_PANEL_EDGE)
+        for rx in range(u0 + 2, u0 + 30, 4):
+            rectb(rgba, bw, rx, 30, rx + 1, 46, TF_PANEL_HI)   # vertical ribs
+        for ry in range(32, 46, 4):
+            rectb(rgba, bw, u0, ry, u0 + 30, ry + 1, TF_PANEL_HI)  # cross-bars
+        rectb(rgba, bw, u0, 30, u0 + 30, 31, TF_PANEL_EDGE)   # top frame
+        rectb(rgba, bw, u0, 45, u0 + 30, 46, TF_PANEL_EDGE)   # bottom frame
+
+# at_at (256x128, true scale): matte imperial-gray armor plating (3 grays,
+# panel seams), darker joints/underbelly, black cockpit slit on the head,
+# subtle rust streaks on the legs. All four legs share one UV block; likewise
+# the four feet.
+# UV: body 36x28x64 @(0,0); neck 8x6x20 @(64,92); head 14x10x18 @(0,92);
+# legs 8x88x8 @(200,0) [shared]; feet 12x6x12 @(120,92) [shared].
+AT_GRAY      = (0x8E, 0x92, 0x98, 0xFF)   # matte imperial gray (mid)
+AT_GRAY_HI   = (0xAC, 0xB0, 0xB6, 0xFF)
+AT_GRAY_SH   = (0x66, 0x6A, 0x70, 0xFF)
+AT_JOINT     = (0x3E, 0x41, 0x47, 0xFF)   # dark joints / underbelly
+AT_WINDOW    = (0x0C, 0x0C, 0x10, 0xFF)   # black cockpit slit
+AT_WINDOW_HI = (0x30, 0x40, 0x52, 0xFF)
+AT_RUST      = (0x7A, 0x56, 0x38, 0xFF)   # subtle rust streaks
+
+def paint_at_at(rgba):
+    bw = 256
+    fill_buf(rgba, (0, 0, 0, 0))
+    # Body 36x28x64 @(0,0): matte gray plating, panel seams on the strip, a
+    # darkened underbelly on the down face, faint plating grain.
+    shade_box(rgba, bw, 0, 0, 36, 28, 64, AT_GRAY, AT_GRAY_HI, AT_GRAY_SH)
+    for sx in range(0, 200, 16):
+        rectb(rgba, bw, sx, 64, sx + 1, 92, AT_GRAY_SH)      # vertical panel seams
+    for sy in range(70, 92, 8):
+        rectb(rgba, bw, 0, sy, 200, sy + 1, AT_GRAY_SH)      # horizontal seams
+    rectb(rgba, bw, 100, 0, 136, 64, AT_JOINT)               # underbelly (down face)
+    speckle(rgba, bw, 0, 64, 200, 92, AT_GRAY_HI, mod=17, salt=51)
+    # Neck 8x6x20 @(64,92): gray w/ ribbed joint bands on the strip.
+    shade_box(rgba, bw, 64, 92, 8, 6, 20, AT_GRAY, AT_GRAY_HI, AT_GRAY_SH)
+    for rx in range(64, 120, 4):
+        rectb(rgba, bw, rx, 112, rx + 1, 118, AT_JOINT)
+    # Head 14x10x18 @(0,92): gray w/ a black cockpit window slit on the front
+    # face (strip cols 18..32, rows 110..120) + a chin gun housing.
+    shade_box(rgba, bw, 0, 92, 14, 10, 18, AT_GRAY, AT_GRAY_HI, AT_GRAY_SH)
+    rectb(rgba, bw, 18, 113, 32, 116, AT_WINDOW)
+    rectb(rgba, bw, 18, 113, 32, 114, AT_WINDOW_HI)
+    rectb(rgba, bw, 20, 116, 30, 118, AT_JOINT)
+    # Legs 8x88x8 @(200,0) [shared by all four]: gray armor, knee + ankle
+    # joint bands, subtle rust streaks down the shins.
+    shade_box(rgba, bw, 200, 0, 8, 88, 8, AT_GRAY, AT_GRAY_HI, AT_GRAY_SH)
+    rectb(rgba, bw, 200, 40, 232, 44, AT_JOINT)              # knee joint band
+    rectb(rgba, bw, 200, 84, 232, 88, AT_JOINT)              # ankle joint band
+    speckle(rgba, bw, 200, 48, 232, 84, AT_RUST, mod=11, salt=52)
+    # Feet 12x6x12 @(120,92) [shared by all four]: dark gray pads + sole shade.
+    shade_box(rgba, bw, 120, 92, 12, 6, 12, AT_GRAY_SH, AT_GRAY, AT_JOINT)
+    rectb(rgba, bw, 120, 104, 168, 110, AT_JOINT)
+
 MOBS = {
     'stormtrooper': paint_stormtrooper,
     'battle_droid': paint_battle_droid,
@@ -1206,6 +1439,9 @@ MOBS = {
     'probe_droid': paint_probe_droid,
     'dragonsnake': paint_dragonsnake,
     'yoda': paint_yoda,
+    # Wave-3: speeder_bike + band_droid use the default 64x64 canvas.
+    'speeder_bike': paint_speeder_bike,
+    'band_droid': paint_band_droid,
 }
 
 # Mobs whose skins are NOT on the default 64x64 canvas: name -> (w, h, fn).
@@ -1213,6 +1449,10 @@ SIZED_MOBS = {
     'bantha': (128, 64, paint_bantha),
     'wampa': (128, 64, paint_wampa),
     'bogwing': (32, 32, paint_bogwing),
+    # Wave-3 vehicles.
+    'xwing': (128, 128, paint_xwing),
+    'tie_fighter': (128, 64, paint_tie_fighter),
+    'at_at': (256, 128, paint_at_at),
 }
 
 # Worn-armor equipment layers: standard 64x32 vanilla armor-sheet UV layout

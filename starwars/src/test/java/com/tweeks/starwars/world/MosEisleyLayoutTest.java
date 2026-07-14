@@ -30,6 +30,25 @@ class MosEisleyLayoutTest {
             .filter(p -> p.kind() == MosEisleyLayout.Kind.STORMTROOPER).count());
         assertEquals(1, placements.stream()
             .filter(p -> p.kind() == MosEisleyLayout.Kind.ASTROMECH).count());
+        assertEquals(3, placements.stream()
+            .filter(p -> p.kind() == MosEisleyLayout.Kind.BAND_DROID).count());
+    }
+
+    @Test
+    void bandDroidsStandOnTheCantinaStageBesideTheJukebox() {
+        var placements = MosEisleyLayout.placements();
+        var jukebox = placements.stream()
+            .filter(p -> p.kind() == MosEisleyLayout.Kind.JUKEBOX).findFirst().orElseThrow();
+        var band = placements.stream()
+            .filter(p -> p.kind() == MosEisleyLayout.Kind.BAND_DROID).toList();
+        assertEquals(3, band.size());
+        for (var d : band) {
+            // Same floor level as the jukebox, and within the jukebox's
+            // 8-block band-detection range (they play to it).
+            assertEquals(jukebox.dy(), d.dy(), d.toString());
+            int manhattan = Math.abs(jukebox.dx() - d.dx()) + Math.abs(jukebox.dz() - d.dz());
+            assertTrue(manhattan <= 8, "band droid out of jukebox range: " + d);
+        }
     }
 
     @Test

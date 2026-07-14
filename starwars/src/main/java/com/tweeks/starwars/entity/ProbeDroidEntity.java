@@ -1,18 +1,27 @@
 package com.tweeks.starwars.entity;
 
+import com.tweeks.starwars.ModEntities;
+import com.tweeks.starwars.entity.ai.ProbeAlarm;
 import com.tweeks.starwars.entity.ai.ProbeBlasterGoal;
 import com.tweeks.starwars.entity.ai.ProbeHoverGoal;
 import com.tweeks.starwars.entity.ai.SwTargetGoal;
 import com.tweeks.starwars.faction.SwFaction;
+import com.tweeks.starwars.world.planet.Planet;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.FlyingMoveControl;
@@ -58,6 +67,11 @@ public class ProbeDroidEntity extends SwMob implements Enemy {
     public static final double HOVER_SCAN_DEPTH = 12.0;
     /** GLOWING duration when the alarm trips. */
     public static final int ALARM_GLOW_TICKS = 100;
+    /** Troopers dropped when the alarm escalation fires. */
+    public static final int GARRISON_SIZE = 3;
+
+    /** Alarm-escalation timer (pure state machine; unit-tested). */
+    private final ProbeAlarm alarm = new ProbeAlarm();
 
     public ProbeDroidEntity(EntityType<? extends ProbeDroidEntity> type, Level level) {
         super(type, level);
@@ -124,6 +138,55 @@ public class ProbeDroidEntity extends SwMob implements Enemy {
         if (newPlayerTarget && !this.level().isClientSide()) {
             this.playSound(SoundEvents.NOTE_BLOCK_BIT.value(), 1.0F, 1.8F);
             this.addEffect(new MobEffectInstance(MobEffects.GLOWING, ALARM_GLOW_TICKS, 0));
+        }
+    }
+
+    /**
+     * Alarm escalation: the initial beep/glow (in {@link #setTarget}) is only
+     * the warning. If the probe keeps a live player target for the full
+     * {@link ProbeAlarm#ARM_TICKS} window it summons a trooper garrison, then
+     * locks out for {@link ProbeAlarm#COOLDOWN_TICKS} before it can call
+     * again.
+     */
+    @Override
+    protected void customServerAiStep(ServerLevel level) {
+        super.customServerAiStep(level);
+        boolean hasLivePlayer = this.getTarget() instanceof Player p && p.isAlive();
+        if (this.alarm.tick(hasLivePlayer) == ProbeAlarm.Result.SUMMON) {
+            this.summonGarrison(level);
+        }
+    }
+
+    /**
+     * Drop {@link #GARRISON_SIZE} troopers in a ring (radius 3-5) around the
+     * probe — {@code SnowtrooperEntity} on Hoth, {@code StormtrooperEntity}
+     * elsewhere — each arriving with a smoke poof and a teleport crack, and
+     * finalized + persistent like a structure garrison.
+     */
+    private void summonGarrison(ServerLevel level) {
+        boolean hoth = level.dimension().equals(Planet.HOTH.levelKey());
+        EntityType<? extends Mob> type = hoth
+            ? ModEntities.SNOWTROOPER.get() : ModEntities.STORMTROOPER.get();
+        for (int i = 0; i < GARRISON_SIZE; i++) {
+            double angle = (Math.PI * 2.0 / GARRISON_SIZE) * i + this.random.nextDouble() * 0.6;
+            double radius = 3.0 + this.random.nextDouble() * 2.0;   // ring r = 3..5
+            double x = this.getX() + Math.cos(angle) * radius;
+            double z = this.getZ() + Math.sin(angle) * radius;
+            int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                (int) Math.floor(x), (int) Math.floor(z));
+
+            Mob trooper = type.create(level, EntitySpawnReason.MOB_SUMMONED);
+            if (trooper == null) continue;
+            trooper.setPersistenceRequired();
+            trooper.snapTo(x, y, z, this.random.nextFloat() * 360.0F, 0.0F);
+            trooper.finalizeSpawn(level, level.getCurrentDifficultyAt(trooper.blockPosition()),
+                EntitySpawnReason.MOB_SUMMONED, null);
+            level.addFreshEntityWithPassengers(trooper);
+
+            level.sendParticles(ParticleTypes.CAMPFIRE_COSY_SMOKE,
+                x, y + 0.5, z, 12, 0.3, 0.4, 0.3, 0.02);
+            level.playSound(null, x, y, z, SoundEvents.ENDERMAN_TELEPORT,
+                SoundSource.HOSTILE, 1.0F, 1.0F);
         }
     }
 

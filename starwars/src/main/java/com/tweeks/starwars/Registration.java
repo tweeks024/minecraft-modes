@@ -44,6 +44,9 @@ public final class Registration {
               .rarity(net.minecraft.world.item.Rarity.RARE)
               .jukeboxPlayable(com.tweeks.starwars.item.ModJukeboxSongs.CANTINA_BAND));
 
+    public static final DeferredItem<com.tweeks.starwars.item.GalaxyMapItem> GALAXY_MAP =
+        ITEMS.registerItem("galaxy_map", com.tweeks.starwars.item.GalaxyMapItem::new, p -> p);
+
     public static final DeferredItem<com.tweeks.starwars.item.BlasterPistolItem> BLASTER_PISTOL =
         ITEMS.registerItem("blaster_pistol", com.tweeks.starwars.item.BlasterPistolItem::new, p -> p);
 
@@ -119,6 +122,12 @@ public final class Registration {
     public static final DeferredItem<SpawnEggItem> YODA_SPAWN_EGG = ITEMS.registerItem(
         "yoda_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.YODA.get()));
 
+    public static final DeferredItem<SpawnEggItem> AT_AT_SPAWN_EGG = ITEMS.registerItem(
+        "at_at_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.AT_AT.get()));
+
+    public static final DeferredItem<SpawnEggItem> BAND_DROID_SPAWN_EGG = ITEMS.registerItem(
+        "band_droid_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.BAND_DROID.get()));
+
     public static final DeferredItem<Item> STORMTROOPER_HELMET = ITEMS.registerItem("stormtrooper_helmet",
         Item::new,
         p -> p.humanoidArmor(com.tweeks.starwars.item.StormtrooperArmorMaterials.STORMTROOPER,
@@ -145,6 +154,18 @@ public final class Registration {
 
     public static final DeferredItem<com.tweeks.starwars.item.LandspeederItem> LANDSPEEDER =
         ITEMS.registerItem("landspeeder", com.tweeks.starwars.item.LandspeederItem::new, p -> p);
+
+    public static final DeferredItem<com.tweeks.starwars.item.VehicleDeployItem> SPEEDER_BIKE =
+        ITEMS.registerItem("speeder_bike",
+            p -> new com.tweeks.starwars.item.VehicleDeployItem(p, ModEntities.SPEEDER_BIKE), p -> p);
+
+    public static final DeferredItem<com.tweeks.starwars.item.VehicleDeployItem> XWING =
+        ITEMS.registerItem("xwing",
+            p -> new com.tweeks.starwars.item.VehicleDeployItem(p, ModEntities.XWING), p -> p);
+
+    public static final DeferredItem<com.tweeks.starwars.item.VehicleDeployItem> TIE_FIGHTER =
+        ITEMS.registerItem("tie_fighter",
+            p -> new com.tweeks.starwars.item.VehicleDeployItem(p, ModEntities.TIE_FIGHTER), p -> p);
 
     public static final DeferredItem<Item> HAN_SOLO_HELMET = ITEMS.registerItem("han_solo_helmet",
         Item::new,
@@ -207,6 +228,10 @@ public final class Registration {
                     output.accept(HAN_SOLO_BOOTS.get());
                     output.accept(STAR_COMPASS.get());
                     output.accept(CANTINA_RECORD.get());
+                    output.accept(GALAXY_MAP.get());
+                    output.accept(SPEEDER_BIKE.get());
+                    output.accept(XWING.get());
+                    output.accept(TIE_FIGHTER.get());
                     output.accept(JAWA_SPAWN_EGG.get());
                     output.accept(TUSKEN_RAIDER_SPAWN_EGG.get());
                     output.accept(BANTHA_SPAWN_EGG.get());
@@ -218,6 +243,8 @@ public final class Registration {
                     output.accept(DRAGONSNAKE_SPAWN_EGG.get());
                     output.accept(BOGWING_SPAWN_EGG.get());
                     output.accept(YODA_SPAWN_EGG.get());
+                    output.accept(AT_AT_SPAWN_EGG.get());
+                    output.accept(BAND_DROID_SPAWN_EGG.get());
                     // Later tasks append their items here.
                 })
                 .build());

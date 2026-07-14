@@ -94,6 +94,12 @@
         "maxCount": 1,
         "minCount": 1,
         "weight": 4
+      },
+      {
+        "type": "starwars:at_at",
+        "maxCount": 1,
+        "minCount": 1,
+        "weight": 1
       }
     ],
     "underground_water_creature": [],

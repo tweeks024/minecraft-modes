@@ -66,6 +66,16 @@ public class ModRecipeProvider extends RecipeProvider {
             .unlockedBy("has_compass", this.has(Items.COMPASS))
             .save(this.output);
 
+        // Galaxy Map: a chart of paper around an amethyst focusing crystal.
+        ShapedRecipeBuilder.shaped(itemLookup, RecipeCategory.TOOLS, Registration.GALAXY_MAP.get())
+            .pattern("PPP")
+            .pattern("PAP")
+            .pattern("PPP")
+            .define('P', Items.PAPER)
+            .define('A', Items.AMETHYST_SHARD)
+            .unlockedBy("has_amethyst", this.has(Items.AMETHYST_SHARD))
+            .save(this.output);
+
         // Blasters: iron ingots + redstone + iron nuggets (astromech "parts").
         ShapedRecipeBuilder.shaped(itemLookup, RecipeCategory.COMBAT, Registration.BLASTER_PISTOL.get())
             .pattern("II")
@@ -92,6 +102,36 @@ public class ModRecipeProvider extends RecipeProvider {
             .define('I', Items.IRON_INGOT)
             .define('R', Items.REDSTONE_BLOCK)
             .unlockedBy("has_iron", this.has(Items.IRON_INGOT))
+            .save(this.output);
+
+        // Speeder bike: lean single-rail frame — half the landspeeder's iron.
+        ShapedRecipeBuilder.shaped(itemLookup, RecipeCategory.TRANSPORTATION, Registration.SPEEDER_BIKE.get())
+            .pattern(" I ")
+            .pattern("IRI")
+            .define('I', Items.IRON_INGOT)
+            .define('R', Items.REDSTONE_BLOCK)
+            .unlockedBy("has_iron", this.has(Items.IRON_INGOT))
+            .save(this.output);
+
+        // X-wing: iron airframe, S-foil wings, redstone drive.
+        ShapedRecipeBuilder.shaped(itemLookup, RecipeCategory.TRANSPORTATION, Registration.XWING.get())
+            .pattern("I I")
+            .pattern("IRI")
+            .pattern("I I")
+            .define('I', Items.IRON_BLOCK)
+            .define('R', Items.REDSTONE_BLOCK)
+            .unlockedBy("has_iron_block", this.has(Items.IRON_BLOCK))
+            .save(this.output);
+
+        // TIE fighter: twin ion panels around a cockpit ball.
+        ShapedRecipeBuilder.shaped(itemLookup, RecipeCategory.TRANSPORTATION, Registration.TIE_FIGHTER.get())
+            .pattern("BIB")
+            .pattern("BRB")
+            .pattern("BIB")
+            .define('B', Items.IRON_BLOCK)
+            .define('I', Items.IRON_INGOT)
+            .define('R', Items.REDSTONE_BLOCK)
+            .unlockedBy("has_iron_block", this.has(Items.IRON_BLOCK))
             .save(this.output);
 
         // Han Solo armor: leather body + one netherite ingot per piece —

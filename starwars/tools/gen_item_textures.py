@@ -540,6 +540,43 @@ def gen_cantina_record(out_path):
 
     write_png(out_path, rgba)
 
+
+def gen_galaxy_map(out_path):
+    """16x16 galaxy-map icon: a dark holo-tablet with a gold frame, a spray
+    of star pixels, an orbit arc, and one amber 'you are here' planet dot."""
+    rgba = bytearray(W * H * 4)
+
+    frame    = (0xC8, 0x9A, 0x46, 0xFF)   # gold frame
+    frame_sh = (0x8E, 0x66, 0x2C, 0xFF)
+    slate    = (0x10, 0x16, 0x2A, 0xFF)   # deep space screen
+    slate_hi = (0x1A, 0x22, 0x40, 0xFF)
+    star     = (0xE8, 0xEE, 0xFF, 0xFF)
+    star_dim = (0x8C, 0x9A, 0xC0, 0xFF)
+    orbit    = (0x3C, 0x50, 0x84, 0xFF)
+    here     = (0xE8, 0xA3, 0x3D, 0xFF)   # amber planet marker
+
+    # Gold frame with shaded bottom/right, screen inset.
+    rect(rgba, 1, 1, 15, 15, frame)
+    rect(rgba, 13, 2, 15, 15, frame_sh)
+    rect(rgba, 2, 13, 15, 15, frame_sh)
+    rect(rgba, 3, 3, 13, 13, slate)
+    rect(rgba, 3, 3, 13, 6, slate_hi)
+
+    # Orbit arc sweeping the screen.
+    for x, y in ((4, 10), (5, 9), (6, 8), (7, 8), (8, 7), (9, 7), (10, 6), (11, 5)):
+        rect(rgba, x, y, x + 1, y + 1, orbit)
+
+    # Stars, mixed brightness.
+    for x, y, c in ((5, 4, star), (10, 4, star_dim), (12, 8, star),
+                    (4, 6, star_dim), (8, 11, star), (11, 11, star_dim)):
+        rect(rgba, x, y, x + 1, y + 1, c)
+
+    # 'You are here' planet dot with a tiny shadow.
+    rect(rgba, 6, 6, 8, 8, here)
+    rect(rgba, 7, 7, 8, 8, (0xB8, 0x7A, 0x24, 0xFF))
+
+    write_png(out_path, rgba)
+
 if __name__ == '__main__':
     out_dir = sys.argv[1] if len(sys.argv) > 1 else '.'
     # blaster_pistol.png / blaster_rifle.png are no longer generated here —
@@ -555,4 +592,5 @@ if __name__ == '__main__':
     gen_landspeeder(os.path.join(out_dir, 'landspeeder.png'))
     gen_star_compass(os.path.join(out_dir, 'star_compass.png'))
     gen_cantina_record(os.path.join(out_dir, 'cantina_record.png'))
+    gen_galaxy_map(os.path.join(out_dir, 'galaxy_map.png'))
     print('OK')

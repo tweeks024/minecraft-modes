@@ -127,6 +127,66 @@ UV_REGIONS_HOLOCRON = {
     'core': (0, 0, 15, 15),
 }
 
+# ─── Task-19 vehicle item models (voxel mini-silhouettes) ────────────────
+# Each vehicle held as an item gets a compact 3D voxel model — mirroring the
+# landspeeder's item file set (items/<id>.json + models/item/<id>.json +
+# textures/item/<id>.png) but as a recognizable 3D silhouette rather than a
+# flat sprite. Same self-contained model pattern as the weapons above (own
+# texture_size + full display block). Cube coords are model-pixel space, y up.
+VEHICLE_TEXTURE_SIZE = 16
+
+# speeder_bike: long orange chassis, forward nose, rear black saddle, two
+# silver steering vanes, two low rails.
+SPEEDER_BIKE_ITEM_CUBES = [
+    ('chassis', (5, 6, 2),    (11, 9, 14),  'body'),
+    ('nose',    (6, 6.5, 0),  (10, 8.5, 2), 'body'),
+    ('seat',    (6.5, 9, 8),  (9.5, 11, 13),'seat'),
+    ('vane_l',  (3, 6.5, 1),  (5, 8.5, 5),  'vane'),
+    ('vane_r',  (11, 6.5, 1), (13, 8.5, 5), 'vane'),
+    ('rail_l',  (4, 5, 4),    (5, 6, 12),   'rail'),
+    ('rail_r',  (11, 5, 4),   (12, 6, 12),  'rail'),
+]
+UV_REGIONS_SPEEDER_BIKE = {
+    'body': (0, 0, 7, 7),
+    'seat': (8, 0, 11, 3),
+    'vane': (8, 4, 11, 7),
+    'rail': (12, 0, 15, 3),
+}
+
+# xwing: a short fuselage + nose with two S-foil bars crossed at +/-45 deg
+# about Z, forming an unmistakable X. Viewed near face-on via a custom gui
+# transform so the X reads from the inventory slot.
+XWING_ITEM_CUBES = [
+    ('fuselage', (7, 6.5, 5),   (9, 9.5, 12),  'hull'),
+    ('nose',     (7.25, 7, 2),  (8.75, 9, 5),  'hull'),
+    ('cockpit',  (7.25, 9.5, 7),(8.75, 10.5, 9),'glass'),
+    ('wing_a',   (7, 1, 7),     (9, 15, 9),    'wing',
+     {'angle': 45, 'axis': 'z', 'origin': [8, 8, 8]}),
+    ('wing_b',   (7, 1, 7),     (9, 15, 9),    'wing',
+     {'angle': -45, 'axis': 'z', 'origin': [8, 8, 8]}),
+]
+UV_REGIONS_XWING = {
+    'hull':  (0, 0, 7, 7),
+    'wing':  (8, 0, 15, 7),
+    'glass': (0, 8, 3, 11),
+}
+
+# tie_fighter: central gunmetal ball + red window, two short pylons, two big
+# black outboard hex panels.
+TIE_FIGHTER_ITEM_CUBES = [
+    ('ball',    (5, 5, 5),   (11, 11, 11), 'metal'),
+    ('window',  (6, 6, 4),   (10, 10, 5),  'window'),
+    ('pylon_l', (3, 7, 7),   (5, 9, 9),    'metal'),
+    ('pylon_r', (11, 7, 7),  (13, 9, 9),   'metal'),
+    ('panel_l', (1, 2, 2),   (2, 14, 14),  'panel'),
+    ('panel_r', (14, 2, 2),  (15, 14, 14), 'panel'),
+]
+UV_REGIONS_TIE_FIGHTER = {
+    'metal':  (0, 0, 7, 7),
+    'panel':  (8, 0, 15, 7),
+    'window': (0, 8, 3, 11),
+}
+
 # ─── Display transforms (shared across all generated weapon models) ─────
 # Structure mirrors gen_meteor_staff.py's DISPLAY dict (same 8 contexts).
 # "gui" uses vanilla's standard angled item-in-a-box transform (matches
@@ -142,6 +202,12 @@ DISPLAY = {
     "gui":                   {"rotation": [30, 225, 0], "translation": [0, 0, 0], "scale": [0.625, 0.625, 0.625]},
     "head":                  {"rotation": [0, 180, 0], "translation": [0, 13, 7], "scale": [1.0, 1.0, 1.0]},
 }
+
+# X-wing item: the shared gui transform's 225 deg yaw would spin the S-foil X
+# edge-on. Override gui to a near-face-on view (small pitch+yaw for depth) so
+# the X reads clearly from the inventory slot. Other contexts inherit DISPLAY.
+XWING_ITEM_DISPLAY = dict(DISPLAY)
+XWING_ITEM_DISPLAY["gui"] = {"rotation": [14, -20, 0], "translation": [0, 0, 0], "scale": [0.72, 0.72, 0.72]}
 
 
 def lighten(color, amount):
@@ -243,6 +309,63 @@ def paint_holocron_texture():
     return img
 
 
+# ─── Vehicle item textures (small atlases, 3+ tones per region) ──────────
+def _region3(draw, box, base, hi, sh):
+    """Fill a UV region with base + a top-edge highlight + bottom-edge shade."""
+    x1, y1, x2, y2 = box
+    draw.rectangle((x1, y1, x2, y2), fill=base)
+    draw.rectangle((x1, y1, x2, y1), fill=hi)
+    draw.rectangle((x1, y2, x2, y2), fill=sh)
+
+
+def paint_speeder_bike_item_texture():
+    """16x16 atlas: orange body, black seat, silver vane, brown rail regions."""
+    img = Image.new('RGBA', (VEHICLE_TEXTURE_SIZE, VEHICLE_TEXTURE_SIZE), TRANSPARENT)
+    draw = ImageDraw.Draw(img)
+    _region3(draw, (0, 0, 7, 7), (0xC2, 0x6A, 0x2E, 0xFF),
+             (0xE0, 0x8A, 0x44, 0xFF), (0x8A, 0x46, 0x1E, 0xFF))   # body
+    draw.rectangle((2, 5, 5, 5), fill=(0x6E, 0x40, 0x24, 0xFF))    # rust fleck
+    _region3(draw, (8, 0, 11, 3), (0x1E, 0x1C, 0x1A, 0xFF),
+             (0x3A, 0x36, 0x32, 0xFF), (0x10, 0x0E, 0x0C, 0xFF))   # seat
+    _region3(draw, (8, 4, 11, 7), (0xB4, 0xB8, 0xC0, 0xFF),
+             (0xD2, 0xD6, 0xDE, 0xFF), (0x82, 0x86, 0x90, 0xFF))   # vane
+    _region3(draw, (12, 0, 15, 3), (0x5A, 0x3A, 0x22, 0xFF),
+             (0x74, 0x4E, 0x30, 0xFF), (0x33, 0x24, 0x16, 0xFF))   # rail
+    return img
+
+
+def paint_xwing_item_texture():
+    """16x16 atlas: off-white hull, white wing w/ a red squadron stripe, dark
+    canopy glass."""
+    img = Image.new('RGBA', (VEHICLE_TEXTURE_SIZE, VEHICLE_TEXTURE_SIZE), TRANSPARENT)
+    draw = ImageDraw.Draw(img)
+    _region3(draw, (0, 0, 7, 7), (0xE6, 0xE4, 0xDC, 0xFF),
+             (0xF6, 0xF4, 0xEE, 0xFF), (0xB8, 0xB6, 0xAE, 0xFF))   # hull
+    draw.rectangle((3, 3, 4, 7), fill=(0x7A, 0x7C, 0x82, 0xFF))    # hull panel line
+    _region3(draw, (8, 0, 15, 7), (0xE6, 0xE4, 0xDC, 0xFF),
+             (0xF6, 0xF4, 0xEE, 0xFF), (0xB8, 0xB6, 0xAE, 0xFF))   # wing base
+    draw.rectangle((8, 3, 15, 4), fill=(0xC2, 0x30, 0x2E, 0xFF))   # red stripe
+    draw.rectangle((8, 3, 15, 3), fill=(0xE0, 0x4A, 0x44, 0xFF))
+    _region3(draw, (0, 8, 3, 11), (0x22, 0x2A, 0x36, 0xFF),
+             (0x4C, 0x60, 0x78, 0xFF), (0x16, 0x1C, 0x26, 0xFF))   # canopy glass
+    return img
+
+
+def paint_tie_fighter_item_texture():
+    """16x16 atlas: gunmetal ball/pylon, black panel w/ a rib, red window."""
+    img = Image.new('RGBA', (VEHICLE_TEXTURE_SIZE, VEHICLE_TEXTURE_SIZE), TRANSPARENT)
+    draw = ImageDraw.Draw(img)
+    _region3(draw, (0, 0, 7, 7), (0x60, 0x64, 0x6C, 0xFF),
+             (0x82, 0x86, 0x90, 0xFF), (0x44, 0x47, 0x4E, 0xFF))   # metal
+    _region3(draw, (8, 0, 15, 7), (0x14, 0x15, 0x18, 0xFF),
+             (0x2E, 0x30, 0x36, 0xFF), (0x0A, 0x0A, 0x0C, 0xFF))   # panel
+    for rx in (10, 13):
+        draw.rectangle((rx, 0, rx, 7), fill=(0x2E, 0x30, 0x36, 0xFF))  # ribs
+    _region3(draw, (0, 8, 3, 11), (0x9A, 0x28, 0x22, 0xFF),
+             (0xC6, 0x44, 0x3A, 0xFF), (0x5E, 0x18, 0x14, 0xFF))   # window
+    return img
+
+
 # ─── UV helpers (mirrors gen_meteor_staff.py's uv_for / uv_for_model_json) ─
 def uv_for(uv_regions, group):
     x1, y1, x2, y2 = uv_regions[group]
@@ -255,11 +378,26 @@ def uv_for_model_json(uv_regions, group, texture_size):
 
 
 # ─── Model / bbmodel builders ────────────────────────────────────────────
-def build_model_json(name, cubes, uv_regions, texture_size, texture_path):
+# Cube tuples are (name, from, to, group) or, for the Task-19 vehicle item
+# models, (name, from, to, group, rotation) where rotation is a dict
+# {'angle': deg, 'axis': 'x'|'y'|'z', 'origin': [x,y,z]} (the X-wing S-foils
+# need a 45 deg tilt to read as an X). The rotation key is emitted only when
+# present, so every pre-existing weapon's model/bbmodel stays byte-identical.
+def _rot_vec(rotation):
+    """Single-axis {'angle','axis'} -> a Blockbench [x,y,z]-euler vector."""
+    vec = [0, 0, 0]
+    vec[{'x': 0, 'y': 1, 'z': 2}[rotation['axis']]] = rotation['angle']
+    return vec
+
+
+def build_model_json(name, cubes, uv_regions, texture_size, texture_path,
+                     display=None):
     elements = []
-    for cube_name, frm, to, group in cubes:
+    for cube in cubes:
+        cube_name, frm, to, group = cube[0], cube[1], cube[2], cube[3]
+        rotation = cube[4] if len(cube) > 4 else None
         uv = uv_for_model_json(uv_regions, group, texture_size)
-        elements.append({
+        element = {
             "name": cube_name,
             "from": list(frm),
             "to": list(to),
@@ -271,7 +409,14 @@ def build_model_json(name, cubes, uv_regions, texture_size, texture_path):
                 "up":    {"uv": uv, "texture": "#0"},
                 "down":  {"uv": uv, "texture": "#0"},
             },
-        })
+        }
+        if rotation:
+            element["rotation"] = {
+                "origin": list(rotation["origin"]),
+                "axis": rotation["axis"],
+                "angle": rotation["angle"],
+            }
+        elements.append(element)
     return {
         "credit": "Generated by starwars/tools/gen_weapon_models.py",
         "texture_size": [texture_size, texture_size],
@@ -280,7 +425,7 @@ def build_model_json(name, cubes, uv_regions, texture_size, texture_path):
             "particle": texture_path,
         },
         "elements": elements,
-        "display": dict(DISPLAY),
+        "display": dict(display if display is not None else DISPLAY),
     }
 
 
@@ -291,13 +436,16 @@ def png_to_data_url(img):
     return 'data:image/png;base64,' + base64.b64encode(buf.getvalue()).decode('ascii')
 
 
-def build_bbmodel(name, cubes, uv_regions, texture_img, texture_relpath, texture_size, model_identifier):
+def build_bbmodel(name, cubes, uv_regions, texture_img, texture_relpath, texture_size,
+                  model_identifier, display=None):
     elements = []
     outliner = []
-    for cube_name, frm, to, group in cubes:
+    for cube in cubes:
+        cube_name, frm, to, group = cube[0], cube[1], cube[2], cube[3]
+        rotation = cube[4] if len(cube) > 4 else None
         eid = det_uuid(f'{name}/element/{cube_name}')
         uv = uv_for(uv_regions, group)
-        elements.append({
+        element = {
             "name": cube_name,
             "rescale": False,
             "locked": False,
@@ -305,7 +453,7 @@ def build_bbmodel(name, cubes, uv_regions, texture_img, texture_relpath, texture
             "to": list(to),
             "autouv": 0,
             "color": 0,
-            "origin": [0, 0, 0],
+            "origin": list(rotation["origin"]) if rotation else [0, 0, 0],
             "faces": {
                 "north": {"uv": uv, "texture": 0},
                 "east":  {"uv": uv, "texture": 0},
@@ -316,7 +464,10 @@ def build_bbmodel(name, cubes, uv_regions, texture_img, texture_relpath, texture
             },
             "type": "cube",
             "uuid": eid,
-        })
+        }
+        if rotation:
+            element["rotation"] = _rot_vec(rotation)
+        elements.append(element)
         outliner.append(eid)
 
     texture = {
@@ -363,7 +514,7 @@ def build_bbmodel(name, cubes, uv_regions, texture_img, texture_relpath, texture
         "elements": elements,
         "outliner": outliner,
         "textures": [texture],
-        "display": dict(DISPLAY),
+        "display": dict(display if display is not None else DISPLAY),
     }
 
 
@@ -398,6 +549,18 @@ def build_holocron_item_json():
         "model": {
             "type": "minecraft:model",
             "model": "starwars:item/holocron",
+        }
+    }
+
+
+def build_vehicle_item_json(vehicle_id):
+    """Plain model selector for a vehicle item — identical shape to the
+    landspeeder's committed items/landspeeder.json (a static item, no
+    per-instance variant)."""
+    return {
+        "model": {
+            "type": "minecraft:model",
+            "model": f"starwars:item/{vehicle_id}",
         }
     }
 
@@ -497,6 +660,36 @@ def main():
     write_json(os.path.join(tools_dir, 'holocron.bbmodel'), holocron_bbmodel)
 
     write_json(os.path.join(items_dir, 'holocron.json'), build_holocron_item_json())
+
+    # ── Vehicle item models (voxel mini-silhouettes) ──
+    # Mirrors the landspeeder item file set (items/<id>.json + models/item/
+    # <id>.json + textures/item/<id>.png) but as a 3D voxel model. Each also
+    # gets an editable tools/<id>_item.bbmodel source — the `_item` suffix
+    # keeps it distinct from the entity rig's tools/<id>.bbmodel (gen_bbmodels).
+    vehicles = [
+        ('speeder_bike', SPEEDER_BIKE_ITEM_CUBES, UV_REGIONS_SPEEDER_BIKE,
+         paint_speeder_bike_item_texture(), None),
+        ('xwing', XWING_ITEM_CUBES, UV_REGIONS_XWING,
+         paint_xwing_item_texture(), XWING_ITEM_DISPLAY),
+        ('tie_fighter', TIE_FIGHTER_ITEM_CUBES, UV_REGIONS_TIE_FIGHTER,
+         paint_tie_fighter_item_texture(), None),
+    ]
+    for vid, cubes, uv_regions, tex, display in vehicles:
+        tex_path = os.path.join(textures_dir, f'{vid}.png')
+        tex.save(tex_path)
+        print(f"  wrote {tex_path}")
+
+        model = build_model_json(vid, cubes, uv_regions, VEHICLE_TEXTURE_SIZE,
+                                 f'starwars:item/{vid}', display=display)
+        write_json(os.path.join(models_dir, f'{vid}.json'), model)
+
+        bbmodel = build_bbmodel(
+            vid, cubes, uv_regions, tex,
+            f'../src/main/resources/assets/starwars/textures/item/{vid}.png',
+            VEHICLE_TEXTURE_SIZE, f'starwars:{vid}', display=display)
+        write_json(os.path.join(tools_dir, f'{vid}_item.bbmodel'), bbmodel)
+
+        write_json(os.path.join(items_dir, f'{vid}.json'), build_vehicle_item_json(vid))
 
     print('OK')
 

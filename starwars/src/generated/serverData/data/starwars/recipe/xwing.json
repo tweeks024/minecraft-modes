@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "I": "minecraft:iron_block",
+    "R": "minecraft:redstone_block"
+  },
+  "pattern": [
+    "I I",
+    "IRI",
+    "I I"
+  ],
+  "result": {
+    "id": "starwars:xwing"
+  }
+}

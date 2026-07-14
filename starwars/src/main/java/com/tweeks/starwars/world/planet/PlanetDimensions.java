@@ -307,6 +307,8 @@ public final class PlanetDimensions {
         mobs.addSpawn(MobCategory.MONSTER, 10, new MobSpawnSettings.SpawnerData(ModEntities.SNOWTROOPER.get(), 2, 4));
         mobs.addSpawn(MobCategory.MONSTER, 5, new MobSpawnSettings.SpawnerData(ModEntities.WAMPA.get(), 1, 1));
         mobs.addSpawn(MobCategory.MONSTER, 4, new MobSpawnSettings.SpawnerData(ModEntities.PROBE_DROID.get(), 1, 1));
+        // The occasional AT-AT on the march — rare, always solo.
+        mobs.addSpawn(MobCategory.MONSTER, 1, new MobSpawnSettings.SpawnerData(ModEntities.AT_AT.get(), 1, 1));
 
         BiomeGenerationSettings.Builder gen = new BiomeGenerationSettings.Builder(features, carvers);
         BiomeDefaultFeatures.addDefaultCarversAndLakes(gen);

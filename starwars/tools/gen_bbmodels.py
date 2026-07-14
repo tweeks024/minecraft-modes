@@ -434,6 +434,145 @@ YODA_CUBES = [
     ('left_leg',  YODA_LLEG_BONE, (-1.0,  0.0, -1.0, 2, 4, 2), (44, 16)),
 ]
 
+# -----------------------------------------------------------------------------
+# Wave-3 vehicle/creature rigs. Bone names + cube sizes are the hand-off
+# contract with the Java entity models being written in parallel — verbatim
+# from the wave-3 art brief, do not rename/resize. All are custom skeletons
+# (their own bone tables) with one cube per bone except band_droid (antenna
+# rides the head bone, horn rides the right_arm bone). Vehicle bones use the
+# same java_to_bbmodel convention as every other rig: bbmodel y=0 is the
+# ground-contact plane. Mirror-image parts that receive identical paint
+# (at_at's four legs, four feet) deliberately share one box-UV offset, exactly
+# as the landspeeder's seat_left/seat_right + turbine_l/turbine_r pairs do.
+# -----------------------------------------------------------------------------
+
+# speeder_bike (64x64): 74-Z-style swoop bike. Long low chassis, a rear seat,
+# two forward steering vanes, two low footrails.
+SPEEDER_BIKE_BONE_DEFS = [
+    ('chassis',    (0, 6, 0)),
+    ('seat',       (0, 10, 4)),
+    ('vane_left',  (-2, 8, -9)),
+    ('vane_right', (2, 8, -9)),
+    ('rail_left',  (-3, 6, 0)),
+    ('rail_right', (3, 6, 0)),
+]
+
+SPEEDER_BIKE_CUBES = [
+    ('chassis',    (0, 6, 0),   (-3, -4, -9, 6, 4, 18), (0, 0)),
+    ('seat',       (0, 10, 4),  (-2, -2, -3, 4, 2, 6),  (0, 22)),
+    ('vane_left',  (-2, 8, -9), (-2, 0, -2, 2, 2, 6),   (20, 22)),
+    ('vane_right', (2, 8, -9),  (0, 0, -2, 2, 2, 6),    (36, 22)),
+    ('rail_left',  (-3, 6, 0),  (-1, 0, -2, 1, 1, 8),   (0, 30)),
+    ('rail_right', (3, 6, 0),   (0, 0, -2, 1, 1, 8),    (18, 30)),
+]
+
+# xwing (128x128): T-65 fighter. Central fuselage + nose + cockpit; four S-foil
+# wings splayed off the rear (top pair rotated +12.5 deg, bottom pair -12.5 deg
+# about Z per the brief) with an engine at each wing root.
+XWING_BONE_DEFS = [
+    ('fuselage',  (0, 8, 0)),
+    ('nose',      (0, 9, -13)),
+    ('cockpit',   (0, 14, 0)),
+    ('wing_tl',   (-3, 13.5, 8), (0, 0, 12.5)),
+    ('wing_tr',   (3, 13.5, 8),  (0, 0, 12.5)),
+    ('wing_bl',   (-3, 8.5, 8),  (0, 0, -12.5)),
+    ('wing_br',   (3, 8.5, 8),   (0, 0, -12.5)),
+    ('engine_tl', (-3, 12, 3)),
+    ('engine_tr', (3, 12, 3)),
+    ('engine_bl', (-3, 7, 3)),
+    ('engine_br', (3, 7, 3)),
+]
+
+XWING_CUBES = [
+    ('fuselage',  (0, 8, 0),     (-3, -6, -13, 6, 6, 26), (0, 0)),
+    ('nose',      (0, 9, -13),   (-2, -4, -10, 4, 4, 10), (64, 0)),
+    ('cockpit',   (0, 14, 0),    (-2, -3, -3, 4, 3, 6),   (64, 14)),
+    ('wing_tl',   (-3, 13.5, 8), (-14, -0.5, -5, 14, 1, 10), (0, 32)),
+    ('wing_tr',   (3, 13.5, 8),  (0, -0.5, -5, 14, 1, 10),   (0, 43)),
+    ('wing_bl',   (-3, 8.5, 8),  (-14, -0.5, -5, 14, 1, 10), (0, 54)),
+    ('wing_br',   (3, 8.5, 8),   (0, -0.5, -5, 14, 1, 10),   (0, 65)),
+    ('engine_tl', (-3, 12, 3),   (-3, -3, 0, 3, 3, 8),    (0, 76)),
+    ('engine_tr', (3, 12, 3),    (0, -3, 0, 3, 3, 8),     (22, 76)),
+    ('engine_bl', (-3, 7, 3),    (-3, -3, 0, 3, 3, 8),    (44, 76)),
+    ('engine_br', (3, 7, 3),     (0, -3, 0, 3, 3, 8),     (66, 76)),
+]
+
+# tie_fighter (128x64): a central cockpit ball with a front window, two short
+# pylons, and two big outboard hexagonal solar panels (tall+deep, 1 thick).
+TIE_FIGHTER_BONE_DEFS = [
+    ('ball',        (0, 10, 0)),
+    ('window',      (0, 12, -4)),
+    ('pylon_left',  (-4, 13, 0)),
+    ('pylon_right', (4, 13, 0)),
+    ('panel_left',  (-8, 4, 0)),
+    ('panel_right', (8, 4, 0)),
+]
+
+TIE_FIGHTER_CUBES = [
+    ('ball',        (0, 10, 0),  (-4, -8, -4, 8, 8, 8),   (0, 0)),
+    ('window',      (0, 12, -4), (-2, -4, -1, 4, 4, 1),   (32, 0)),
+    ('pylon_left',  (-4, 13, 0), (-4, -2, -1, 4, 2, 2),   (32, 5)),
+    ('pylon_right', (4, 13, 0),  (0, -2, -1, 4, 2, 2),    (44, 5)),
+    ('panel_left',  (-8, 4, 0),  (-1, -16, -7, 1, 16, 14), (0, 16)),
+    ('panel_right', (8, 4, 0),   (0, -16, -7, 1, 16, 14),  (30, 16)),
+]
+
+# at_at (256x128, true scale): armored body high off the ground, an up-angled
+# neck to the head, four tall legs to the ground with foot pads. All four legs
+# are identical mirror geometry and share one box-UV offset; likewise the four
+# feet (same convention as the landspeeder's mirrored seat/turbine pairs).
+AT_AT_BONE_DEFS = [
+    ('body',    (0, 88, 0)),
+    ('neck',    (0, 110, -32), (45, 0, 0)),
+    ('head',    (0, 118, -40)),
+    ('leg_fl',  (-14, 88, -26)),
+    ('leg_fr',  (14, 88, -26)),
+    ('leg_bl',  (-14, 88, 26)),
+    ('leg_br',  (14, 88, 26)),
+    ('foot_fl', (-14, 0, -26)),
+    ('foot_fr', (14, 0, -26)),
+    ('foot_bl', (-14, 0, 26)),
+    ('foot_br', (14, 0, 26)),
+]
+
+AT_AT_CUBES = [
+    ('body',    (0, 88, 0),     (-18, -28, -32, 36, 28, 64), (0, 0)),
+    ('neck',    (0, 110, -32),  (-4, -3, -20, 8, 6, 20),     (64, 92)),
+    ('head',    (0, 118, -40),  (-7, -10, -18, 14, 10, 18),  (0, 92)),
+    ('leg_fl',  (-14, 88, -26), (-4, 0, -4, 8, 88, 8),       (200, 0)),
+    ('leg_fr',  (14, 88, -26),  (-4, 0, -4, 8, 88, 8),       (200, 0)),
+    ('leg_bl',  (-14, 88, 26),  (-4, 0, -4, 8, 88, 8),       (200, 0)),
+    ('leg_br',  (14, 88, 26),   (-4, 0, -4, 8, 88, 8),       (200, 0)),
+    ('foot_fl', (-14, 0, -26),  (-6, -6, -6, 12, 6, 12),     (120, 92)),
+    ('foot_fr', (14, 0, -26),   (-6, -6, -6, 12, 6, 12),     (120, 92)),
+    ('foot_bl', (-14, 0, 26),   (-6, -6, -6, 12, 6, 12),     (120, 92)),
+    ('foot_br', (14, 0, 26),    (-6, -6, -6, 12, 6, 12),     (120, 92)),
+]
+
+# band_droid (64x64): Bith-band-meets-protocol-droid. Domed head with a stub
+# antenna, boxy body, two arms (the right one carrying a forward-jutting horn
+# instrument), two short legs. Antenna rides the head bone; horn rides the
+# right_arm bone — so head and right_arm each hold two cubes.
+BAND_DROID_BONE_DEFS = [
+    ('head',      (0, 14, 0)),
+    ('body',      (0, 6, 0)),
+    ('right_arm', (-3, 14, 0)),
+    ('left_arm',  (3, 14, 0)),
+    ('right_leg', (-1, 6, 0)),
+    ('left_leg',  (1, 6, 0)),
+]
+
+BAND_DROID_CUBES = [
+    ('head',      (0, 14, 0),  (-3, -6, -3, 6, 6, 6),  (0, 0)),
+    ('antenna',   (0, 14, 0),  (-0.5, -9, -0.5, 1, 3, 1), (24, 0)),
+    ('body',      (0, 6, 0),   (-3, -8, -2, 6, 8, 4),  (0, 16)),
+    ('right_arm', (-3, 14, 0), (-2, 0, -1, 2, 8, 2),   (24, 16)),
+    ('horn',      (-3, 14, 0), (-2, 7, -6, 2, 2, 5),   (40, 0)),
+    ('left_arm',  (3, 14, 0),  (0, 0, -1, 2, 8, 2),    (32, 16)),
+    ('right_leg', (-1, 6, 0),  (-2, 0, -1, 2, 6, 2),   (0, 32)),
+    ('left_leg',  (1, 6, 0),   (0, 0, -1, 2, 6, 2),    (12, 32)),
+]
+
 # mob_name -> bone_defs override (only needed for mobs whose bone set/pivots
 # aren't the standard humanoid table).
 MOB_BONE_DEFS = {
@@ -447,6 +586,11 @@ MOB_BONE_DEFS = {
     'dragonsnake': DRAGONSNAKE_BONE_DEFS,
     'bogwing': BOGWING_BONE_DEFS,
     'yoda': YODA_BONE_DEFS,
+    'speeder_bike': SPEEDER_BIKE_BONE_DEFS,
+    'xwing': XWING_BONE_DEFS,
+    'tie_fighter': TIE_FIGHTER_BONE_DEFS,
+    'at_at': AT_AT_BONE_DEFS,
+    'band_droid': BAND_DROID_BONE_DEFS,
 }
 
 # mob_name -> (tex_width, tex_height) for non-64x64 texture canvases.
@@ -454,6 +598,10 @@ MOB_TEX_SIZES = {
     'bantha': (128, 64),
     'wampa': (128, 64),
     'bogwing': (32, 32),
+    'xwing': (128, 128),
+    'tie_fighter': (128, 64),
+    'at_at': (256, 128),
+    # speeder_bike + band_droid use the default 64x64 canvas.
 }
 
 MOBS = {
@@ -495,6 +643,12 @@ MOBS = {
     'dragonsnake': DRAGONSNAKE_CUBES,
     'bogwing': BOGWING_CUBES,
     'yoda': YODA_CUBES,
+    # Wave-3 vehicles/creatures (custom skeletons, see *_BONE_DEFS above).
+    'speeder_bike': SPEEDER_BIKE_CUBES,
+    'xwing': XWING_CUBES,
+    'tie_fighter': TIE_FIGHTER_CUBES,
+    'at_at': AT_AT_CUBES,
+    'band_droid': BAND_DROID_CUBES,
 }
 
 
@@ -529,11 +683,20 @@ def make_cube(name, mob_name, bone, java, uv_offset, inflate=0.0):
     return cube
 
 
-def make_bone_group(mob_name, name, origin, child_uuids):
-    """Build the outliner entry for one bone (head/body/arm/leg/etc)."""
-    return {
+def make_bone_group(mob_name, name, origin, child_uuids, rotation=None):
+    """Build the outliner entry for one bone (head/body/arm/leg/etc).
+
+    `rotation` (optional [x, y, z] degrees) is the bone's rest-pose rotation
+    — used by the Task-19 vehicle rigs (xwing S-foils, at_at neck). Omitted
+    entirely for unrotated bones so every pre-existing mob's outliner entry
+    stays byte-identical."""
+    group = {
         "name": name,
         "origin": list(origin),
+    }
+    if rotation is not None:
+        group["rotation"] = list(rotation)
+    group.update({
         "color": 0,
         "uuid": det_uuid(f"{mob_name}/bone/{name}"),
         "export": True,
@@ -542,7 +705,8 @@ def make_bone_group(mob_name, name, origin, child_uuids):
         "visibility": True,
         "autouv": 0,
         "children": child_uuids,
-    }
+    })
+    return group
 
 
 # Default (standard humanoid) bone table, as (bone_name, origin) pairs in
@@ -561,7 +725,8 @@ DEFAULT_BONE_DEFS = [
 
 
 def _parent_bone_name(bone_origin, bone_defs):
-    for name, origin in bone_defs:
+    for entry in bone_defs:
+        name, origin = entry[0], entry[1]
         if bone_origin == origin:
             return name
     raise ValueError(bone_origin)
@@ -582,7 +747,7 @@ def build_bbmodel(mob_name, cubes, texture_path, tex_height=64, bone_defs=None,
         bone_defs = DEFAULT_BONE_DEFS
 
     elements = []
-    bone_children = {name: [] for name, _ in bone_defs}
+    bone_children = {entry[0]: [] for entry in bone_defs}
 
     for entry in cubes:
         if len(entry) == 5:
@@ -594,9 +759,13 @@ def build_bbmodel(mob_name, cubes, texture_path, tex_height=64, bone_defs=None,
         elements.append(cube)
         bone_children[_parent_bone_name(bone, bone_defs)].append(cube["uuid"])
 
+    # bone_defs entries are (name, origin) or (name, origin, rotation) — the
+    # optional rotation ([x,y,z] deg) is emitted only when present, so every
+    # pre-existing (2-tuple) mob's outliner stays byte-identical.
     outliner = [
-        make_bone_group(mob_name, name, origin, bone_children[name])
-        for name, origin in bone_defs
+        make_bone_group(mob_name, entry[0], entry[1], bone_children[entry[0]],
+                        rotation=(entry[2] if len(entry) > 2 else None))
+        for entry in bone_defs
     ]
 
     # Embed the texture as base64.

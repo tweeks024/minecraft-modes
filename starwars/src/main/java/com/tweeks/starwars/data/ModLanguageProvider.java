@@ -76,6 +76,14 @@ public class ModLanguageProvider extends LanguageProvider {
         add("starwars.planet.home", "Home");
         add(com.tweeks.starwars.Registration.CANTINA_RECORD.get(), "Music Disc");
         add("jukebox_song.starwars.cantina_band", "Figrin's Fizz - Cantina Swing");
+        add(com.tweeks.starwars.Registration.GALAXY_MAP.get(), "Galaxy Map");
+        add("screen.starwars.galaxy_map", "Galaxy Map");
+        add("screen.starwars.galaxy_map.charted", "Charted");
+        add("screen.starwars.galaxy_map.uncharted", "Uncharted");
+        add("screen.starwars.galaxy_map.gates", "Gates: %s");
+        add("screen.starwars.galaxy_map.nearby", "Nearest gates in this world");
+        add("screen.starwars.galaxy_map.no_gates", "No gates charted here yet - build one!");
+        add("screen.starwars.galaxy_map.gate_line", "%s gate at %s, %s, %s (%sm away)");
 
         add(com.tweeks.starwars.ModEntities.JAWA.get(), "Jawa");
         add(com.tweeks.starwars.ModEntities.TUSKEN_RAIDER.get(), "Tusken Raider");
@@ -88,6 +96,16 @@ public class ModLanguageProvider extends LanguageProvider {
         add(com.tweeks.starwars.ModEntities.DRAGONSNAKE.get(), "Dragonsnake");
         add(com.tweeks.starwars.ModEntities.BOGWING.get(), "Bogwing");
         add(com.tweeks.starwars.ModEntities.YODA.get(), "Yoda");
+        add(com.tweeks.starwars.ModEntities.SPEEDER_BIKE.get(), "Speeder Bike");
+        add(com.tweeks.starwars.ModEntities.XWING.get(), "X-wing");
+        add(com.tweeks.starwars.ModEntities.TIE_FIGHTER.get(), "TIE Fighter");
+        add(com.tweeks.starwars.ModEntities.AT_AT.get(), "AT-AT Walker");
+        add(com.tweeks.starwars.ModEntities.BAND_DROID.get(), "Cantina Band Droid");
+        add(com.tweeks.starwars.Registration.SPEEDER_BIKE.get(), "Speeder Bike");
+        add(com.tweeks.starwars.Registration.XWING.get(), "X-wing");
+        add(com.tweeks.starwars.Registration.TIE_FIGHTER.get(), "TIE Fighter");
+        add(com.tweeks.starwars.Registration.AT_AT_SPAWN_EGG.get(), "AT-AT Walker Spawn Egg");
+        add(com.tweeks.starwars.Registration.BAND_DROID_SPAWN_EGG.get(), "Cantina Band Droid Spawn Egg");
         add(com.tweeks.starwars.Registration.JAWA_SPAWN_EGG.get(), "Jawa Spawn Egg");
         add(com.tweeks.starwars.Registration.TUSKEN_RAIDER_SPAWN_EGG.get(), "Tusken Raider Spawn Egg");
         add(com.tweeks.starwars.Registration.BANTHA_SPAWN_EGG.get(), "Bantha Spawn Egg");

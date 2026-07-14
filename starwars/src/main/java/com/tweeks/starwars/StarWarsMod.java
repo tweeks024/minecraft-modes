@@ -112,6 +112,18 @@ public class StarWarsMod {
                 net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 net.minecraft.world.entity.Mob::checkMobSpawnRules,
                 net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
+            // AT-AT is a MONSTER but a DAYTIME siege walker — the monster
+            // darkness rule (checkMonsterSpawnRules) would wrongly forbid it
+            // in the light. Use the generic mob rule instead. (Natural-spawn
+            // cost/biome wiring is owned elsewhere; this only sets HOW it may
+            // place once a spawn is attempted.)
+            event.register(ModEntities.AT_AT.get(),
+                net.minecraft.world.entity.SpawnPlacementTypes.ON_GROUND,
+                net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                net.minecraft.world.entity.PathfinderMob::checkMobSpawnRules,
+                net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
+            // band_droid deliberately has NO spawn placement: it never spawns
+            // naturally (placed only inside the Mos Eisley cantina).
         });
     }
 
@@ -159,5 +171,11 @@ public class StarWarsMod {
             com.tweeks.starwars.entity.BogwingEntity.createAttributes().build());
         event.put(ModEntities.YODA.get(),
             com.tweeks.starwars.entity.YodaEntity.createAttributes().build());
+        // wave 3: siege boss + ambient musician (the vehicles are
+        // VehicleEntity, not Mobs — they take no attribute supplier).
+        event.put(ModEntities.AT_AT.get(),
+            com.tweeks.starwars.entity.AtAtEntity.createAttributes().build());
+        event.put(ModEntities.BAND_DROID.get(),
+            com.tweeks.starwars.entity.BandDroidEntity.createAttributes().build());
     }
 }

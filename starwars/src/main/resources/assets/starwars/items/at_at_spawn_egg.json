@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "starwars:item/at_at_spawn_egg"
+  }
+}

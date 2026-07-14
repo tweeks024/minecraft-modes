@@ -191,6 +191,49 @@ public final class ModEntities {
             .build(ResourceKey.create(Registries.ENTITY_TYPE,
                 Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "yoda"))));
 
+    // ---- wave 3: vehicles, siege boss, ambient droid ----
+
+    public static final DeferredHolder<EntityType<?>, EntityType<com.tweeks.starwars.entity.SpeederBikeEntity>> SPEEDER_BIKE =
+        ENTITY_TYPES.register("speeder_bike", () -> EntityType.Builder.<com.tweeks.starwars.entity.SpeederBikeEntity>of(
+                com.tweeks.starwars.entity.SpeederBikeEntity::new, MobCategory.MISC)
+            .sized(1.6f, 0.8f)
+            .clientTrackingRange(10)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "speeder_bike"))));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<com.tweeks.starwars.entity.XwingEntity>> XWING =
+        ENTITY_TYPES.register("xwing", () -> EntityType.Builder.<com.tweeks.starwars.entity.XwingEntity>of(
+                com.tweeks.starwars.entity.XwingEntity::new, MobCategory.MISC)
+            .sized(2.8f, 1.4f)
+            .clientTrackingRange(10)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "xwing"))));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<com.tweeks.starwars.entity.TieFighterEntity>> TIE_FIGHTER =
+        ENTITY_TYPES.register("tie_fighter", () -> EntityType.Builder.<com.tweeks.starwars.entity.TieFighterEntity>of(
+                com.tweeks.starwars.entity.TieFighterEntity::new, MobCategory.MISC)
+            .sized(2.4f, 2.2f)
+            .clientTrackingRange(10)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "tie_fighter"))));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<com.tweeks.starwars.entity.AtAtEntity>> AT_AT =
+        ENTITY_TYPES.register("at_at", () -> EntityType.Builder.<com.tweeks.starwars.entity.AtAtEntity>of(
+                com.tweeks.starwars.entity.AtAtEntity::new, MobCategory.MONSTER)
+            .sized(5.0f, 9.0f)
+            .eyeHeight(8.5f)
+            .clientTrackingRange(12)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "at_at"))));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<com.tweeks.starwars.entity.BandDroidEntity>> BAND_DROID =
+        ENTITY_TYPES.register("band_droid", () -> EntityType.Builder.<com.tweeks.starwars.entity.BandDroidEntity>of(
+                com.tweeks.starwars.entity.BandDroidEntity::new, MobCategory.CREATURE)
+            .sized(0.5f, 1.4f)
+            .clientTrackingRange(10)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "band_droid"))));
+
     public static void register(IEventBus modEventBus) {
         ENTITY_TYPES.register(modEventBus);
     }

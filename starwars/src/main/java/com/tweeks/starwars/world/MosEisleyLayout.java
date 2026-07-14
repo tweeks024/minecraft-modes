@@ -27,7 +27,7 @@ public final class MosEisleyLayout {
         STREET, FLOOR, WALL, DOME, ROOF, WINDOW, DOOR_AIR, AIR,
         LAMP, VAPORATOR, BAR, SEAT, TABLE, JUKEBOX, LANTERN,
         PAD, PAD_WALL, CHEST_CANTINA, CHEST_DOCKING,
-        JAWA, STORMTROOPER, ASTROMECH
+        JAWA, STORMTROOPER, ASTROMECH, BAND_DROID
     }
 
     public record Placement(int dx, int dy, int dz, Kind kind) {}
@@ -266,6 +266,12 @@ public final class MosEisleyLayout {
         put(out, 16, 1, 37, Kind.LANTERN);
         put(out, 8, 2, 36, Kind.LANTERN);
         put(out, 14, 2, 36, Kind.LANTERN);
+
+        // The house band: three droids on the back stage corner beside the
+        // jukebox (the astromechs give them a wide berth — see AstromechEntity).
+        put(out, 9, 1, 38, Kind.BAND_DROID);
+        put(out, 11, 1, 38, Kind.BAND_DROID);
+        put(out, 13, 1, 38, Kind.BAND_DROID);
     }
 
     /** Last write wins, mirroring the removeIf-then-add convention. */

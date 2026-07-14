@@ -287,6 +287,31 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
 
         // Yoda: no drops — masters leave no possessions behind.
         this.add(ModEntities.YODA.get(), LootTable.lootTable());
+
+        // AT-AT: a boss-tier salvage haul — 4-8 iron_ingot + 1 iron_block +
+        // 1-2 redstone, plus a rare (10%) chin-blaster-grade rifle drop.
+        this.add(ModEntities.AT_AT.get(),
+            LootTable.lootTable()
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.IRON_INGOT)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(4.0f, 8.0f)))))
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.IRON_BLOCK)
+                        .apply(SetItemCountFunction.setCount(ConstantValue.exactly(1.0f)))))
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.REDSTONE)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0f, 2.0f)))))
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .when(LootItemRandomChanceCondition.randomChance(0.10f))
+                    .add(LootItem.lootTableItem(Registration.BLASTER_RIFLE.get())
+                        .apply(SetItemDamageFunction.setDamage(UniformGenerator.between(0.3f, 1.0f))))));
+
+        // Band droid: 1-2 iron_nugget (spare servo parts) — a harmless musician.
+        this.add(ModEntities.BAND_DROID.get(),
+            LootTable.lootTable()
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.IRON_NUGGET)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0f, 2.0f))))));
     }
 
     @Override
@@ -312,7 +337,9 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
             ModEntities.SNOWTROOPER.get(),
             ModEntities.DRAGONSNAKE.get(),
             ModEntities.BOGWING.get(),
-            ModEntities.YODA.get()
+            ModEntities.YODA.get(),
+            ModEntities.AT_AT.get(),
+            ModEntities.BAND_DROID.get()
         );
         return BuiltInRegistries.ENTITY_TYPE.stream().filter(known::contains);
     }

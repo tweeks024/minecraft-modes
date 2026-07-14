@@ -1,0 +1,336 @@
+{
+  "meta": {
+    "format_version": "4.5",
+    "model_format": "modded_entity",
+    "box_uv": true
+  },
+  "name": "tie_fighter",
+  "model_identifier": "",
+  "visible_box": [
+    4,
+    4,
+    0
+  ],
+  "variable_placeholders": "",
+  "variable_placeholder_buttons": [],
+  "unhandled_root_fields": {},
+  "resolution": {
+    "width": 128,
+    "height": 64
+  },
+  "elements": [
+    {
+      "name": "ball",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -4,
+        10,
+        -4
+      ],
+      "to": [
+        4,
+        18,
+        4
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        10,
+        0
+      ],
+      "uv_offset": [
+        0,
+        0
+      ],
+      "type": "cube",
+      "uuid": "fb5c3315-501d-5746-895e-7c4cf4c069fd"
+    },
+    {
+      "name": "window",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -2,
+        12,
+        -5
+      ],
+      "to": [
+        2,
+        16,
+        -4
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        12,
+        -4
+      ],
+      "uv_offset": [
+        32,
+        0
+      ],
+      "type": "cube",
+      "uuid": "ed6af453-7e4d-5fc6-8716-8276f88d1a12"
+    },
+    {
+      "name": "pylon_left",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -8,
+        13,
+        -1
+      ],
+      "to": [
+        -4,
+        15,
+        1
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        -4,
+        13,
+        0
+      ],
+      "uv_offset": [
+        32,
+        5
+      ],
+      "type": "cube",
+      "uuid": "eff4153d-a086-52dc-83bc-a460f128dad0"
+    },
+    {
+      "name": "pylon_right",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        4,
+        13,
+        -1
+      ],
+      "to": [
+        8,
+        15,
+        1
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        4,
+        13,
+        0
+      ],
+      "uv_offset": [
+        44,
+        5
+      ],
+      "type": "cube",
+      "uuid": "3c323ce9-1e1c-5980-924a-77f1d449869c"
+    },
+    {
+      "name": "panel_left",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -9,
+        4,
+        -7
+      ],
+      "to": [
+        -8,
+        20,
+        7
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        -8,
+        4,
+        0
+      ],
+      "uv_offset": [
+        0,
+        16
+      ],
+      "type": "cube",
+      "uuid": "0cbbd802-0abc-5028-9846-7408e4be7cad"
+    },
+    {
+      "name": "panel_right",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        8,
+        4,
+        -7
+      ],
+      "to": [
+        9,
+        20,
+        7
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        8,
+        4,
+        0
+      ],
+      "uv_offset": [
+        30,
+        16
+      ],
+      "type": "cube",
+      "uuid": "53ad65fe-0a2b-5f29-a1ee-ff6182b93561"
+    }
+  ],
+  "outliner": [
+    {
+      "name": "ball",
+      "origin": [
+        0,
+        10,
+        0
+      ],
+      "color": 0,
+      "uuid": "cd54ad48-0d1b-514a-b7e2-3fa3bafb3ed4",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "fb5c3315-501d-5746-895e-7c4cf4c069fd"
+      ]
+    },
+    {
+      "name": "window",
+      "origin": [
+        0,
+        12,
+        -4
+      ],
+      "color": 0,
+      "uuid": "360815aa-82de-58ec-8eea-ee9e7a8efa19",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "ed6af453-7e4d-5fc6-8716-8276f88d1a12"
+      ]
+    },
+    {
+      "name": "pylon_left",
+      "origin": [
+        -4,
+        13,
+        0
+      ],
+      "color": 0,
+      "uuid": "9317efd0-d488-5485-918c-351deeda0168",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "eff4153d-a086-52dc-83bc-a460f128dad0"
+      ]
+    },
+    {
+      "name": "pylon_right",
+      "origin": [
+        4,
+        13,
+        0
+      ],
+      "color": 0,
+      "uuid": "623e23a2-3d54-5b03-9f48-a902af71a468",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "3c323ce9-1e1c-5980-924a-77f1d449869c"
+      ]
+    },
+    {
+      "name": "panel_left",
+      "origin": [
+        -8,
+        4,
+        0
+      ],
+      "color": 0,
+      "uuid": "f0d00c0c-e45e-56d7-96bd-53f80ee72202",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "0cbbd802-0abc-5028-9846-7408e4be7cad"
+      ]
+    },
+    {
+      "name": "panel_right",
+      "origin": [
+        8,
+        4,
+        0
+      ],
+      "color": 0,
+      "uuid": "6929d4bd-382d-5835-a9de-70be8880d196",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "53ad65fe-0a2b-5f29-a1ee-ff6182b93561"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "path": "/home/tweeks/code/minecraft-modes/starwars/src/main/resources/assets/starwars/textures/entity/tie_fighter.png",
+      "name": "tie_fighter.png",
+      "folder": "entity",
+      "namespace": "starwars",
+      "id": "0",
+      "particle": false,
+      "render_mode": "default",
+      "render_sides": "auto",
+      "frame_time": 1,
+      "frame_order_type": "loop",
+      "frame_order": "",
+      "frame_interpolate": false,
+      "visible": true,
+      "internal": true,
+      "saved": true,
+      "uuid": "a31d2bcb-cc81-566d-a49f-f35b93ced3da",
+      "relative_path": "../src/main/resources/assets/starwars/textures/entity/tie_fighter.png",
+      "use_as_default": false,
+      "layers_enabled": false,
+      "sync_to_project": "",
+      "width": 128,
+      "height": 64,
+      "uv_width": 128,
+      "uv_height": 64,
+      "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAABACAYAAADS1n9/AAABdUlEQVR4nO3aoQ7CMBSFYTRBQoJGoQgKgSbB8QgEgeQpEGg0D8RrjVQsGaSshdHe0fN/yRUko0vbQ9exDQYB58u1aqvNdtdaofad+2ZdNWs/HT9VTBtIJHUA3ITf5rPWcsfk6Cs8UgcgNPl15egrPFIHwC3xocnnMmAoRwBiKkdf4ZFjE+g7T6idT4/HlwiAuNQBCLXftXKM0V9LPQFdA9S1rMe39w7HUxWq8WTqrZjvhsq6//JiA/D6bx0BKERsAOr78fq+nQAUggCI+yQAzSIAhYjZSb/bBLJLL0Dq2zACUKjFclUNh6PsE2h1XrwgAOIIgDgCII4AiCMA4giAOAIgjgCIIwDiCIA4AiCOAIgjAIVwg6lU1uPdO/XLHe6X1XzZI/Vnq/Naj3fvuAFSKuvx7h1WAHEEQBwBEGd9TWYPYIwVQBwBEEcAxFlfk9kDGGMFEEcAxBEAcdbXZPYAxqwfz/I4GAAAAAAAAAAAAAAAAAB+5QEPmJz6pAchXQAAAABJRU5ErkJggg=="
+    }
+  ]
+}
