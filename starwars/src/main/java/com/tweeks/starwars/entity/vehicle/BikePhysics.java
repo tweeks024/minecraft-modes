@@ -20,11 +20,16 @@ package com.tweeks.starwars.entity.vehicle;
 public final class BikePhysics {
     private BikePhysics() {}
 
-    public static final double HOVER_HEIGHT = 0.4;
-    public static final double HOVER_SCAN_DEPTH = 3.0;
-    public static final double SPRING_STIFFNESS = 0.10;
-    public static final double SPRING_DAMPING = 0.40;
-    public static final double MAX_VERTICAL_ACCEL = 0.15;
+    /** Resting skim height — raised so the bike floats clear of 1-block terrain
+     *  instead of nosing into it (the old 0.4 snagged on every ledge). */
+    public static final double HOVER_HEIGHT = 1.6;
+    /** Extra lift added to the target height while the rider holds jump, so
+     *  space climbs the bike up and over taller obstacles. */
+    public static final double BOOST_HEIGHT = 3.0;
+    public static final double HOVER_SCAN_DEPTH = 6.0;
+    public static final double SPRING_STIFFNESS = 0.14;
+    public static final double SPRING_DAMPING = 0.42;
+    public static final double MAX_VERTICAL_ACCEL = 0.22;
     public static final double GRAVITY = -0.04;
     public static final double TERMINAL_FALL = -0.6;
     /** Snappier than the landspeeder's 0.06. */
@@ -48,11 +53,30 @@ public final class BikePhysics {
      * @param verticalVel  current vertical velocity (blocks/tick)
      */
     public static double verticalAccel(double distToGround, double verticalVel) {
+        return verticalAccel(distToGround, verticalVel, false);
+    }
+
+    /**
+     * Vertical acceleration for this tick.
+     *
+     * @param distToGround hull-bottom to sensed-ground distance, or
+     *                     {@code Double.NaN} when no ground within
+     *                     {@link #HOVER_SCAN_DEPTH}
+     * @param verticalVel  current vertical velocity (blocks/tick)
+     * @param boosting     rider is holding jump — raise the target height so
+     *                     the bike climbs
+     */
+    public static double verticalAccel(double distToGround, double verticalVel, boolean boosting) {
+        double target = boosting ? HOVER_HEIGHT + BOOST_HEIGHT : HOVER_HEIGHT;
         if (Double.isNaN(distToGround)) {
+            // No ground sensed. Holding jump still lifts (climb out of a pit);
+            // otherwise sink gently under gravity.
+            if (boosting) {
+                return Math.min(MAX_VERTICAL_ACCEL, SPRING_STIFFNESS * BOOST_HEIGHT - SPRING_DAMPING * verticalVel);
+            }
             return Math.max(GRAVITY, TERMINAL_FALL - verticalVel);
         }
-        double accel = SPRING_STIFFNESS * (HOVER_HEIGHT - distToGround)
-            - SPRING_DAMPING * verticalVel;
+        double accel = SPRING_STIFFNESS * (target - distToGround) - SPRING_DAMPING * verticalVel;
         return Math.max(-MAX_VERTICAL_ACCEL, Math.min(MAX_VERTICAL_ACCEL, accel));
     }
 

@@ -188,6 +188,7 @@ public abstract class StarfighterEntity extends VehicleEntity {
 
     private void tickDriven() {
         boolean forwardHeld = false;
+        boolean climbHeld = false;
         if (this.getControllingPassenger() instanceof Player driver) {
             // The fighter points where the pilot looks (like AbstractHorse's
             // tickRidden): copy the driver's yaw and pitch, then thrust along
@@ -198,6 +199,10 @@ public abstract class StarfighterEntity extends VehicleEntity {
             this.yRotO = this.getYRot();
             this.xRotO = this.getXRot();
             forwardHeld = driver.zza > 0;
+            // Space (jump) is a direct climb — lets the fighter lift off and
+            // clear terrain without nailing the pitch. Sneak, not jump,
+            // dismounts, so this is a safe control.
+            climbHeld = driver.jumping;
         }
 
         boolean onGround = this.onGround();
@@ -213,9 +218,11 @@ public abstract class StarfighterEntity extends VehicleEntity {
         double vx = lookX * this.speed;
         double vz = lookZ * this.speed;
         // Vertical share from the nose pitch (clamped to a fraction of the
-        // airspeed) plus a gentle stall-sink when nearly stopped in the air.
+        // airspeed), a gentle stall-sink when nearly stopped, plus direct
+        // climb thrust while space is held.
         double vy = FlightPhysics.verticalComponent(this.speed, -this.getXRot())
-            + FlightPhysics.sinkRate(this.speed, onGround);
+            + FlightPhysics.sinkRate(this.speed, onGround)
+            + FlightPhysics.climbThrust(climbHeld);
         this.setDeltaMovement(vx, vy, vz);
     }
 

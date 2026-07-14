@@ -114,4 +114,24 @@ public class FlightPhysicsTest {
         // Exactly at the threshold is "not slow enough" to sink.
         assertEquals(0.0, FlightPhysics.sinkRate(FlightPhysics.SINK_SPEED_THRESHOLD, false), 1e-9);
     }
+
+    @Test
+    public void climbThrustLiftsWhenJumpHeld() {
+        assertEquals(0.0, FlightPhysics.climbThrust(false), 1e-9);
+        assertEquals(FlightPhysics.CLIMB_THRUST, FlightPhysics.climbThrust(true), 1e-9);
+        assertTrue(FlightPhysics.CLIMB_THRUST > 0.0, "space must produce upward thrust");
+    }
+
+    @Test
+    public void climbThrustEnablesVerticalTakeoffFromStandstill() {
+        // Stopped on the ground (speed 0, level nose): pitch gives no lift and
+        // taxi-cap holds forward speed down, so without the climb key you can't
+        // leave the ground. Holding jump adds real upward velocity.
+        double vyNoJump = FlightPhysics.verticalComponent(0.0, 0.0)
+            + FlightPhysics.sinkRate(0.0, true) + FlightPhysics.climbThrust(false);
+        double vyJump = FlightPhysics.verticalComponent(0.0, 0.0)
+            + FlightPhysics.sinkRate(0.0, true) + FlightPhysics.climbThrust(true);
+        assertEquals(0.0, vyNoJump, 1e-9);
+        assertTrue(vyJump > 0.2, "space should lift the fighter off the ground, got " + vyJump);
+    }
 }

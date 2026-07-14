@@ -2,6 +2,10 @@ modLoader="javafml"
 loaderVersion="[1,)"
 license="${mod_license}"
 
+# Exposes LivingEntity.jumping so hover vehicles read the rider's space key.
+[[accessTransformers]]
+    file="META-INF/accesstransformer.cfg"
+
 [[mods]]
 modId="${mod_id}"
 version="${mod_version}"

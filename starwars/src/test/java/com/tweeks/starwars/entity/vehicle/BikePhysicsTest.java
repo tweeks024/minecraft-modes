@@ -73,6 +73,34 @@ public class BikePhysicsTest {
     }
 
     @Test
+    public void hoverHeightClearsOneBlockTerrain() {
+        // The whole point of the fix: the resting skim must float the hull
+        // clear above a 1-block ledge instead of nosing into it.
+        assertTrue(BikePhysics.HOVER_HEIGHT >= 1.0,
+            "hover height must clear a full block (was 0.4, which snagged)");
+    }
+
+    @Test
+    public void boostingSettlesHigherThanResting() {
+        double[] resting = simulate(3.0, 0.0, 300);
+        double distB = 3.0, velB = 0.0;
+        for (int i = 0; i < 300; i++) {
+            velB += BikePhysics.verticalAccel(distB, velB, true);
+            distB += velB;
+        }
+        assertEquals(BikePhysics.HOVER_HEIGHT + BikePhysics.BOOST_HEIGHT, distB, 0.1);
+        assertTrue(distB > resting[0] + 1.0, "holding jump must lift the bike well above the rest height");
+    }
+
+    @Test
+    public void boostingLiftsEvenWithNoGroundBelow() {
+        // Over a pit (no ground sensed), holding jump still pushes upward so
+        // you can climb out instead of sinking.
+        double accel = BikePhysics.verticalAccel(Double.NaN, 0.0, true);
+        assertTrue(accel > 0.0, "jump over a void must produce lift, got " + accel);
+    }
+
+    @Test
     public void bikeAccelIsSnappierThanLandspeeder() {
         assertTrue(BikePhysics.FORWARD_ACCEL > HoverPhysics.FORWARD_ACCEL);
     }

@@ -67,4 +67,13 @@ public final class FlightPhysics {
     public static double sinkRate(double speed, boolean onGround) {
         return (!onGround && speed < SINK_SPEED_THRESHOLD) ? SINK_RATE : 0.0;
     }
+
+    /** Direct upward thrust while the pilot holds jump (space) — enough to lift
+     *  off from a standstill and climb clear of terrain without pitching. */
+    public static final double CLIMB_THRUST = 0.4;
+
+    /** Upward velocity from the climb key this tick (0 when not held). */
+    public static double climbThrust(boolean jumpHeld) {
+        return jumpHeld ? CLIMB_THRUST : 0.0;
+    }
 }

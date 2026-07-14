@@ -188,18 +188,27 @@ public class SpeederBikeEntity extends VehicleEntity {
 
     private void tickDriven() {
         Vec3 vel = this.getDeltaMovement();
-        double vy = vel.y + BikePhysics.verticalAccel(this.sampleGroundDistance(), vel.y);
 
         int fwd = 0;
         int turn = 0;
+        boolean boosting = false;
         if (this.getControllingPassenger() instanceof Player driver) {
             fwd = driver.zza > 0 ? 1 : (driver.zza < 0 ? -1 : 0);
             turn = driver.xxa > 0 ? 1 : (driver.xxa < 0 ? -1 : 0);
+            // Space (jump) raises the bike — a free control since sneak, not
+            // jump, is what dismounts. Read via the exposed jumping field.
+            boosting = driver.jumping;
             if (turn != 0) {
                 this.setYRot(BikePhysics.nextYaw(this.getYRot(), -turn));
             }
         }
         this.forwardSpeed = BikePhysics.nextForwardSpeed(this.forwardSpeed, fwd);
+
+        // Auto-climb: if terrain is rising just ahead, treat it as "boosting"
+        // so the bike floats up and over it instead of snagging.
+        boolean obstacleAhead = this.forwardSpeed > 0.05 && this.blockedAhead();
+        double vy = vel.y + BikePhysics.verticalAccel(
+            this.sampleGroundDistance(), vel.y, boosting || obstacleAhead);
 
         double yawRad = Math.toRadians(this.getYRot());
         Vec3 facing = new Vec3(-Math.sin(yawRad), 0.0, Math.cos(yawRad));
@@ -207,6 +216,17 @@ public class SpeederBikeEntity extends VehicleEntity {
         double bx = vel.x + (desired.x - vel.x) * BikePhysics.VELOCITY_BLEND;
         double bz = vel.z + (desired.z - vel.z) * BikePhysics.VELOCITY_BLEND;
         this.setDeltaMovement(bx, vy, bz);
+    }
+
+    /** Is there a solid block just ahead at the bike's level? (auto-climb trigger) */
+    private boolean blockedAhead() {
+        double yawRad = Math.toRadians(this.getYRot());
+        Vec3 facing = new Vec3(-Math.sin(yawRad), 0.0, Math.cos(yawRad));
+        Vec3 from = this.position().add(0.0, 0.3, 0.0);
+        Vec3 to = from.add(facing.scale(1.6));
+        BlockHitResult hit = this.level().clip(new ClipContext(
+            from, to, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
+        return hit.getType() != HitResult.Type.MISS;
     }
 
     /** Distance from frame origin straight down to ground, fluid surfaces included. */
