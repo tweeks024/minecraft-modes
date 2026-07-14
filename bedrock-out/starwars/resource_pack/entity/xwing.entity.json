@@ -1,0 +1,20 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "starwars:xwing",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/xwing.png"
+      },
+      "geometry": {
+        "default": "geometry.starwars.xwing"
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ]
+    }
+  }
+}

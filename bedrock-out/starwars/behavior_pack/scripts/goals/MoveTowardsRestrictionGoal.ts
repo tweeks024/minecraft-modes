@@ -1,5 +1,5 @@
 // TODO LLM: cache miss; run :translate --with-llm to translate
-// Goal: net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal
+// Goal: net.minecraft.world.entity.ai.goal.MoveTowardsRestrictionGoal
 //
 // This file is a placeholder. Either:
 //   1. Run `./gradlew :translator:translate --with-llm` with ANTHROPIC_API_KEY set, or
@@ -8,7 +8,7 @@
 /*
 Original Java source — translate this:
 
-this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Player.class, true))
+this.goalSelector.addGoal(4, new MoveTowardsRestrictionGoal(this, 0.8))
 */
 
 // Empty handler so Bedrock's script engine accepts the file.

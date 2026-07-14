@@ -8,22 +8,28 @@ Bedrock recipes do not accept Java's datagen-only `category` hint; the field is 
 
 - `blaster_pistol`
 - `blaster_rifle`
+- `galaxy_map`
 - `han_solo_boots`
 - `han_solo_chestplate`
 - `han_solo_helmet`
 - `han_solo_leggings`
 - `landspeeder`
+- `speeder_bike`
 - `star_compass`
 - `stormtrooper_boots`
 - `stormtrooper_chestplate`
 - `stormtrooper_helmet`
 - `stormtrooper_leggings`
+- `tie_fighter`
+- `xwing`
 
 ## Loot table `random_sequence` dropped
 
 Bedrock has no equivalent of Java's `random_sequence` field; loot rolls use the level RNG instead.
 
 - `entities/astromech.json`
+- `entities/at_at.json`
+- `entities/band_droid.json`
 - `entities/bantha.json`
 - `entities/battle_droid.json`
 - `entities/boba_fett.json`
@@ -70,11 +76,15 @@ Java→Bedrock vanilla-sound path mapping is best-effort for Phase 1a (the trans
 
 These goals produced a `// TODO LLM:` stub at `behavior_pack/scripts/goals/<GoalClass>.ts`. Either re-run with `--with-llm` (and `ANTHROPIC_API_KEY` set) to fill them in, or hand-translate them:
 
+- `AtAtChinBlasterGoal` — cache miss; run :translate --with-llm to translate
+- `AtAtStompGoal` — cache miss; run :translate --with-llm to translate
+- `AvoidEntityGoal` — cache miss; run :translate --with-llm to translate
 - `BlasterAttackGoal` — cache miss; run :translate --with-llm to translate
 - `BobaJetpackGoal` — cache miss; run :translate --with-llm to translate
 - `HanQuickdrawGoal` — cache miss; run :translate --with-llm to translate
 - `LeiaRallyGoal` — cache miss; run :translate --with-llm to translate
 - `LukeLeapGoal` — cache miss; run :translate --with-llm to translate
+- `MoveTowardsRestrictionGoal` — cache miss; run :translate --with-llm to translate
 - `NearestAttackableTargetGoal` — cache miss; run :translate --with-llm to translate
 - `ObiWanPushGoal` — cache miss; run :translate --with-llm to translate
 - `ProbeBlasterGoal` — cache miss; run :translate --with-llm to translate
@@ -125,6 +135,7 @@ These goals are registered on a shared superclass but gated by a per-entity cond
 These items override `Item` methods (e.g. `postHurtEnemy`, `useOn`, `hurtEnemy`) with custom logic. Phase 3 (LLM stage) translates these to `behavior_pack/scripts/items/*.ts` event handlers; Phase 2 only emits the static item JSON:
 
 - `blaster_pistol`: BlasterPistolItem overrides: use. Scoundrel's Luck set bonus (full Han Solo set doubles the first blaster shot against each new target) is server-side Java logic — absent on Bedrock.
+- `galaxy_map`: GalaxyMapItem overrides: use
 - `han_solo_boots`: worn-armor visuals are absent on Bedrock — the item equips and protects (minecraft:wearable); the armor geometry/textures are emitted but no attachable consumes them, so nothing renders on the player's body.
 - `han_solo_chestplate`: worn-armor visuals are absent on Bedrock — the item equips and protects (minecraft:wearable); the armor geometry/textures are emitted but no attachable consumes them, so nothing renders on the player's body.
 - `han_solo_helmet`: worn-armor visuals are absent on Bedrock — the item equips and protects (minecraft:wearable); the armor geometry/textures are emitted but no attachable consumes them, so nothing renders on the player's body.
@@ -164,6 +175,8 @@ These items have a `resource_pack/attachables/<id>.json` (from a `.bbmodel`) who
 These spawn eggs received default base/overlay colors because the Java side computes them at runtime via `EntityType.Builder` defaults. Hand-tune per the source mod's mob palette if the colors look wrong in-game:
 
 - `astromech_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
+- `at_at_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
+- `band_droid_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `bantha_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `battle_droid_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `boba_fett_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
@@ -254,6 +267,7 @@ Bedrock has no equivalent of Java's procedural `Structure`/`StructurePiece` data
 These `VehicleEntity` subclasses are emitted as a ground-driven Bedrock approximation (`minecraft:rideable` + `minecraft:input_ground_controlled`) rather than the mob pipeline's walking-mob defaults. Java-specific hover/vehicle physics have no Bedrock equivalent:
 
 - `landspeeder`: Java hover physics (spring to 0.5 blocks, water-skimming) has no Bedrock equivalent — emitted as a ground-driven rideable (input_ground_controlled); banking/bob visuals dropped. A single-item loot table now backs minecraft:loot for drop parity with the Java destroy-drop. The item's attachable emission is suppressed for this entity (see ItemAnalyzer) since the full 3-block vehicle geometry would otherwise render as the held-item model.
+- `speeder_bike`: Java hover physics (spring to 0.5 blocks, water-skimming) has no Bedrock equivalent — emitted as a ground-driven rideable (input_ground_controlled); banking/bob visuals dropped. A single-item loot table now backs minecraft:loot for drop parity with the Java destroy-drop. The item's attachable emission is suppressed for this entity (see ItemAnalyzer) since the full 3-block vehicle geometry would otherwise render as the held-item model.
 
 ## Named-character singletons (not enforced on Bedrock)
 

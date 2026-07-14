@@ -1,0 +1,327 @@
+{
+  "format_version": "1.16.0",
+  "minecraft:geometry": [
+    {
+      "description": {
+        "identifier": "geometry.starwars.xwing",
+        "texture_width": 128,
+        "texture_height": 128,
+        "visible_bounds_width": 4,
+        "visible_bounds_height": 4,
+        "visible_bounds_offset": [
+          0,
+          0,
+          0
+        ]
+      },
+      "bones": [
+        {
+          "name": "fuselage",
+          "pivot": [
+            0,
+            8,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -3,
+                8,
+                -13
+              ],
+              "size": [
+                6,
+                6,
+                26
+              ],
+              "uv": [
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "name": "nose",
+          "pivot": [
+            0,
+            9,
+            -13
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -2,
+                9,
+                -23
+              ],
+              "size": [
+                4,
+                4,
+                10
+              ],
+              "uv": [
+                64,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "name": "cockpit",
+          "pivot": [
+            0,
+            14,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -2,
+                14,
+                -3
+              ],
+              "size": [
+                4,
+                3,
+                6
+              ],
+              "uv": [
+                64,
+                14
+              ]
+            }
+          ]
+        },
+        {
+          "name": "wing_tl",
+          "pivot": [
+            -3,
+            13.5,
+            8
+          ],
+          "rotation": [
+            0,
+            0,
+            12.5
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -17,
+                13,
+                3
+              ],
+              "size": [
+                14,
+                1,
+                10
+              ],
+              "uv": [
+                0,
+                32
+              ]
+            }
+          ]
+        },
+        {
+          "name": "wing_tr",
+          "pivot": [
+            3,
+            13.5,
+            8
+          ],
+          "rotation": [
+            0,
+            0,
+            12.5
+          ],
+          "cubes": [
+            {
+              "origin": [
+                3,
+                13,
+                3
+              ],
+              "size": [
+                14,
+                1,
+                10
+              ],
+              "uv": [
+                0,
+                43
+              ]
+            }
+          ]
+        },
+        {
+          "name": "wing_bl",
+          "pivot": [
+            -3,
+            8.5,
+            8
+          ],
+          "rotation": [
+            0,
+            0,
+            -12.5
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -17,
+                8,
+                3
+              ],
+              "size": [
+                14,
+                1,
+                10
+              ],
+              "uv": [
+                0,
+                54
+              ]
+            }
+          ]
+        },
+        {
+          "name": "wing_br",
+          "pivot": [
+            3,
+            8.5,
+            8
+          ],
+          "rotation": [
+            0,
+            0,
+            -12.5
+          ],
+          "cubes": [
+            {
+              "origin": [
+                3,
+                8,
+                3
+              ],
+              "size": [
+                14,
+                1,
+                10
+              ],
+              "uv": [
+                0,
+                65
+              ]
+            }
+          ]
+        },
+        {
+          "name": "engine_tl",
+          "pivot": [
+            -3,
+            12,
+            3
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -6,
+                12,
+                3
+              ],
+              "size": [
+                3,
+                3,
+                8
+              ],
+              "uv": [
+                0,
+                76
+              ]
+            }
+          ]
+        },
+        {
+          "name": "engine_tr",
+          "pivot": [
+            3,
+            12,
+            3
+          ],
+          "cubes": [
+            {
+              "origin": [
+                3,
+                12,
+                3
+              ],
+              "size": [
+                3,
+                3,
+                8
+              ],
+              "uv": [
+                22,
+                76
+              ]
+            }
+          ]
+        },
+        {
+          "name": "engine_bl",
+          "pivot": [
+            -3,
+            7,
+            3
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -6,
+                7,
+                3
+              ],
+              "size": [
+                3,
+                3,
+                8
+              ],
+              "uv": [
+                44,
+                76
+              ]
+            }
+          ]
+        },
+        {
+          "name": "engine_br",
+          "pivot": [
+            3,
+            7,
+            3
+          ],
+          "cubes": [
+            {
+              "origin": [
+                3,
+                7,
+                3
+              ],
+              "size": [
+                3,
+                3,
+                8
+              ],
+              "uv": [
+                66,
+                76
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

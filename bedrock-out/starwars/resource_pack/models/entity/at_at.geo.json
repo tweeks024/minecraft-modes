@@ -1,0 +1,312 @@
+{
+  "format_version": "1.16.0",
+  "minecraft:geometry": [
+    {
+      "description": {
+        "identifier": "geometry.starwars.at_at",
+        "texture_width": 256,
+        "texture_height": 128,
+        "visible_bounds_width": 4,
+        "visible_bounds_height": 4,
+        "visible_bounds_offset": [
+          0,
+          0,
+          0
+        ]
+      },
+      "bones": [
+        {
+          "name": "body",
+          "pivot": [
+            0,
+            88,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -18,
+                88,
+                -32
+              ],
+              "size": [
+                36,
+                28,
+                64
+              ],
+              "uv": [
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "name": "neck",
+          "pivot": [
+            0,
+            110,
+            -32
+          ],
+          "rotation": [
+            45,
+            0,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -4,
+                107,
+                -52
+              ],
+              "size": [
+                8,
+                6,
+                20
+              ],
+              "uv": [
+                64,
+                92
+              ]
+            }
+          ]
+        },
+        {
+          "name": "head",
+          "pivot": [
+            0,
+            118,
+            -40
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -7,
+                118,
+                -58
+              ],
+              "size": [
+                14,
+                10,
+                18
+              ],
+              "uv": [
+                0,
+                92
+              ]
+            }
+          ]
+        },
+        {
+          "name": "leg_fl",
+          "pivot": [
+            -14,
+            88,
+            -26
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -18,
+                0,
+                -30
+              ],
+              "size": [
+                8,
+                88,
+                8
+              ],
+              "uv": [
+                200,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "name": "leg_fr",
+          "pivot": [
+            14,
+            88,
+            -26
+          ],
+          "cubes": [
+            {
+              "origin": [
+                10,
+                0,
+                -30
+              ],
+              "size": [
+                8,
+                88,
+                8
+              ],
+              "uv": [
+                200,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "name": "leg_bl",
+          "pivot": [
+            -14,
+            88,
+            26
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -18,
+                0,
+                22
+              ],
+              "size": [
+                8,
+                88,
+                8
+              ],
+              "uv": [
+                200,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "name": "leg_br",
+          "pivot": [
+            14,
+            88,
+            26
+          ],
+          "cubes": [
+            {
+              "origin": [
+                10,
+                0,
+                22
+              ],
+              "size": [
+                8,
+                88,
+                8
+              ],
+              "uv": [
+                200,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "name": "foot_fl",
+          "pivot": [
+            -14,
+            0,
+            -26
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -20,
+                0,
+                -32
+              ],
+              "size": [
+                12,
+                6,
+                12
+              ],
+              "uv": [
+                120,
+                92
+              ]
+            }
+          ]
+        },
+        {
+          "name": "foot_fr",
+          "pivot": [
+            14,
+            0,
+            -26
+          ],
+          "cubes": [
+            {
+              "origin": [
+                8,
+                0,
+                -32
+              ],
+              "size": [
+                12,
+                6,
+                12
+              ],
+              "uv": [
+                120,
+                92
+              ]
+            }
+          ]
+        },
+        {
+          "name": "foot_bl",
+          "pivot": [
+            -14,
+            0,
+            26
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -20,
+                0,
+                20
+              ],
+              "size": [
+                12,
+                6,
+                12
+              ],
+              "uv": [
+                120,
+                92
+              ]
+            }
+          ]
+        },
+        {
+          "name": "foot_br",
+          "pivot": [
+            14,
+            0,
+            26
+          ],
+          "cubes": [
+            {
+              "origin": [
+                8,
+                0,
+                20
+              ],
+              "size": [
+                12,
+                6,
+                12
+              ],
+              "uv": [
+                120,
+                92
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

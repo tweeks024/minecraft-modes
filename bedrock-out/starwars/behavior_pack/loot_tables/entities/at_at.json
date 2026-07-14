@@ -1,0 +1,86 @@
+{
+  "pools": [
+    {
+      "rolls": 1.0,
+      "entries": [
+        {
+          "type": "item",
+          "name": "minecraft:iron_ingot",
+          "functions": [
+            {
+              "add": false,
+              "count": {
+                "max": 8.0,
+                "min": 4.0,
+                "type": "uniform"
+              },
+              "function": "set_count"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1.0,
+      "entries": [
+        {
+          "type": "item",
+          "name": "minecraft:iron_block",
+          "functions": [
+            {
+              "add": false,
+              "count": 1.0,
+              "function": "set_count"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1.0,
+      "entries": [
+        {
+          "type": "item",
+          "name": "minecraft:redstone",
+          "functions": [
+            {
+              "add": false,
+              "count": {
+                "max": 2.0,
+                "min": 1.0,
+                "type": "uniform"
+              },
+              "function": "set_count"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1.0,
+      "conditions": [
+        {
+          "chance": 0.1,
+          "condition": "random_chance"
+        }
+      ],
+      "entries": [
+        {
+          "type": "item",
+          "name": "starwars:blaster_rifle",
+          "functions": [
+            {
+              "add": false,
+              "damage": {
+                "max": 1.0,
+                "min": 0.3,
+                "type": "uniform"
+              },
+              "function": "set_damage"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

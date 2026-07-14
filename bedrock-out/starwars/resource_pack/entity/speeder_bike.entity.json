@@ -1,0 +1,20 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "starwars:speeder_bike",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/speeder_bike.png"
+      },
+      "geometry": {
+        "default": "geometry.starwars.speeder_bike"
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ]
+    }
+  }
+}

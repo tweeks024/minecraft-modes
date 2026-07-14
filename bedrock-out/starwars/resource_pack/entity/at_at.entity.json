@@ -1,0 +1,20 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "starwars:at_at",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/at_at.png"
+      },
+      "geometry": {
+        "default": "geometry.starwars.at_at"
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ]
+    }
+  }
+}

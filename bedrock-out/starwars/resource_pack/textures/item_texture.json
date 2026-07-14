@@ -5,6 +5,12 @@
     "starwars:astromech_spawn_egg": {
       "textures": "textures/items/astromech_spawn_egg"
     },
+    "starwars:at_at_spawn_egg": {
+      "textures": "textures/items/at_at_spawn_egg"
+    },
+    "starwars:band_droid_spawn_egg": {
+      "textures": "textures/items/band_droid_spawn_egg"
+    },
     "starwars:bantha_spawn_egg": {
       "textures": "textures/items/bantha_spawn_egg"
     },
@@ -31,6 +37,9 @@
     },
     "starwars:dragonsnake_spawn_egg": {
       "textures": "textures/items/dragonsnake_spawn_egg"
+    },
+    "starwars:galaxy_map": {
+      "textures": "textures/items/galaxy_map"
     },
     "starwars:han_solo_boots": {
       "textures": "textures/items/han_solo_boots"
@@ -89,6 +98,9 @@
     "starwars:snowtrooper_spawn_egg": {
       "textures": "textures/items/snowtrooper_spawn_egg"
     },
+    "starwars:speeder_bike": {
+      "textures": "textures/items/speeder_bike"
+    },
     "starwars:star_compass": {
       "textures": "textures/items/star_compass"
     },
@@ -110,11 +122,17 @@
     "starwars:tauntaun_spawn_egg": {
       "textures": "textures/items/tauntaun_spawn_egg"
     },
+    "starwars:tie_fighter": {
+      "textures": "textures/items/tie_fighter"
+    },
     "starwars:tusken_raider_spawn_egg": {
       "textures": "textures/items/tusken_raider_spawn_egg"
     },
     "starwars:wampa_spawn_egg": {
       "textures": "textures/items/wampa_spawn_egg"
+    },
+    "starwars:xwing": {
+      "textures": "textures/items/xwing"
     },
     "starwars:yoda_spawn_egg": {
       "textures": "textures/items/yoda_spawn_egg"

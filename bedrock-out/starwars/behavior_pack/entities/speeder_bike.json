@@ -1,0 +1,63 @@
+{
+  "format_version": "1.21.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "starwars:speeder_bike",
+      "is_spawnable": true,
+      "is_summonable": true
+    },
+    "components": {
+      "minecraft:collision_box": {
+        "width": 1.6,
+        "height": 0.8
+      },
+      "minecraft:health": {
+        "value": 30,
+        "max": 30
+      },
+      "minecraft:input_ground_controlled": {},
+      "minecraft:loot": {
+        "table": "loot_tables/entities/speeder_bike.json"
+      },
+      "minecraft:movement": {
+        "value": 0.35
+      },
+      "minecraft:movement.basic": {},
+      "minecraft:physics": {},
+      "minecraft:pushable": {
+        "is_pushable": false,
+        "is_pushable_by_piston": true
+      },
+      "minecraft:rideable": {
+        "seat_count": 2,
+        "family_types": [
+          "player"
+        ],
+        "interact_text": "action.interact.ride",
+        "seats": [
+          {
+            "position": [
+              -0.25,
+              0.35,
+              0
+            ]
+          },
+          {
+            "position": [
+              0.25,
+              0.35,
+              0
+            ]
+          }
+        ]
+      },
+      "minecraft:type_family": {
+        "family": [
+          "speeder_bike",
+          "vehicle"
+        ]
+      }
+    },
+    "events": {}
+  }
+}

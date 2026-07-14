@@ -1,0 +1,20 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "starwars:tie_fighter",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/tie_fighter.png"
+      },
+      "geometry": {
+        "default": "geometry.starwars.tie_fighter"
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ]
+    }
+  }
+}
