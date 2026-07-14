@@ -1,0 +1,19 @@
+{
+  "format_version": "1.21.0",
+  "minecraft:item": {
+    "description": {
+      "identifier": "starwars:saberstaff",
+      "menu_category": {
+        "category": "items"
+      }
+    },
+    "components": {
+      "minecraft:durability": {
+        "max_durability": 2000
+      },
+      "minecraft:hand_equipped": true,
+      "minecraft:icon": "starwars:saberstaff",
+      "minecraft:max_stack_size": 1
+    }
+  }
+}

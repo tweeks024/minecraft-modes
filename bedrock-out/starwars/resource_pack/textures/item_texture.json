@@ -38,6 +38,9 @@
     "starwars:credit": {
       "textures": "textures/items/credit"
     },
+    "starwars:darth_maul_spawn_egg": {
+      "textures": "textures/items/darth_maul_spawn_egg"
+    },
     "starwars:darth_vader_spawn_egg": {
       "textures": "textures/items/darth_vader_spawn_egg"
     },
@@ -121,6 +124,9 @@
     },
     "starwars:saber_hilt": {
       "textures": "textures/items/saber_hilt"
+    },
+    "starwars:saberstaff": {
+      "textures": "textures/items/saberstaff"
     },
     "starwars:snowtrooper_spawn_egg": {
       "textures": "textures/items/snowtrooper_spawn_egg"

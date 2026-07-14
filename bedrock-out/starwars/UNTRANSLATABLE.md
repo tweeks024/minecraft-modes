@@ -28,6 +28,7 @@ Bedrock recipes do not accept Java's datagen-only `category` hint; the field is 
 ## Recipe types not yet supported
 
 - `kyber_saber`: type `starwars:kyber_saber`
+- `saberstaff`: type `starwars:saberstaff`
 
 ## Loot table `random_sequence` dropped
 
@@ -41,6 +42,7 @@ Bedrock has no equivalent of Java's `random_sequence` field; loot rolls use the 
 - `entities/boba_fett.json`
 - `entities/bogwing.json`
 - `entities/chewbacca.json`
+- `entities/darth_maul.json`
 - `entities/darth_vader.json`
 - `entities/dragonsnake.json`
 - `entities/ewok.json`
@@ -101,6 +103,8 @@ These goals produced a `// TODO LLM:` stub at `behavior_pack/scripts/goals/<Goal
 - `HanQuickdrawGoal` — cache miss; run :translate --with-llm to translate
 - `LeiaRallyGoal` — cache miss; run :translate --with-llm to translate
 - `LukeLeapGoal` — cache miss; run :translate --with-llm to translate
+- `MaulLeapGoal` — cache miss; run :translate --with-llm to translate
+- `MaulSpinGoal` — cache miss; run :translate --with-llm to translate
 - `MoveTowardsRestrictionGoal` — cache miss; run :translate --with-llm to translate
 - `NearestAttackableTargetGoal` — cache miss; run :translate --with-llm to translate
 - `ObiWanPushGoal` — cache miss; run :translate --with-llm to translate
@@ -168,6 +172,7 @@ These items override `Item` methods (e.g. `postHurtEnemy`, `useOn`, `hurtEnemy`)
 - `kyber_crystal`: KyberCrystalItem overrides: use
 - `landspeeder`: LandspeederItem overrides: use
 - `lightsaber`: LightsaberItem overrides: use, hurtEnemy
+- `saberstaff`: SaberstaffItem overrides: use, hurtEnemy
 - `star_compass`: StarCompassItem overrides: useOn. Gate ignition (iron-block frame validation + planet-picker UI that fills the frame with hyperspace_portal film) is server-side Java logic — absent on Bedrock; the hyperspace_portal block and the planet dimensions it leads to are not translated.
 - `stormtrooper_boots`: worn-armor visuals are absent on Bedrock — the item equips and protects (minecraft:wearable); the armor geometry/textures are emitted but no attachable consumes them, so nothing renders on the player's body.
 - `stormtrooper_chestplate`: worn-armor visuals are absent on Bedrock — the item equips and protects (minecraft:wearable); the armor geometry/textures are emitted but no attachable consumes them, so nothing renders on the player's body.
@@ -200,6 +205,7 @@ These items have a `resource_pack/attachables/<id>.json` (from a `.bbmodel`) who
 - `blaster_rifle`: no dedicated textures/entity/blaster_rifle texture was authored; the attachable falls back to the item icon texture textures/items/blaster_rifle for the 3D held-item view — verify visually in-game.
 - `holocron`: no dedicated textures/entity/holocron texture was authored; the attachable falls back to the item icon texture textures/items/holocron for the 3D held-item view — verify visually in-game.
 - `lightsaber`: no dedicated textures/entity/lightsaber texture was authored; the attachable falls back to the item icon texture textures/items/lightsaber_blue for the 3D held-item view — verify visually in-game.
+- `saberstaff`: no dedicated textures/entity/saberstaff texture was authored; the attachable falls back to the item icon texture textures/items/saberstaff for the 3D held-item view — verify visually in-game.
 
 ## Spawn egg colors hardcoded
 
@@ -213,6 +219,7 @@ These spawn eggs received default base/overlay colors because the Java side comp
 - `boba_fett_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `bogwing_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `chewbacca_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
+- `darth_maul_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `darth_vader_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `dragonsnake_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `ewok_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
@@ -341,6 +348,7 @@ These `VehicleEntity` subclasses are emitted as a ground-driven Bedrock approxim
 These entities enforce a one-living-instance-per-server invariant on the Java side via a `*SavedData` class. Bedrock has no SavedData equivalent, so this invariant is not enforced in the translated output — duplicates are possible:
 
 - `boba_fett`: Java enforces one living instance per server via SavedData (finalizeSpawn claim + die/remove clear); Bedrock output has no equivalent — duplicates are possible.
+- `darth_maul`: Java enforces one living instance per server via SavedData (finalizeSpawn claim + die/remove clear); Bedrock output has no equivalent — duplicates are possible.
 - `darth_vader`: Java enforces one living instance per server via SavedData (finalizeSpawn claim + die/remove clear); Bedrock output has no equivalent — duplicates are possible.
 - `han_solo`: Java enforces one living instance per server via SavedData (finalizeSpawn claim + die/remove clear); Bedrock output has no equivalent — duplicates are possible.
 - `luke_skywalker`: Java enforces one living instance per server via SavedData (finalizeSpawn claim + die/remove clear); Bedrock output has no equivalent — duplicates are possible.

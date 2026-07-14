@@ -1,0 +1,20 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "starwars:darth_maul",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/darth_maul.png"
+      },
+      "geometry": {
+        "default": "geometry.starwars.darth_maul"
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ]
+    }
+  }
+}
