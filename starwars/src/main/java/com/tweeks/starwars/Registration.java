@@ -157,6 +157,12 @@ public final class Registration {
     public static final DeferredItem<SpawnEggItem> BAND_DROID_SPAWN_EGG = ITEMS.registerItem(
         "band_droid_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.BAND_DROID.get()));
 
+    public static final DeferredItem<SpawnEggItem> CHEWBACCA_SPAWN_EGG = ITEMS.registerItem(
+        "chewbacca_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.CHEWBACCA.get()));
+
+    public static final DeferredItem<SpawnEggItem> GROGU_SPAWN_EGG = ITEMS.registerItem(
+        "grogu_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.GROGU.get()));
+
     public static final DeferredItem<Item> STORMTROOPER_HELMET = ITEMS.registerItem("stormtrooper_helmet",
         Item::new,
         p -> p.humanoidArmor(com.tweeks.starwars.item.StormtrooperArmorMaterials.STORMTROOPER,
@@ -281,6 +287,8 @@ public final class Registration {
                     output.accept(YODA_SPAWN_EGG.get());
                     output.accept(AT_AT_SPAWN_EGG.get());
                     output.accept(BAND_DROID_SPAWN_EGG.get());
+                    output.accept(CHEWBACCA_SPAWN_EGG.get());
+                    output.accept(GROGU_SPAWN_EGG.get());
                     // Later tasks append their items here.
                 })
                 .build());

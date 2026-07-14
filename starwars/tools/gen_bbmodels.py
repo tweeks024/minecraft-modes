@@ -573,6 +573,76 @@ BAND_DROID_CUBES = [
     ('left_leg',  (1, 6, 0),   (0, 0, -1, 2, 6, 2),    (12, 32)),
 ]
 
+# -----------------------------------------------------------------------------
+# Companion mobs. Bone names + cube sizes are the hand-off contract with the
+# Java entity models being written in parallel — verbatim from the brief, do
+# not rename/resize. Both are custom skeletons with their own bone tables.
+# snout/ear_left/ear_right (Chewbacca) and ear_left/ear_right/robe_skirt
+# (Grogu) are accessory cubes riding the head/body bones (like yoda's ears).
+# -----------------------------------------------------------------------------
+
+# Chewbacca (64x64): tall Wookiee. Legs 0..8, body 6..20 (14 tall), head
+# 20..28 with a forward-jutting snout + small top-side ears; long 14-tall arms
+# hang from the shoulders down past the hips.
+CHEW_HEAD_BONE = (0, 20, 0)
+CHEW_BODY_BONE = (0, 6, 0)
+CHEW_RARM_BONE = (-5.5, 18, 0)
+CHEW_LARM_BONE = (5.5, 18, 0)
+CHEW_RLEG_BONE = (-2, 8, 0)
+CHEW_LLEG_BONE = (2, 8, 0)
+
+CHEWBACCA_BONE_DEFS = [
+    ('head', CHEW_HEAD_BONE),
+    ('body', CHEW_BODY_BONE),
+    ('right_arm', CHEW_RARM_BONE),
+    ('left_arm', CHEW_LARM_BONE),
+    ('right_leg', CHEW_RLEG_BONE),
+    ('left_leg', CHEW_LLEG_BONE),
+]
+
+CHEWBACCA_CUBES = [
+    ('head',      CHEW_HEAD_BONE, (-4.0,  -8.0, -4.0, 8, 8, 8),  (0, 0)),
+    ('snout',     CHEW_HEAD_BONE, (-2.0,  -3.0, -7.0, 4, 3, 4),  (32, 0)),
+    ('ear_left',  CHEW_HEAD_BONE, ( 4.0,  -8.0, -0.5, 1, 2, 1),  (48, 0)),
+    ('ear_right', CHEW_HEAD_BONE, (-5.0,  -8.0, -0.5, 1, 2, 1),  (52, 0)),
+    ('body',      CHEW_BODY_BONE, (-4.0, -14.0, -2.5, 8, 14, 5), (0, 16)),
+    ('right_arm', CHEW_RARM_BONE, (-1.5,   0.0, -1.5, 3, 14, 3), (28, 16)),
+    ('left_arm',  CHEW_LARM_BONE, (-1.5,   0.0, -1.5, 3, 14, 3), (40, 16)),
+    ('right_leg', CHEW_RLEG_BONE, (-1.5,   0.0, -1.5, 3, 8, 3),  (0, 36)),
+    ('left_leg',  CHEW_LLEG_BONE, (-1.5,   0.0, -1.5, 3, 8, 3),  (14, 36)),
+]
+
+# Grogu (32x32): tiny foundling. Legs 0..2, body 2..7, oversized head 6..12
+# (sunk onto the body, no neck) with big ears flaring straight out at head
+# mid-height; stubby arms; a robe_skirt overlay wrapping wider+under the body.
+GROGU_HEAD_BONE = (0, 6, 0)
+GROGU_BODY_BONE = (0, 2, 0)
+GROGU_RARM_BONE = (-2.5, 6, 0)
+GROGU_LARM_BONE = (2.5, 6, 0)
+GROGU_RLEG_BONE = (-1, 2, 0)
+GROGU_LLEG_BONE = (1, 2, 0)
+
+GROGU_BONE_DEFS = [
+    ('head', GROGU_HEAD_BONE),
+    ('body', GROGU_BODY_BONE),
+    ('right_arm', GROGU_RARM_BONE),
+    ('left_arm', GROGU_LARM_BONE),
+    ('right_leg', GROGU_RLEG_BONE),
+    ('left_leg', GROGU_LLEG_BONE),
+]
+
+GROGU_CUBES = [
+    ('head',       GROGU_HEAD_BONE, (-3.5, -6.0, -3.0, 7, 6, 6), (0, 0)),
+    ('ear_left',   GROGU_HEAD_BONE, ( 3.5, -3.5, -1.5, 5, 1, 3), (0, 14)),
+    ('ear_right',  GROGU_HEAD_BONE, (-8.5, -3.5, -1.5, 5, 1, 3), (0, 18)),
+    ('body',       GROGU_BODY_BONE, (-2.0, -5.0, -1.5, 4, 5, 3), (0, 22)),
+    ('right_arm',  GROGU_RARM_BONE, (-0.5,  0.0, -0.5, 1, 4, 1), (16, 12)),
+    ('left_arm',   GROGU_LARM_BONE, (-0.5,  0.0, -0.5, 1, 4, 1), (20, 12)),
+    ('right_leg',  GROGU_RLEG_BONE, (-0.5,  0.0, -0.5, 1, 2, 1), (24, 12)),
+    ('left_leg',   GROGU_LLEG_BONE, (-0.5,  0.0, -0.5, 1, 2, 1), (28, 12)),
+    ('robe_skirt', GROGU_BODY_BONE, (-2.5, -2.0, -2.0, 5, 3, 4), (14, 22)),
+]
+
 # mob_name -> bone_defs override (only needed for mobs whose bone set/pivots
 # aren't the standard humanoid table).
 MOB_BONE_DEFS = {
@@ -591,6 +661,8 @@ MOB_BONE_DEFS = {
     'tie_fighter': TIE_FIGHTER_BONE_DEFS,
     'at_at': AT_AT_BONE_DEFS,
     'band_droid': BAND_DROID_BONE_DEFS,
+    'chewbacca': CHEWBACCA_BONE_DEFS,
+    'grogu': GROGU_BONE_DEFS,
 }
 
 # mob_name -> (tex_width, tex_height) for non-64x64 texture canvases.
@@ -601,7 +673,8 @@ MOB_TEX_SIZES = {
     'xwing': (128, 128),
     'tie_fighter': (128, 64),
     'at_at': (256, 128),
-    # speeder_bike + band_droid use the default 64x64 canvas.
+    'grogu': (32, 32),
+    # speeder_bike + band_droid + chewbacca use the default 64x64 canvas.
 }
 
 MOBS = {
@@ -649,6 +722,9 @@ MOBS = {
     'tie_fighter': TIE_FIGHTER_CUBES,
     'at_at': AT_AT_CUBES,
     'band_droid': BAND_DROID_CUBES,
+    # Companions: custom skeletons (see *_BONE_DEFS above).
+    'chewbacca': CHEWBACCA_CUBES,
+    'grogu': GROGU_CUBES,
 }
 
 

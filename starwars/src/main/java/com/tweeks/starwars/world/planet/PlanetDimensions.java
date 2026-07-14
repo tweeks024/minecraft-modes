@@ -315,6 +315,8 @@ public final class PlanetDimensions {
         mobs.addSpawn(MobCategory.MONSTER, 6, new MobSpawnSettings.SpawnerData(EntityType.SLIME, 1, 3));
         mobs.addSpawn(MobCategory.MONSTER, 8, new MobSpawnSettings.SpawnerData(ModEntities.DRAGONSNAKE.get(), 1, 2));
         mobs.addSpawn(MobCategory.AMBIENT, 8, new MobSpawnSettings.SpawnerData(ModEntities.BOGWING.get(), 2, 4));
+        // Somewhere in the deep marsh, a very rare little one waits.
+        mobs.addSpawn(MobCategory.CREATURE, 1, new MobSpawnSettings.SpawnerData(ModEntities.GROGU.get(), 1, 1));
 
         BiomeGenerationSettings.Builder gen = new BiomeGenerationSettings.Builder(features, carvers);
         BiomeDefaultFeatures.addDefaultCarversAndLakes(gen);
@@ -413,6 +415,9 @@ public final class PlanetDimensions {
         mobs.addSpawn(MobCategory.CREATURE, 4, new MobSpawnSettings.SpawnerData(EntityType.FOX, 1, 2));
         mobs.addSpawn(MobCategory.MONSTER, 10, new MobSpawnSettings.SpawnerData(ModEntities.STORMTROOPER.get(), 2, 4));
         mobs.addSpawn(MobCategory.CREATURE, 8, new MobSpawnSettings.SpawnerData(ModEntities.REBEL_TROOPER.get(), 2, 4));
+        // A wild Chewbacca roams the highland woods — find him, feed him,
+        // and he's yours.
+        mobs.addSpawn(MobCategory.CREATURE, 2, new MobSpawnSettings.SpawnerData(ModEntities.CHEWBACCA.get(), 1, 1));
 
         BiomeGenerationSettings.Builder gen = new BiomeGenerationSettings.Builder(features, carvers);
         BiomeDefaultFeatures.addDefaultCarversAndLakes(gen);

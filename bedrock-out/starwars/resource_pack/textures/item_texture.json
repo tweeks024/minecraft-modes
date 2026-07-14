@@ -32,6 +32,9 @@
     "starwars:cantina_record": {
       "textures": "textures/items/cantina_record"
     },
+    "starwars:chewbacca_spawn_egg": {
+      "textures": "textures/items/chewbacca_spawn_egg"
+    },
     "starwars:darth_vader_spawn_egg": {
       "textures": "textures/items/darth_vader_spawn_egg"
     },
@@ -40,6 +43,9 @@
     },
     "starwars:galaxy_map": {
       "textures": "textures/items/galaxy_map"
+    },
+    "starwars:grogu_spawn_egg": {
+      "textures": "textures/items/grogu_spawn_egg"
     },
     "starwars:han_solo_boots": {
       "textures": "textures/items/han_solo_boots"

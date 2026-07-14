@@ -1419,6 +1419,166 @@ def paint_at_at(rgba):
     shade_box(rgba, bw, 120, 92, 12, 6, 12, AT_GRAY_SH, AT_GRAY, AT_JOINT)
     rectb(rgba, bw, 120, 104, 168, 110, AT_JOINT)
 
+# -----------------------------------------------------------------------------
+# Companion mobs: Chewbacca (64x64) + Grogu (32x32). Box-UV offsets below match
+# gen_bbmodels.py's CHEWBACCA_CUBES / GROGU_CUBES exactly.
+# -----------------------------------------------------------------------------
+
+# Chewbacca (64x64): shaggy warm-brown Wookiee. Vertical fur banding all over,
+# a slightly lighter face/snout, dark eyes + black nose, and a diagonal leather
+# bandolier (silver ammo boxes) across the chest + back. Long fully-furred arms.
+# UV: head 8x8x8 @(0,0) [face front x8..16,y8..16]; snout 4x3x4 @(32,0)
+# [nose front x36..40,y4..7]; ear_left/ear_right 1x2x1 @(48,0)/(52,0);
+# body 8x14x5 @(0,16) [chest front x5..13, back x18..26, rows 21..35];
+# right_arm/left_arm 3x14x3 @(28,16)/(40,16); right_leg/left_leg 3x8x3
+# @(0,36)/(14,36).
+CHEW_FUR      = (0x6B, 0x4A, 0x2E, 0xFF)   # warm brown (egg primary)
+CHEW_FUR_HI   = (0x8C, 0x64, 0x40, 0xFF)   # lit brown
+CHEW_FUR_SH   = (0x4A, 0x31, 0x1E, 0xFF)   # shadow brown
+CHEW_FUR_DK   = (0x35, 0x24, 0x16, 0xFF)   # darkest streak (~egg secondary)
+CHEW_FACE     = (0x86, 0x60, 0x40, 0xFF)   # lighter face/muzzle
+CHEW_FACE_HI  = (0xA2, 0x7A, 0x54, 0xFF)
+CHEW_FACE_SH  = (0x64, 0x46, 0x2C, 0xFF)
+CHEW_EYE      = (0x17, 0x0E, 0x09, 0xFF)   # dark eyes
+CHEW_NOSE     = (0x0C, 0x09, 0x07, 0xFF)   # black nose
+CHEW_STRAP    = (0x33, 0x24, 0x18, 0xFF)   # dark leather bandolier
+CHEW_STRAP_HI = (0x4E, 0x39, 0x26, 0xFF)
+CHEW_AMMO     = (0xBE, 0xC2, 0xCA, 0xFF)   # silver ammo box
+CHEW_AMMO_SH  = (0x84, 0x88, 0x90, 0xFF)
+
+def _fur_region(rgba, x0, y0, x1, y1, salt):
+    """Shaggy vertical fur banding over a box-UV footprint already base-shaded
+    by shade_box: broken dark + light vertical streaks (deterministic, no RNG,
+    64x64 canvas)."""
+    for x in range(x0, x1):
+        col = (x + salt) % 3
+        for y in range(y0, y1):
+            broken = (x * 5 + y * 3 + salt) % 4
+            if col == 0 and broken != 0:
+                c = CHEW_FUR_DK
+            elif col == 2 and broken == 0:
+                c = CHEW_FUR_HI
+            else:
+                continue
+            i = 4 * (y * W + x)
+            rgba[i+0], rgba[i+1], rgba[i+2], rgba[i+3] = c
+
+def _bandolier(rgba, x0, y0, w, h, flip):
+    """Stepped 2px diagonal leather bandolier with silver ammo boxes across a
+    body face at (x0,y0) spanning w x h (64x64 canvas)."""
+    for i in range(h):
+        fx = (w - 2) * i // (h - 1)
+        if flip:
+            fx = (w - 2) - fx
+        sx = x0 + fx
+        rect(rgba, sx, y0 + i, sx + 2, y0 + i + 1, CHEW_STRAP)
+        rect(rgba, sx, y0 + i, sx + 1, y0 + i + 1, CHEW_STRAP_HI)  # lit edge
+    for i in range(2, h - 2, 4):                     # silver ammo boxes
+        fx = (w - 2) * i // (h - 1)
+        if flip:
+            fx = (w - 2) - fx
+        sx = x0 + fx
+        rect(rgba, sx, y0 + i, sx + 2, y0 + i + 2, CHEW_AMMO)
+        rect(rgba, sx, y0 + i + 1, sx + 2, y0 + i + 2, CHEW_AMMO_SH)
+
+def paint_chewbacca(rgba):
+    fill(rgba, (0, 0, 0, 0))
+    # Head 8x8x8 @(0,0): shaggy fur; lighter face on the front face (x8..16).
+    shade_box(rgba, W, 0, 0, 8, 8, 8, CHEW_FUR, CHEW_FUR_HI, CHEW_FUR_SH)
+    _fur_region(rgba, 0, 0, 32, 16, 1)
+    rect(rgba, 9, 10, 15, 16, CHEW_FACE)             # lighter muzzle-frame
+    rect(rgba, 9, 10, 15, 11, CHEW_FACE_HI)          # brow-ridge highlight
+    rect(rgba, 9, 15, 15, 16, CHEW_FACE_SH)          # jaw shadow
+    rect(rgba, 9, 11, 15, 12, CHEW_FUR_DK)           # brow fur line
+    rect(rgba, 10, 12, 11, 13, CHEW_EYE)             # eye L
+    rect(rgba, 13, 12, 14, 13, CHEW_EYE)             # eye R
+    # Snout 4x3x4 @(32,0): black nose on the front face, muzzle below; furry top.
+    shade_box(rgba, W, 32, 0, 4, 3, 4, CHEW_FACE, CHEW_FACE_HI, CHEW_FACE_SH)
+    rect(rgba, 36, 0, 40, 1, CHEW_FUR_HI)            # up face (snout crown fur)
+    rect(rgba, 36, 4, 40, 5, CHEW_NOSE)              # black nose
+    rect(rgba, 36, 5, 40, 7, CHEW_FACE)              # muzzle
+    rect(rgba, 36, 6, 40, 7, CHEW_FACE_SH)           # lip line
+    # Ears 1x2x1 @(48,0)/(52,0): furred.
+    shade_box(rgba, W, 48, 0, 1, 2, 1, CHEW_FUR, CHEW_FUR_HI, CHEW_FUR_SH)
+    shade_box(rgba, W, 52, 0, 1, 2, 1, CHEW_FUR, CHEW_FUR_HI, CHEW_FUR_SH)
+    # Body 8x14x5 @(0,16): shaggy fur + diagonal bandolier on the chest (front
+    # face x5..13) and back (back face x18..26).
+    shade_box(rgba, W, 0, 16, 8, 14, 5, CHEW_FUR, CHEW_FUR_HI, CHEW_FUR_SH)
+    _fur_region(rgba, 0, 16, 26, 35, 2)
+    _bandolier(rgba, 5, 21, 8, 14, False)            # chest strap
+    _bandolier(rgba, 18, 21, 8, 14, True)            # back strap
+    # Arms 3x14x3 @(28,16)/(40,16): long, fully furred.
+    for u0 in (28, 40):
+        shade_box(rgba, W, u0, 16, 3, 14, 3, CHEW_FUR, CHEW_FUR_HI, CHEW_FUR_SH)
+        _fur_region(rgba, u0, 16, u0 + 12, 33, u0)
+    # Legs 3x8x3 @(0,36)/(14,36): furred, darker paw rows.
+    for u0 in (0, 14):
+        shade_box(rgba, W, u0, 36, 3, 8, 3, CHEW_FUR, CHEW_FUR_HI, CHEW_FUR_SH)
+        _fur_region(rgba, u0, 36, u0 + 12, 47, u0 + 3)
+        rect(rgba, u0, 45, u0 + 12, 47, CHEW_FUR_DK)  # dark paws
+
+# Grogu (32x32): pale sage-green foundling with an oversized head, big round
+# ears (green outside / pink inside), huge dark friendly eyes, tiny nose+mouth,
+# and a coarse tan robe. Adorable is the goal.
+# UV: head 7x6x6 @(0,0) [face front x6..13,y6..12]; ear_left 5x1x3 @(0,14)
+# [outer=up x3..8, inner/pink=down x8..13]; ear_right @(0,18);
+# body 4x5x3 @(0,22) [robe front x3..7,y25..30]; right_arm/left_arm 1x4x1
+# @(16,12)/(20,12); right_leg/left_leg 1x2x1 @(24,12)/(28,12);
+# robe_skirt 5x3x4 @(14,22).
+GROGU_SKIN     = (0x8F, 0xA8, 0x6E, 0xFF)  # pale sage green (egg primary)
+GROGU_SKIN_HI  = (0xA8, 0xBE, 0x88, 0xFF)
+GROGU_SKIN_SH  = (0x6E, 0x86, 0x52, 0xFF)
+GROGU_EAR_IN   = (0xD6, 0xA6, 0xA0, 0xFF)  # pink inner ear
+GROGU_EAR_INSH = (0xBC, 0x86, 0x82, 0xFF)
+GROGU_EYE      = (0x17, 0x11, 0x0F, 0xFF)  # big dark eyes
+GROGU_EYE_HI   = (0x4A, 0x3C, 0x36, 0xFF)  # catchlight
+GROGU_NOSE     = (0x5C, 0x4E, 0x42, 0xFF)  # tiny nose
+GROGU_ROBE     = (0xC8, 0xB2, 0x86, 0xFF)  # coarse tan robe (egg secondary)
+GROGU_ROBE_HI  = (0xDC, 0xC8, 0xA0, 0xFF)
+GROGU_ROBE_SH  = (0xA6, 0x90, 0x66, 0xFF)
+
+def paint_grogu(rgba):
+    bw = 32
+    fill_buf(rgba, (0, 0, 0, 0))
+    # Head 7x6x6 @(0,0): green skin, soft cheek shading; big eyes on the front
+    # face (x6..13, rows 6..12).
+    shade_box(rgba, bw, 0, 0, 7, 6, 6, GROGU_SKIN, GROGU_SKIN_HI, GROGU_SKIN_SH)
+    rectb(rgba, bw, 6, 6, 13, 7, GROGU_SKIN_HI)      # forehead highlight
+    rectb(rgba, bw, 6, 10, 13, 12, GROGU_SKIN_SH)    # cheek/chin shading
+    rectb(rgba, bw, 7, 8, 9, 10, GROGU_EYE)          # eye L (2x2, large)
+    rectb(rgba, bw, 10, 8, 12, 10, GROGU_EYE)        # eye R
+    rectb(rgba, bw, 7, 8, 8, 9, GROGU_EYE_HI)        # catchlight L
+    rectb(rgba, bw, 10, 8, 11, 9, GROGU_EYE_HI)      # catchlight R
+    rectb(rgba, bw, 9, 10, 10, 11, GROGU_NOSE)       # tiny nose
+    rectb(rgba, bw, 8, 11, 11, 12, GROGU_SKIN_SH)    # soft mouth line
+    # Ears 5x1x3 @(0,14)/(0,18): green outer (up face), pink inner (down face).
+    for v0 in (14, 18):
+        shade_box(rgba, bw, 0, v0, 5, 1, 3, GROGU_SKIN, GROGU_SKIN_HI, GROGU_SKIN_SH)
+        rectb(rgba, bw, 3, v0, 8, v0 + 3, GROGU_SKIN)          # outer = green
+        rectb(rgba, bw, 3, v0, 8, v0 + 1, GROGU_SKIN_HI)
+        rectb(rgba, bw, 8, v0, 13, v0 + 3, GROGU_EAR_IN)       # inner = pink
+        rectb(rgba, bw, 8, v0 + 2, 13, v0 + 3, GROGU_EAR_INSH)
+        rectb(rgba, bw, 9, v0 + 1, 12, v0 + 2, GROGU_EAR_INSH)  # inner fold
+    # Body 4x5x3 @(0,22): coarse tan robe with weave speckle + fold shading.
+    shade_box(rgba, bw, 0, 22, 4, 5, 3, GROGU_ROBE, GROGU_ROBE_HI, GROGU_ROBE_SH)
+    speckle(rgba, bw, 0, 25, 14, 30, GROGU_ROBE_SH, mod=4, salt=61)
+    rectb(rgba, bw, 3, 25, 7, 26, GROGU_ROBE_HI)     # collar highlight
+    rectb(rgba, bw, 4, 26, 6, 30, GROGU_ROBE_SH)     # center robe fold
+    # Arms 1x4x1 @(16,12)/(20,12): tan sleeve, green hand at the cuff.
+    for u0 in (16, 20):
+        shade_box(rgba, bw, u0, 12, 1, 4, 1, GROGU_ROBE, GROGU_ROBE_HI, GROGU_ROBE_SH)
+        rectb(rgba, bw, u0, 15, u0 + 4, 17, GROGU_SKIN)        # hand
+        rectb(rgba, bw, u0, 16, u0 + 4, 17, GROGU_SKIN_SH)
+    # Legs 1x2x1 @(24,12)/(28,12): robe hem + green feet.
+    for u0 in (24, 28):
+        shade_box(rgba, bw, u0, 12, 1, 2, 1, GROGU_ROBE, GROGU_ROBE_HI, GROGU_ROBE_SH)
+        rectb(rgba, bw, u0, 14, u0 + 4, 15, GROGU_SKIN)        # feet
+    # Robe skirt 5x3x4 @(14,22): coarse tan wrap under the body, vertical folds.
+    shade_box(rgba, bw, 14, 22, 5, 3, 4, GROGU_ROBE, GROGU_ROBE_HI, GROGU_ROBE_SH)
+    speckle(rgba, bw, 14, 26, 32, 29, GROGU_ROBE_SH, mod=4, salt=62)
+    for fx in (20, 24, 28):                          # cloth folds
+        rectb(rgba, bw, fx, 26, fx + 1, 29, GROGU_ROBE_SH)
+
 MOBS = {
     'stormtrooper': paint_stormtrooper,
     'battle_droid': paint_battle_droid,
@@ -1442,6 +1602,9 @@ MOBS = {
     # Wave-3: speeder_bike + band_droid use the default 64x64 canvas.
     'speeder_bike': paint_speeder_bike,
     'band_droid': paint_band_droid,
+    # Companions: Chewbacca uses the default 64x64 canvas (Grogu is 32x32,
+    # see SIZED_MOBS).
+    'chewbacca': paint_chewbacca,
 }
 
 # Mobs whose skins are NOT on the default 64x64 canvas: name -> (w, h, fn).
@@ -1453,6 +1616,8 @@ SIZED_MOBS = {
     'xwing': (128, 128, paint_xwing),
     'tie_fighter': (128, 64, paint_tie_fighter),
     'at_at': (256, 128, paint_at_at),
+    # Companion: Grogu on a compact 32x32 canvas.
+    'grogu': (32, 32, paint_grogu),
 }
 
 # Worn-armor equipment layers: standard 64x32 vanilla armor-sheet UV layout

@@ -114,6 +114,8 @@ public class ModLanguageProvider extends LanguageProvider {
         add(com.tweeks.starwars.ModEntities.TIE_FIGHTER.get(), "TIE Fighter");
         add(com.tweeks.starwars.ModEntities.AT_AT.get(), "AT-AT Walker");
         add(com.tweeks.starwars.ModEntities.BAND_DROID.get(), "Cantina Band Droid");
+        add(com.tweeks.starwars.ModEntities.CHEWBACCA.get(), "Chewbacca");
+        add(com.tweeks.starwars.ModEntities.GROGU.get(), "Grogu");
         add(com.tweeks.starwars.Registration.SPEEDER_BIKE.get(), "Speeder Bike");
         add(com.tweeks.starwars.Registration.XWING.get(), "X-wing");
         add(com.tweeks.starwars.Registration.TIE_FIGHTER.get(), "TIE Fighter");
@@ -130,6 +132,8 @@ public class ModLanguageProvider extends LanguageProvider {
         add(com.tweeks.starwars.Registration.DRAGONSNAKE_SPAWN_EGG.get(), "Dragonsnake Spawn Egg");
         add(com.tweeks.starwars.Registration.BOGWING_SPAWN_EGG.get(), "Bogwing Spawn Egg");
         add(com.tweeks.starwars.Registration.YODA_SPAWN_EGG.get(), "Yoda Spawn Egg");
+        add(com.tweeks.starwars.Registration.CHEWBACCA_SPAWN_EGG.get(), "Chewbacca Spawn Egg");
+        add(com.tweeks.starwars.Registration.GROGU_SPAWN_EGG.get(), "Grogu Spawn Egg");
         add("starwars.gate.invalid", "The gate frame is incomplete - build an iron block rectangle (2x3 up to 8x8 inside)");
         add("starwars.gate.already_there", "This gate already leads to the world you are standing in");
         add("starwars.gate.locked", "Destination locked: %s");

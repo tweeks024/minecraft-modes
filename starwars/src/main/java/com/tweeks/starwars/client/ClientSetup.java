@@ -9,6 +9,8 @@ import com.tweeks.starwars.client.model.BanthaModel;
 import com.tweeks.starwars.client.model.BattleDroidModel;
 import com.tweeks.starwars.client.model.BobaFettModel;
 import com.tweeks.starwars.client.model.BogwingModel;
+import com.tweeks.starwars.client.model.ChewbaccaModel;
+import com.tweeks.starwars.client.model.GroguModel;
 import com.tweeks.starwars.client.model.DragonsnakeModel;
 import com.tweeks.starwars.client.model.HanSoloModel;
 import com.tweeks.starwars.client.model.JawaModel;
@@ -67,6 +69,9 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.TIE_FIGHTER.get(), TieFighterRenderer::new);
         event.registerEntityRenderer(ModEntities.AT_AT.get(), AtAtRenderer::new);
         event.registerEntityRenderer(ModEntities.BAND_DROID.get(), BandDroidRenderer::new);
+        // companions
+        event.registerEntityRenderer(ModEntities.CHEWBACCA.get(), ChewbaccaRenderer::new);
+        event.registerEntityRenderer(ModEntities.GROGU.get(), GroguRenderer::new);
     }
 
     @SubscribeEvent
@@ -99,5 +104,8 @@ public final class ClientSetup {
         event.registerLayerDefinition(TieFighterModel.LAYER_LOCATION, TieFighterModel::createBodyLayer);
         event.registerLayerDefinition(AtAtModel.LAYER_LOCATION, AtAtModel::createBodyLayer);
         event.registerLayerDefinition(BandDroidModel.LAYER_LOCATION, BandDroidModel::createBodyLayer);
+        // companions
+        event.registerLayerDefinition(ChewbaccaModel.LAYER_LOCATION, ChewbaccaModel::createBodyLayer);
+        event.registerLayerDefinition(GroguModel.LAYER_LOCATION, GroguModel::createBodyLayer);
     }
 }

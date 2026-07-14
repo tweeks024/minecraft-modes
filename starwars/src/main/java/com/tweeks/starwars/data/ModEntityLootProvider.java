@@ -312,6 +312,18 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
                 .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
                     .add(LootItem.lootTableItem(Items.IRON_NUGGET)
                         .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0f, 2.0f))))));
+
+        // Chewbacca: 0-2 string (shed wookiee fur). A TAMED Chewbacca drops
+        // nothing — the entity suppresses this table while tame so a killed
+        // companion isn't looted (see ChewbaccaEntity#dropFromLootTable).
+        this.add(ModEntities.CHEWBACCA.get(),
+            LootTable.lootTable()
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.STRING)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(0.0f, 2.0f))))));
+
+        // Grogu: no drops — you would never.
+        this.add(ModEntities.GROGU.get(), LootTable.lootTable());
     }
 
     @Override
@@ -339,7 +351,9 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
             ModEntities.BOGWING.get(),
             ModEntities.YODA.get(),
             ModEntities.AT_AT.get(),
-            ModEntities.BAND_DROID.get()
+            ModEntities.BAND_DROID.get(),
+            ModEntities.CHEWBACCA.get(),
+            ModEntities.GROGU.get()
         );
         return BuiltInRegistries.ENTITY_TYPE.stream().filter(known::contains);
     }

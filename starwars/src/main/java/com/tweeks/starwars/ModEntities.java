@@ -234,6 +234,24 @@ public final class ModEntities {
             .build(ResourceKey.create(Registries.ENTITY_TYPE,
                 Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "band_droid"))));
 
+    // ---- companions: tameable follower + carryable rare ----
+
+    public static final DeferredHolder<EntityType<?>, EntityType<com.tweeks.starwars.entity.ChewbaccaEntity>> CHEWBACCA =
+        ENTITY_TYPES.register("chewbacca", () -> EntityType.Builder.<com.tweeks.starwars.entity.ChewbaccaEntity>of(
+                com.tweeks.starwars.entity.ChewbaccaEntity::new, MobCategory.CREATURE)
+            .sized(0.9f, 2.4f)
+            .clientTrackingRange(12)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "chewbacca"))));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<com.tweeks.starwars.entity.GroguEntity>> GROGU =
+        ENTITY_TYPES.register("grogu", () -> EntityType.Builder.<com.tweeks.starwars.entity.GroguEntity>of(
+                com.tweeks.starwars.entity.GroguEntity::new, MobCategory.CREATURE)
+            .sized(0.4f, 0.6f)
+            .clientTrackingRange(10)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "grogu"))));
+
     public static void register(IEventBus modEventBus) {
         ENTITY_TYPES.register(modEventBus);
     }

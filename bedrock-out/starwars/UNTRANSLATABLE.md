@@ -39,8 +39,10 @@ Bedrock has no equivalent of Java's `random_sequence` field; loot rolls use the 
 - `entities/battle_droid.json`
 - `entities/boba_fett.json`
 - `entities/bogwing.json`
+- `entities/chewbacca.json`
 - `entities/darth_vader.json`
 - `entities/dragonsnake.json`
+- `entities/grogu.json`
 - `entities/han_solo.json`
 - `entities/jawa.json`
 - `entities/jedi_knight.json`
@@ -77,6 +79,12 @@ Java→Bedrock vanilla-sound path mapping is best-effort for Phase 1a (the trans
 - `minecraft:entity.illusioner.cast_spell` → `entity.illusioner.cast_spell`
 - `minecraft:entity.zombie.attack_iron_door` → `entity.zombie.attack_iron_door`
 
+## Texture categories skipped
+
+These top-level categories under `assets/starwars/textures/` are not mapped to Bedrock locations by the translator. Files inside were not copied:
+
+- `gui`
+
 ## Entity goals stubbed for LLM (cache miss; run :translate --with-llm to translate)
 
 These goals produced a `// TODO LLM:` stub at `behavior_pack/scripts/goals/<GoalClass>.ts`. Either re-run with `--with-llm` (and `ANTHROPIC_API_KEY` set) to fill them in, or hand-translate them:
@@ -86,15 +94,20 @@ These goals produced a `// TODO LLM:` stub at `behavior_pack/scripts/goals/<Goal
 - `AvoidEntityGoal` — cache miss; run :translate --with-llm to translate
 - `BlasterAttackGoal` — cache miss; run :translate --with-llm to translate
 - `BobaJetpackGoal` — cache miss; run :translate --with-llm to translate
+- `BowcasterAttackGoal` — cache miss; run :translate --with-llm to translate
+- `FollowOwnerGoal` — cache miss; run :translate --with-llm to translate
 - `HanQuickdrawGoal` — cache miss; run :translate --with-llm to translate
 - `LeiaRallyGoal` — cache miss; run :translate --with-llm to translate
 - `LukeLeapGoal` — cache miss; run :translate --with-llm to translate
 - `MoveTowardsRestrictionGoal` — cache miss; run :translate --with-llm to translate
 - `NearestAttackableTargetGoal` — cache miss; run :translate --with-llm to translate
 - `ObiWanPushGoal` — cache miss; run :translate --with-llm to translate
+- `OwnerHurtByTargetGoal` — cache miss; run :translate --with-llm to translate
+- `OwnerHurtTargetGoal` — cache miss; run :translate --with-llm to translate
 - `ProbeBlasterGoal` — cache miss; run :translate --with-llm to translate
 - `ProbeHoverGoal` — cache miss; run :translate --with-llm to translate
 - `RandomSwimmingGoal` — cache miss; run :translate --with-llm to translate
+- `SitWhenOrderedToGoal` — cache miss; run :translate --with-llm to translate
 - `SwTargetGoal` — cache miss; run :translate --with-llm to translate
 - `VaderChokeGoal` — cache miss; run :translate --with-llm to translate
 - `YodaLeapGoal` — cache miss; run :translate --with-llm to translate
@@ -191,8 +204,10 @@ These spawn eggs received default base/overlay colors because the Java side comp
 - `battle_droid_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `boba_fett_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `bogwing_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
+- `chewbacca_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `darth_vader_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `dragonsnake_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
+- `grogu_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `han_solo_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `jawa_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `jedi_knight_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.

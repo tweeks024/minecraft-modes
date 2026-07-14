@@ -1,5 +1,5 @@
 // TODO LLM: cache miss; run :translate --with-llm to translate
-// Goal: net.minecraft.world.entity.ai.goal.AvoidEntityGoal
+// Goal: net.minecraft.world.entity.ai.goal.SitWhenOrderedToGoal
 //
 // This file is a placeholder. Either:
 //   1. Run `./gradlew :translator:translate --with-llm` with ANTHROPIC_API_KEY set, or
@@ -8,7 +8,7 @@
 /*
 Original Java source — translate this:
 
-this.goalSelector.addGoal(2, new AvoidEntityGoal<>(this, LivingEntity.class, 8.0F, 1.4, 1.6, living -> living instanceof Enemy || (living instanceof SwCombatant sc && sc.getFaction() == SwFaction.EMPIRE)))
+this.goalSelector.addGoal(1, new SitWhenOrderedToGoal(this))
 */
 
 // Empty handler so Bedrock's script engine accepts the file.

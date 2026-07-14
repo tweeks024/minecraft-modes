@@ -125,6 +125,20 @@ public class StarWarsMod {
                 net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
             // band_droid deliberately has NO spawn placement: it never spawns
             // naturally (placed only inside the Mos Eisley cantina).
+
+            // Companions are CREATUREs — generic ground mob rule (like the
+            // Jedi Knight). Natural-spawn list wiring is left to the
+            // integration step; this only sets HOW they place once attempted.
+            event.register(ModEntities.CHEWBACCA.get(),
+                net.minecraft.world.entity.SpawnPlacementTypes.ON_GROUND,
+                net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                net.minecraft.world.entity.PathfinderMob::checkMobSpawnRules,
+                net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
+            event.register(ModEntities.GROGU.get(),
+                net.minecraft.world.entity.SpawnPlacementTypes.ON_GROUND,
+                net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                net.minecraft.world.entity.PathfinderMob::checkMobSpawnRules,
+                net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
         });
     }
 
@@ -178,5 +192,10 @@ public class StarWarsMod {
             com.tweeks.starwars.entity.AtAtEntity.createAttributes().build());
         event.put(ModEntities.BAND_DROID.get(),
             com.tweeks.starwars.entity.BandDroidEntity.createAttributes().build());
+        // companions
+        event.put(ModEntities.CHEWBACCA.get(),
+            com.tweeks.starwars.entity.ChewbaccaEntity.createAttributes().build());
+        event.put(ModEntities.GROGU.get(),
+            com.tweeks.starwars.entity.GroguEntity.createAttributes().build());
     }
 }
