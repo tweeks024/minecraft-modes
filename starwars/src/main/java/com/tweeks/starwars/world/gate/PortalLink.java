@@ -72,7 +72,8 @@ public final class PortalLink {
 
     /** Where (and how oriented) a fresh arrival gate should be built. */
     private static ArrivalSpot arrivalSpot(ServerLevel target, BlockPos approx, boolean requestedAxisX) {
-        if (Planet.byLevel(target.dimension()) == Planet.CORUSCANT) {
+        Planet here = Planet.byLevel(target.dimension());
+        if (here == Planet.CORUSCANT) {
             long snapped = snapToStreet(approx.getX(), approx.getZ());
             int x = unpackX(snapped);
             int z = unpackZ(snapped);
@@ -80,6 +81,14 @@ public final class PortalLink {
             // along it (plane on Z) so its 3-wide footprint fits the road.
             boolean axisX = x == approx.getX();
             return new ArrivalSpot(new BlockPos(x, CityLayout.STREET_Y + 1, z), axisX);
+        }
+        if (here == Planet.DEATH_STAR) {
+            // The station is solid — snap onto a corridor deck so you never
+            // arrive inside a wall (GateBuilder's CLEAR step then opens the
+            // pocket around the frame).
+            long seed = target.getSeed();
+            int[] spot = com.tweeks.starwars.world.planet.StationLayout.arrivalPos(seed, approx.getX(), approx.getZ());
+            return new ArrivalSpot(new BlockPos(spot[0], spot[1], spot[2]), requestedAxisX);
         }
         // Force the chunk into existence so the heightmap answers truthfully.
         target.getChunk(approx.getX() >> 4, approx.getZ() >> 4);
@@ -118,6 +127,7 @@ public final class PortalLink {
             case CORUSCANT -> Blocks.LIGHT_GRAY_CONCRETE.defaultBlockState();
             case DAGOBAH -> Blocks.MUD_BRICKS.defaultBlockState();
             case HOTH -> Blocks.PACKED_ICE.defaultBlockState();
+            case DEATH_STAR -> Blocks.LIGHT_GRAY_CONCRETE.defaultBlockState();
             case ANDOR, HOME -> Blocks.STONE_BRICKS.defaultBlockState();
         };
     }

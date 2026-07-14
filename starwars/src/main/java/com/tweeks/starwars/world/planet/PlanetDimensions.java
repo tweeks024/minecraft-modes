@@ -135,6 +135,28 @@ public final class PlanetDimensions {
             timelines.getOrThrow(TimelineTags.IN_OVERWORLD),
             Optional.of(clocks.getOrThrow(WorldClocks.OVERWORLD))));
 
+        // Death Star: a sealed interior — no sky, permanent artificial night,
+        // black void beyond the hull, and monsters (troopers, droids) spawn
+        // in any light so the halls are never safe.
+        ctx.register(Planet.DEATH_STAR.dimensionTypeKey(), new DimensionType(
+            true, false, true, false, 1.0, 0, 256, 256,
+            BlockTags.INFINIBURN_OVERWORLD, 0.1F,
+            new DimensionType.MonsterSettings(net.minecraft.util.valueproviders.ConstantInt.of(15), 15),
+            DimensionType.Skybox.NONE, CardinalLighting.Type.NETHER,
+            EnvironmentAttributeMap.builder()
+                .set(EnvironmentAttributes.FOG_COLOR, 0xFF0A0A0C)
+                .set(EnvironmentAttributes.SKY_COLOR, 0xFF060608)
+                .set(EnvironmentAttributes.FOG_START_DISTANCE, 6.0F)
+                .set(EnvironmentAttributes.FOG_END_DISTANCE, 64.0F)
+                .set(EnvironmentAttributes.AMBIENT_LIGHT_COLOR, 0xFF3A3D42)
+                .set(EnvironmentAttributes.BED_RULE, BedRule.EXPLODES)
+                .set(EnvironmentAttributes.RESPAWN_ANCHOR_WORKS, true)
+                .set(EnvironmentAttributes.NETHER_PORTAL_SPAWNS_PIGLINS, false)
+                .set(EnvironmentAttributes.CAN_START_RAID, false)
+                .build(),
+            timelines.getOrThrow(TimelineTags.IN_NETHER),
+            Optional.empty()));
+
         // Coruscant: frozen golden-hour sky over the endless city, brighter
         // starfield, violet haze. No world clock — time stands still. Monster
         // spawns ignore light so battle droids patrol the lamplit streets.
@@ -264,6 +286,27 @@ public final class PlanetDimensions {
         ctx.register(PlanetBiomes.CORUSCANT_CITY, cityBiome(features, carvers));
         ctx.register(PlanetBiomes.DAGOBAH_SWAMP, dagobahBiome(features, carvers));
         ctx.register(PlanetBiomes.HOTH_PLAINS, hothBiome(features, carvers));
+        ctx.register(PlanetBiomes.DEATH_STAR_INTERIOR, deathStarBiome(features, carvers));
+    }
+
+    private static Biome deathStarBiome(HolderGetter<PlacedFeature> features, HolderGetter<ConfiguredWorldCarver<?>> carvers) {
+        MobSpawnSettings.Builder mobs = new MobSpawnSettings.Builder();
+        mobs.addSpawn(MobCategory.MONSTER, 20, new MobSpawnSettings.SpawnerData(ModEntities.STORMTROOPER.get(), 2, 4));
+        mobs.addSpawn(MobCategory.MONSTER, 14, new MobSpawnSettings.SpawnerData(ModEntities.BATTLE_DROID.get(), 2, 4));
+        mobs.addSpawn(MobCategory.MONSTER, 8, new MobSpawnSettings.SpawnerData(ModEntities.PROBE_DROID.get(), 1, 2));
+        // A few rebel infiltrators are loose aboard — allies in the firefight.
+        mobs.addSpawn(MobCategory.CREATURE, 4, new MobSpawnSettings.SpawnerData(ModEntities.REBEL_TROOPER.get(), 1, 2));
+
+        return new Biome.BiomeBuilder()
+            .hasPrecipitation(false)
+            .temperature(0.7F)
+            .downfall(0.0F)
+            .setAttribute(EnvironmentAttributes.SKY_COLOR, 0xFF060608)
+            .setAttribute(EnvironmentAttributes.FOG_COLOR, 0xFF0A0A0C)
+            .specialEffects(new BiomeSpecialEffects.Builder().waterColor(0x3A3D42).build())
+            .mobSpawnSettings(mobs.build())
+            .generationSettings(new BiomeGenerationSettings.Builder(features, carvers).build())
+            .build();
     }
 
     private static Biome dagobahBiome(HolderGetter<PlacedFeature> features, HolderGetter<ConfiguredWorldCarver<?>> carvers) {
@@ -450,5 +493,9 @@ public final class PlanetDimensions {
             new NoiseBasedChunkGenerator(
                 new FixedBiomeSource(biomes.getOrThrow(PlanetBiomes.HOTH_PLAINS)),
                 noise.getOrThrow(HOTH_NOISE))));
+
+        ctx.register(Planet.DEATH_STAR.stemKey(), new LevelStem(
+            types.getOrThrow(Planet.DEATH_STAR.dimensionTypeKey()),
+            new DeathStarChunkGenerator(biomes.getOrThrow(PlanetBiomes.DEATH_STAR_INTERIOR))));
     }
 }

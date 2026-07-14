@@ -73,6 +73,7 @@ public class ModLanguageProvider extends LanguageProvider {
         add("starwars.planet.coruscant", "Coruscant");
         add("starwars.planet.dagobah", "Dagobah");
         add("starwars.planet.hoth", "Hoth");
+        add("starwars.planet.death_star", "Death Star");
         add("starwars.planet.home", "Home");
         add(com.tweeks.starwars.Registration.CANTINA_RECORD.get(), "Music Disc");
         add("jukebox_song.starwars.cantina_band", "Figrin's Fizz - Cantina Swing");

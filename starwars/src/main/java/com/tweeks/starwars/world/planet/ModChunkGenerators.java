@@ -16,6 +16,9 @@ public final class ModChunkGenerators {
     public static final java.util.function.Supplier<MapCodec<CoruscantChunkGenerator>> CORUSCANT =
         CHUNK_GENERATORS.register("coruscant", () -> CoruscantChunkGenerator.CODEC);
 
+    public static final java.util.function.Supplier<MapCodec<DeathStarChunkGenerator>> DEATH_STAR =
+        CHUNK_GENERATORS.register("death_star", () -> DeathStarChunkGenerator.CODEC);
+
     private ModChunkGenerators() {
     }
 

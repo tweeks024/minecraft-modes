@@ -1,0 +1,7 @@
+{
+  "type": "starwars:death_star",
+  "generator": {
+    "type": "starwars:death_star",
+    "biome": "starwars:death_star_interior"
+  }
+}

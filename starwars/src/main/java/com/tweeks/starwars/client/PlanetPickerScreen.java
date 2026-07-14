@@ -28,6 +28,7 @@ public class PlanetPickerScreen extends Screen {
         0xFF8E6BE8, // CORUSCANT — dusk violet
         0xFF6B8E4E, // DAGOBAH — swamp green
         0xFFA8D8F0, // HOTH — glacier blue
+        0xFF6E7178, // DEATH_STAR — imperial gray
         0xFF4D9BE8, // HOME — overworld blue
     };
 

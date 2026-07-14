@@ -19,6 +19,8 @@ public final class PlanetBiomes {
     public static final ResourceKey<Biome> DAGOBAH_SWAMP = key("dagobah_swamp");
     /** Hoth: barren snowfields and glacier crags. */
     public static final ResourceKey<Biome> HOTH_PLAINS = key("hoth_plains");
+    /** Death Star: the interior of the battle station. */
+    public static final ResourceKey<Biome> DEATH_STAR_INTERIOR = key("death_star_interior");
 
     private PlanetBiomes() {
     }

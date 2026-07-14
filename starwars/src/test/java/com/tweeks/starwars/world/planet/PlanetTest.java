@@ -42,9 +42,10 @@ class PlanetTest {
     }
 
     @Test
-    void radialHasSixWedgesWithHomeLast() {
-        assertEquals(6, Planet.COUNT);
+    void radialHasSevenWedgesWithHomeLast() {
+        assertEquals(7, Planet.COUNT);
         assertEquals(Planet.HOME, Planet.byWedge(Planet.COUNT - 1));
+        assertEquals("starwars:death_star", Planet.DEATH_STAR.levelKey().identifier().toString());
     }
 
     @Test

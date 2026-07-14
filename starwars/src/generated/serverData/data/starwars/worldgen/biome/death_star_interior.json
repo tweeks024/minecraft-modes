@@ -1,0 +1,51 @@
+{
+  "attributes": {
+    "minecraft:visual/fog_color": "#0a0a0c",
+    "minecraft:visual/sky_color": "#060608"
+  },
+  "carvers": [],
+  "downfall": 0.0,
+  "effects": {
+    "water_color": "#3a3d42"
+  },
+  "features": [],
+  "has_precipitation": false,
+  "spawn_costs": {},
+  "spawners": {
+    "ambient": [],
+    "axolotls": [],
+    "creature": [
+      {
+        "type": "starwars:rebel_trooper",
+        "maxCount": 2,
+        "minCount": 1,
+        "weight": 4
+      }
+    ],
+    "misc": [],
+    "monster": [
+      {
+        "type": "starwars:stormtrooper",
+        "maxCount": 4,
+        "minCount": 2,
+        "weight": 20
+      },
+      {
+        "type": "starwars:battle_droid",
+        "maxCount": 4,
+        "minCount": 2,
+        "weight": 14
+      },
+      {
+        "type": "starwars:probe_droid",
+        "maxCount": 2,
+        "minCount": 1,
+        "weight": 8
+      }
+    ],
+    "underground_water_creature": [],
+    "water_ambient": [],
+    "water_creature": []
+  },
+  "temperature": 0.7
+}
