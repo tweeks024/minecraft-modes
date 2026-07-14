@@ -14,6 +14,7 @@ Bedrock recipes do not accept Java's datagen-only `category` hint; the field is 
 - `han_solo_helmet`
 - `han_solo_leggings`
 - `landspeeder`
+- `saber_hilt`
 - `speeder_bike`
 - `star_compass`
 - `stormtrooper_boots`
@@ -22,6 +23,10 @@ Bedrock recipes do not accept Java's datagen-only `category` hint; the field is 
 - `stormtrooper_leggings`
 - `tie_fighter`
 - `xwing`
+
+## Recipe types not yet supported
+
+- `kyber_saber`: type `starwars:kyber_saber`
 
 ## Loot table `random_sequence` dropped
 
@@ -141,6 +146,7 @@ These items override `Item` methods (e.g. `postHurtEnemy`, `useOn`, `hurtEnemy`)
 - `han_solo_helmet`: worn-armor visuals are absent on Bedrock — the item equips and protects (minecraft:wearable); the armor geometry/textures are emitted but no attachable consumes them, so nothing renders on the player's body.
 - `han_solo_leggings`: worn-armor visuals are absent on Bedrock — the item equips and protects (minecraft:wearable); the armor geometry/textures are emitted but no attachable consumes them, so nothing renders on the player's body.
 - `holocron`: HolocronItem overrides: use
+- `kyber_crystal`: KyberCrystalItem overrides: use
 - `landspeeder`: LandspeederItem overrides: use
 - `lightsaber`: LightsaberItem overrides: use, hurtEnemy
 - `star_compass`: StarCompassItem overrides: useOn. Gate ignition (iron-block frame validation + planet-picker UI that fills the frame with hyperspace_portal film) is server-side Java logic — absent on Bedrock; the hyperspace_portal block and the planet dimensions it leads to are not translated.
@@ -153,12 +159,16 @@ These items override `Item` methods (e.g. `postHurtEnemy`, `useOn`, `hurtEnemy`)
 
 The translator has no Bedrock block emitter. These Java block registrations (`BLOCKS.registerBlock` / `BLOCKS.registerSimpleBlock`) have no Bedrock counterpart in the output — the block does not exist on the Bedrock side, and any mechanic built on it is absent:
 
+- `blue_kyber_ore`: custom block 'blue_kyber_ore' not translated — translator has no Bedrock block emitter (block class Block)
+- `green_kyber_ore`: custom block 'green_kyber_ore' not translated — translator has no Bedrock block emitter (block class Block)
 - `hyperspace_portal`: custom block 'hyperspace_portal' not translated — translator has no Bedrock block emitter; portal/teleport behavior impossible without a scripting harness (block class HyperspacePortalBlock)
+- `purple_kyber_ore`: custom block 'purple_kyber_ore' not translated — translator has no Bedrock block emitter (block class Block)
 
 ## Item model selector not translatable — static icon used
 
 These items use a `minecraft:select` component-keyed client model (e.g. a data-component-driven color). Phase 2 does not translate the selector; the item was instead given a fixed icon so it isn't a broken/missing texture reference in Bedrock. If the selected color/state matters in-game, hand-write the swap via Phase 3 scripting:
 
+- `kyber_crystal`: item model selector not translatable — using starwars:kyber_crystal_blue as static icon
 - `lightsaber`: item model selector not translatable — using starwars:lightsaber_blue as static icon
 
 ## Attachable held-item texture substituted or missing

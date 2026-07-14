@@ -65,6 +65,18 @@
     "starwars:jedi_knight_spawn_egg": {
       "textures": "textures/items/jedi_knight_spawn_egg"
     },
+    "starwars:kyber_crystal_blue": {
+      "textures": "textures/items/kyber_crystal_blue"
+    },
+    "starwars:kyber_crystal_green": {
+      "textures": "textures/items/kyber_crystal_green"
+    },
+    "starwars:kyber_crystal_purple": {
+      "textures": "textures/items/kyber_crystal_purple"
+    },
+    "starwars:kyber_crystal_red": {
+      "textures": "textures/items/kyber_crystal_red"
+    },
     "starwars:landspeeder": {
       "textures": "textures/items/landspeeder"
     },
@@ -94,6 +106,9 @@
     },
     "starwars:rebel_trooper_spawn_egg": {
       "textures": "textures/items/rebel_trooper_spawn_egg"
+    },
+    "starwars:saber_hilt": {
+      "textures": "textures/items/saber_hilt"
     },
     "starwars:snowtrooper_spawn_egg": {
       "textures": "textures/items/snowtrooper_spawn_egg"
