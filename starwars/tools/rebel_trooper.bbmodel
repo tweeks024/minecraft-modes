@@ -1,0 +1,396 @@
+{
+  "meta": {
+    "format_version": "4.5",
+    "model_format": "modded_entity",
+    "box_uv": true
+  },
+  "name": "rebel_trooper",
+  "model_identifier": "",
+  "visible_box": [
+    4,
+    4,
+    0
+  ],
+  "variable_placeholders": "",
+  "variable_placeholder_buttons": [],
+  "unhandled_root_fields": {},
+  "resolution": {
+    "width": 64,
+    "height": 64
+  },
+  "elements": [
+    {
+      "name": "head",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -4,
+        24,
+        -4
+      ],
+      "to": [
+        4,
+        32,
+        4
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        0,
+        0
+      ],
+      "type": "cube",
+      "uuid": "2eb36d8b-5126-52a0-b421-3019b90c8266"
+    },
+    {
+      "name": "body",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -4,
+        12,
+        -2
+      ],
+      "to": [
+        4,
+        24,
+        2
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        16,
+        16
+      ],
+      "type": "cube",
+      "uuid": "f7114b52-50a5-5759-99e3-4106df38b870"
+    },
+    {
+      "name": "right_arm",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -8,
+        12,
+        -2
+      ],
+      "to": [
+        -4,
+        24,
+        2
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        -5,
+        22,
+        0
+      ],
+      "uv_offset": [
+        40,
+        16
+      ],
+      "type": "cube",
+      "uuid": "09dc7af8-0ff8-542d-b1e5-0fcda4208053"
+    },
+    {
+      "name": "left_arm",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        4,
+        12,
+        -2
+      ],
+      "to": [
+        8,
+        24,
+        2
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        5,
+        22,
+        0
+      ],
+      "uv_offset": [
+        32,
+        48
+      ],
+      "type": "cube",
+      "uuid": "0459f06d-311b-57b4-8b31-7be74040d5fe"
+    },
+    {
+      "name": "right_leg",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -3.9,
+        0,
+        -2
+      ],
+      "to": [
+        0.10000000000000009,
+        12,
+        2
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        -1.9,
+        12,
+        0
+      ],
+      "uv_offset": [
+        0,
+        16
+      ],
+      "type": "cube",
+      "uuid": "3fe1cac9-f7d5-5e47-a67e-4b1fc4c85e67"
+    },
+    {
+      "name": "left_leg",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -0.10000000000000009,
+        0,
+        -2
+      ],
+      "to": [
+        3.9,
+        12,
+        2
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        1.9,
+        12,
+        0
+      ],
+      "uv_offset": [
+        16,
+        48
+      ],
+      "type": "cube",
+      "uuid": "a83fab02-bfbb-5417-99c8-c68369c04f0c"
+    },
+    {
+      "name": "helmet_shell",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -4.0,
+        24.0,
+        -4.0
+      ],
+      "to": [
+        4.0,
+        32.0,
+        4.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        32,
+        0
+      ],
+      "type": "cube",
+      "uuid": "83b4ff91-ab36-526e-b0e2-10c94ded5494",
+      "inflate": 0.6
+    },
+    {
+      "name": "chin_vent",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -1.5,
+        23.5,
+        -5.0
+      ],
+      "to": [
+        1.5,
+        25.5,
+        -4.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        56,
+        16
+      ],
+      "type": "cube",
+      "uuid": "7b477406-65f0-5d88-a1b3-2695fa87156e"
+    }
+  ],
+  "outliner": [
+    {
+      "name": "head",
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "color": 0,
+      "uuid": "11d5a1cf-4f4e-59ed-8d45-f63682a1c0e8",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "2eb36d8b-5126-52a0-b421-3019b90c8266",
+        "f7114b52-50a5-5759-99e3-4106df38b870",
+        "83b4ff91-ab36-526e-b0e2-10c94ded5494",
+        "7b477406-65f0-5d88-a1b3-2695fa87156e"
+      ]
+    },
+    {
+      "name": "body",
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "color": 0,
+      "uuid": "9ca4181c-4469-5dbb-a50e-3830b0bf896a",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": []
+    },
+    {
+      "name": "right_arm",
+      "origin": [
+        -5,
+        22,
+        0
+      ],
+      "color": 0,
+      "uuid": "6902647b-96f7-5c70-bea9-5318cbf61c52",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "09dc7af8-0ff8-542d-b1e5-0fcda4208053"
+      ]
+    },
+    {
+      "name": "left_arm",
+      "origin": [
+        5,
+        22,
+        0
+      ],
+      "color": 0,
+      "uuid": "e57c8aeb-95e8-5f7e-b4f5-57801bd05c4a",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "0459f06d-311b-57b4-8b31-7be74040d5fe"
+      ]
+    },
+    {
+      "name": "right_leg",
+      "origin": [
+        -1.9,
+        12,
+        0
+      ],
+      "color": 0,
+      "uuid": "516f1a23-6a6c-5e08-b072-2ca849dfbe75",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "3fe1cac9-f7d5-5e47-a67e-4b1fc4c85e67"
+      ]
+    },
+    {
+      "name": "left_leg",
+      "origin": [
+        1.9,
+        12,
+        0
+      ],
+      "color": 0,
+      "uuid": "a3ad7bff-a3c1-5b92-a999-a0a1c712de83",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "a83fab02-bfbb-5417-99c8-c68369c04f0c"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "path": "/home/tweeks/code/minecraft-modes/starwars/src/main/resources/assets/starwars/textures/entity/rebel_trooper.png",
+      "name": "rebel_trooper.png",
+      "folder": "entity",
+      "namespace": "starwars",
+      "id": "0",
+      "particle": false,
+      "render_mode": "default",
+      "render_sides": "auto",
+      "frame_time": 1,
+      "frame_order_type": "loop",
+      "frame_order": "",
+      "frame_interpolate": false,
+      "visible": true,
+      "internal": true,
+      "saved": true,
+      "uuid": "1d75a6e3-8971-51ff-8223-3f570191bc00",
+      "relative_path": "../src/main/resources/assets/starwars/textures/entity/rebel_trooper.png",
+      "use_as_default": false,
+      "layers_enabled": false,
+      "sync_to_project": "",
+      "width": 64,
+      "height": 64,
+      "uv_width": 64,
+      "uv_height": 64,
+      "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABiUlEQVR4nO2asUoDQRRF92skZcp0WluIWImVlYXpRcTCeitLsRCrfID4ASlT+A2p/YsRAkpYyL7Bm+d9z7kLp0jIvNw9+9iZ7KR7f7kpY6w/FhBWffT7F4/Xo1j1OzSgNxIgARIgARIgAY4C0Hnem8444PrsK2xeIeOA67NPkC7g5GxaImMJgOt/Lp/KGKvX+1Gs8Rb0DqgJOZnONux6/e8FeGJNY5YAa7xZvzbovls/jAD2PO+NKaC/PS8Iq7c+NBdHkx+e+8sN2+/BAu4eTl0JL+BqfljFMFjtOBRL0N4FDBcaloBdn689ARQJQKeR9AKi3wOaF4B2aHoB4TvA++ewu4DtRcFvSC/geHZQEGpFfa/ChisxCwmILgC9S3sjAZYA7xaLjgSwA7CRAHYANhLADsBGAtgB2EgAOwAbCWAHYCMB7ABsJAAtwN7/pwtAH6un7wAJ+KOdJa+dI7qA5jsgvQDvx9bhBTTfAagAdgfRBTTfAekFoP8vSC8A3VyVgNYFpJ8Fsgv4AubTwOoZDvrXAAAAAElFTkSuQmCC"
+    }
+  ]
+}

@@ -186,6 +186,107 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
                     .add(LootItem.lootTableItem(Items.REDSTONE).setWeight(60)
                         .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0f, 2.0f))))
                     .add(EmptyLootItem.emptyItem().setWeight(40))));
+
+        // Jawa: no natural drops — the barter interaction IS the loot.
+        this.add(ModEntities.JAWA.get(), LootTable.lootTable());
+
+        // Tusken Raider: 1-2 string + 1-2 bone (wraps and gaffi-stick scraps).
+        this.add(ModEntities.TUSKEN_RAIDER.get(),
+            LootTable.lootTable()
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.STRING)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0f, 2.0f)))))
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.BONE)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0f, 2.0f))))));
+
+        // Bantha: 2-4 leather + 1-3 beef — the walking supply drop.
+        this.add(ModEntities.BANTHA.get(),
+            LootTable.lootTable()
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.LEATHER)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0f, 4.0f)))))
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.BEEF)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0f, 3.0f))))));
+
+        // Rebel trooper: 1-2 redstone + 0-1 iron_nugget (field-kit scraps).
+        this.add(ModEntities.REBEL_TROOPER.get(),
+            LootTable.lootTable()
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.REDSTONE)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0f, 2.0f)))))
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.IRON_NUGGET)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(0.0f, 1.0f))))));
+
+        // Probe droid: 1-2 redstone + 1 iron_ingot + 0-1 glowstone_dust
+        // (power cells, chassis plate, sensor dust).
+        this.add(ModEntities.PROBE_DROID.get(),
+            LootTable.lootTable()
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.REDSTONE)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0f, 2.0f)))))
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.IRON_INGOT)
+                        .apply(SetItemCountFunction.setCount(ConstantValue.exactly(1.0f)))))
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.GLOWSTONE_DUST)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(0.0f, 1.0f))))));
+
+        // Wampa: 2-3 white_wool + 1-2 bone (shaggy pelt and gnawed remains).
+        this.add(ModEntities.WAMPA.get(),
+            LootTable.lootTable()
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.WHITE_WOOL)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0f, 3.0f)))))
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.BONE)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0f, 2.0f))))));
+
+        // Tauntaun: 1-3 leather (and, famously, warmth).
+        this.add(ModEntities.TAUNTAUN.get(),
+            LootTable.lootTable()
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.LEATHER)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0f, 3.0f))))));
+
+        // Snowtrooper: not in the wave's loot brief, but per its "only
+        // differences" contract it mirrors the stormtrooper table exactly
+        // (nuggets + rifle chance + armor-piece chance).
+        this.add(ModEntities.SNOWTROOPER.get(),
+            LootTable.lootTable()
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.IRON_NUGGET).setWeight(60)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(0.0f, 2.0f))))
+                    .add(EmptyLootItem.emptyItem().setWeight(40)))
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .when(LootItemRandomChanceCondition.randomChance(0.25f))
+                    .add(LootItem.lootTableItem(Registration.BLASTER_RIFLE.get())
+                        .apply(SetItemDamageFunction.setDamage(UniformGenerator.between(0.3f, 1.0f)))))
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .when(LootItemRandomChanceCondition.randomChance(0.10f))
+                    .add(LootItem.lootTableItem(Registration.STORMTROOPER_HELMET.get()))
+                    .add(LootItem.lootTableItem(Registration.STORMTROOPER_CHESTPLATE.get()))
+                    .add(LootItem.lootTableItem(Registration.STORMTROOPER_LEGGINGS.get()))
+                    .add(LootItem.lootTableItem(Registration.STORMTROOPER_BOOTS.get()))));
+
+        // Dragonsnake: 1-2 slime_ball (swamp ooze).
+        this.add(ModEntities.DRAGONSNAKE.get(),
+            LootTable.lootTable()
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.SLIME_BALL)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0f, 2.0f))))));
+
+        // Bogwing: exactly 1 feather.
+        this.add(ModEntities.BOGWING.get(),
+            LootTable.lootTable()
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.FEATHER)
+                        .apply(SetItemCountFunction.setCount(ConstantValue.exactly(1.0f))))));
+
+        // Yoda: no drops — masters leave no possessions behind.
+        this.add(ModEntities.YODA.get(), LootTable.lootTable());
     }
 
     @Override
@@ -200,7 +301,18 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
             ModEntities.BOBA_FETT.get(),
             ModEntities.ASTROMECH.get(),
             ModEntities.HAN_SOLO.get(),
-            ModEntities.PRINCESS_LEIA.get()
+            ModEntities.PRINCESS_LEIA.get(),
+            ModEntities.JAWA.get(),
+            ModEntities.TUSKEN_RAIDER.get(),
+            ModEntities.BANTHA.get(),
+            ModEntities.REBEL_TROOPER.get(),
+            ModEntities.PROBE_DROID.get(),
+            ModEntities.WAMPA.get(),
+            ModEntities.TAUNTAUN.get(),
+            ModEntities.SNOWTROOPER.get(),
+            ModEntities.DRAGONSNAKE.get(),
+            ModEntities.BOGWING.get(),
+            ModEntities.YODA.get()
         );
         return BuiltInRegistries.ENTITY_TYPE.stream().filter(known::contains);
     }

@@ -15,6 +15,10 @@ public final class PlanetBiomes {
     public static final ResourceKey<Biome> ALDHANI_HIGHLANDS = key("aldhani_highlands");
     /** Coruscant: the endless city. */
     public static final ResourceKey<Biome> CORUSCANT_CITY = key("coruscant_city");
+    /** Dagobah: fog-bound mangrove marsh. */
+    public static final ResourceKey<Biome> DAGOBAH_SWAMP = key("dagobah_swamp");
+    /** Hoth: barren snowfields and glacier crags. */
+    public static final ResourceKey<Biome> HOTH_PLAINS = key("hoth_plains");
 
     private PlanetBiomes() {
     }

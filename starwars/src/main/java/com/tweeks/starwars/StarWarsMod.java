@@ -48,6 +48,70 @@ public class StarWarsMod {
                 net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 net.minecraft.world.entity.PathfinderMob::checkMobSpawnRules,
                 net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
+
+            // EMPIRE-like monsters share the trooper darkness rule.
+            event.register(ModEntities.PROBE_DROID.get(),
+                net.minecraft.world.entity.SpawnPlacementTypes.ON_GROUND,
+                net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                com.tweeks.starwars.spawning.TrooperSpawnRules::checkSpawnRules,
+                net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
+            event.register(ModEntities.SNOWTROOPER.get(),
+                net.minecraft.world.entity.SpawnPlacementTypes.ON_GROUND,
+                net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                com.tweeks.starwars.spawning.TrooperSpawnRules::checkSpawnRules,
+                net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
+            // Non-imperial hostiles use the plain vanilla monster darkness rule.
+            event.register(ModEntities.TUSKEN_RAIDER.get(),
+                net.minecraft.world.entity.SpawnPlacementTypes.ON_GROUND,
+                net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                net.minecraft.world.entity.monster.Monster::checkMonsterSpawnRules,
+                net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
+            event.register(ModEntities.WAMPA.get(),
+                net.minecraft.world.entity.SpawnPlacementTypes.ON_GROUND,
+                net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                net.minecraft.world.entity.monster.Monster::checkMonsterSpawnRules,
+                net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
+            // CREATUREs (and Yoda, who never naturally spawns anyway) use the
+            // generic mob rule, like the Jedi Knight above.
+            event.register(ModEntities.JAWA.get(),
+                net.minecraft.world.entity.SpawnPlacementTypes.ON_GROUND,
+                net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                net.minecraft.world.entity.PathfinderMob::checkMobSpawnRules,
+                net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
+            event.register(ModEntities.BANTHA.get(),
+                net.minecraft.world.entity.SpawnPlacementTypes.ON_GROUND,
+                net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                net.minecraft.world.entity.PathfinderMob::checkMobSpawnRules,
+                net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
+            event.register(ModEntities.REBEL_TROOPER.get(),
+                net.minecraft.world.entity.SpawnPlacementTypes.ON_GROUND,
+                net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                net.minecraft.world.entity.PathfinderMob::checkMobSpawnRules,
+                net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
+            event.register(ModEntities.TAUNTAUN.get(),
+                net.minecraft.world.entity.SpawnPlacementTypes.ON_GROUND,
+                net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                net.minecraft.world.entity.PathfinderMob::checkMobSpawnRules,
+                net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
+            event.register(ModEntities.YODA.get(),
+                net.minecraft.world.entity.SpawnPlacementTypes.ON_GROUND,
+                net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                net.minecraft.world.entity.PathfinderMob::checkMobSpawnRules,
+                net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
+            // Dragonsnake spawns IN water (guardian-style placement).
+            event.register(ModEntities.DRAGONSNAKE.get(),
+                net.minecraft.world.entity.SpawnPlacementTypes.IN_WATER,
+                net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                com.tweeks.starwars.entity.DragonsnakeEntity::checkDragonsnakeSpawnRules,
+                net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
+            // Bogwing: AMBIENT flier — ground placement + generic mob rule
+            // (the vanilla bat registers ON_GROUND too; its extra darkness
+            // checks live in Bat::checkBatSpawnRules, which we don't need).
+            event.register(ModEntities.BOGWING.get(),
+                net.minecraft.world.entity.SpawnPlacementTypes.ON_GROUND,
+                net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                net.minecraft.world.entity.Mob::checkMobSpawnRules,
+                net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
         });
     }
 
@@ -72,5 +136,28 @@ public class StarWarsMod {
             com.tweeks.starwars.entity.HanSoloEntity.createAttributes().build());
         event.put(ModEntities.PRINCESS_LEIA.get(),
             com.tweeks.starwars.entity.PrincessLeiaEntity.createAttributes().build());
+        event.put(ModEntities.JAWA.get(),
+            com.tweeks.starwars.entity.JawaEntity.createAttributes().build());
+        event.put(ModEntities.TUSKEN_RAIDER.get(),
+            com.tweeks.starwars.entity.TuskenRaiderEntity.createAttributes().build());
+        event.put(ModEntities.BANTHA.get(),
+            com.tweeks.starwars.entity.BanthaEntity.createAttributes().build());
+        event.put(ModEntities.REBEL_TROOPER.get(),
+            com.tweeks.starwars.entity.RebelTrooperEntity.createAttributes().build());
+        event.put(ModEntities.PROBE_DROID.get(),
+            com.tweeks.starwars.entity.ProbeDroidEntity.createAttributes().build());
+        event.put(ModEntities.WAMPA.get(),
+            com.tweeks.starwars.entity.WampaEntity.createAttributes().build());
+        event.put(ModEntities.TAUNTAUN.get(),
+            com.tweeks.starwars.entity.TauntaunEntity.createAttributes().build());
+        // Snowtrooper reuses the stormtrooper attribute set (inherited static).
+        event.put(ModEntities.SNOWTROOPER.get(),
+            com.tweeks.starwars.entity.StormtrooperEntity.createAttributes().build());
+        event.put(ModEntities.DRAGONSNAKE.get(),
+            com.tweeks.starwars.entity.DragonsnakeEntity.createAttributes().build());
+        event.put(ModEntities.BOGWING.get(),
+            com.tweeks.starwars.entity.BogwingEntity.createAttributes().build());
+        event.put(ModEntities.YODA.get(),
+            com.tweeks.starwars.entity.YodaEntity.createAttributes().build());
     }
 }

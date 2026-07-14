@@ -29,6 +29,12 @@
         "maxCount": 4,
         "minCount": 2,
         "weight": 14
+      },
+      {
+        "type": "starwars:probe_droid",
+        "maxCount": 1,
+        "minCount": 1,
+        "weight": 4
       }
     ],
     "underground_water_creature": [],

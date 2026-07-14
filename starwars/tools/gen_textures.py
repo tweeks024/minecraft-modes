@@ -561,6 +561,631 @@ def paint_landspeeder(rgba):
     rect(rgba, 28, 54, 58, 59, SPEEDER_GLASS)
     rect(rgba, 28, 54, 58, 56, SPEEDER_GLASS_HI)
 
+# -----------------------------------------------------------------------------
+# Task-14 mobs. Width-aware helpers: the originals above hardcode the 64x64
+# canvas (rect() indexes with the global W), which the bantha/wampa (128x64)
+# and bogwing (32x32) canvases can't use. All new painters go through these.
+# -----------------------------------------------------------------------------
+
+def rectb(rgba, bw, x0, y0, x1, y1, color):
+    """rect() for an arbitrary buffer width `bw` (half-open in x and y)."""
+    r, g, b, a = color
+    for y in range(y0, y1):
+        for x in range(x0, x1):
+            i = 4 * (y * bw + x)
+            rgba[i + 0] = r
+            rgba[i + 1] = g
+            rgba[i + 2] = b
+            rgba[i + 3] = a
+
+def shade_box(rgba, bw, u, v, w, h, d, base, hi, sh):
+    """Paint the full box-UV footprint of a (w,h,d) cube at uv offset (u,v)
+    with the finished-art minimum: base + top highlight + bottom shade.
+
+    Layout (box UV): top/bottom faces occupy x[u+d, u+d+2w) rows [v, v+d);
+    the side wraparound strip occupies x[u, u+2(w+d)) rows [v+d, v+d+h).
+    The up face gets `hi`, the down face `sh`, the strip gets `base` with a
+    1px `hi` top row and a shaded bottom (2px when the strip is tall enough).
+    Mob painters layer their details on top of this.
+    """
+    rectb(rgba, bw, u + d, v, u + d + w, v + d, hi)            # up face
+    rectb(rgba, bw, u + d + w, v, u + d + 2 * w, v + d, sh)    # down face
+    strip_w = 2 * (w + d)
+    rectb(rgba, bw, u, v + d, u + strip_w, v + d + h, base)    # side strip
+    rectb(rgba, bw, u, v + d, u + strip_w, v + d + 1, hi)      # strip top row
+    shade_rows = 2 if h >= 4 else 1
+    rectb(rgba, bw, u, v + d + h - shade_rows, u + strip_w, v + d + h, sh)
+
+def speckle(rgba, bw, x0, y0, x1, y1, color, mod=5, salt=0):
+    """Deterministic scattered dots (hash pattern, no RNG) for fur streaks,
+    scale noise, weathering, etc."""
+    r, g, b, a = color
+    for y in range(y0, y1):
+        for x in range(x0, x1):
+            if (x * 7 + y * 13 + salt) % mod == 0:
+                i = 4 * (y * bw + x)
+                rgba[i + 0] = r
+                rgba[i + 1] = g
+                rgba[i + 2] = b
+                rgba[i + 3] = a
+
+# Jawa: dark brown hooded robe, black face void with glowing yellow eyes,
+# crossed light-tan bandolier straps.
+# UV map (gen_bbmodels JAWA_CUBES == JawaModel.java): head 8x8x8 @(0,0);
+# body 8x9x4 @(0,16); right_arm/left_arm 3x9x3 @(24,16)/(36,16);
+# right_leg/left_leg 3x6x3 @(0,32)/(12,32).
+JAWA_ROBE     = (0x52, 0x3A, 0x24, 0xFF)
+JAWA_ROBE_HI  = (0x6B, 0x4E, 0x32, 0xFF)
+JAWA_ROBE_SH  = (0x3A, 0x28, 0x18, 0xFF)
+JAWA_VOID     = (0x0A, 0x08, 0x06, 0xFF)
+JAWA_EYE      = (0xF2, 0xC1, 0x4E, 0xFF)   # glowing yellow
+JAWA_EYE_CORE = (0xFF, 0xEE, 0x9A, 0xFF)   # hot core
+JAWA_STRAP    = (0xC8, 0xB2, 0x8A, 0xFF)   # bandolier
+JAWA_STRAP_SH = (0x9A, 0x86, 0x62, 0xFF)
+
+def paint_jawa(rgba):
+    fill(rgba, (0, 0, 0, 0))
+    # Head 8x8x8 @(0,0): hood all around.
+    shade_box(rgba, W, 0, 0, 8, 8, 8, JAWA_ROBE, JAWA_ROBE_HI, JAWA_ROBE_SH)
+    speckle(rgba, W, 0, 8, 32, 16, JAWA_ROBE_SH, mod=7, salt=1)  # coarse weave
+    # Face front (x8..16, y8..16): black void framed by a 1px hood rim,
+    # two glowing yellow eyes with hot cores.
+    rect(rgba, 9, 9, 15, 16, JAWA_VOID)
+    rect(rgba, 10, 11, 12, 13, JAWA_EYE)
+    rect(rgba, 13, 11, 15, 13, JAWA_EYE)
+    rect(rgba, 10, 11, 11, 12, JAWA_EYE_CORE)
+    rect(rgba, 13, 11, 14, 12, JAWA_EYE_CORE)
+    # Body 8x9x4 @(0,16): robe + crossed bandolier straps on the front face
+    # (x4..12 of the strip rows 20..29).
+    shade_box(rgba, W, 0, 16, 8, 9, 4, JAWA_ROBE, JAWA_ROBE_HI, JAWA_ROBE_SH)
+    speckle(rgba, W, 0, 20, 24, 29, JAWA_ROBE_SH, mod=7, salt=2)
+    for i in range(8):                       # crossed straps, stepped diagonals
+        x = 4 + i
+        rect(rgba, x, 21 + i, x + 1, 22 + i, JAWA_STRAP)
+        rect(rgba, x, 28 - i, x + 1, 29 - i, JAWA_STRAP)
+    rect(rgba, 7, 24, 9, 25, JAWA_STRAP_SH)  # crossing-point shadow
+    # Arms 3x9x3 @(24,16)/(36,16): robe sleeves, darker cuffs.
+    for u0 in (24, 36):
+        shade_box(rgba, W, u0, 16, 3, 9, 3, JAWA_ROBE, JAWA_ROBE_HI, JAWA_ROBE_SH)
+        rect(rgba, u0, 26, u0 + 12, 28, JAWA_ROBE_SH)   # cuff
+    # Legs 3x6x3 @(0,32)/(12,32): robe hem + near-black feet rows.
+    for u0 in (0, 12):
+        shade_box(rgba, W, u0, 32, 3, 6, 3, JAWA_ROBE, JAWA_ROBE_HI, JAWA_ROBE_SH)
+        rect(rgba, u0, 39, u0 + 12, 41, JAWA_VOID)      # dark feet
+
+# Tusken Raider: sand-tan head wraps w/ metal goggles + mouth spikes,
+# layered tan/brown robes, dark gloves. Standard humanoid UV layout.
+TUSKEN_WRAP    = (0xC8, 0xB2, 0x8A, 0xFF)
+TUSKEN_WRAP_HI = (0xDE, 0xCC, 0xA6, 0xFF)
+TUSKEN_WRAP_SH = (0xA6, 0x90, 0x6A, 0xFF)
+TUSKEN_ROBE    = (0xA8, 0x92, 0x6C, 0xFF)
+TUSKEN_ROBE_SH = (0x86, 0x72, 0x52, 0xFF)
+TUSKEN_BROWN   = (0x6E, 0x58, 0x3E, 0xFF)
+TUSKEN_METAL   = (0x8A, 0x84, 0x78, 0xFF)
+TUSKEN_LENS    = (0x14, 0x12, 0x10, 0xFF)
+TUSKEN_SPIKE   = (0x5A, 0x50, 0x44, 0xFF)
+TUSKEN_GLOVE   = (0x3A, 0x30, 0x24, 0xFF)
+
+def paint_tusken_raider(rgba):
+    fill(rgba, TUSKEN_ROBE)
+    # Head: sand-tan wraps with horizontal wrap seams.
+    rect(rgba, 0, 0, 32, 8, TUSKEN_WRAP)          # top/bottom faces
+    rect(rgba, 8, 0, 24, 1, TUSKEN_WRAP_HI)
+    rect(rgba, 0, 8, 32, 16, TUSKEN_WRAP)         # wraparound sides
+    rect(rgba, 0, 8, 32, 9, TUSKEN_WRAP_HI)
+    for vy in (11, 14):                            # wrap seams all around
+        rect(rgba, 0, vy, 32, vy + 1, TUSKEN_WRAP_SH)
+    # Face front (8..16, 8..16): metal eye goggles + mouth spikes.
+    rect(rgba, 9, 10, 12, 13, TUSKEN_METAL)       # left goggle ring
+    rect(rgba, 12, 10, 15, 13, TUSKEN_METAL)      # right goggle ring
+    rect(rgba, 10, 11, 11, 12, TUSKEN_LENS)       # left lens
+    rect(rgba, 13, 11, 14, 12, TUSKEN_LENS)       # right lens
+    rect(rgba, 11, 13, 13, 16, TUSKEN_SPIKE)      # breather block
+    rect(rgba, 10, 14, 11, 16, TUSKEN_SPIKE)      # mouth spike L
+    rect(rgba, 13, 14, 14, 16, TUSKEN_SPIKE)      # mouth spike R
+    rect(rgba, 11, 14, 12, 15, TUSKEN_LENS)       # spike shadow
+    # Wrap-shell overlay (32..64, 0..16, inflated head box): outer head-wrap
+    # layer with a transparent front window (40..48, 8..16) so the goggles/
+    # spikes on the base head show through.
+    rect(rgba, 32, 0, 64, 16, TUSKEN_WRAP)
+    rect(rgba, 40, 0, 48, 8, TUSKEN_WRAP_HI)      # up face
+    rect(rgba, 48, 0, 56, 8, TUSKEN_WRAP_SH)      # down face
+    rect(rgba, 32, 8, 64, 9, TUSKEN_WRAP_HI)      # crown highlight
+    for vy in (11, 14):                            # wrap seams
+        rect(rgba, 32, vy, 64, vy + 1, TUSKEN_WRAP_SH)
+    rect(rgba, 32, 15, 64, 16, TUSKEN_BROWN)      # neck-wrap rim
+    rect(rgba, 40, 8, 48, 16, (0, 0, 0, 0))       # front window (transparent)
+    # chin_vent cube (56,16)-(64,19): breather spikes peeking below the wrap.
+    rect(rgba, 56, 16, 64, 19, TUSKEN_SPIKE)
+    rect(rgba, 56, 16, 64, 17, TUSKEN_METAL)
+    rect(rgba, 60, 17, 61, 19, TUSKEN_LENS)
+    # Body: layered tan/brown robes + bandolier + belt.
+    rect(rgba, 16, 16, 40, 32, TUSKEN_ROBE)
+    rect(rgba, 16, 16, 40, 17, TUSKEN_WRAP_HI)
+    rect(rgba, 16, 20, 40, 22, TUSKEN_BROWN)      # shoulder layer seam
+    rect(rgba, 22, 17, 26, 28, TUSKEN_BROWN)      # bandolier strap
+    rect(rgba, 16, 27, 40, 29, TUSKEN_BROWN)      # belt
+    rect(rgba, 27, 27, 30, 29, TUSKEN_METAL)      # buckle
+    rect(rgba, 16, 30, 40, 32, TUSKEN_ROBE_SH)
+    # Arms: robe sleeves, dark gloves on the wrist rows.
+    for (u0, v0) in ((40, 16), (32, 48)):
+        rect(rgba, u0, v0, u0 + 16, v0 + 16, TUSKEN_ROBE)
+        rect(rgba, u0, v0, u0 + 16, v0 + 1, TUSKEN_WRAP_HI)
+        rect(rgba, u0, v0 + 7, u0 + 16, v0 + 8, TUSKEN_ROBE_SH)   # sleeve fold
+        rect(rgba, u0, v0 + 12, u0 + 16, v0 + 16, TUSKEN_GLOVE)   # gloves
+    # Legs: wrapped tan with brown binding rows.
+    for (u0, v0) in ((0, 16), (16, 48)):
+        rect(rgba, u0, v0, u0 + 16, v0 + 16, TUSKEN_ROBE)
+        rect(rgba, u0, v0, u0 + 16, v0 + 1, TUSKEN_WRAP_HI)
+        for dy in (4, 8):
+            rect(rgba, u0, v0 + dy, u0 + 16, v0 + dy + 1, TUSKEN_BROWN)
+        rect(rgba, u0, v0 + 13, u0 + 16, v0 + 16, TUSKEN_ROBE_SH)  # boot wraps
+
+# Rebel trooper (Endor/Yavin commando): tan shirt + olive combat vest,
+# brown belt, tan helmet with band, determined face. Standard humanoid UV.
+REBEL_SHIRT    = (0xC8, 0xB2, 0x8A, 0xFF)
+REBEL_SHIRT_HI = (0xDE, 0xCC, 0xA6, 0xFF)
+REBEL_SHIRT_SH = (0xA6, 0x90, 0x6A, 0xFF)
+REBEL_VEST     = (0x66, 0x6B, 0x3F, 0xFF)   # olive
+REBEL_VEST_HI  = (0x7A, 0x80, 0x50, 0xFF)
+REBEL_VEST_SH  = (0x4E, 0x52, 0x30, 0xFF)
+REBEL_HELMET   = (0xB4, 0x9E, 0x76, 0xFF)
+REBEL_BELT     = (0x5A, 0x40, 0x28, 0xFF)
+REBEL_TROUSER  = (0x8A, 0x78, 0x58, 0xFF)
+REBEL_BOOT     = (0x4A, 0x38, 0x26, 0xFF)
+REBEL_SKIN     = (0xE8, 0xC0, 0x98, 0xFF)
+REBEL_SKIN_SH  = (0xC8, 0xA0, 0x7C, 0xFF)
+REBEL_EYE      = (0x28, 0x30, 0x38, 0xFF)
+
+def paint_rebel_trooper(rgba):
+    fill(rgba, REBEL_SHIRT)
+    # Head: tan helmet dome over a determined face strip.
+    rect(rgba, 0, 0, 32, 8, REBEL_HELMET)         # helmet top/bottom faces
+    rect(rgba, 8, 0, 24, 1, REBEL_SHIRT_HI)
+    rect(rgba, 0, 8, 32, 12, REBEL_HELMET)        # helmet sides down to brow
+    rect(rgba, 0, 8, 32, 9, REBEL_SHIRT_HI)       # dome highlight
+    rect(rgba, 0, 11, 32, 12, REBEL_VEST_SH)      # helmet band (olive-dark)
+    rect(rgba, 0, 12, 32, 16, REBEL_SKIN)         # face strip all around
+    # Face front (8..16): brow shadow + eyes + set mouth = determined.
+    rect(rgba, 8, 12, 16, 13, REBEL_SKIN_SH)      # brow shadow under band
+    rect(rgba, 9, 13, 11, 14, REBEL_EYE)          # narrowed left eye
+    rect(rgba, 13, 13, 15, 14, REBEL_EYE)         # narrowed right eye
+    rect(rgba, 10, 15, 14, 16, REBEL_SKIN_SH)     # set jaw line
+    # Helmet-shell overlay (32..64, 0..16, inflated head box): tan dome with
+    # the olive band, open-faced — transparent front window (40..48, 8..16)
+    # so the face strip shows through under the brim.
+    rect(rgba, 32, 0, 64, 16, REBEL_HELMET)
+    rect(rgba, 40, 0, 48, 8, REBEL_SHIRT_HI)      # up face
+    rect(rgba, 48, 0, 56, 8, REBEL_SHIRT_SH)      # down face
+    rect(rgba, 32, 8, 64, 9, REBEL_SHIRT_HI)      # dome highlight
+    rect(rgba, 32, 11, 64, 12, REBEL_VEST_SH)     # helmet band
+    rect(rgba, 32, 14, 64, 16, REBEL_SHIRT_SH)    # rim shade
+    rect(rgba, 40, 8, 48, 16, (0, 0, 0, 0))       # front window (transparent)
+    # chin_vent cube (56,16)-(64,19): brown chin strap.
+    rect(rgba, 56, 16, 64, 19, REBEL_BELT)
+    rect(rgba, 56, 16, 64, 17, REBEL_SHIRT_SH)
+    rect(rgba, 59, 17, 61, 19, (0x9A, 0x8A, 0x60, 0xFF))  # strap buckle
+    # Body: tan shirt under an olive combat vest + brown belt.
+    rect(rgba, 16, 16, 40, 32, REBEL_SHIRT)
+    rect(rgba, 16, 16, 40, 17, REBEL_SHIRT_HI)
+    rect(rgba, 16, 18, 40, 28, REBEL_VEST)        # vest wrap
+    rect(rgba, 16, 18, 40, 19, REBEL_VEST_HI)
+    rect(rgba, 26, 19, 30, 27, REBEL_SHIRT)       # open vest front: shirt shows
+    rect(rgba, 20, 20, 24, 23, REBEL_VEST_SH)     # chest pouch L
+    rect(rgba, 32, 20, 36, 23, REBEL_VEST_SH)     # chest pouch R
+    rect(rgba, 16, 26, 40, 28, REBEL_VEST_SH)     # vest hem shade
+    rect(rgba, 16, 28, 40, 30, REBEL_BELT)        # brown belt
+    rect(rgba, 26, 28, 29, 30, (0x9A, 0x8A, 0x60, 0xFF))  # buckle
+    rect(rgba, 16, 30, 40, 32, REBEL_SHIRT_SH)
+    # Arms: tan sleeves, rolled-cuff highlight, shaded wrists.
+    for (u0, v0) in ((40, 16), (32, 48)):
+        rect(rgba, u0, v0, u0 + 16, v0 + 16, REBEL_SHIRT)
+        rect(rgba, u0, v0, u0 + 16, v0 + 1, REBEL_SHIRT_HI)
+        rect(rgba, u0, v0 + 3, u0 + 16, v0 + 4, REBEL_VEST)     # shoulder strap
+        rect(rgba, u0, v0 + 8, u0 + 16, v0 + 9, REBEL_SHIRT_SH) # elbow fold
+        rect(rgba, u0, v0 + 14, u0 + 16, v0 + 16, REBEL_SHIRT_SH)
+    # Legs: field trousers + dark boots.
+    for (u0, v0) in ((0, 16), (16, 48)):
+        rect(rgba, u0, v0, u0 + 16, v0 + 16, REBEL_TROUSER)
+        rect(rgba, u0, v0, u0 + 16, v0 + 1, REBEL_SHIRT_HI)
+        rect(rgba, u0, v0 + 6, u0 + 16, v0 + 7, REBEL_SHIRT_SH)  # knee seam
+        rect(rgba, u0, v0 + 11, u0 + 16, v0 + 16, REBEL_BOOT)    # boots
+        rect(rgba, u0, v0 + 11, u0 + 16, v0 + 12, REBEL_BELT)    # boot cuff
+
+# Snowtrooper: stormtrooper-white armor w/ fabric-skirt shading on the lower
+# body, a smooth helmet with a cold-blue visor slit + breather box. Reuses
+# the stormtrooper rig (incl. helmet_shell overlay @(32,0) and chin_vent
+# @(56,16)), so this paints the stormtrooper UV layout.
+SNOW_WHITE    = (0xF2, 0xF2, 0xF2, 0xFF)
+SNOW_WHITE_HI = (0xFF, 0xFF, 0xFF, 0xFF)
+SNOW_WHITE_SH = (0xD2, 0xD4, 0xDA, 0xFF)
+SNOW_FABRIC   = (0xE4, 0xE2, 0xDC, 0xFF)   # fabric skirt, warmer white
+SNOW_FABRIC_SH= (0xC2, 0xBE, 0xB4, 0xFF)
+SNOW_VISOR    = (0x4A, 0x74, 0x9E, 0xFF)   # cold-blue slit
+SNOW_VISOR_DK = (0x2A, 0x44, 0x66, 0xFF)
+SNOW_GRAY     = (0x8A, 0x8F, 0x99, 0xFF)
+
+def paint_snowtrooper(rgba):
+    fill(rgba, SNOW_WHITE)
+    # Head front (8..16, 8..16): smooth faceplate, cold-blue visor slit.
+    rect(rgba, 8, 8, 16, 16, SNOW_WHITE_HI)
+    rect(rgba, 9, 10, 15, 11, SNOW_VISOR)        # visor slit
+    rect(rgba, 12, 10, 15, 11, SNOW_VISOR_DK)    # slit gradient
+    rect(rgba, 10, 13, 14, 15, SNOW_GRAY)        # breather box
+    rect(rgba, 11, 14, 13, 15, SNOW_VISOR_DK)    # breather intake
+    # Helmet-overlay region (32..64, 0..16): smooth white shell.
+    rect(rgba, 32, 0, 64, 16, SNOW_WHITE)
+    rect(rgba, 32, 0, 64, 1, SNOW_WHITE_HI)
+    rect(rgba, 40, 9, 56, 10, SNOW_VISOR)        # visor slit on the shell front
+    rect(rgba, 32, 14, 64, 16, SNOW_WHITE_SH)
+    # chin_vent cube UV (56,16)-(64,19): gray breather.
+    rect(rgba, 56, 16, 64, 19, SNOW_GRAY)
+    rect(rgba, 56, 16, 64, 17, SNOW_WHITE_SH)
+    # Body: armor chest over a fabric skirt on the lower rows.
+    rect(rgba, 16, 16, 40, 32, SNOW_WHITE)
+    rect(rgba, 16, 16, 40, 17, SNOW_WHITE_HI)
+    rect(rgba, 26, 20, 30, 24, SNOW_GRAY)        # chest control box
+    rect(rgba, 16, 24, 40, 32, SNOW_FABRIC)      # fabric skirt wrap
+    for x in range(18, 40, 4):                   # skirt fold shading
+        rect(rgba, x, 25, x + 1, 32, SNOW_FABRIC_SH)
+    rect(rgba, 16, 24, 40, 25, SNOW_WHITE_SH)    # armor/fabric seam
+    # Arms/legs: white armor, seams + snow-fabric cuffs.
+    for (u0, v0) in ((40, 16), (32, 48), (0, 16), (16, 48)):
+        rect(rgba, u0, v0, u0 + 16, v0 + 16, SNOW_WHITE)
+        rect(rgba, u0, v0, u0 + 16, v0 + 1, SNOW_WHITE_HI)
+        rect(rgba, u0, v0 + 6, u0 + 16, v0 + 7, SNOW_FABRIC_SH)  # joint seam
+        rect(rgba, u0, v0 + 12, u0 + 16, v0 + 14, SNOW_FABRIC)   # fabric cuff
+        rect(rgba, u0, v0 + 14, u0 + 16, v0 + 16, SNOW_WHITE_SH)
+    rect(rgba, 30, 8, 32, 16, SNOW_WHITE_SH)     # head edge shade
+    rect(rgba, 16, 30, 40, 32, SNOW_FABRIC_SH)   # skirt hem shade
+
+# Bantha (128x64): shaggy chocolate-brown fur w/ streak banding, cream
+# muzzle, dark curved horns, darker legs, wool skirt overlay.
+# UV: body 14x10x22 @(0,0); head 10x9x10 @(72,0); right_horn/left_horn 2x2x6
+# @(112,0)/(112,8); leg0..3 4x14x4 @(96,19)/(112,19)/(96,37)/(112,37);
+# wool_skirt 16x5x24 @(0,32).
+BANTHA_FUR    = (0x6B, 0x4F, 0x35, 0xFF)   # chocolate brown
+BANTHA_FUR_HI = (0x86, 0x66, 0x46, 0xFF)
+BANTHA_FUR_SH = (0x50, 0x3A, 0x26, 0xFF)
+BANTHA_FUR_DK = (0x3C, 0x2B, 0x1C, 0xFF)   # deepest streaks / leg shade
+BANTHA_CREAM  = (0xE8, 0xDC, 0xC0, 0xFF)   # muzzle
+BANTHA_HORN   = (0x4A, 0x3E, 0x30, 0xFF)
+BANTHA_HORN_HI= (0x66, 0x58, 0x46, 0xFF)
+BANTHA_HORN_DK= (0x2E, 0x26, 0x1C, 0xFF)
+BANTHA_EYE    = (0x18, 0x12, 0x0C, 0xFF)
+
+def paint_bantha(rgba):
+    bw = 128
+    fill_buf(rgba, (0, 0, 0, 0))
+    # Body @(0,0), fp 72x32: shaggy fur with horizontal streak banding.
+    shade_box(rgba, bw, 0, 0, 14, 10, 22, BANTHA_FUR, BANTHA_FUR_HI, BANTHA_FUR_SH)
+    for vy in range(24, 32, 3):                      # streak bands on the strip
+        band = BANTHA_FUR_SH if (vy // 3) % 2 else BANTHA_FUR_DK
+        rectb(rgba, bw, 0, vy, 72, vy + 1, band)
+    speckle(rgba, bw, 0, 22, 72, 32, BANTHA_FUR_HI, mod=6, salt=3)
+    speckle(rgba, bw, 22, 0, 36, 22, BANTHA_FUR_SH, mod=5, salt=4)  # up-face shag
+    # Head @(72,0), fp 40x19: fur + cream muzzle + eyes on the front face
+    # (x82..92, rows 10..19).
+    shade_box(rgba, bw, 72, 0, 10, 9, 10, BANTHA_FUR, BANTHA_FUR_HI, BANTHA_FUR_SH)
+    speckle(rgba, bw, 72, 10, 112, 19, BANTHA_FUR_SH, mod=6, salt=5)
+    rectb(rgba, bw, 83, 14, 91, 19, BANTHA_CREAM)    # cream muzzle
+    rectb(rgba, bw, 83, 18, 91, 19, (0xC6, 0xB8, 0x9A, 0xFF))  # muzzle shade
+    rectb(rgba, bw, 85, 16, 86, 18, BANTHA_FUR_SH)   # nostril L
+    rectb(rgba, bw, 88, 16, 89, 18, BANTHA_FUR_SH)   # nostril R
+    rectb(rgba, bw, 83, 11, 85, 13, BANTHA_EYE)      # eye L
+    rectb(rgba, bw, 89, 11, 91, 13, BANTHA_EYE)      # eye R
+    rectb(rgba, bw, 84, 11, 85, 12, BANTHA_FUR_HI)   # eye glint
+    rectb(rgba, bw, 89, 11, 90, 12, BANTHA_FUR_HI)
+    # Horns @(112,0)/(112,8), fp 16x8 each: 3-tone horn, ridge rings, dark tip.
+    for v0 in (0, 8):
+        shade_box(rgba, bw, 112, v0, 2, 2, 6, BANTHA_HORN, BANTHA_HORN_HI, BANTHA_HORN_DK)
+        for hx in (114, 117, 120, 123):              # ridge rings along z
+            rectb(rgba, bw, hx, v0 + 6, hx + 1, v0 + 8, BANTHA_HORN_DK)
+        rectb(rgba, bw, 118, v0 + 6, 120, v0 + 8, BANTHA_HORN_DK)  # front tip
+    # Legs 4x14x4, fp 16x18: darker fur, banding, near-black hoof rows.
+    for (u0, v0) in ((96, 19), (112, 19), (96, 37), (112, 37)):
+        shade_box(rgba, bw, u0, v0, 4, 14, 4, BANTHA_FUR_SH, BANTHA_FUR, BANTHA_FUR_DK)
+        speckle(rgba, bw, u0, v0 + 4, u0 + 16, v0 + 14, BANTHA_FUR_DK, mod=5, salt=u0 + v0)
+        rectb(rgba, bw, u0, v0 + 15, u0 + 16, v0 + 18, BANTHA_FUR_DK)   # hoof
+        rectb(rgba, bw, u0, v0 + 15, u0 + 16, v0 + 16, BANTHA_HORN)     # hoof rim
+    # Wool skirt @(0,32), fp 80x29: extra-shaggy wool — deep vertical
+    # streaks. Speckle stays inside the box-UV's sampled pixels (top faces
+    # x24..56 rows 32..56, strip x0..80 rows 56..61) so it can't splatter
+    # into the leg blocks that pack into the footprint's unused corners.
+    shade_box(rgba, bw, 0, 32, 16, 5, 24, BANTHA_FUR, BANTHA_FUR_HI, BANTHA_FUR_SH)
+    for x in range(0, 80, 2):                        # hanging wool strands
+        c = BANTHA_FUR_DK if (x // 2) % 3 == 0 else BANTHA_FUR_SH
+        rectb(rgba, bw, x, 58, x + 1, 61, c)
+    speckle(rgba, bw, 24, 32, 56, 56, BANTHA_FUR_SH, mod=4, salt=6)
+    speckle(rgba, bw, 0, 56, 80, 58, BANTHA_FUR_SH, mod=4, salt=6)
+
+# Tauntaun (64x64): gray-taupe hide, cream belly, darker dorsal stripe with
+# spots, dark horns/claws.
+# UV: body 8x10x14 @(0,0); neck 4x6x4 @(44,0); right_arm/left_arm 3x6x3
+# @(44,10)/(44,19); head 6x6x8 @(0,24); tail 3x3x8 @(28,28);
+# right_hind/left_hind 4x12x4 @(0,40)/(16,40).
+TAUN_HIDE    = (0x9A, 0x8C, 0x7A, 0xFF)   # gray-taupe
+TAUN_HIDE_HI = (0xB2, 0xA6, 0x94, 0xFF)
+TAUN_HIDE_SH = (0x7A, 0x6E, 0x5E, 0xFF)
+TAUN_BELLY   = (0xE8, 0xDC, 0xC0, 0xFF)   # cream
+TAUN_STRIPE  = (0x5E, 0x52, 0x44, 0xFF)   # dorsal stripe
+TAUN_DARK    = (0x3E, 0x36, 0x2C, 0xFF)   # horns / claws
+TAUN_EYE     = (0x1C, 0x16, 0x10, 0xFF)
+
+def paint_tauntaun(rgba):
+    fill(rgba, (0, 0, 0, 0))
+    # Body @(0,0), fp 44x24: hide, dorsal stripe down the up face (x14..22,
+    # rows 0..14), spots along it, cream belly on the down face + lower strip.
+    shade_box(rgba, W, 0, 0, 8, 10, 14, TAUN_HIDE, TAUN_HIDE_HI, TAUN_HIDE_SH)
+    rect(rgba, 17, 0, 19, 14, TAUN_STRIPE)          # dorsal stripe (up face)
+    for y in range(1, 13, 3):                       # small flanking spots
+        rect(rgba, 15, y, 16, y + 1, TAUN_STRIPE)
+        rect(rgba, 20, y + 1, 21, y + 2, TAUN_STRIPE)
+    rect(rgba, 22, 0, 30, 14, TAUN_BELLY)           # belly (down face)
+    rect(rgba, 0, 20, 44, 22, TAUN_BELLY)           # belly rows on the strip
+    rect(rgba, 0, 22, 44, 24, (0xC6, 0xB8, 0x9A, 0xFF))  # belly shade
+    speckle(rgba, W, 0, 14, 44, 20, TAUN_HIDE_SH, mod=6, salt=7)
+    # Neck @(44,0), fp 16x10: hide + stripe continuation on the up face.
+    shade_box(rgba, W, 44, 0, 4, 6, 4, TAUN_HIDE, TAUN_HIDE_HI, TAUN_HIDE_SH)
+    rect(rgba, 49, 0, 51, 4, TAUN_STRIPE)
+    speckle(rgba, W, 44, 4, 60, 10, TAUN_HIDE_SH, mod=5, salt=8)
+    # Arms @(44,10)/(44,19), fp 12x9: hide, dark claw tips.
+    for v0 in (10, 19):
+        shade_box(rgba, W, 44, v0, 3, 6, 3, TAUN_HIDE, TAUN_HIDE_HI, TAUN_HIDE_SH)
+        rect(rgba, 44, v0 + 8, 56, v0 + 9, TAUN_DARK)   # claws
+    # Head @(0,24), fp 28x14: hide, horn hints, eyes + nostrils on the front
+    # face (x8..14, rows 32..38).
+    shade_box(rgba, W, 0, 24, 6, 6, 8, TAUN_HIDE, TAUN_HIDE_HI, TAUN_HIDE_SH)
+    rect(rgba, 8, 24, 10, 27, TAUN_DARK)            # horn base L (up face)
+    rect(rgba, 12, 24, 14, 27, TAUN_DARK)           # horn base R
+    rect(rgba, 8, 24, 9, 25, TAUN_HIDE_HI)          # horn glint
+    rect(rgba, 9, 33, 10, 34, TAUN_EYE)             # eye L
+    rect(rgba, 12, 33, 13, 34, TAUN_EYE)            # eye R
+    rect(rgba, 9, 36, 13, 38, TAUN_BELLY)           # cream snout
+    rect(rgba, 10, 36, 11, 37, TAUN_STRIPE)         # nostril
+    rect(rgba, 11, 36, 12, 37, TAUN_STRIPE)
+    # Tail @(28,28), fp 22x11: hide, stripe along the up face (x36..39,
+    # rows 28..36), dark tip on the back face (x47..50, rows 36..39).
+    shade_box(rgba, W, 28, 28, 3, 3, 8, TAUN_HIDE, TAUN_HIDE_HI, TAUN_HIDE_SH)
+    rect(rgba, 37, 28, 38, 36, TAUN_STRIPE)         # up-face stripe
+    rect(rgba, 47, 36, 50, 39, TAUN_HIDE_SH)        # tail tip shade (back face)
+    # Hind legs @(0,40)/(16,40), fp 16x16: hide, hock banding, dark claws.
+    for u0 in (0, 16):
+        shade_box(rgba, W, u0, 40, 4, 12, 4, TAUN_HIDE, TAUN_HIDE_HI, TAUN_HIDE_SH)
+        speckle(rgba, W, u0, 44, u0 + 16, 52, TAUN_HIDE_SH, mod=5, salt=u0)
+        rect(rgba, u0, 49, u0 + 16, 50, TAUN_HIDE_SH)   # hock band
+        rect(rgba, u0, 54, u0 + 16, 56, TAUN_DARK)      # claws
+
+# Wampa (128x64): off-white shaggy fur w/ gray shading, blood-red claw tips,
+# dark horns, fanged mouth.
+# UV: body 14x12x8 @(0,0); head 10x8x8 @(44,0); right_horn/left_horn 2x3x2
+# @(80,0)/(88,0); right_arm/left_arm 5x14x5 @(0,20)/(20,20);
+# right_leg/left_leg 5x10x5 @(40,20)/(60,20).
+WAMPA_FUR    = (0xF0, 0xED, 0xE6, 0xFF)   # off-white
+WAMPA_FUR_HI = (0xFC, 0xFB, 0xF8, 0xFF)
+WAMPA_FUR_SH = (0xC8, 0xC6, 0xC2, 0xFF)   # gray shading
+WAMPA_FUR_DK = (0x9E, 0x9C, 0x9A, 0xFF)   # deep shag
+WAMPA_HORN   = (0x4A, 0x40, 0x36, 0xFF)
+WAMPA_HORN_HI= (0x6A, 0x5E, 0x50, 0xFF)
+WAMPA_HORN_DK= (0x2E, 0x27, 0x20, 0xFF)
+WAMPA_CLAW   = (0xB0, 0x30, 0x30, 0xFF)   # blood-red
+WAMPA_CLAW_DK= (0x7A, 0x1E, 0x1E, 0xFF)
+WAMPA_MOUTH  = (0x3A, 0x14, 0x14, 0xFF)
+WAMPA_EYE    = (0x18, 0x14, 0x12, 0xFF)
+
+def paint_wampa(rgba):
+    bw = 128
+    fill_buf(rgba, (0, 0, 0, 0))
+    # Body @(0,0), fp 44x20: shaggy off-white fur, gray streaks.
+    shade_box(rgba, bw, 0, 0, 14, 12, 8, WAMPA_FUR, WAMPA_FUR_HI, WAMPA_FUR_SH)
+    speckle(rgba, bw, 0, 8, 44, 20, WAMPA_FUR_SH, mod=4, salt=9)
+    speckle(rgba, bw, 0, 8, 44, 20, WAMPA_FUR_DK, mod=11, salt=10)
+    for x in range(2, 44, 5):                       # hanging shag strands
+        rectb(rgba, bw, x, 17, x + 1, 20, WAMPA_FUR_DK)
+    # Head @(44,0), fp 36x16: fur; face on the front face (x52..62, rows
+    # 8..16): sunken eyes, wide fanged mouth.
+    shade_box(rgba, bw, 44, 0, 10, 8, 8, WAMPA_FUR, WAMPA_FUR_HI, WAMPA_FUR_SH)
+    speckle(rgba, bw, 44, 8, 80, 16, WAMPA_FUR_SH, mod=5, salt=11)
+    rectb(rgba, bw, 53, 9, 55, 11, WAMPA_EYE)       # eye L
+    rectb(rgba, bw, 59, 9, 61, 11, WAMPA_EYE)       # eye R
+    rectb(rgba, bw, 53, 9, 54, 10, WAMPA_FUR_DK)    # brow shadow
+    rectb(rgba, bw, 60, 9, 61, 10, WAMPA_FUR_DK)
+    rectb(rgba, bw, 53, 12, 61, 15, WAMPA_MOUTH)    # open mouth
+    for fx in (53, 55, 57, 59):                     # upper fangs
+        rectb(rgba, bw, fx, 12, fx + 1, 14, WAMPA_FUR_HI)
+    rectb(rgba, bw, 54, 14, 55, 15, WAMPA_FUR_HI)   # lower fang
+    rectb(rgba, bw, 58, 14, 59, 15, WAMPA_FUR_HI)
+    rectb(rgba, bw, 53, 15, 61, 16, WAMPA_FUR_SH)   # chin
+    # Horns @(80,0)/(88,0), fp 8x5: dark 3-tone horns.
+    for u0 in (80, 88):
+        shade_box(rgba, bw, u0, 0, 2, 3, 2, WAMPA_HORN, WAMPA_HORN_HI, WAMPA_HORN_DK)
+        rectb(rgba, bw, u0, 4, u0 + 8, 5, WAMPA_HORN_DK)  # tip ring
+    # Arms @(0,20)/(20,20), fp 20x19: fur + blood-red claw tips on the
+    # bottom rows (3 claw stripes each on the front face).
+    for u0 in (0, 20):
+        shade_box(rgba, bw, u0, 20, 5, 14, 5, WAMPA_FUR, WAMPA_FUR_HI, WAMPA_FUR_SH)
+        speckle(rgba, bw, u0, 25, u0 + 20, 37, WAMPA_FUR_SH, mod=5, salt=u0 + 1)
+        for cx in (u0 + 6, u0 + 8, u0 + 10):        # claws on the front face
+            rectb(rgba, bw, cx, 36, cx + 1, 39, WAMPA_CLAW)
+            rectb(rgba, bw, cx, 38, cx + 1, 39, WAMPA_CLAW_DK)
+    # Legs @(40,20)/(60,20), fp 20x15: fur + red toe-claw stripes.
+    for u0 in (40, 60):
+        shade_box(rgba, bw, u0, 20, 5, 10, 5, WAMPA_FUR, WAMPA_FUR_HI, WAMPA_FUR_SH)
+        speckle(rgba, bw, u0, 25, u0 + 20, 33, WAMPA_FUR_SH, mod=5, salt=u0 + 2)
+        for cx in (u0 + 6, u0 + 8, u0 + 10):        # toe claws
+            rectb(rgba, bw, cx, 33, cx + 1, 35, WAMPA_CLAW)
+
+# Probe droid (64x64): near-black/gunmetal pod w/ panel lines, single RED
+# eye lens (bright + glow ring), gray legs.
+# UV: pod 10x8x10 @(0,0); eye 4x4x2 @(40,0); antenna 1x6x1 @(52,0);
+# leg0..3 1x8x1 @(0,18)/(4,18)/(8,18)/(12,18).
+PROBE_POD      = (0x33, 0x36, 0x3B, 0xFF)   # gunmetal
+PROBE_POD_HI   = (0x4A, 0x4E, 0x56, 0xFF)
+PROBE_POD_DK   = (0x1E, 0x20, 0x24, 0xFF)   # near-black panel lines
+PROBE_LEG      = (0x6A, 0x6E, 0x76, 0xFF)   # gray
+PROBE_LEG_DK   = (0x44, 0x48, 0x4E, 0xFF)
+PROBE_RED      = (0xE3, 0x3B, 0x3B, 0xFF)   # bright lens
+PROBE_RED_GLOW = (0x8A, 0x1E, 0x1E, 0xFF)   # glow ring
+PROBE_RED_HOT  = (0xFF, 0x8A, 0x7A, 0xFF)   # lens hot-spot
+
+def paint_probe_droid(rgba):
+    fill(rgba, (0, 0, 0, 0))
+    # Pod @(0,0), fp 40x18: gunmetal with panel lines + rivet dots.
+    shade_box(rgba, W, 0, 0, 10, 8, 10, PROBE_POD, PROBE_POD_HI, PROBE_POD_DK)
+    for x in (5, 15, 25, 35):                       # vertical panel lines
+        rect(rgba, x, 10, x + 1, 18, PROBE_POD_DK)
+    rect(rgba, 0, 13, 40, 14, PROBE_POD_DK)         # horizontal panel line
+    speckle(rgba, W, 0, 10, 40, 18, PROBE_POD_HI, mod=9, salt=12)  # rivets
+    rect(rgba, 10, 0, 20, 10, PROBE_POD_HI)         # up face
+    rect(rgba, 13, 3, 17, 7, PROBE_POD)             # dome hatch on top
+    rect(rgba, 20, 0, 30, 10, PROBE_POD_DK)         # down face, darkest
+    rect(rgba, 23, 3, 27, 7, PROBE_LEG_DK)          # belly sensor plate
+    # Eye @(40,0), fp 12x6: gunmetal housing; front face (x42..46, rows 2..6)
+    # = bright red lens with glow ring + hot-spot.
+    shade_box(rgba, W, 40, 0, 4, 4, 2, PROBE_POD, PROBE_POD_HI, PROBE_POD_DK)
+    rect(rgba, 42, 2, 46, 6, PROBE_RED_GLOW)        # glow ring
+    rect(rgba, 43, 3, 45, 5, PROBE_RED)             # bright lens
+    rect(rgba, 43, 3, 44, 4, PROBE_RED_HOT)         # hot-spot
+    # Antenna @(52,0), fp 4x7: gray mast, dark tip band.
+    shade_box(rgba, W, 52, 0, 1, 6, 1, PROBE_LEG, PROBE_POD_HI, PROBE_LEG_DK)
+    rect(rgba, 52, 1, 56, 2, PROBE_POD_DK)
+    # Legs @(0..16,18), fp 4x9 each: gray manipulator arms, dark joints.
+    for u0 in (0, 4, 8, 12):
+        shade_box(rgba, W, u0, 18, 1, 8, 1, PROBE_LEG, PROBE_POD_HI, PROBE_LEG_DK)
+        rect(rgba, u0, 22, u0 + 4, 23, PROBE_POD_DK)   # knee joint
+        rect(rgba, u0, 25, u0 + 4, 26, PROBE_POD_DK)   # claw joint
+
+# Dragonsnake (64x64): murky green scales w/ darker diamond back pattern,
+# pale belly, red eyes.
+# UV: head 6x4x8 @(0,0); seg0 5x4x8 @(28,0); seg1 @(0,12); seg2 @(26,12);
+# seg3 @(0,24).
+DSNAKE_SCALE    = (0x4A, 0x6B, 0x3A, 0xFF)   # murky green
+DSNAKE_SCALE_HI = (0x60, 0x84, 0x4C, 0xFF)
+DSNAKE_SCALE_SH = (0x36, 0x50, 0x2A, 0xFF)
+DSNAKE_DIAMOND  = (0x23, 0x3A, 0x1E, 0xFF)   # dark back pattern
+DSNAKE_BELLY    = (0xB8, 0xB4, 0x8A, 0xFF)   # pale belly
+DSNAKE_EYE      = (0xC0, 0x28, 0x28, 0xFF)   # red
+DSNAKE_MOUTH    = (0x2A, 0x1E, 0x14, 0xFF)
+
+def _dsnake_diamonds(rgba, x0, y0, x1, y1, salt):
+    """Dark zigzag diamond stripe down the center of an up-face region."""
+    cx = (x0 + x1) // 2
+    for y in range(y0, y1):
+        off = (0, 1, 0, -1)[(y + salt) % 4]
+        rect(rgba, cx + off - 1, y, cx + off + 1, y + 1, DSNAKE_DIAMOND)
+
+def paint_dragonsnake(rgba):
+    fill(rgba, (0, 0, 0, 0))
+    # (u, v, cube width) per box — head is 6 wide, segs are 5 wide.
+    segs = [(0, 0, 6), (28, 0, 5), (0, 12, 5), (26, 12, 5), (0, 24, 5)]
+    for i, (u0, v0, w0) in enumerate(segs):
+        shade_box(rgba, W, u0, v0, w0, 4, 8, DSNAKE_SCALE, DSNAKE_SCALE_HI, DSNAKE_SCALE_SH)
+        # Up face: diamond back pattern; down face: pale belly.
+        _dsnake_diamonds(rgba, u0 + 8, v0, u0 + 8 + w0, v0 + 8, salt=i)
+        rect(rgba, u0 + 8 + w0, v0, u0 + 8 + 2 * w0, v0 + 8, DSNAKE_BELLY)
+        rect(rgba, u0 + 8 + w0, v0, u0 + 8 + 2 * w0, v0 + 1, (0x9E, 0x9A, 0x74, 0xFF))
+        speckle(rgba, W, u0, v0 + 8, u0 + 2 * (8 + w0), v0 + 12, DSNAKE_SCALE_SH,
+                mod=3, salt=13 + i)                  # scale noise on the strip
+    # Head extras @(0,0): red eyes high on the front face (x8..14, rows
+    # 8..12) + mouth line + snout shade.
+    rect(rgba, 9, 8, 10, 10, DSNAKE_EYE)             # eye L
+    rect(rgba, 12, 8, 13, 10, DSNAKE_EYE)            # eye R
+    rect(rgba, 9, 8, 10, 9, (0xE8, 0x5A, 0x4A, 0xFF))   # eye glint
+    rect(rgba, 10, 10, 12, 11, DSNAKE_SCALE_SH)      # snout shade
+    rect(rgba, 8, 11, 14, 12, DSNAKE_MOUTH)          # mouth line
+
+# Bogwing (32x32): teal-green membrane wings, brown furry body, tiny beak.
+# UV: body 4x3x6 @(0,0); head 3x3x4 @(0,9); right_wing/left_wing 10x1x6
+# @(0,16)/(0,23).
+BOG_BODY    = (0x6B, 0x4A, 0x2B, 0xFF)   # brown fur
+BOG_BODY_HI = (0x86, 0x62, 0x3C, 0xFF)
+BOG_BODY_SH = (0x50, 0x36, 0x1E, 0xFF)
+BOG_WING    = (0x4A, 0x8E, 0x8A, 0xFF)   # teal membrane
+BOG_WING_HI = (0x62, 0xA8, 0xA2, 0xFF)
+BOG_WING_SH = (0x35, 0x6B, 0x68, 0xFF)
+BOG_VEIN    = (0x26, 0x4E, 0x4C, 0xFF)
+BOG_BEAK    = (0xC8, 0x92, 0x3A, 0xFF)
+BOG_EYE     = (0x14, 0x10, 0x0C, 0xFF)
+
+def paint_bogwing(rgba):
+    bw = 32
+    fill_buf(rgba, (0, 0, 0, 0))
+    # Body @(0,0), fp 20x9: brown fur + speckle shag.
+    shade_box(rgba, bw, 0, 0, 4, 3, 6, BOG_BODY, BOG_BODY_HI, BOG_BODY_SH)
+    speckle(rgba, bw, 0, 6, 20, 9, BOG_BODY_SH, mod=3, salt=14)
+    # Head @(0,9), fp 14x7: fur; front face (x4..7, rows 13..16): eyes + beak.
+    shade_box(rgba, bw, 0, 9, 3, 3, 4, BOG_BODY, BOG_BODY_HI, BOG_BODY_SH)
+    rectb(rgba, bw, 4, 13, 5, 14, BOG_EYE)          # eye L
+    rectb(rgba, bw, 6, 13, 7, 14, BOG_EYE)          # eye R
+    rectb(rgba, bw, 4, 14, 7, 16, BOG_BEAK)         # tiny beak
+    rectb(rgba, bw, 4, 15, 7, 16, (0x9A, 0x6E, 0x2A, 0xFF))  # beak underside
+    # Wings @(0,16)/(0,23), fp 32x7 each: teal membrane on the up/down faces
+    # (up x6..16, down x16..26), dark vein lines, brown leading-edge strip.
+    for v0 in (16, 23):
+        shade_box(rgba, bw, 0, v0, 10, 1, 6, BOG_BODY, BOG_WING_HI, BOG_WING_SH)
+        rectb(rgba, bw, 6, v0, 16, v0 + 6, BOG_WING)         # up face membrane
+        rectb(rgba, bw, 6, v0, 16, v0 + 1, BOG_WING_HI)
+        rectb(rgba, bw, 16, v0, 26, v0 + 6, BOG_WING_SH)     # down face membrane
+        for vx in (8, 11, 14):                               # vein lines (up)
+            rectb(rgba, bw, vx, v0 + 1, vx + 1, v0 + 6, BOG_VEIN)
+        for vx in (18, 21, 24):                              # vein lines (down)
+            rectb(rgba, bw, vx, v0 + 1, vx + 1, v0 + 6, BOG_VEIN)
+        rectb(rgba, bw, 26, v0, 32, v0 + 6, BOG_WING)        # wingtip block
+        rectb(rgba, bw, 26, v0 + 5, 32, v0 + 6, BOG_WING_SH)
+        rectb(rgba, bw, 0, v0 + 6, 32, v0 + 7, BOG_BODY_SH)  # brown leading edge
+
+# Yoda (64x64): green skin (3-tone), wispy white hair strip, coarse beige robe.
+# UV: head 9x8x8 @(0,0); right_ear/left_ear 3x2x1 @(34,0)/(42,0);
+# body 6x7x4 @(0,16); right_arm/left_arm 2x6x2 @(20,16)/(28,16);
+# right_leg/left_leg 2x4x2 @(36,16)/(44,16).
+YODA_SKIN    = (0x7A, 0xA0, 0x5A, 0xFF)   # green
+YODA_SKIN_HI = (0x94, 0xB8, 0x72, 0xFF)
+YODA_SKIN_SH = (0x5C, 0x7E, 0x42, 0xFF)
+YODA_HAIR    = (0xE8, 0xE6, 0xDE, 0xFF)   # wispy white
+YODA_ROBE    = (0xB8, 0xA8, 0x88, 0xFF)   # coarse beige
+YODA_ROBE_HI = (0xCE, 0xC0, 0xA2, 0xFF)
+YODA_ROBE_SH = (0x94, 0x84, 0x66, 0xFF)
+YODA_BELT    = (0x5A, 0x46, 0x2E, 0xFF)
+YODA_EYE     = (0x2A, 0x30, 0x1E, 0xFF)
+
+def paint_yoda(rgba):
+    fill(rgba, (0, 0, 0, 0))
+    # Head @(0,0), fp 34x16: green skin, wispy white hair on the crown's
+    # back half + upper side rows, wrinkles + eyes + mouth on the front face
+    # (x8..17, rows 8..16).
+    shade_box(rgba, W, 0, 0, 9, 8, 8, YODA_SKIN, YODA_SKIN_HI, YODA_SKIN_SH)
+    speckle(rgba, W, 8, 4, 17, 8, YODA_HAIR, mod=2, salt=15)   # crown wisps
+    speckle(rgba, W, 0, 8, 8, 11, YODA_HAIR, mod=3, salt=16)   # side wisps (east)
+    speckle(rgba, W, 17, 8, 25, 11, YODA_HAIR, mod=3, salt=17) # side wisps (west)
+    rect(rgba, 9, 9, 16, 10, YODA_SKIN_SH)          # brow wrinkle
+    rect(rgba, 10, 11, 11, 12, YODA_EYE)            # eye L
+    rect(rgba, 14, 11, 15, 12, YODA_EYE)            # eye R
+    rect(rgba, 11, 13, 14, 14, YODA_SKIN_SH)        # cheek wrinkle
+    rect(rgba, 11, 14, 14, 15, (0x4A, 0x66, 0x36, 0xFF))  # mouth line
+    # Ears @(34,0)/(42,0), fp 8x3: green, darker tips (east face = tip).
+    for u0 in (34, 42):
+        shade_box(rgba, W, u0, 0, 3, 2, 1, YODA_SKIN, YODA_SKIN_HI, YODA_SKIN_SH)
+        rect(rgba, u0, 1, u0 + 1, 3, YODA_SKIN_SH)  # tip shade
+    # Body @(0,16), fp 20x11: coarse beige robe, weave speckle, V-collar,
+    # belt row on the strip (rows 20..27).
+    shade_box(rgba, W, 0, 16, 6, 7, 4, YODA_ROBE, YODA_ROBE_HI, YODA_ROBE_SH)
+    speckle(rgba, W, 0, 20, 20, 27, YODA_ROBE_SH, mod=4, salt=18)  # coarse weave
+    rect(rgba, 5, 20, 9, 21, YODA_ROBE_SH)          # V-collar fold
+    rect(rgba, 6, 21, 8, 22, YODA_ROBE_SH)          # V-collar point
+    rect(rgba, 0, 24, 20, 25, YODA_BELT)            # belt
+    rect(rgba, 6, 24, 8, 25, (0x8A, 0x7A, 0x5A, 0xFF))  # buckle
+    # Arms @(20,16)/(28,16), fp 8x8: robe sleeves, green hands on the
+    # bottom rows.
+    for u0 in (20, 28):
+        shade_box(rgba, W, u0, 16, 2, 6, 2, YODA_ROBE, YODA_ROBE_HI, YODA_ROBE_SH)
+        rect(rgba, u0, 22, u0 + 8, 24, YODA_SKIN)   # hands
+        rect(rgba, u0, 23, u0 + 8, 24, YODA_SKIN_SH)
+    # Legs @(36,16)/(44,16), fp 8x6: robe hem, green feet row.
+    for u0 in (36, 44):
+        shade_box(rgba, W, u0, 16, 2, 4, 2, YODA_ROBE, YODA_ROBE_HI, YODA_ROBE_SH)
+        rect(rgba, u0, 20, u0 + 8, 21, YODA_ROBE_SH)
+        rect(rgba, u0, 21, u0 + 8, 22, YODA_SKIN)   # bare feet
+
 MOBS = {
     'stormtrooper': paint_stormtrooper,
     'battle_droid': paint_battle_droid,
@@ -573,6 +1198,21 @@ MOBS = {
     'han_solo': paint_han_solo,
     'princess_leia': paint_princess_leia,
     'landspeeder': paint_landspeeder,
+    'jawa': paint_jawa,
+    'tusken_raider': paint_tusken_raider,
+    'rebel_trooper': paint_rebel_trooper,
+    'snowtrooper': paint_snowtrooper,
+    'tauntaun': paint_tauntaun,
+    'probe_droid': paint_probe_droid,
+    'dragonsnake': paint_dragonsnake,
+    'yoda': paint_yoda,
+}
+
+# Mobs whose skins are NOT on the default 64x64 canvas: name -> (w, h, fn).
+SIZED_MOBS = {
+    'bantha': (128, 64, paint_bantha),
+    'wampa': (128, 64, paint_wampa),
+    'bogwing': (32, 32, paint_bogwing),
 }
 
 # Worn-armor equipment layers: standard 64x32 vanilla armor-sheet UV layout
@@ -785,6 +1425,13 @@ if __name__ == '__main__':
         paint_fn(rgba)
         out_path = os.path.join(out_dir, f'{name}.png')
         write_png(out_path, rgba)
+        print(name)
+
+    for name, (mw, mh, paint_fn) in SIZED_MOBS.items():
+        rgba = bytearray(mw * mh * 4)
+        paint_fn(rgba)
+        out_path = os.path.join(out_dir, f'{name}.png')
+        write_png(out_path, rgba, width=mw, height=mh)
         print(name)
 
     humanoid_dir = os.path.join(out_dir, 'equipment', 'humanoid')

@@ -22,10 +22,12 @@ public enum Planet implements StringRepresentable {
     TATOOINE("tatooine"),
     ANDOR("andor"),
     CORUSCANT("coruscant"),
+    DAGOBAH("dagobah"),
+    HOTH("hoth"),
     HOME("home");
 
     /** Number of wedges on the planet picker radial. */
-    public static final int COUNT = 4;
+    public static final int COUNT = 6;
 
     public static final com.mojang.serialization.Codec<Planet> CODEC =
         StringRepresentable.fromEnum(Planet::values);

@@ -1,0 +1,14 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 1977100510,
+    "separation": 9,
+    "spacing": 28
+  },
+  "structures": [
+    {
+      "structure": "starwars:xwing_wreck",
+      "weight": 1
+    }
+  ]
+}

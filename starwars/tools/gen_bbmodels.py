@@ -196,11 +196,264 @@ LANDSPEEDER_CUBES = [
     ('turbine_r',   SPEEDER_BONE, ( 5.0, 17.9,  10.0, 5, 5, 9),   (0, 50)),
 ]
 
+# -----------------------------------------------------------------------------
+# Task-14 mobs. Bone names + cube sizes are the hand-off contract with the
+# Java entity models being written in parallel — do not rename/resize.
+# tusken_raider + rebel_trooper reuse HUMANOID_CUBES outright (see MOBS);
+# snowtrooper has NO rig at all (reuses the stormtrooper geometry + its own
+# skin). All rigs below are custom skeletons with their own bone tables.
+# -----------------------------------------------------------------------------
+
+# Jawa: 3/4-height robed scavenger, grounded stack — legs 0..6, robe body
+# 6..15, head 15..23 (same pivots and cube tuples as JawaModel.java, which
+# was written against this rig's UV layout: compact blocks at head (0,0),
+# body (0,16), arms (24,16)/(36,16), legs (0,32)/(12,32)).
+JAWA_HEAD_BONE = (0, 15, 0)
+JAWA_BODY_BONE = (0, 6, 0)
+JAWA_RARM_BONE = (-5.5, 13, 0)
+JAWA_LARM_BONE = (5.5, 13, 0)
+JAWA_RLEG_BONE = (-1.5, 6, 0)
+JAWA_LLEG_BONE = (1.5, 6, 0)
+
+JAWA_BONE_DEFS = [
+    ('head', JAWA_HEAD_BONE),
+    ('body', JAWA_BODY_BONE),
+    ('right_arm', JAWA_RARM_BONE),
+    ('left_arm', JAWA_LARM_BONE),
+    ('right_leg', JAWA_RLEG_BONE),
+    ('left_leg', JAWA_LLEG_BONE),
+]
+
+JAWA_CUBES = [
+    ('head',      JAWA_HEAD_BONE, (-4.0, -8.0, -4.0, 8, 8, 8),    (0, 0)),
+    ('body',      JAWA_BODY_BONE, (-4.0, -9.0, -2.0, 8, 9, 4),    (0, 16)),
+    ('right_arm', JAWA_RARM_BONE, (-1.5, -2.0, -1.5, 3, 9, 3),    (24, 16)),
+    ('left_arm',  JAWA_LARM_BONE, (-1.5, -2.0, -1.5, 3, 9, 3),    (36, 16)),
+    ('right_leg', JAWA_RLEG_BONE, (-1.5,  0.0, -1.5, 3, 6, 3),    (0, 32)),
+    ('left_leg',  JAWA_LLEG_BONE, (-1.5,  0.0, -1.5, 3, 6, 3),    (12, 32)),
+]
+
+# Bantha (128x64 canvas): quadruped. Body 14x10x22 with its underside at
+# y=14; wool_skirt overlay hangs 12..17 around the body's lower half; head
+# at the front (z-) with two forward-running horn cubes on the head bone;
+# leg0..leg3 at the body corners, feet on the ground.
+BANTHA_BODY_BONE = (0, 24, 0)
+BANTHA_HEAD_BONE = (0, 22, -11)
+BANTHA_LEG0_BONE = (-5, 14, -8)
+BANTHA_LEG1_BONE = (5, 14, -8)
+BANTHA_LEG2_BONE = (-5, 14, 8)
+BANTHA_LEG3_BONE = (5, 14, 8)
+
+BANTHA_BONE_DEFS = [
+    ('body', BANTHA_BODY_BONE),
+    ('head', BANTHA_HEAD_BONE),
+    ('leg0', BANTHA_LEG0_BONE),
+    ('leg1', BANTHA_LEG1_BONE),
+    ('leg2', BANTHA_LEG2_BONE),
+    ('leg3', BANTHA_LEG3_BONE),
+]
+
+BANTHA_CUBES = [
+    ('body',       BANTHA_BODY_BONE, (-7.0,  0.0, -11.0, 14, 10, 22), (0, 0)),
+    ('wool_skirt', BANTHA_BODY_BONE, (-8.0,  7.0, -12.0, 16, 5, 24),  (0, 32)),
+    ('head',       BANTHA_HEAD_BONE, (-5.0, -2.0, -10.0, 10, 9, 10),  (72, 0)),
+    ('right_horn', BANTHA_HEAD_BONE, (-7.0,  1.0,  -8.0, 2, 2, 6),    (112, 0)),
+    ('left_horn',  BANTHA_HEAD_BONE, ( 5.0,  1.0,  -8.0, 2, 2, 6),    (112, 8)),
+    ('leg0',       BANTHA_LEG0_BONE, (-2.0,  0.0,  -2.0, 4, 14, 4),   (96, 19)),
+    ('leg1',       BANTHA_LEG1_BONE, (-2.0,  0.0,  -2.0, 4, 14, 4),   (112, 19)),
+    ('leg2',       BANTHA_LEG2_BONE, (-2.0,  0.0,  -2.0, 4, 14, 4),   (96, 37)),
+    ('leg3',       BANTHA_LEG3_BONE, (-2.0,  0.0,  -2.0, 4, 14, 4),   (112, 37)),
+]
+
+# Tauntaun: bipedal snow lizard. Body 12..22 with the neck rising off its
+# front top into the forward-jutting head; small arms hang off the front
+# flanks; hind legs carry the ground contact; tail juts rearward.
+TAUN_BODY_BONE  = (0, 22, 0)
+TAUN_NECK_BONE  = (0, 22, -5)
+TAUN_HEAD_BONE  = (0, 26, -5)
+TAUN_RARM_BONE  = (-4, 19, -5)
+TAUN_LARM_BONE  = (4, 19, -5)
+TAUN_RHIND_BONE = (-2, 12, 4)
+TAUN_LHIND_BONE = (2, 12, 4)
+TAUN_TAIL_BONE  = (0, 15, 7)
+
+TAUNTAUN_BONE_DEFS = [
+    ('body', TAUN_BODY_BONE),
+    ('neck', TAUN_NECK_BONE),
+    ('head', TAUN_HEAD_BONE),
+    ('right_arm', TAUN_RARM_BONE),
+    ('left_arm', TAUN_LARM_BONE),
+    ('right_hind', TAUN_RHIND_BONE),
+    ('left_hind', TAUN_LHIND_BONE),
+    ('tail', TAUN_TAIL_BONE),
+]
+
+TAUNTAUN_CUBES = [
+    ('body',       TAUN_BODY_BONE,  (-4.0,  0.0, -7.0, 8, 10, 14), (0, 0)),
+    ('neck',       TAUN_NECK_BONE,  (-2.0, -4.0, -2.0, 4, 6, 4),   (44, 0)),
+    ('head',       TAUN_HEAD_BONE,  (-3.0, -5.0, -8.0, 6, 6, 8),   (0, 24)),
+    ('right_arm',  TAUN_RARM_BONE,  (-3.0,  0.0, -1.5, 3, 6, 3),   (44, 10)),
+    ('left_arm',   TAUN_LARM_BONE,  ( 0.0,  0.0, -1.5, 3, 6, 3),   (44, 19)),
+    ('right_hind', TAUN_RHIND_BONE, (-2.0,  0.0, -2.0, 4, 12, 4),  (0, 40)),
+    ('left_hind',  TAUN_LHIND_BONE, (-2.0,  0.0, -2.0, 4, 12, 4),  (16, 40)),
+    ('tail',       TAUN_TAIL_BONE,  (-1.5, -1.5,  0.0, 3, 3, 8),   (28, 28)),
+]
+
+# Wampa (128x64 canvas): hulking biped. Body 12..24, head 24..32 with two
+# upward horn stubs; long 14-tall arms reach from the shoulders (y22) down
+# past the body's underside; stout legs 0..10 under a 2px shag overhang.
+WAMPA_BODY_BONE = (0, 12, 0)
+WAMPA_HEAD_BONE = (0, 24, 0)
+WAMPA_RARM_BONE = (-9.5, 22, 0)
+WAMPA_LARM_BONE = (9.5, 22, 0)
+WAMPA_RLEG_BONE = (-3.5, 12, 0)
+WAMPA_LLEG_BONE = (3.5, 12, 0)
+
+WAMPA_BONE_DEFS = [
+    ('body', WAMPA_BODY_BONE),
+    ('head', WAMPA_HEAD_BONE),
+    ('right_arm', WAMPA_RARM_BONE),
+    ('left_arm', WAMPA_LARM_BONE),
+    ('right_leg', WAMPA_RLEG_BONE),
+    ('left_leg', WAMPA_LLEG_BONE),
+]
+
+WAMPA_CUBES = [
+    ('body',       WAMPA_BODY_BONE, (-7.0, -12.0, -4.0, 14, 12, 8), (0, 0)),
+    ('head',       WAMPA_HEAD_BONE, (-5.0,  -8.0, -4.0, 10, 8, 8),  (44, 0)),
+    ('right_horn', WAMPA_HEAD_BONE, (-6.0, -10.0, -1.0, 2, 3, 2),   (80, 0)),
+    ('left_horn',  WAMPA_HEAD_BONE, ( 4.0, -10.0, -1.0, 2, 3, 2),   (88, 0)),
+    ('right_arm',  WAMPA_RARM_BONE, (-2.5,  -2.0, -2.5, 5, 14, 5),  (0, 20)),
+    ('left_arm',   WAMPA_LARM_BONE, (-2.5,  -2.0, -2.5, 5, 14, 5),  (20, 20)),
+    ('right_leg',  WAMPA_RLEG_BONE, (-2.5,   2.0, -2.5, 5, 10, 5),  (40, 20)),
+    ('left_leg',   WAMPA_LLEG_BONE, (-2.5,   2.0, -2.5, 5, 10, 5),  (60, 20)),
+]
+
+# Probe droid: levitating pod (20..28) with a front eye cube + top antenna
+# on the pod bone, and four 8-tall manipulator legs dangling from the pod's
+# corners to y=12 — it hovers, so nothing reaches the ground.
+PROBE_POD_BONE  = (0, 24, 0)
+PROBE_LEG0_BONE = (-4, 20, -4)
+PROBE_LEG1_BONE = (4, 20, -4)
+PROBE_LEG2_BONE = (-4, 20, 4)
+PROBE_LEG3_BONE = (4, 20, 4)
+
+PROBE_DROID_BONE_DEFS = [
+    ('pod', PROBE_POD_BONE),
+    ('leg0', PROBE_LEG0_BONE),
+    ('leg1', PROBE_LEG1_BONE),
+    ('leg2', PROBE_LEG2_BONE),
+    ('leg3', PROBE_LEG3_BONE),
+]
+
+PROBE_DROID_CUBES = [
+    ('pod',     PROBE_POD_BONE,  (-5.0,  -4.0, -5.0, 10, 8, 10), (0, 0)),
+    ('eye',     PROBE_POD_BONE,  (-2.0,  -2.0, -7.0, 4, 4, 2),   (40, 0)),
+    ('antenna', PROBE_POD_BONE,  (-0.5, -10.0, -0.5, 1, 6, 1),   (52, 0)),
+    ('leg0',    PROBE_LEG0_BONE, (-0.5,   0.0, -0.5, 1, 8, 1),   (0, 18)),
+    ('leg1',    PROBE_LEG1_BONE, (-0.5,   0.0, -0.5, 1, 8, 1),   (4, 18)),
+    ('leg2',    PROBE_LEG2_BONE, (-0.5,   0.0, -0.5, 1, 8, 1),   (8, 18)),
+    ('leg3',    PROBE_LEG3_BONE, (-0.5,   0.0, -0.5, 1, 8, 1),   (12, 18)),
+]
+
+# Dragonsnake: ground-hugging swamp serpent, head + 4 segments chained
+# straight behind along +z (total z extent -20..20, height 0..4). Segment
+# pivots sit at each joint's front edge for slither articulation; the head
+# pivots at the neck joint, mid-height.
+DSNAKE_HEAD_BONE = (0, 2, -12)
+DSNAKE_SEG0_BONE = (0, 4, -12)
+DSNAKE_SEG1_BONE = (0, 4, -4)
+DSNAKE_SEG2_BONE = (0, 4, 4)
+DSNAKE_SEG3_BONE = (0, 4, 12)
+
+DRAGONSNAKE_BONE_DEFS = [
+    ('head', DSNAKE_HEAD_BONE),
+    ('seg0', DSNAKE_SEG0_BONE),
+    ('seg1', DSNAKE_SEG1_BONE),
+    ('seg2', DSNAKE_SEG2_BONE),
+    ('seg3', DSNAKE_SEG3_BONE),
+]
+
+DRAGONSNAKE_CUBES = [
+    ('head', DSNAKE_HEAD_BONE, (-3.0, -2.0, -8.0, 6, 4, 8), (0, 0)),
+    ('seg0', DSNAKE_SEG0_BONE, (-2.5,  0.0,  0.0, 5, 4, 8), (28, 0)),
+    ('seg1', DSNAKE_SEG1_BONE, (-2.5,  0.0,  0.0, 5, 4, 8), (0, 12)),
+    ('seg2', DSNAKE_SEG2_BONE, (-2.5,  0.0,  0.0, 5, 4, 8), (26, 12)),
+    ('seg3', DSNAKE_SEG3_BONE, (-2.5,  0.0,  0.0, 5, 4, 8), (0, 24)),
+]
+
+# Bogwing (32x32 canvas): small swamp flyer hovering at y~14-19; flat wing
+# panels flap from the body's flanks (pivots at x=+/-2).
+BOG_BODY_BONE  = (0, 17, 0)
+BOG_HEAD_BONE  = (0, 17, -3)
+BOG_RWING_BONE = (-2, 17, 0)
+BOG_LWING_BONE = (2, 17, 0)
+
+BOGWING_BONE_DEFS = [
+    ('body', BOG_BODY_BONE),
+    ('head', BOG_HEAD_BONE),
+    ('right_wing', BOG_RWING_BONE),
+    ('left_wing', BOG_LWING_BONE),
+]
+
+BOGWING_CUBES = [
+    ('body',       BOG_BODY_BONE,  ( -2.0,  0.0, -3.0, 4, 3, 6),  (0, 0)),
+    ('head',       BOG_HEAD_BONE,  ( -1.5, -2.0, -4.0, 3, 3, 4),  (0, 9)),
+    ('right_wing', BOG_RWING_BONE, (-10.0,  0.0, -3.0, 10, 1, 6), (0, 16)),
+    ('left_wing',  BOG_LWING_BONE, (  0.0,  0.0, -3.0, 10, 1, 6), (0, 23)),
+]
+
+# Yoda: knee-high. Head pivot (0,12,0) per the brief (head 12..20, wider
+# than tall at 9x8x8) with ear cubes flaring off the sides; robe body 5..12;
+# stubby arms + 4-tall legs (0..4 — the 1px robe-hem gap up to the body
+# reads as shadow).
+YODA_HEAD_BONE = (0, 12, 0)
+YODA_BODY_BONE = (0, 5, 0)
+YODA_RARM_BONE = (-4, 11, 0)
+YODA_LARM_BONE = (4, 11, 0)
+YODA_RLEG_BONE = (-1.5, 4, 0)
+YODA_LLEG_BONE = (1.5, 4, 0)
+
+YODA_BONE_DEFS = [
+    ('head', YODA_HEAD_BONE),
+    ('body', YODA_BODY_BONE),
+    ('right_arm', YODA_RARM_BONE),
+    ('left_arm', YODA_LARM_BONE),
+    ('right_leg', YODA_RLEG_BONE),
+    ('left_leg', YODA_LLEG_BONE),
+]
+
+YODA_CUBES = [
+    ('head',      YODA_HEAD_BONE, (-4.5, -8.0, -4.0, 9, 8, 8), (0, 0)),
+    ('right_ear', YODA_HEAD_BONE, (-7.5, -6.0, -0.5, 3, 2, 1), (34, 0)),
+    ('left_ear',  YODA_HEAD_BONE, ( 4.5, -6.0, -0.5, 3, 2, 1), (42, 0)),
+    ('body',      YODA_BODY_BONE, (-3.0, -7.0, -2.0, 6, 7, 4), (0, 16)),
+    ('right_arm', YODA_RARM_BONE, (-1.0, -1.0, -1.0, 2, 6, 2), (20, 16)),
+    ('left_arm',  YODA_LARM_BONE, (-1.0, -1.0, -1.0, 2, 6, 2), (28, 16)),
+    ('right_leg', YODA_RLEG_BONE, (-1.0,  0.0, -1.0, 2, 4, 2), (36, 16)),
+    ('left_leg',  YODA_LLEG_BONE, (-1.0,  0.0, -1.0, 2, 4, 2), (44, 16)),
+]
+
 # mob_name -> bone_defs override (only needed for mobs whose bone set/pivots
 # aren't the standard humanoid table).
 MOB_BONE_DEFS = {
     'astromech': ASTROMECH_BONE_DEFS,
     'landspeeder': LANDSPEEDER_BONE_DEFS,
+    'jawa': JAWA_BONE_DEFS,
+    'bantha': BANTHA_BONE_DEFS,
+    'tauntaun': TAUNTAUN_BONE_DEFS,
+    'wampa': WAMPA_BONE_DEFS,
+    'probe_droid': PROBE_DROID_BONE_DEFS,
+    'dragonsnake': DRAGONSNAKE_BONE_DEFS,
+    'bogwing': BOGWING_BONE_DEFS,
+    'yoda': YODA_BONE_DEFS,
+}
+
+# mob_name -> (tex_width, tex_height) for non-64x64 texture canvases.
+MOB_TEX_SIZES = {
+    'bantha': (128, 64),
+    'wampa': (128, 64),
+    'bogwing': (32, 32),
 }
 
 MOBS = {
@@ -227,6 +480,21 @@ MOBS = {
     # Landspeeder: fully custom single-bone skeleton (see LANDSPEEDER_BONE_DEFS
     # above) — a static vehicle, no arms/legs/animation.
     'landspeeder': LANDSPEEDER_CUBES,
+    # Task-14 mobs. Tusken Raider + Rebel Trooper are humanoids at the
+    # stormtrooper's proportions, and their Java models reuse the
+    # stormtrooper's accessory cubes verbatim (inflated helmet_shell @(32,0)
+    # + chin_vent @(56,16)) as wrap-shell/breather and helmet-shell/strap.
+    # (Snowtrooper deliberately absent: it reuses the stormtrooper rig.)
+    'tusken_raider': HUMANOID_CUBES + STORMTROOPER_ACCESSORIES,
+    'rebel_trooper': HUMANOID_CUBES + STORMTROOPER_ACCESSORIES,
+    'jawa': JAWA_CUBES,
+    'bantha': BANTHA_CUBES,
+    'tauntaun': TAUNTAUN_CUBES,
+    'wampa': WAMPA_CUBES,
+    'probe_droid': PROBE_DROID_CUBES,
+    'dragonsnake': DRAGONSNAKE_CUBES,
+    'bogwing': BOGWING_CUBES,
+    'yoda': YODA_CUBES,
 }
 
 
@@ -299,14 +567,16 @@ def _parent_bone_name(bone_origin, bone_defs):
     raise ValueError(bone_origin)
 
 
-def build_bbmodel(mob_name, cubes, texture_path, tex_height=64, bone_defs=None):
+def build_bbmodel(mob_name, cubes, texture_path, tex_height=64, bone_defs=None,
+                  tex_width=64):
     """Return the full bbmodel dict for one mob.
 
     `cubes` is a flat list of (name, bone, java, uv[, inflate]) tuples —
     the full cube table for the mob (humanoid cubes + accessories, or a
     fully custom skeleton). `bone_defs` is an optional (name, origin) list
     overriding the standard humanoid 6-bone table — required for mobs whose
-    skeleton doesn't match it (see ASTROMECH_BONE_DEFS).
+    skeleton doesn't match it (see ASTROMECH_BONE_DEFS). `tex_width`/
+    `tex_height` set the texture canvas (bantha/wampa 128x64, bogwing 32x32).
     """
     if bone_defs is None:
         bone_defs = DEFAULT_BONE_DEFS
@@ -358,9 +628,9 @@ def build_bbmodel(mob_name, cubes, texture_path, tex_height=64, bone_defs=None):
         "use_as_default": False,
         "layers_enabled": False,
         "sync_to_project": "",
-        "width": 64,
+        "width": tex_width,
         "height": tex_height,
-        "uv_width": 64,
+        "uv_width": tex_width,
         "uv_height": tex_height,
         "source": tex_data,
     }
@@ -377,16 +647,18 @@ def build_bbmodel(mob_name, cubes, texture_path, tex_height=64, bone_defs=None):
         "variable_placeholders": "",
         "variable_placeholder_buttons": [],
         "unhandled_root_fields": {},
-        "resolution": {"width": 64, "height": tex_height},
+        "resolution": {"width": tex_width, "height": tex_height},
         "elements": elements,
         "outliner": outliner,
         "textures": [texture],
     }
 
 
-def write_bbmodel(out_dir, mob_name, cubes, texture_dir, tex_height=64, bone_defs=None):
+def write_bbmodel(out_dir, mob_name, cubes, texture_dir, tex_height=64, bone_defs=None,
+                  tex_width=64):
     texture_path = os.path.join(texture_dir, f"{mob_name}.png")
-    bbmodel = build_bbmodel(mob_name, cubes, texture_path, tex_height, bone_defs=bone_defs)
+    bbmodel = build_bbmodel(mob_name, cubes, texture_path, tex_height, bone_defs=bone_defs,
+                            tex_width=tex_width)
     out_path = os.path.join(out_dir, f"{mob_name}.bbmodel")
     with open(out_path, 'w') as f:
         json.dump(bbmodel, f, indent=2)
@@ -587,8 +859,10 @@ if __name__ == '__main__':
     print(f"Texture dir: {texture_dir}")
 
     for mob_name, cubes in MOBS.items():
+        tw, th = MOB_TEX_SIZES.get(mob_name, (64, 64))
         write_bbmodel(out_dir, mob_name, cubes, texture_dir,
-                       bone_defs=MOB_BONE_DEFS.get(mob_name))
+                       tex_height=th, bone_defs=MOB_BONE_DEFS.get(mob_name),
+                       tex_width=tw)
 
     for piece_name, (cubes, folder, texture_basename) in ARMOR_PIECES.items():
         write_armor_bbmodel(out_dir, piece_name, cubes, texture_dir, folder, texture_basename)

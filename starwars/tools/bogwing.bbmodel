@@ -1,0 +1,242 @@
+{
+  "meta": {
+    "format_version": "4.5",
+    "model_format": "modded_entity",
+    "box_uv": true
+  },
+  "name": "bogwing",
+  "model_identifier": "",
+  "visible_box": [
+    4,
+    4,
+    0
+  ],
+  "variable_placeholders": "",
+  "variable_placeholder_buttons": [],
+  "unhandled_root_fields": {},
+  "resolution": {
+    "width": 32,
+    "height": 32
+  },
+  "elements": [
+    {
+      "name": "body",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -2.0,
+        14.0,
+        -3.0
+      ],
+      "to": [
+        2.0,
+        17.0,
+        3.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        17,
+        0
+      ],
+      "uv_offset": [
+        0,
+        0
+      ],
+      "type": "cube",
+      "uuid": "a7cb8842-b0f1-5bc0-b445-5ef75174b573"
+    },
+    {
+      "name": "head",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -1.5,
+        16.0,
+        -7.0
+      ],
+      "to": [
+        1.5,
+        19.0,
+        -3.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        17,
+        -3
+      ],
+      "uv_offset": [
+        0,
+        9
+      ],
+      "type": "cube",
+      "uuid": "da1b1697-ec17-55a8-8144-65431af9012f"
+    },
+    {
+      "name": "right_wing",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -12.0,
+        16.0,
+        -3.0
+      ],
+      "to": [
+        -2.0,
+        17.0,
+        3.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        -2,
+        17,
+        0
+      ],
+      "uv_offset": [
+        0,
+        16
+      ],
+      "type": "cube",
+      "uuid": "b7fc6657-a571-5e93-880b-ae136f0b6546"
+    },
+    {
+      "name": "left_wing",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        2.0,
+        16.0,
+        -3.0
+      ],
+      "to": [
+        12.0,
+        17.0,
+        3.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        2,
+        17,
+        0
+      ],
+      "uv_offset": [
+        0,
+        23
+      ],
+      "type": "cube",
+      "uuid": "cc16bc1c-b963-5319-b208-a216d9276435"
+    }
+  ],
+  "outliner": [
+    {
+      "name": "body",
+      "origin": [
+        0,
+        17,
+        0
+      ],
+      "color": 0,
+      "uuid": "c15900c8-59c2-5ded-b506-442753207154",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "a7cb8842-b0f1-5bc0-b445-5ef75174b573"
+      ]
+    },
+    {
+      "name": "head",
+      "origin": [
+        0,
+        17,
+        -3
+      ],
+      "color": 0,
+      "uuid": "0957832c-08a3-585d-addf-4fb6f59f0be9",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "da1b1697-ec17-55a8-8144-65431af9012f"
+      ]
+    },
+    {
+      "name": "right_wing",
+      "origin": [
+        -2,
+        17,
+        0
+      ],
+      "color": 0,
+      "uuid": "de316c3e-5cc1-5b59-a09e-31b0dc7f9f17",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "b7fc6657-a571-5e93-880b-ae136f0b6546"
+      ]
+    },
+    {
+      "name": "left_wing",
+      "origin": [
+        2,
+        17,
+        0
+      ],
+      "color": 0,
+      "uuid": "5b44a864-bbe8-58df-8c68-5f45abf35be5",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "cc16bc1c-b963-5319-b208-a216d9276435"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "path": "/home/tweeks/code/minecraft-modes/starwars/src/main/resources/assets/starwars/textures/entity/bogwing.png",
+      "name": "bogwing.png",
+      "folder": "entity",
+      "namespace": "starwars",
+      "id": "0",
+      "particle": false,
+      "render_mode": "default",
+      "render_sides": "auto",
+      "frame_time": 1,
+      "frame_order_type": "loop",
+      "frame_order": "",
+      "frame_interpolate": false,
+      "visible": true,
+      "internal": true,
+      "saved": true,
+      "uuid": "7bb6274c-70e3-5528-b025-99a27c26b21e",
+      "relative_path": "../src/main/resources/assets/starwars/textures/entity/bogwing.png",
+      "use_as_default": false,
+      "layers_enabled": false,
+      "sync_to_project": "",
+      "width": 32,
+      "height": 32,
+      "uv_width": 32,
+      "uv_height": 32,
+      "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAqElEQVR4nGNgwAHakmz+I+MAMzkUjEsf1cCoA0YdQDcHwAxHtogSNskOAGnK9tIGY2qwyXIANTHJDkAHuOKdYoNHHTBoHYCe30UEeFBoXJhqDoBlIxg+MckKjtHlkDHVHICejWblacExTbMbIZC0YtF/YrBpdgZR2KuvCyvG6QCYAjU/n//42DALQHx87FEHjDoAF6Z6bUi12nM0G446YNg5YOhlwxEDAGhAT6VZZ/fEAAAAAElFTkSuQmCC"
+    }
+  ]
+}

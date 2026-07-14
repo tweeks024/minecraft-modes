@@ -1,0 +1,289 @@
+{
+  "meta": {
+    "format_version": "4.5",
+    "model_format": "modded_entity",
+    "box_uv": true
+  },
+  "name": "dragonsnake",
+  "model_identifier": "",
+  "visible_box": [
+    4,
+    4,
+    0
+  ],
+  "variable_placeholders": "",
+  "variable_placeholder_buttons": [],
+  "unhandled_root_fields": {},
+  "resolution": {
+    "width": 64,
+    "height": 64
+  },
+  "elements": [
+    {
+      "name": "head",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -3.0,
+        0.0,
+        -20.0
+      ],
+      "to": [
+        3.0,
+        4.0,
+        -12.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        2,
+        -12
+      ],
+      "uv_offset": [
+        0,
+        0
+      ],
+      "type": "cube",
+      "uuid": "53c4ff48-17a8-5b6b-82b1-8c06dac2a993"
+    },
+    {
+      "name": "seg0",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -2.5,
+        0.0,
+        -12.0
+      ],
+      "to": [
+        2.5,
+        4.0,
+        -4.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        4,
+        -12
+      ],
+      "uv_offset": [
+        28,
+        0
+      ],
+      "type": "cube",
+      "uuid": "00ad67ce-3c9f-5bf2-b483-93a6d27dac7b"
+    },
+    {
+      "name": "seg1",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -2.5,
+        0.0,
+        -4.0
+      ],
+      "to": [
+        2.5,
+        4.0,
+        4.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        4,
+        -4
+      ],
+      "uv_offset": [
+        0,
+        12
+      ],
+      "type": "cube",
+      "uuid": "9f3894ad-2c16-5e8d-b5bf-19490dae0af4"
+    },
+    {
+      "name": "seg2",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -2.5,
+        0.0,
+        4.0
+      ],
+      "to": [
+        2.5,
+        4.0,
+        12.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        4,
+        4
+      ],
+      "uv_offset": [
+        26,
+        12
+      ],
+      "type": "cube",
+      "uuid": "385c2f0c-588e-5d97-87e0-a2b0c7bb8459"
+    },
+    {
+      "name": "seg3",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -2.5,
+        0.0,
+        12.0
+      ],
+      "to": [
+        2.5,
+        4.0,
+        20.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        4,
+        12
+      ],
+      "uv_offset": [
+        0,
+        24
+      ],
+      "type": "cube",
+      "uuid": "4e7b53be-0958-56fd-a79a-e63b614d5ff1"
+    }
+  ],
+  "outliner": [
+    {
+      "name": "head",
+      "origin": [
+        0,
+        2,
+        -12
+      ],
+      "color": 0,
+      "uuid": "d984d758-a287-5932-a7ac-16b6feb48526",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "53c4ff48-17a8-5b6b-82b1-8c06dac2a993"
+      ]
+    },
+    {
+      "name": "seg0",
+      "origin": [
+        0,
+        4,
+        -12
+      ],
+      "color": 0,
+      "uuid": "9d59acbd-40e0-559e-b5c5-5f53a2ff862f",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "00ad67ce-3c9f-5bf2-b483-93a6d27dac7b"
+      ]
+    },
+    {
+      "name": "seg1",
+      "origin": [
+        0,
+        4,
+        -4
+      ],
+      "color": 0,
+      "uuid": "5d29207f-0320-5868-a652-2dfa232e335e",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "9f3894ad-2c16-5e8d-b5bf-19490dae0af4"
+      ]
+    },
+    {
+      "name": "seg2",
+      "origin": [
+        0,
+        4,
+        4
+      ],
+      "color": 0,
+      "uuid": "593b5495-68a2-5088-968b-4ecc811b8d95",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "385c2f0c-588e-5d97-87e0-a2b0c7bb8459"
+      ]
+    },
+    {
+      "name": "seg3",
+      "origin": [
+        0,
+        4,
+        12
+      ],
+      "color": 0,
+      "uuid": "ad11424e-3b90-5fce-8b08-a0b9275b0f53",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "4e7b53be-0958-56fd-a79a-e63b614d5ff1"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "path": "/home/tweeks/code/minecraft-modes/starwars/src/main/resources/assets/starwars/textures/entity/dragonsnake.png",
+      "name": "dragonsnake.png",
+      "folder": "entity",
+      "namespace": "starwars",
+      "id": "0",
+      "particle": false,
+      "render_mode": "default",
+      "render_sides": "auto",
+      "frame_time": 1,
+      "frame_order_type": "loop",
+      "frame_order": "",
+      "frame_interpolate": false,
+      "visible": true,
+      "internal": true,
+      "saved": true,
+      "uuid": "7c0f6aef-f38b-5bee-8371-ee8d6a9fc3cb",
+      "relative_path": "../src/main/resources/assets/starwars/textures/entity/dragonsnake.png",
+      "use_as_default": false,
+      "layers_enabled": false,
+      "sync_to_project": "",
+      "width": 64,
+      "height": 64,
+      "uv_width": 64,
+      "uv_height": 64,
+      "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABOklEQVR4nO2XMQ7CMAxFOQQzCwvqARh6hIqBmYmdlSMwcQQGTsHAyHG4BShIRahKSVJSxyTvSZZcqcE/lmvsycTB9rB6GJvXs5e1z+fT3mqu3xsSb4w4wYK6oq6Xo9VixOsme4w4QYJ8RcUQ1o2jIgG+oqiASAnw+dxi3C1IED2AHpBpD1iuq3egPv++ad7+bbFwvu/yh54L8b0T0OzqhzFzqM83l7b5Pme7/tBzoX5QBeRo0RJQzaZWS33BaAlw4bsH/BrH1miT7gDfhGXR/bUJUzcBSgsrvgLUTYDSwoqvAHpAqgqQms3V7QAtY87jqneAzwTkZCQgNlK7gFrU/j1JoXZAkULtiCpF8RVADyi9ArLvARI7gLHU9+xFak5Pfc9e/nZEjUXxCQAAAAAAAAAAAAAAAACAIngCtg2m9SettIcAAAAASUVORK5CYII="
+    }
+  ]
+}

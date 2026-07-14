@@ -1,0 +1,7 @@
+{
+  "type": "starwars:wampa_cave",
+  "biomes": "starwars:hoth_plains",
+  "spawn_overrides": {},
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin"
+}

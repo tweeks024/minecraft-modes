@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "starwars:item/tauntaun_spawn_egg"
+  }
+}

@@ -116,6 +116,8 @@ public final class PortalLink {
         return switch (planet) {
             case TATOOINE -> Blocks.SMOOTH_SANDSTONE.defaultBlockState();
             case CORUSCANT -> Blocks.LIGHT_GRAY_CONCRETE.defaultBlockState();
+            case DAGOBAH -> Blocks.MUD_BRICKS.defaultBlockState();
+            case HOTH -> Blocks.PACKED_ICE.defaultBlockState();
             case ANDOR, HOME -> Blocks.STONE_BRICKS.defaultBlockState();
         };
     }

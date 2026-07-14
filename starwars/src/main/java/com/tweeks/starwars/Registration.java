@@ -37,6 +37,13 @@ public final class Registration {
     public static final DeferredItem<com.tweeks.starwars.item.StarCompassItem> STAR_COMPASS =
         ITEMS.registerItem("star_compass", com.tweeks.starwars.item.StarCompassItem::new, p -> p);
 
+    // The cantina band's set list, on one well-worn record.
+    public static final DeferredItem<Item> CANTINA_RECORD = ITEMS.registerItem("cantina_record",
+        Item::new,
+        p -> p.stacksTo(1)
+              .rarity(net.minecraft.world.item.Rarity.RARE)
+              .jukeboxPlayable(com.tweeks.starwars.item.ModJukeboxSongs.CANTINA_BAND));
+
     public static final DeferredItem<com.tweeks.starwars.item.BlasterPistolItem> BLASTER_PISTOL =
         ITEMS.registerItem("blaster_pistol", com.tweeks.starwars.item.BlasterPistolItem::new, p -> p);
 
@@ -78,6 +85,39 @@ public final class Registration {
 
     public static final DeferredItem<SpawnEggItem> PRINCESS_LEIA_SPAWN_EGG = ITEMS.registerItem(
         "princess_leia_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.PRINCESS_LEIA.get()));
+
+    public static final DeferredItem<SpawnEggItem> JAWA_SPAWN_EGG = ITEMS.registerItem(
+        "jawa_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.JAWA.get()));
+
+    public static final DeferredItem<SpawnEggItem> TUSKEN_RAIDER_SPAWN_EGG = ITEMS.registerItem(
+        "tusken_raider_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.TUSKEN_RAIDER.get()));
+
+    public static final DeferredItem<SpawnEggItem> BANTHA_SPAWN_EGG = ITEMS.registerItem(
+        "bantha_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.BANTHA.get()));
+
+    public static final DeferredItem<SpawnEggItem> REBEL_TROOPER_SPAWN_EGG = ITEMS.registerItem(
+        "rebel_trooper_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.REBEL_TROOPER.get()));
+
+    public static final DeferredItem<SpawnEggItem> PROBE_DROID_SPAWN_EGG = ITEMS.registerItem(
+        "probe_droid_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.PROBE_DROID.get()));
+
+    public static final DeferredItem<SpawnEggItem> WAMPA_SPAWN_EGG = ITEMS.registerItem(
+        "wampa_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.WAMPA.get()));
+
+    public static final DeferredItem<SpawnEggItem> TAUNTAUN_SPAWN_EGG = ITEMS.registerItem(
+        "tauntaun_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.TAUNTAUN.get()));
+
+    public static final DeferredItem<SpawnEggItem> SNOWTROOPER_SPAWN_EGG = ITEMS.registerItem(
+        "snowtrooper_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.SNOWTROOPER.get()));
+
+    public static final DeferredItem<SpawnEggItem> DRAGONSNAKE_SPAWN_EGG = ITEMS.registerItem(
+        "dragonsnake_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.DRAGONSNAKE.get()));
+
+    public static final DeferredItem<SpawnEggItem> BOGWING_SPAWN_EGG = ITEMS.registerItem(
+        "bogwing_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.BOGWING.get()));
+
+    public static final DeferredItem<SpawnEggItem> YODA_SPAWN_EGG = ITEMS.registerItem(
+        "yoda_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.YODA.get()));
 
     public static final DeferredItem<Item> STORMTROOPER_HELMET = ITEMS.registerItem("stormtrooper_helmet",
         Item::new,
@@ -166,6 +206,18 @@ public final class Registration {
                     output.accept(HAN_SOLO_LEGGINGS.get());
                     output.accept(HAN_SOLO_BOOTS.get());
                     output.accept(STAR_COMPASS.get());
+                    output.accept(CANTINA_RECORD.get());
+                    output.accept(JAWA_SPAWN_EGG.get());
+                    output.accept(TUSKEN_RAIDER_SPAWN_EGG.get());
+                    output.accept(BANTHA_SPAWN_EGG.get());
+                    output.accept(REBEL_TROOPER_SPAWN_EGG.get());
+                    output.accept(PROBE_DROID_SPAWN_EGG.get());
+                    output.accept(WAMPA_SPAWN_EGG.get());
+                    output.accept(TAUNTAUN_SPAWN_EGG.get());
+                    output.accept(SNOWTROOPER_SPAWN_EGG.get());
+                    output.accept(DRAGONSNAKE_SPAWN_EGG.get());
+                    output.accept(BOGWING_SPAWN_EGG.get());
+                    output.accept(YODA_SPAWN_EGG.get());
                     // Later tasks append their items here.
                 })
                 .build());

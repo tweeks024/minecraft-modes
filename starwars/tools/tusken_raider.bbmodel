@@ -1,0 +1,396 @@
+{
+  "meta": {
+    "format_version": "4.5",
+    "model_format": "modded_entity",
+    "box_uv": true
+  },
+  "name": "tusken_raider",
+  "model_identifier": "",
+  "visible_box": [
+    4,
+    4,
+    0
+  ],
+  "variable_placeholders": "",
+  "variable_placeholder_buttons": [],
+  "unhandled_root_fields": {},
+  "resolution": {
+    "width": 64,
+    "height": 64
+  },
+  "elements": [
+    {
+      "name": "head",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -4,
+        24,
+        -4
+      ],
+      "to": [
+        4,
+        32,
+        4
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        0,
+        0
+      ],
+      "type": "cube",
+      "uuid": "d84d9cd2-3cd5-5e2e-a08a-98eba89a0eea"
+    },
+    {
+      "name": "body",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -4,
+        12,
+        -2
+      ],
+      "to": [
+        4,
+        24,
+        2
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        16,
+        16
+      ],
+      "type": "cube",
+      "uuid": "f07b125e-0f7b-5f39-8284-8816fa0562fc"
+    },
+    {
+      "name": "right_arm",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -8,
+        12,
+        -2
+      ],
+      "to": [
+        -4,
+        24,
+        2
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        -5,
+        22,
+        0
+      ],
+      "uv_offset": [
+        40,
+        16
+      ],
+      "type": "cube",
+      "uuid": "acc8c093-2aae-5f91-a739-8fb4efac3577"
+    },
+    {
+      "name": "left_arm",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        4,
+        12,
+        -2
+      ],
+      "to": [
+        8,
+        24,
+        2
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        5,
+        22,
+        0
+      ],
+      "uv_offset": [
+        32,
+        48
+      ],
+      "type": "cube",
+      "uuid": "05dbf35a-3d87-53d1-8a10-5739b9f4372a"
+    },
+    {
+      "name": "right_leg",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -3.9,
+        0,
+        -2
+      ],
+      "to": [
+        0.10000000000000009,
+        12,
+        2
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        -1.9,
+        12,
+        0
+      ],
+      "uv_offset": [
+        0,
+        16
+      ],
+      "type": "cube",
+      "uuid": "e1cffe3a-2879-50db-a4a0-9218dc25290f"
+    },
+    {
+      "name": "left_leg",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -0.10000000000000009,
+        0,
+        -2
+      ],
+      "to": [
+        3.9,
+        12,
+        2
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        1.9,
+        12,
+        0
+      ],
+      "uv_offset": [
+        16,
+        48
+      ],
+      "type": "cube",
+      "uuid": "431a9971-78fb-57fe-9546-cecd1d1af827"
+    },
+    {
+      "name": "helmet_shell",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -4.0,
+        24.0,
+        -4.0
+      ],
+      "to": [
+        4.0,
+        32.0,
+        4.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        32,
+        0
+      ],
+      "type": "cube",
+      "uuid": "a3b6464a-44ec-5bc4-8a30-eeab1e30d3e2",
+      "inflate": 0.6
+    },
+    {
+      "name": "chin_vent",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -1.5,
+        23.5,
+        -5.0
+      ],
+      "to": [
+        1.5,
+        25.5,
+        -4.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        56,
+        16
+      ],
+      "type": "cube",
+      "uuid": "c10c08a9-b256-5170-a7cf-93e373273299"
+    }
+  ],
+  "outliner": [
+    {
+      "name": "head",
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "color": 0,
+      "uuid": "612e9e34-2e7e-56c8-a879-cbad7bf8c435",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "d84d9cd2-3cd5-5e2e-a08a-98eba89a0eea",
+        "f07b125e-0f7b-5f39-8284-8816fa0562fc",
+        "a3b6464a-44ec-5bc4-8a30-eeab1e30d3e2",
+        "c10c08a9-b256-5170-a7cf-93e373273299"
+      ]
+    },
+    {
+      "name": "body",
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "color": 0,
+      "uuid": "6c627660-b900-5d02-bcfb-a8850992e414",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": []
+    },
+    {
+      "name": "right_arm",
+      "origin": [
+        -5,
+        22,
+        0
+      ],
+      "color": 0,
+      "uuid": "97452b0d-e15a-5050-87d0-739eca84e7da",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "acc8c093-2aae-5f91-a739-8fb4efac3577"
+      ]
+    },
+    {
+      "name": "left_arm",
+      "origin": [
+        5,
+        22,
+        0
+      ],
+      "color": 0,
+      "uuid": "426bdabc-0d66-570d-8cc6-14a31e3df232",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "05dbf35a-3d87-53d1-8a10-5739b9f4372a"
+      ]
+    },
+    {
+      "name": "right_leg",
+      "origin": [
+        -1.9,
+        12,
+        0
+      ],
+      "color": 0,
+      "uuid": "24cdb5aa-5a2b-5ec7-8f90-d4f550a1ec2a",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "e1cffe3a-2879-50db-a4a0-9218dc25290f"
+      ]
+    },
+    {
+      "name": "left_leg",
+      "origin": [
+        1.9,
+        12,
+        0
+      ],
+      "color": 0,
+      "uuid": "79a11a28-c870-53eb-9a07-626d809f20e2",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "431a9971-78fb-57fe-9546-cecd1d1af827"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "path": "/home/tweeks/code/minecraft-modes/starwars/src/main/resources/assets/starwars/textures/entity/tusken_raider.png",
+      "name": "tusken_raider.png",
+      "folder": "entity",
+      "namespace": "starwars",
+      "id": "0",
+      "particle": false,
+      "render_mode": "default",
+      "render_sides": "auto",
+      "frame_time": 1,
+      "frame_order_type": "loop",
+      "frame_order": "",
+      "frame_interpolate": false,
+      "visible": true,
+      "internal": true,
+      "saved": true,
+      "uuid": "000c58cd-4b06-536e-b5ec-8961e8468112",
+      "relative_path": "../src/main/resources/assets/starwars/textures/entity/tusken_raider.png",
+      "use_as_default": false,
+      "layers_enabled": false,
+      "sync_to_project": "",
+      "width": 64,
+      "height": 64,
+      "uv_width": 64,
+      "uv_height": 64,
+      "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABbElEQVR4nO2ZMQrCQBBFcwQRj+ABrC2sPIBYiUcQsbDyAGKRSjxEsPYUFp7BqygrRELQnYTJ5O8mP/DAIpn8fTu7ETa539KXj+cjUyHV174/O2+8SPUTbUBrKIACKIACKIACDAVov/PWJMKlro+eYXGGhEtdv8pN6fHwk04IkNaQww12NBx8B57/rvKsFkmAun7vO6DOzevF/EMbAw9qCTjcwF3r5xLaaP9glkBx9pvugt1q5kUSID0v1kd/5635t3/lJNfL9mVB2bTVeyTKnVtcxg4K6LoACfUmYo25gKZnuncCol8CoQs47ZcqRAFWLcoOoICeCKizXIp/QTvzFbAWMJ2MVYgCrHdZLcELsIYCrAVYt3DoUAA6ABoKQAdAQwHoAGgoAB0ADQWgA6ChAHQANBSADoCGArQF0Of/cAGxQwHoAGjgx+PRC4gdCkAHQJ9McQ9AB0BDAegAaOACrA8/zQWEfvpLARTg5w1x66zsjAGGuQAAAABJRU5ErkJggg=="
+    }
+  ]
+}

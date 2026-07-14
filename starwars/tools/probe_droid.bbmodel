@@ -1,0 +1,349 @@
+{
+  "meta": {
+    "format_version": "4.5",
+    "model_format": "modded_entity",
+    "box_uv": true
+  },
+  "name": "probe_droid",
+  "model_identifier": "",
+  "visible_box": [
+    4,
+    4,
+    0
+  ],
+  "variable_placeholders": "",
+  "variable_placeholder_buttons": [],
+  "unhandled_root_fields": {},
+  "resolution": {
+    "width": 64,
+    "height": 64
+  },
+  "elements": [
+    {
+      "name": "pod",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -5.0,
+        20.0,
+        -5.0
+      ],
+      "to": [
+        5.0,
+        28.0,
+        5.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        0,
+        0
+      ],
+      "type": "cube",
+      "uuid": "d095388a-129a-5098-93c4-79036eea350c"
+    },
+    {
+      "name": "eye",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -2.0,
+        22.0,
+        -7.0
+      ],
+      "to": [
+        2.0,
+        26.0,
+        -5.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        40,
+        0
+      ],
+      "type": "cube",
+      "uuid": "6d1a2155-116f-52a2-8319-f38ea04adf96"
+    },
+    {
+      "name": "antenna",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -0.5,
+        28.0,
+        -0.5
+      ],
+      "to": [
+        0.5,
+        34.0,
+        0.5
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        52,
+        0
+      ],
+      "type": "cube",
+      "uuid": "0df2b32e-323f-5866-b5a0-bd0fdd430cb6"
+    },
+    {
+      "name": "leg0",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -4.5,
+        12.0,
+        -4.5
+      ],
+      "to": [
+        -3.5,
+        20.0,
+        -3.5
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        -4,
+        20,
+        -4
+      ],
+      "uv_offset": [
+        0,
+        18
+      ],
+      "type": "cube",
+      "uuid": "16893d08-b0ef-5d7b-9aff-30fbcb5478bd"
+    },
+    {
+      "name": "leg1",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        3.5,
+        12.0,
+        -4.5
+      ],
+      "to": [
+        4.5,
+        20.0,
+        -3.5
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        4,
+        20,
+        -4
+      ],
+      "uv_offset": [
+        4,
+        18
+      ],
+      "type": "cube",
+      "uuid": "40805ef4-4406-5310-9949-37e3c9dd76c4"
+    },
+    {
+      "name": "leg2",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -4.5,
+        12.0,
+        3.5
+      ],
+      "to": [
+        -3.5,
+        20.0,
+        4.5
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        -4,
+        20,
+        4
+      ],
+      "uv_offset": [
+        8,
+        18
+      ],
+      "type": "cube",
+      "uuid": "3728b1d4-af0b-595c-b2d4-a3e1695246a4"
+    },
+    {
+      "name": "leg3",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        3.5,
+        12.0,
+        3.5
+      ],
+      "to": [
+        4.5,
+        20.0,
+        4.5
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        4,
+        20,
+        4
+      ],
+      "uv_offset": [
+        12,
+        18
+      ],
+      "type": "cube",
+      "uuid": "d93d9d3a-8195-551c-b49f-f3ad294610d7"
+    }
+  ],
+  "outliner": [
+    {
+      "name": "pod",
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "color": 0,
+      "uuid": "fa1e9c0e-580d-5ac3-a937-b7215558ee7a",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "d095388a-129a-5098-93c4-79036eea350c",
+        "6d1a2155-116f-52a2-8319-f38ea04adf96",
+        "0df2b32e-323f-5866-b5a0-bd0fdd430cb6"
+      ]
+    },
+    {
+      "name": "leg0",
+      "origin": [
+        -4,
+        20,
+        -4
+      ],
+      "color": 0,
+      "uuid": "18737ed2-f4b7-5cb8-b3b4-9c45c4822559",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "16893d08-b0ef-5d7b-9aff-30fbcb5478bd"
+      ]
+    },
+    {
+      "name": "leg1",
+      "origin": [
+        4,
+        20,
+        -4
+      ],
+      "color": 0,
+      "uuid": "ea7340c9-b5f8-5218-b448-cf6b230b1340",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "40805ef4-4406-5310-9949-37e3c9dd76c4"
+      ]
+    },
+    {
+      "name": "leg2",
+      "origin": [
+        -4,
+        20,
+        4
+      ],
+      "color": 0,
+      "uuid": "08576269-96d5-5d2b-a0d0-f0e0d045784a",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "3728b1d4-af0b-595c-b2d4-a3e1695246a4"
+      ]
+    },
+    {
+      "name": "leg3",
+      "origin": [
+        4,
+        20,
+        4
+      ],
+      "color": 0,
+      "uuid": "3bd522f9-b87f-5299-b4ee-2a4f0c66c181",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "d93d9d3a-8195-551c-b49f-f3ad294610d7"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "path": "/home/tweeks/code/minecraft-modes/starwars/src/main/resources/assets/starwars/textures/entity/probe_droid.png",
+      "name": "probe_droid.png",
+      "folder": "entity",
+      "namespace": "starwars",
+      "id": "0",
+      "particle": false,
+      "render_mode": "default",
+      "render_sides": "auto",
+      "frame_time": 1,
+      "frame_order_type": "loop",
+      "frame_order": "",
+      "frame_interpolate": false,
+      "visible": true,
+      "internal": true,
+      "saved": true,
+      "uuid": "0d374f40-a10e-5a5d-9fd2-6543ed6ca79a",
+      "relative_path": "../src/main/resources/assets/starwars/textures/entity/probe_droid.png",
+      "use_as_default": false,
+      "layers_enabled": false,
+      "sync_to_project": "",
+      "width": 64,
+      "height": 64,
+      "uv_width": 64,
+      "uv_height": 64,
+      "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABQ0lEQVR4nO2YPQoCMRBGPcli4Q0EG1sLsbD0EBaWFh7Ba3qQlSCBbMjoZHWSuPseDPjzsZM8kuzqYqHkcDz1muqWK1Vp+0r9313Pfb/bH7N7ZA2gVQHf9mlOgL/uvesGJfU/X66DMhGw3mwHJQlwyzCsMQJ8Dzfp/n7rH9vX63gMviYnwOfdpN3kvQBpZU1aQFiSgLjn3wvIpYiAGneB6iBgqgKkSWgn+8tcqswF+EMsPNTcgFMHXfxZnEtl4pyUCXNhpoiAeHApAakJSLlfCjUXkNqfmr1cKmMuQLsUpdynjOY6PpNaKeYCau1trVBzAS0u+zBTTECrIswFONxAwufm3Pd/zdgHlGIPKtbEv59zq/b4v2b2Aj4dQk0cUpbMfgXMXsDst0D8H1pu1R4/AAAAAAAAAAAAAAAAAAAAAAAAvOEJcHH32anJwjgAAAAASUVORK5CYII="
+    }
+  ]
+}

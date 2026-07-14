@@ -1,0 +1,7 @@
+{
+  "type": "starwars:yoda_hut",
+  "biomes": "starwars:dagobah_swamp",
+  "spawn_overrides": {},
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin"
+}

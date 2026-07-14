@@ -1,0 +1,6 @@
+{
+  "type": "starwars:xwing_wreck",
+  "biomes": "starwars:dagobah_swamp",
+  "spawn_overrides": {},
+  "step": "surface_structures"
+}

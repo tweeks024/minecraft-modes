@@ -113,6 +113,9 @@ public final class NamedCharacterSpawner {
     private static final Set<ResourceKey<Biome>> BOBA_FETT_BIOMES = Set.of(
         com.tweeks.starwars.world.planet.PlanetBiomes.DUNE_SEA,
         com.tweeks.starwars.world.planet.PlanetBiomes.JUNDLAND_WASTES);
+    /** Yoda waits in the Dagobah marsh, near his hut when one is close. */
+    private static final Set<ResourceKey<Biome>> YODA_BIOMES = Set.of(
+        com.tweeks.starwars.world.planet.PlanetBiomes.DAGOBAH_SWAMP);
 
     private static int tickCounter = 0;
 
@@ -141,6 +144,12 @@ public final class NamedCharacterSpawner {
         if (tatooine != null) {
             tryRollCharacter(tatooine, BobaFettSavedData.get(server),
                 ModEntities.BOBA_FETT.get(), BOBA_FETT_BIOMES, IMPERIAL_STRUCTURES, false);
+        }
+        ServerLevel dagobah = server.getLevel(
+            com.tweeks.starwars.world.planet.Planet.DAGOBAH.levelKey());
+        if (dagobah != null) {
+            tryRollCharacter(dagobah, com.tweeks.starwars.entity.YodaSavedData.get(server),
+                ModEntities.YODA.get(), YODA_BIOMES, JEDI_STRUCTURES, false);
         }
         tryRollCharacter(sl, LukeSavedData.get(server),
             ModEntities.LUKE_SKYWALKER.get(), JEDI_BIOMES, JEDI_STRUCTURES, false);

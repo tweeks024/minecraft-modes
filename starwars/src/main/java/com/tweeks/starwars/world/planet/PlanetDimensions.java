@@ -55,6 +55,10 @@ public final class PlanetDimensions {
         ResourceKey.create(Registries.NOISE_SETTINGS, Identifier.fromNamespaceAndPath("starwars", "tatooine"));
     public static final ResourceKey<NoiseGeneratorSettings> ANDOR_NOISE =
         ResourceKey.create(Registries.NOISE_SETTINGS, Identifier.fromNamespaceAndPath("starwars", "andor"));
+    public static final ResourceKey<NoiseGeneratorSettings> DAGOBAH_NOISE =
+        ResourceKey.create(Registries.NOISE_SETTINGS, Identifier.fromNamespaceAndPath("starwars", "dagobah"));
+    public static final ResourceKey<NoiseGeneratorSettings> HOTH_NOISE =
+        ResourceKey.create(Registries.NOISE_SETTINGS, Identifier.fromNamespaceAndPath("starwars", "hoth"));
 
     private PlanetDimensions() {
     }
@@ -91,6 +95,42 @@ public final class PlanetDimensions {
                 .set(EnvironmentAttributes.BED_RULE, BedRule.CAN_SLEEP_WHEN_DARK)
                 .set(EnvironmentAttributes.NETHER_PORTAL_SPAWNS_PIGLINS, false)
                 .set(EnvironmentAttributes.CAN_START_RAID, false)
+                .build(),
+            timelines.getOrThrow(TimelineTags.IN_OVERWORLD),
+            Optional.of(clocks.getOrThrow(WorldClocks.OVERWORLD))));
+
+        // Dagobah: fog so thick the sun is a rumour. Short fog distances do
+        // the heavy lifting; the biome supplies the murk colors.
+        ctx.register(Planet.DAGOBAH.dimensionTypeKey(), new DimensionType(
+            false, true, false, false, 1.0, -64, 384, 384,
+            BlockTags.INFINIBURN_OVERWORLD, 0.0F, overworldMonsters,
+            DimensionType.Skybox.OVERWORLD, CardinalLighting.Type.DEFAULT,
+            EnvironmentAttributeMap.builder()
+                .set(EnvironmentAttributes.FOG_COLOR, 0xFF4A5741)
+                .set(EnvironmentAttributes.SKY_COLOR, 0xFF5E6B4F)
+                .set(EnvironmentAttributes.FOG_START_DISTANCE, 12.0F)
+                .set(EnvironmentAttributes.FOG_END_DISTANCE, 90.0F)
+                .set(EnvironmentAttributes.CLOUD_HEIGHT, 110.0F)
+                .set(EnvironmentAttributes.BED_RULE, BedRule.CAN_SLEEP_WHEN_DARK)
+                .set(EnvironmentAttributes.NETHER_PORTAL_SPAWNS_PIGLINS, false)
+                .set(EnvironmentAttributes.CAN_START_RAID, false)
+                .build(),
+            timelines.getOrThrow(TimelineTags.IN_OVERWORLD),
+            Optional.of(clocks.getOrThrow(WorldClocks.OVERWORLD))));
+
+        // Hoth: blinding-bright ice world under a pale crisp sky.
+        ctx.register(Planet.HOTH.dimensionTypeKey(), new DimensionType(
+            false, true, false, false, 1.0, -64, 384, 384,
+            BlockTags.INFINIBURN_OVERWORLD, 0.0F, overworldMonsters,
+            DimensionType.Skybox.OVERWORLD, CardinalLighting.Type.DEFAULT,
+            EnvironmentAttributeMap.builder()
+                .set(EnvironmentAttributes.SKY_COLOR, 0xFFC2D8EA)
+                .set(EnvironmentAttributes.FOG_COLOR, 0xFFD8E8F2)
+                .set(EnvironmentAttributes.CLOUD_HEIGHT, 210.0F)
+                .set(EnvironmentAttributes.BED_RULE, BedRule.CAN_SLEEP_WHEN_DARK)
+                .set(EnvironmentAttributes.NETHER_PORTAL_SPAWNS_PIGLINS, false)
+                .set(EnvironmentAttributes.CAN_START_RAID, false)
+                .set(EnvironmentAttributes.SNOW_GOLEM_MELTS, false)
                 .build(),
             timelines.getOrThrow(TimelineTags.IN_OVERWORLD),
             Optional.of(clocks.getOrThrow(WorldClocks.OVERWORLD))));
@@ -134,6 +174,16 @@ public final class PlanetDimensions {
             base.noiseSettings(), base.defaultBlock(), base.defaultFluid(),
             base.noiseRouter(), andorSurface(), base.spawnTarget(), 63,
             false, true, false, false));
+        // Dagobah: sea level up at 64 turns every lowland into marsh.
+        ctx.register(DAGOBAH_NOISE, new NoiseGeneratorSettings(
+            base.noiseSettings(), base.defaultBlock(), base.defaultFluid(),
+            base.noiseRouter(), dagobahSurface(), base.spawnTarget(), 64,
+            false, true, false, false));
+        // Hoth: frozen ocean world — water stays (the cold biome ices it over).
+        ctx.register(HOTH_NOISE, new NoiseGeneratorSettings(
+            base.noiseSettings(), base.defaultBlock(), base.defaultFluid(),
+            base.noiseRouter(), hothSurface(), base.spawnTarget(), 63,
+            false, true, false, false));
     }
 
     private static SurfaceRules.RuleSource state(net.minecraft.world.level.block.Block block) {
@@ -176,6 +226,32 @@ public final class PlanetDimensions {
             SurfaceRules.ifTrue(SurfaceRules.UNDER_FLOOR, state(Blocks.DIRT)));
     }
 
+    private static SurfaceRules.RuleSource dagobahSurface() {
+        SurfaceRules.RuleSource mudOrGrass = SurfaceRules.sequence(
+            SurfaceRules.ifTrue(SurfaceRules.noiseCondition(Noises.SURFACE, 0.2, Double.MAX_VALUE), state(Blocks.MUD)),
+            SurfaceRules.ifTrue(SurfaceRules.waterBlockCheck(-1, 0), state(Blocks.GRASS_BLOCK)),
+            state(Blocks.MUD));
+        return SurfaceRules.sequence(
+            bedrockFloor(),
+            SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, mudOrGrass),
+            SurfaceRules.ifTrue(SurfaceRules.UNDER_FLOOR, SurfaceRules.sequence(
+                SurfaceRules.ifTrue(SurfaceRules.noiseCondition(Noises.SURFACE, 0.2, Double.MAX_VALUE), state(Blocks.MUD)),
+                state(Blocks.DIRT))));
+    }
+
+    private static SurfaceRules.RuleSource hothSurface() {
+        return SurfaceRules.sequence(
+            bedrockFloor(),
+            SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, SurfaceRules.sequence(
+                // Glacier crags above the snowline, sparse powder-snow traps
+                // on the flats, snowfields everywhere else.
+                SurfaceRules.ifTrue(SurfaceRules.yBlockCheck(VerticalAnchor.absolute(96), 0), state(Blocks.PACKED_ICE)),
+                SurfaceRules.ifTrue(SurfaceRules.noiseCondition(Noises.POWDER_SNOW, 0.45, 0.58), state(Blocks.POWDER_SNOW)),
+                state(Blocks.SNOW_BLOCK))),
+            SurfaceRules.ifTrue(SurfaceRules.UNDER_FLOOR, state(Blocks.SNOW_BLOCK)),
+            SurfaceRules.ifTrue(SurfaceRules.DEEP_UNDER_FLOOR, state(Blocks.PACKED_ICE)));
+    }
+
     // ------------------------------------------------------------------
     // Biomes
 
@@ -186,6 +262,67 @@ public final class PlanetDimensions {
         ctx.register(PlanetBiomes.JUNDLAND_WASTES, desertBiome(features, carvers, 0xFFC9CBB8, 0xFFD8C29A));
         ctx.register(PlanetBiomes.ALDHANI_HIGHLANDS, highlandsBiome(features, carvers));
         ctx.register(PlanetBiomes.CORUSCANT_CITY, cityBiome(features, carvers));
+        ctx.register(PlanetBiomes.DAGOBAH_SWAMP, dagobahBiome(features, carvers));
+        ctx.register(PlanetBiomes.HOTH_PLAINS, hothBiome(features, carvers));
+    }
+
+    private static Biome dagobahBiome(HolderGetter<PlacedFeature> features, HolderGetter<ConfiguredWorldCarver<?>> carvers) {
+        MobSpawnSettings.Builder mobs = new MobSpawnSettings.Builder();
+        mobs.addSpawn(MobCategory.CREATURE, 10, new MobSpawnSettings.SpawnerData(EntityType.FROG, 2, 5));
+        mobs.addSpawn(MobCategory.MONSTER, 6, new MobSpawnSettings.SpawnerData(EntityType.SLIME, 1, 3));
+        mobs.addSpawn(MobCategory.MONSTER, 8, new MobSpawnSettings.SpawnerData(ModEntities.DRAGONSNAKE.get(), 1, 2));
+        mobs.addSpawn(MobCategory.AMBIENT, 8, new MobSpawnSettings.SpawnerData(ModEntities.BOGWING.get(), 2, 4));
+
+        BiomeGenerationSettings.Builder gen = new BiomeGenerationSettings.Builder(features, carvers);
+        BiomeDefaultFeatures.addDefaultCarversAndLakes(gen);
+        BiomeDefaultFeatures.addDefaultCrystalFormations(gen);
+        BiomeDefaultFeatures.addDefaultUndergroundVariety(gen);
+        BiomeDefaultFeatures.addDefaultSprings(gen);
+        BiomeDefaultFeatures.addDefaultOres(gen);
+        BiomeDefaultFeatures.addDefaultSoftDisks(gen);
+        BiomeDefaultFeatures.addMangroveSwampVegetation(gen);
+        BiomeDefaultFeatures.addMangroveSwampExtraVegetation(gen);
+
+        return new Biome.BiomeBuilder()
+            .hasPrecipitation(true)
+            .temperature(0.8F)
+            .downfall(1.0F)
+            .setAttribute(EnvironmentAttributes.SKY_COLOR, 0xFF5E6B4F)
+            .setAttribute(EnvironmentAttributes.FOG_COLOR, 0xFF4A5741)
+            .setAttribute(EnvironmentAttributes.WATER_FOG_COLOR, 0xFF232D17)
+            .specialEffects(new BiomeSpecialEffects.Builder()
+                .waterColor(0x3A5A45)
+                .foliageColorOverride(0x495225)
+                .grassColorModifier(BiomeSpecialEffects.GrassColorModifier.SWAMP)
+                .build())
+            .mobSpawnSettings(mobs.build())
+            .generationSettings(gen.build())
+            .build();
+    }
+
+    private static Biome hothBiome(HolderGetter<PlacedFeature> features, HolderGetter<ConfiguredWorldCarver<?>> carvers) {
+        MobSpawnSettings.Builder mobs = new MobSpawnSettings.Builder();
+        mobs.addSpawn(MobCategory.CREATURE, 10, new MobSpawnSettings.SpawnerData(ModEntities.TAUNTAUN.get(), 2, 4));
+        mobs.addSpawn(MobCategory.CREATURE, 5, new MobSpawnSettings.SpawnerData(ModEntities.REBEL_TROOPER.get(), 2, 3));
+        mobs.addSpawn(MobCategory.MONSTER, 10, new MobSpawnSettings.SpawnerData(ModEntities.SNOWTROOPER.get(), 2, 4));
+        mobs.addSpawn(MobCategory.MONSTER, 5, new MobSpawnSettings.SpawnerData(ModEntities.WAMPA.get(), 1, 1));
+        mobs.addSpawn(MobCategory.MONSTER, 4, new MobSpawnSettings.SpawnerData(ModEntities.PROBE_DROID.get(), 1, 1));
+
+        BiomeGenerationSettings.Builder gen = new BiomeGenerationSettings.Builder(features, carvers);
+        BiomeDefaultFeatures.addDefaultCarversAndLakes(gen);
+        BiomeDefaultFeatures.addDefaultUndergroundVariety(gen);
+        BiomeDefaultFeatures.addDefaultOres(gen);
+
+        return new Biome.BiomeBuilder()
+            .hasPrecipitation(true)
+            .temperature(-0.8F)
+            .downfall(0.5F)
+            .setAttribute(EnvironmentAttributes.SKY_COLOR, 0xFFC2D8EA)
+            .setAttribute(EnvironmentAttributes.FOG_COLOR, 0xFFD8E8F2)
+            .specialEffects(new BiomeSpecialEffects.Builder().waterColor(0x3938C9).build())
+            .mobSpawnSettings(mobs.build())
+            .generationSettings(gen.build())
+            .build();
     }
 
     private static Biome desertBiome(HolderGetter<PlacedFeature> features, HolderGetter<ConfiguredWorldCarver<?>> carvers,
@@ -193,7 +330,10 @@ public final class PlanetDimensions {
         MobSpawnSettings.Builder mobs = new MobSpawnSettings.Builder();
         mobs.addSpawn(MobCategory.MONSTER, 12, new MobSpawnSettings.SpawnerData(ModEntities.STORMTROOPER.get(), 2, 4));
         mobs.addSpawn(MobCategory.MONSTER, 6, new MobSpawnSettings.SpawnerData(EntityType.HUSK, 2, 3));
+        mobs.addSpawn(MobCategory.MONSTER, 8, new MobSpawnSettings.SpawnerData(ModEntities.TUSKEN_RAIDER.get(), 1, 3));
         mobs.addSpawn(MobCategory.CREATURE, 4, new MobSpawnSettings.SpawnerData(ModEntities.ASTROMECH.get(), 1, 2));
+        mobs.addSpawn(MobCategory.CREATURE, 8, new MobSpawnSettings.SpawnerData(ModEntities.JAWA.get(), 2, 4));
+        mobs.addSpawn(MobCategory.CREATURE, 6, new MobSpawnSettings.SpawnerData(ModEntities.BANTHA.get(), 2, 3));
 
         BiomeGenerationSettings.Builder gen = new BiomeGenerationSettings.Builder(features, carvers);
         BiomeDefaultFeatures.addFossilDecoration(gen);
@@ -225,6 +365,7 @@ public final class PlanetDimensions {
         mobs.addSpawn(MobCategory.CREATURE, 6, new MobSpawnSettings.SpawnerData(EntityType.RABBIT, 2, 3));
         mobs.addSpawn(MobCategory.CREATURE, 4, new MobSpawnSettings.SpawnerData(EntityType.FOX, 1, 2));
         mobs.addSpawn(MobCategory.MONSTER, 10, new MobSpawnSettings.SpawnerData(ModEntities.STORMTROOPER.get(), 2, 4));
+        mobs.addSpawn(MobCategory.CREATURE, 8, new MobSpawnSettings.SpawnerData(ModEntities.REBEL_TROOPER.get(), 2, 4));
 
         BiomeGenerationSettings.Builder gen = new BiomeGenerationSettings.Builder(features, carvers);
         BiomeDefaultFeatures.addDefaultCarversAndLakes(gen);
@@ -253,6 +394,7 @@ public final class PlanetDimensions {
     private static Biome cityBiome(HolderGetter<PlacedFeature> features, HolderGetter<ConfiguredWorldCarver<?>> carvers) {
         MobSpawnSettings.Builder mobs = new MobSpawnSettings.Builder();
         mobs.addSpawn(MobCategory.MONSTER, 14, new MobSpawnSettings.SpawnerData(ModEntities.BATTLE_DROID.get(), 2, 4));
+        mobs.addSpawn(MobCategory.MONSTER, 4, new MobSpawnSettings.SpawnerData(ModEntities.PROBE_DROID.get(), 1, 1));
         mobs.addSpawn(MobCategory.CREATURE, 3, new MobSpawnSettings.SpawnerData(ModEntities.JEDI_KNIGHT.get(), 1, 1));
 
         return new Biome.BiomeBuilder()
@@ -294,5 +436,17 @@ public final class PlanetDimensions {
         ctx.register(Planet.CORUSCANT.stemKey(), new LevelStem(
             types.getOrThrow(Planet.CORUSCANT.dimensionTypeKey()),
             new CoruscantChunkGenerator(biomes.getOrThrow(PlanetBiomes.CORUSCANT_CITY))));
+
+        ctx.register(Planet.DAGOBAH.stemKey(), new LevelStem(
+            types.getOrThrow(Planet.DAGOBAH.dimensionTypeKey()),
+            new NoiseBasedChunkGenerator(
+                new FixedBiomeSource(biomes.getOrThrow(PlanetBiomes.DAGOBAH_SWAMP)),
+                noise.getOrThrow(DAGOBAH_NOISE))));
+
+        ctx.register(Planet.HOTH.stemKey(), new LevelStem(
+            types.getOrThrow(Planet.HOTH.dimensionTypeKey()),
+            new NoiseBasedChunkGenerator(
+                new FixedBiomeSource(biomes.getOrThrow(PlanetBiomes.HOTH_PLAINS)),
+                noise.getOrThrow(HOTH_NOISE))));
     }
 }

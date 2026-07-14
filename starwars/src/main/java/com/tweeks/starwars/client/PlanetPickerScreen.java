@@ -19,13 +19,15 @@ import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 public class PlanetPickerScreen extends Screen {
 
     private static final double DEADZONE_PX = 18.0;
-    private static final int OUTER_RADIUS_PX = 80;
-    private static final int DISC_HALF_PX = 14;
+    private static final int OUTER_RADIUS_PX = 95;
+    private static final int DISC_HALF_PX = 13;
 
     private static final int[] WEDGE_COLORS = {
         0xFFE8A33D, // TATOOINE — twin-sun amber
         0xFF57B86B, // ANDOR — highland green
         0xFF8E6BE8, // CORUSCANT — dusk violet
+        0xFF6B8E4E, // DAGOBAH — swamp green
+        0xFFA8D8F0, // HOTH — glacier blue
         0xFF4D9BE8, // HOME — overworld blue
     };
 

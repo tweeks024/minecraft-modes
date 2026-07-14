@@ -1,13 +1,18 @@
 package com.tweeks.starwars.data;
 
 import com.tweeks.starwars.StarWarsMod;
+import com.tweeks.starwars.world.EchoBaseStructure;
 import com.tweeks.starwars.world.EscapePodStructure;
 import com.tweeks.starwars.world.FerrixTownStructure;
 import com.tweeks.starwars.world.ImperialOutpostStructure;
 import com.tweeks.starwars.world.JediRuinStructure;
 import com.tweeks.starwars.world.KraytSkeletonStructure;
 import com.tweeks.starwars.world.MoistureFarmStructure;
+import com.tweeks.starwars.world.MosEisleyStructure;
 import com.tweeks.starwars.world.SandcrawlerStructure;
+import com.tweeks.starwars.world.WampaCaveStructure;
+import com.tweeks.starwars.world.XwingWreckStructure;
+import com.tweeks.starwars.world.YodaHutStructure;
 import com.tweeks.starwars.world.planet.PlanetBiomes;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.Registries;
@@ -83,6 +88,46 @@ public final class ModStructureProvider {
         Registries.STRUCTURE_SET,
         Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "krayt_skeletons"));
 
+    public static final ResourceKey<Structure> MOS_EISLEY = ResourceKey.create(
+        Registries.STRUCTURE,
+        Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "mos_eisley"));
+
+    public static final ResourceKey<StructureSet> MOS_EISLEY_SET = ResourceKey.create(
+        Registries.STRUCTURE_SET,
+        Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "mos_eisleys"));
+
+    public static final ResourceKey<Structure> YODA_HUT = ResourceKey.create(
+        Registries.STRUCTURE,
+        Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "yoda_hut"));
+
+    public static final ResourceKey<StructureSet> YODA_HUT_SET = ResourceKey.create(
+        Registries.STRUCTURE_SET,
+        Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "yoda_huts"));
+
+    public static final ResourceKey<Structure> XWING_WRECK = ResourceKey.create(
+        Registries.STRUCTURE,
+        Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "xwing_wreck"));
+
+    public static final ResourceKey<StructureSet> XWING_WRECK_SET = ResourceKey.create(
+        Registries.STRUCTURE_SET,
+        Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "xwing_wrecks"));
+
+    public static final ResourceKey<Structure> ECHO_BASE = ResourceKey.create(
+        Registries.STRUCTURE,
+        Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "echo_base"));
+
+    public static final ResourceKey<StructureSet> ECHO_BASE_SET = ResourceKey.create(
+        Registries.STRUCTURE_SET,
+        Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "echo_bases"));
+
+    public static final ResourceKey<Structure> WAMPA_CAVE = ResourceKey.create(
+        Registries.STRUCTURE,
+        Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "wampa_cave"));
+
+    public static final ResourceKey<StructureSet> WAMPA_CAVE_SET = ResourceKey.create(
+        Registries.STRUCTURE_SET,
+        Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "wampa_caves"));
+
     public static void bootstrapStructures(BootstrapContext<Structure> ctx) {
         var biomes = ctx.lookup(Registries.BIOME);
         ctx.register(ESCAPE_POD, new EscapePodStructure(new Structure.StructureSettings(
@@ -141,6 +186,42 @@ public final class ModStructureProvider {
             Map.of(),                                  // no spawn overrides
             GenerationStep.Decoration.SURFACE_STRUCTURES,
             TerrainAdjustment.BEARD_THIN)));
+
+        ctx.register(MOS_EISLEY, new MosEisleyStructure(new Structure.StructureSettings(
+            HolderSet.direct(
+                biomes.getOrThrow(PlanetBiomes.DUNE_SEA),
+                biomes.getOrThrow(PlanetBiomes.JUNDLAND_WASTES)),
+            Map.of(),                                  // no spawn overrides
+            GenerationStep.Decoration.SURFACE_STRUCTURES,
+            TerrainAdjustment.BEARD_THIN)));
+
+        ctx.register(YODA_HUT, new YodaHutStructure(new Structure.StructureSettings(
+            HolderSet.direct(
+                biomes.getOrThrow(PlanetBiomes.DAGOBAH_SWAMP)),
+            Map.of(),                                  // no spawn overrides
+            GenerationStep.Decoration.SURFACE_STRUCTURES,
+            TerrainAdjustment.BEARD_THIN)));
+
+        ctx.register(XWING_WRECK, new XwingWreckStructure(new Structure.StructureSettings(
+            HolderSet.direct(
+                biomes.getOrThrow(PlanetBiomes.DAGOBAH_SWAMP)),
+            Map.of(),                                  // no spawn overrides
+            GenerationStep.Decoration.SURFACE_STRUCTURES,
+            TerrainAdjustment.NONE)));                 // half-sunk wreck: no beard under the sunken nose
+
+        ctx.register(ECHO_BASE, new EchoBaseStructure(new Structure.StructureSettings(
+            HolderSet.direct(
+                biomes.getOrThrow(PlanetBiomes.HOTH_PLAINS)),
+            Map.of(),                                  // no spawn overrides
+            GenerationStep.Decoration.SURFACE_STRUCTURES,
+            TerrainAdjustment.BEARD_THIN)));
+
+        ctx.register(WAMPA_CAVE, new WampaCaveStructure(new Structure.StructureSettings(
+            HolderSet.direct(
+                biomes.getOrThrow(PlanetBiomes.HOTH_PLAINS)),
+            Map.of(),                                  // no spawn overrides
+            GenerationStep.Decoration.SURFACE_STRUCTURES,
+            TerrainAdjustment.BEARD_THIN)));
     }
 
     public static void bootstrapSets(BootstrapContext<StructureSet> ctx) {
@@ -172,5 +253,25 @@ public final class ModStructureProvider {
         ctx.register(KRAYT_SKELETON_SET, new StructureSet(
             structures.getOrThrow(KRAYT_SKELETON),
             new RandomSpreadStructurePlacement(32, 10, RandomSpreadType.LINEAR, 1977100507)));
+
+        ctx.register(MOS_EISLEY_SET, new StructureSet(
+            structures.getOrThrow(MOS_EISLEY),
+            new RandomSpreadStructurePlacement(48, 16, RandomSpreadType.LINEAR, 1977100508)));
+
+        ctx.register(YODA_HUT_SET, new StructureSet(
+            structures.getOrThrow(YODA_HUT),
+            new RandomSpreadStructurePlacement(24, 8, RandomSpreadType.LINEAR, 1977100509)));
+
+        ctx.register(XWING_WRECK_SET, new StructureSet(
+            structures.getOrThrow(XWING_WRECK),
+            new RandomSpreadStructurePlacement(28, 9, RandomSpreadType.LINEAR, 1977100510)));
+
+        ctx.register(ECHO_BASE_SET, new StructureSet(
+            structures.getOrThrow(ECHO_BASE),
+            new RandomSpreadStructurePlacement(40, 12, RandomSpreadType.LINEAR, 1977100511)));
+
+        ctx.register(WAMPA_CAVE_SET, new StructureSet(
+            structures.getOrThrow(WAMPA_CAVE),
+            new RandomSpreadStructurePlacement(20, 7, RandomSpreadType.LINEAR, 1977100512)));
     }
 }

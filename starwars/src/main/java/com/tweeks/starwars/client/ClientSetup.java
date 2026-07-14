@@ -3,16 +3,26 @@ package com.tweeks.starwars.client;
 import com.tweeks.starwars.ModEntities;
 import com.tweeks.starwars.StarWarsMod;
 import com.tweeks.starwars.client.model.AstromechModel;
+import com.tweeks.starwars.client.model.BanthaModel;
 import com.tweeks.starwars.client.model.BattleDroidModel;
 import com.tweeks.starwars.client.model.BobaFettModel;
+import com.tweeks.starwars.client.model.BogwingModel;
+import com.tweeks.starwars.client.model.DragonsnakeModel;
 import com.tweeks.starwars.client.model.HanSoloModel;
+import com.tweeks.starwars.client.model.JawaModel;
 import com.tweeks.starwars.client.model.JediKnightModel;
 import com.tweeks.starwars.client.model.LandspeederModel;
 import com.tweeks.starwars.client.model.LukeModel;
 import com.tweeks.starwars.client.model.ObiWanModel;
 import com.tweeks.starwars.client.model.PrincessLeiaModel;
+import com.tweeks.starwars.client.model.ProbeDroidModel;
+import com.tweeks.starwars.client.model.RebelTrooperModel;
 import com.tweeks.starwars.client.model.StormtrooperModel;
+import com.tweeks.starwars.client.model.TauntaunModel;
+import com.tweeks.starwars.client.model.TuskenRaiderModel;
 import com.tweeks.starwars.client.model.VaderModel;
+import com.tweeks.starwars.client.model.WampaModel;
+import com.tweeks.starwars.client.model.YodaModel;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -35,6 +45,17 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.HAN_SOLO.get(), HanSoloRenderer::new);
         event.registerEntityRenderer(ModEntities.PRINCESS_LEIA.get(), PrincessLeiaRenderer::new);
         event.registerEntityRenderer(ModEntities.LANDSPEEDER.get(), LandspeederRenderer::new);
+        event.registerEntityRenderer(ModEntities.JAWA.get(), JawaRenderer::new);
+        event.registerEntityRenderer(ModEntities.TUSKEN_RAIDER.get(), TuskenRaiderRenderer::new);
+        event.registerEntityRenderer(ModEntities.BANTHA.get(), BanthaRenderer::new);
+        event.registerEntityRenderer(ModEntities.REBEL_TROOPER.get(), RebelTrooperRenderer::new);
+        event.registerEntityRenderer(ModEntities.PROBE_DROID.get(), ProbeDroidRenderer::new);
+        event.registerEntityRenderer(ModEntities.WAMPA.get(), WampaRenderer::new);
+        event.registerEntityRenderer(ModEntities.TAUNTAUN.get(), TauntaunRenderer::new);
+        event.registerEntityRenderer(ModEntities.SNOWTROOPER.get(), SnowtrooperRenderer::new);
+        event.registerEntityRenderer(ModEntities.DRAGONSNAKE.get(), DragonsnakeRenderer::new);
+        event.registerEntityRenderer(ModEntities.BOGWING.get(), BogwingRenderer::new);
+        event.registerEntityRenderer(ModEntities.YODA.get(), YodaRenderer::new);
     }
 
     @SubscribeEvent
@@ -50,5 +71,16 @@ public final class ClientSetup {
         event.registerLayerDefinition(HanSoloModel.LAYER_LOCATION, HanSoloModel::createBodyLayer);
         event.registerLayerDefinition(PrincessLeiaModel.LAYER_LOCATION, PrincessLeiaModel::createBodyLayer);
         event.registerLayerDefinition(LandspeederModel.LAYER_LOCATION, LandspeederModel::createBodyLayer);
+        event.registerLayerDefinition(JawaModel.LAYER_LOCATION, JawaModel::createBodyLayer);
+        event.registerLayerDefinition(TuskenRaiderModel.LAYER_LOCATION, TuskenRaiderModel::createBodyLayer);
+        event.registerLayerDefinition(BanthaModel.LAYER_LOCATION, BanthaModel::createBodyLayer);
+        event.registerLayerDefinition(RebelTrooperModel.LAYER_LOCATION, RebelTrooperModel::createBodyLayer);
+        event.registerLayerDefinition(ProbeDroidModel.LAYER_LOCATION, ProbeDroidModel::createBodyLayer);
+        event.registerLayerDefinition(WampaModel.LAYER_LOCATION, WampaModel::createBodyLayer);
+        event.registerLayerDefinition(TauntaunModel.LAYER_LOCATION, TauntaunModel::createBodyLayer);
+        // Snowtrooper reuses StormtrooperModel's layer — no new definition.
+        event.registerLayerDefinition(DragonsnakeModel.LAYER_LOCATION, DragonsnakeModel::createBodyLayer);
+        event.registerLayerDefinition(BogwingModel.LAYER_LOCATION, BogwingModel::createBodyLayer);
+        event.registerLayerDefinition(YodaModel.LAYER_LOCATION, YodaModel::createBodyLayer);
     }
 }

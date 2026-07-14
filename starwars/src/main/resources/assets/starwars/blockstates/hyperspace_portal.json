@@ -6,6 +6,10 @@
         "planet=andor,axis=z": { "model": "starwars:block/hyperspace_portal_andor_z" },
         "planet=coruscant,axis=x": { "model": "starwars:block/hyperspace_portal_coruscant_x" },
         "planet=coruscant,axis=z": { "model": "starwars:block/hyperspace_portal_coruscant_z" },
+        "planet=dagobah,axis=x": { "model": "starwars:block/hyperspace_portal_dagobah_x" },
+        "planet=dagobah,axis=z": { "model": "starwars:block/hyperspace_portal_dagobah_z" },
+        "planet=hoth,axis=x": { "model": "starwars:block/hyperspace_portal_hoth_x" },
+        "planet=hoth,axis=z": { "model": "starwars:block/hyperspace_portal_hoth_z" },
         "planet=home,axis=x": { "model": "starwars:block/hyperspace_portal_home_x" },
         "planet=home,axis=z": { "model": "starwars:block/hyperspace_portal_home_z" }
     }

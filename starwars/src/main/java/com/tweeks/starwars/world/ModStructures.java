@@ -66,6 +66,41 @@ public final class ModStructures {
         STRUCTURE_PIECES.register("krayt_skeleton",
             () -> (StructurePieceType) KraytSkeletonPiece::new);
 
+    public static final DeferredHolder<StructureType<?>, StructureType<MosEisleyStructure>> MOS_EISLEY_TYPE =
+        STRUCTURE_TYPES.register("mos_eisley", () -> () -> MosEisleyStructure.CODEC);
+
+    public static final DeferredHolder<StructurePieceType, StructurePieceType> MOS_EISLEY_PIECE =
+        STRUCTURE_PIECES.register("mos_eisley",
+            () -> (StructurePieceType) MosEisleyPiece::new);
+
+    public static final DeferredHolder<StructureType<?>, StructureType<YodaHutStructure>> YODA_HUT_TYPE =
+        STRUCTURE_TYPES.register("yoda_hut", () -> () -> YodaHutStructure.CODEC);
+
+    public static final DeferredHolder<StructurePieceType, StructurePieceType> YODA_HUT_PIECE =
+        STRUCTURE_PIECES.register("yoda_hut",
+            () -> (StructurePieceType) YodaHutPiece::new);
+
+    public static final DeferredHolder<StructureType<?>, StructureType<XwingWreckStructure>> XWING_WRECK_TYPE =
+        STRUCTURE_TYPES.register("xwing_wreck", () -> () -> XwingWreckStructure.CODEC);
+
+    public static final DeferredHolder<StructurePieceType, StructurePieceType> XWING_WRECK_PIECE =
+        STRUCTURE_PIECES.register("xwing_wreck",
+            () -> (StructurePieceType) XwingWreckPiece::new);
+
+    public static final DeferredHolder<StructureType<?>, StructureType<EchoBaseStructure>> ECHO_BASE_TYPE =
+        STRUCTURE_TYPES.register("echo_base", () -> () -> EchoBaseStructure.CODEC);
+
+    public static final DeferredHolder<StructurePieceType, StructurePieceType> ECHO_BASE_PIECE =
+        STRUCTURE_PIECES.register("echo_base",
+            () -> (StructurePieceType) EchoBasePiece::new);
+
+    public static final DeferredHolder<StructureType<?>, StructureType<WampaCaveStructure>> WAMPA_CAVE_TYPE =
+        STRUCTURE_TYPES.register("wampa_cave", () -> () -> WampaCaveStructure.CODEC);
+
+    public static final DeferredHolder<StructurePieceType, StructurePieceType> WAMPA_CAVE_PIECE =
+        STRUCTURE_PIECES.register("wampa_cave",
+            () -> (StructurePieceType) WampaCavePiece::new);
+
     public static void register(IEventBus modEventBus) {
         STRUCTURE_TYPES.register(modEventBus);
         STRUCTURE_PIECES.register(modEventBus);

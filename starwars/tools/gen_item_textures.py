@@ -489,6 +489,57 @@ def gen_star_compass(out_path):
 
     write_png(out_path, rgba)
 
+
+def gen_cantina_record(out_path):
+    """16x16 music-disc icon for the cantina tune: near-black vinyl disc
+    (stepped circle, 3 tones + groove ring), warm amber label with a dark
+    spindle hole, one specular highlight arc top-left."""
+    rgba = bytearray(W * H * 4)
+
+    vinyl    = (0x24, 0x24, 0x28, 0xFF)
+    vinyl_hi = (0x3E, 0x3E, 0x46, 0xFF)
+    vinyl_sh = (0x16, 0x16, 0x1A, 0xFF)
+    vinyl_ol = (0x0A, 0x0A, 0x0C, 0xFF)
+    groove   = (0x30, 0x30, 0x36, 0xFF)
+    label    = (0xE8, 0xA3, 0x3D, 0xFF)   # cantina amber
+    label_sh = (0xB8, 0x7A, 0x24, 0xFF)
+    hole     = (0x0A, 0x0A, 0x0C, 0xFF)
+    shine    = (0x8A, 0x8A, 0x96, 0xFF)
+
+    segs = [
+        (2,  [(5, 11)]),
+        (3,  [(4, 12)]),
+        (4,  [(3, 13)]),
+        (5,  [(2, 14)]),
+        (6,  [(2, 14)]),
+        (7,  [(2, 14)]),
+        (8,  [(2, 14)]),
+        (9,  [(2, 14)]),
+        (10, [(2, 14)]),
+        (11, [(3, 13)]),
+        (12, [(4, 12)]),
+        (13, [(5, 11)]),
+    ]
+    outline_and_fill(rgba, segs, outline=vinyl_ol, base=vinyl, hi=vinyl_hi,
+                      sh=vinyl_sh, hi_rows={2, 3, 4}, sh_rows={11, 12, 13})
+
+    # Groove ring between rim and label.
+    rect(rgba, 5, 4, 11, 5, groove)
+    rect(rgba, 4, 5, 5, 11, groove)
+    rect(rgba, 11, 5, 12, 11, groove)
+    rect(rgba, 5, 11, 11, 12, groove)
+
+    # Amber label with shaded lower half and spindle hole.
+    rect(rgba, 6, 6, 10, 8, label)
+    rect(rgba, 6, 8, 10, 10, label_sh)
+    rect(rgba, 7, 7, 9, 9, hole)
+
+    # Specular arc top-left on the vinyl.
+    rect(rgba, 4, 3, 6, 4, shine)
+    rect(rgba, 3, 4, 4, 6, shine)
+
+    write_png(out_path, rgba)
+
 if __name__ == '__main__':
     out_dir = sys.argv[1] if len(sys.argv) > 1 else '.'
     # blaster_pistol.png / blaster_rifle.png are no longer generated here —
@@ -503,4 +554,5 @@ if __name__ == '__main__':
     gen_han_solo_boots(os.path.join(out_dir, 'han_solo_boots.png'))
     gen_landspeeder(os.path.join(out_dir, 'landspeeder.png'))
     gen_star_compass(os.path.join(out_dir, 'star_compass.png'))
+    gen_cantina_record(os.path.join(out_dir, 'cantina_record.png'))
     print('OK')

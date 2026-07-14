@@ -36,7 +36,9 @@ public class DataGenerators {
             .add(Registries.STRUCTURE, ModStructureProvider::bootstrapStructures)
             .add(Registries.STRUCTURE_SET, ModStructureProvider::bootstrapSets)
             .add(Registries.LEVEL_STEM,
-                 com.tweeks.starwars.world.planet.PlanetDimensions::bootstrapStems);
+                 com.tweeks.starwars.world.planet.PlanetDimensions::bootstrapStems)
+            .add(Registries.JUKEBOX_SONG,
+                 com.tweeks.starwars.item.ModJukeboxSongs::bootstrap);
         gen.addProvider(true, new DatapackBuiltinEntriesProvider(
             output, lookup, builder, Set.of(StarWarsMod.MOD_ID)));
 

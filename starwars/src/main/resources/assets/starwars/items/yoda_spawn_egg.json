@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "starwars:item/yoda_spawn_egg"
+  }
+}

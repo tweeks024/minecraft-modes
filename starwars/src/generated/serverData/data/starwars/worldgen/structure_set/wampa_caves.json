@@ -1,0 +1,14 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 1977100512,
+    "separation": 7,
+    "spacing": 20
+  },
+  "structures": [
+    {
+      "structure": "starwars:wampa_cave",
+      "weight": 1
+    }
+  ]
+}

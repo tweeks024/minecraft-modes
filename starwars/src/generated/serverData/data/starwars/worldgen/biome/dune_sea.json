@@ -83,6 +83,18 @@
         "maxCount": 2,
         "minCount": 1,
         "weight": 4
+      },
+      {
+        "type": "starwars:jawa",
+        "maxCount": 4,
+        "minCount": 2,
+        "weight": 8
+      },
+      {
+        "type": "starwars:bantha",
+        "maxCount": 3,
+        "minCount": 2,
+        "weight": 6
       }
     ],
     "misc": [],
@@ -98,6 +110,12 @@
         "maxCount": 3,
         "minCount": 2,
         "weight": 6
+      },
+      {
+        "type": "starwars:tusken_raider",
+        "maxCount": 3,
+        "minCount": 1,
+        "weight": 8
       }
     ],
     "underground_water_creature": [],
