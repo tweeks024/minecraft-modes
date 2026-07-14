@@ -41,6 +41,9 @@
     "starwars:dragonsnake_spawn_egg": {
       "textures": "textures/items/dragonsnake_spawn_egg"
     },
+    "starwars:ewok_spawn_egg": {
+      "textures": "textures/items/ewok_spawn_egg"
+    },
     "starwars:galaxy_map": {
       "textures": "textures/items/galaxy_map"
     },
