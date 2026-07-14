@@ -44,3 +44,9 @@ The Java entity renderer is too complex to parse statically. Phase 2 fell back t
 
 - `thief`: no bbmodel matched id 'thief'; defaulted to 'geometry.humanoid'.
 
+## Other datapack registries not translatable
+
+Data-driven registries with no Bedrock add-on equivalent are dropped; the behavior they back stays Java-only:
+
+- `damage_type/blackjack`: custom damage type not translatable — data/thief/damage_type/blackjack.json; Bedrock has no data-driven damage-type registry, so bolts/sabers deal generic damage there
+

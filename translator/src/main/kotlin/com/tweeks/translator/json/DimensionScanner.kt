@@ -76,6 +76,41 @@ class DimensionScanner(
                     "tune plays on Java only",
             )
         }
+        // NeoForge biome modifiers that inject natural mob spawns into vanilla
+        // biomes: without a Bedrock spawn_rules emitter these mobs simply never
+        // spawn naturally on Bedrock, so the loss must be disclosed.
+        scanFamily(modRoot, modId, "neoforge/biome_modifier") { id ->
+            untranslatable.recordSilentDatapackDrop(
+                modId,
+                "biome_modifier/$id",
+                "biome modifier not translated — data/$modId/neoforge/biome_modifier/$id.json; " +
+                    "natural spawning it adds to vanilla biomes is absent on Bedrock (no spawn_rules emitted)",
+            )
+        }
+        scanFamily(modRoot, modId, "damage_type") { id ->
+            untranslatable.recordSilentDatapackDrop(
+                modId,
+                "damage_type/$id",
+                "custom damage type not translatable — data/$modId/damage_type/$id.json; Bedrock has no " +
+                    "data-driven damage-type registry, so bolts/sabers deal generic damage there",
+            )
+        }
+        scanFamily(modRoot, modId, "worldgen/configured_feature") { id ->
+            untranslatable.recordSilentDatapackDrop(
+                modId,
+                "configured_feature/$id",
+                "worldgen feature not translatable — data/$modId/worldgen/configured_feature/$id.json; " +
+                    "ore/feature generation has no Bedrock equivalent",
+            )
+        }
+        scanFamily(modRoot, modId, "worldgen/placed_feature") { id ->
+            untranslatable.recordSilentDatapackDrop(
+                modId,
+                "placed_feature/$id",
+                "worldgen placement not translatable — data/$modId/worldgen/placed_feature/$id.json; " +
+                    "ore/feature placement has no Bedrock equivalent",
+            )
+        }
     }
 
     /**

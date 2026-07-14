@@ -172,6 +172,31 @@ These `createAttributes()` values are neither numeric literals nor resolvable `s
 - attribute `MAX_HEALTH` value `MAX_HEALTH` is not a literal or a resolvable static-final constant
 - attribute `MOVEMENT_SPEED` value `SPEED_DISGUISED` is not a literal or a resolvable static-final constant
 
+## Other datapack registries not translatable
+
+Data-driven registries with no Bedrock add-on equivalent are dropped; the behavior they back stays Java-only:
+
+- `biome_modifier/add_bandit_leaders`: biome modifier not translated — data/wildwest/neoforge/biome_modifier/add_bandit_leaders.json; natural spawning it adds to vanilla biomes is absent on Bedrock (no spawn_rules emitted)
+- `biome_modifier/add_bandits`: biome modifier not translated — data/wildwest/neoforge/biome_modifier/add_bandits.json; natural spawning it adds to vanilla biomes is absent on Bedrock (no spawn_rules emitted)
+- `biome_modifier/add_crabs`: biome modifier not translated — data/wildwest/neoforge/biome_modifier/add_crabs.json; natural spawning it adds to vanilla biomes is absent on Bedrock (no spawn_rules emitted)
+- `biome_modifier/add_walkers`: biome modifier not translated — data/wildwest/neoforge/biome_modifier/add_walkers.json; natural spawning it adds to vanilla biomes is absent on Bedrock (no spawn_rules emitted)
+- `biome_modifier/grim_reaper_overworld_spawns`: biome modifier not translated — data/wildwest/neoforge/biome_modifier/grim_reaper_overworld_spawns.json; natural spawning it adds to vanilla biomes is absent on Bedrock (no spawn_rules emitted)
+- `biome_modifier/herobrine_spawns`: biome modifier not translated — data/wildwest/neoforge/biome_modifier/herobrine_spawns.json; natural spawning it adds to vanilla biomes is absent on Bedrock (no spawn_rules emitted)
+- `biome_modifier/null_end_spawns`: biome modifier not translated — data/wildwest/neoforge/biome_modifier/null_end_spawns.json; natural spawning it adds to vanilla biomes is absent on Bedrock (no spawn_rules emitted)
+- `biome_modifier/null_nether_spawns`: biome modifier not translated — data/wildwest/neoforge/biome_modifier/null_nether_spawns.json; natural spawning it adds to vanilla biomes is absent on Bedrock (no spawn_rules emitted)
+- `biome_modifier/null_overworld_spawns`: biome modifier not translated — data/wildwest/neoforge/biome_modifier/null_overworld_spawns.json; natural spawning it adds to vanilla biomes is absent on Bedrock (no spawn_rules emitted)
+- `biome_modifier/steve_stacker_spawns`: biome modifier not translated — data/wildwest/neoforge/biome_modifier/steve_stacker_spawns.json; natural spawning it adds to vanilla biomes is absent on Bedrock (no spawn_rules emitted)
+- `biome_modifier/the_agent_end_spawns`: biome modifier not translated — data/wildwest/neoforge/biome_modifier/the_agent_end_spawns.json; natural spawning it adds to vanilla biomes is absent on Bedrock (no spawn_rules emitted)
+- `biome_modifier/the_agent_overworld_spawns`: biome modifier not translated — data/wildwest/neoforge/biome_modifier/the_agent_overworld_spawns.json; natural spawning it adds to vanilla biomes is absent on Bedrock (no spawn_rules emitted)
+- `damage_type/cannonball`: custom damage type not translatable — data/wildwest/damage_type/cannonball.json; Bedrock has no data-driven damage-type registry, so bolts/sabers deal generic damage there
+- `damage_type/club`: custom damage type not translatable — data/wildwest/damage_type/club.json; Bedrock has no data-driven damage-type registry, so bolts/sabers deal generic damage there
+- `damage_type/gunshot`: custom damage type not translatable — data/wildwest/damage_type/gunshot.json; Bedrock has no data-driven damage-type registry, so bolts/sabers deal generic damage there
+- `damage_type/infinity_power`: custom damage type not translatable — data/wildwest/damage_type/infinity_power.json; Bedrock has no data-driven damage-type registry, so bolts/sabers deal generic damage there
+- `damage_type/infinity_soul`: custom damage type not translatable — data/wildwest/damage_type/infinity_soul.json; Bedrock has no data-driven damage-type registry, so bolts/sabers deal generic damage there
+- `damage_type/knife`: custom damage type not translatable — data/wildwest/damage_type/knife.json; Bedrock has no data-driven damage-type registry, so bolts/sabers deal generic damage there
+- `damage_type/meteor`: custom damage type not translatable — data/wildwest/damage_type/meteor.json; Bedrock has no data-driven damage-type registry, so bolts/sabers deal generic damage there
+- `damage_type/piston_punch`: custom damage type not translatable — data/wildwest/damage_type/piston_punch.json; Bedrock has no data-driven damage-type registry, so bolts/sabers deal generic damage there
+
 ## Named-character singletons (not enforced on Bedrock)
 
 These entities enforce a one-living-instance-per-server invariant on the Java side via a `*SavedData` class. Bedrock has no SavedData equivalent, so this invariant is not enforced in the translated output — duplicates are possible:

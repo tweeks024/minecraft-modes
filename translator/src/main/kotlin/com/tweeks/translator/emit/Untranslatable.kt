@@ -50,6 +50,7 @@ class Untranslatable {
     private val datapackBiomes = TreeMap<String, TreeMap<String, String>>()
     private val datapackNoiseSettings = TreeMap<String, TreeMap<String, String>>()
     private val datapackJukeboxSongs = TreeMap<String, TreeMap<String, String>>()
+    private val datapackMisc = TreeMap<String, TreeMap<String, String>>()
     private val blocksNotTranslated = TreeMap<String, TreeMap<String, String>>()
     private val phase2Failures = TreeMap<String, MutableList<String>>()
     private val duplicateBehaviorComponents = TreeMap<String, TreeMap<String, TreeSet<String>>>()
@@ -299,6 +300,16 @@ class Untranslatable {
     }
 
     /**
+     * Record any other data-driven registry entry that has no Bedrock
+     * counterpart and is silently dropped (custom damage types, worldgen
+     * features, biome modifiers). [entryId] is prefixed with its family so
+     * the sorted section reads cleanly.
+     */
+    fun recordSilentDatapackDrop(modId: String, entryId: String, summary: String) {
+        datapackMisc.getOrPut(modId) { TreeMap() }[entryId] = summary
+    }
+
+    /**
      * Record a Java block registration (`BLOCKS.registerBlock` /
      * `BLOCKS.registerSimpleBlock`) with no Bedrock counterpart — the
      * translator has no Bedrock block emitter, so the block does not exist
@@ -391,6 +402,7 @@ class Untranslatable {
         ids.addAll(datapackBiomes.keys)
         ids.addAll(datapackNoiseSettings.keys)
         ids.addAll(datapackJukeboxSongs.keys)
+        ids.addAll(datapackMisc.keys)
         ids.addAll(blocksNotTranslated.keys)
         ids.addAll(phase2Failures.keys)
         ids.addAll(duplicateBehaviorComponents.keys)
@@ -722,6 +734,16 @@ class Untranslatable {
             sb.append("Java-only:\n\n")
             for ((noiseId, summary) in items) {
                 sb.append("- `").append(noiseId).append("`: ").append(summary).append('\n')
+            }
+            sb.append('\n')
+        }
+        datapackMisc[modId]?.takeIf { it.isNotEmpty() }?.let { items ->
+            any = true
+            sb.append("## Other datapack registries not translatable\n\n")
+            sb.append("Data-driven registries with no Bedrock add-on equivalent are dropped; ")
+            sb.append("the behavior they back stays Java-only:\n\n")
+            for ((entryId, summary) in items) {
+                sb.append("- `").append(entryId).append("`: ").append(summary).append('\n')
             }
             sb.append('\n')
         }

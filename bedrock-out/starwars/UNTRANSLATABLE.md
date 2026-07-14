@@ -284,6 +284,26 @@ Bedrock add-ons cannot express Java's `worldgen/noise_settings` density-function
 - `mustafar`: custom noise settings / chunk generation not expressible — data/starwars/worldgen/noise_settings/mustafar.json; terrain shaping lives in the datapack noise router and the mod's Java chunk generator
 - `tatooine`: custom noise settings / chunk generation not expressible — data/starwars/worldgen/noise_settings/tatooine.json; terrain shaping lives in the datapack noise router and the mod's Java chunk generator
 
+## Other datapack registries not translatable
+
+Data-driven registries with no Bedrock add-on equivalent are dropped; the behavior they back stays Java-only:
+
+- `biome_modifier/add_astromechs`: biome modifier not translated — data/starwars/neoforge/biome_modifier/add_astromechs.json; natural spawning it adds to vanilla biomes is absent on Bedrock (no spawn_rules emitted)
+- `biome_modifier/add_battle_droids`: biome modifier not translated — data/starwars/neoforge/biome_modifier/add_battle_droids.json; natural spawning it adds to vanilla biomes is absent on Bedrock (no spawn_rules emitted)
+- `biome_modifier/add_jedi_knights`: biome modifier not translated — data/starwars/neoforge/biome_modifier/add_jedi_knights.json; natural spawning it adds to vanilla biomes is absent on Bedrock (no spawn_rules emitted)
+- `biome_modifier/add_stormtroopers`: biome modifier not translated — data/starwars/neoforge/biome_modifier/add_stormtroopers.json; natural spawning it adds to vanilla biomes is absent on Bedrock (no spawn_rules emitted)
+- `configured_feature/blue_kyber_ore`: worldgen feature not translatable — data/starwars/worldgen/configured_feature/blue_kyber_ore.json; ore/feature generation has no Bedrock equivalent
+- `configured_feature/green_kyber_ore`: worldgen feature not translatable — data/starwars/worldgen/configured_feature/green_kyber_ore.json; ore/feature generation has no Bedrock equivalent
+- `configured_feature/purple_kyber_ore`: worldgen feature not translatable — data/starwars/worldgen/configured_feature/purple_kyber_ore.json; ore/feature generation has no Bedrock equivalent
+- `configured_feature/red_kyber_ore`: worldgen feature not translatable — data/starwars/worldgen/configured_feature/red_kyber_ore.json; ore/feature generation has no Bedrock equivalent
+- `damage_type/blaster_bolt`: custom damage type not translatable — data/starwars/damage_type/blaster_bolt.json; Bedrock has no data-driven damage-type registry, so bolts/sabers deal generic damage there
+- `damage_type/force_lightning`: custom damage type not translatable — data/starwars/damage_type/force_lightning.json; Bedrock has no data-driven damage-type registry, so bolts/sabers deal generic damage there
+- `damage_type/lightsaber`: custom damage type not translatable — data/starwars/damage_type/lightsaber.json; Bedrock has no data-driven damage-type registry, so bolts/sabers deal generic damage there
+- `placed_feature/blue_kyber_ore`: worldgen placement not translatable — data/starwars/worldgen/placed_feature/blue_kyber_ore.json; ore/feature placement has no Bedrock equivalent
+- `placed_feature/green_kyber_ore`: worldgen placement not translatable — data/starwars/worldgen/placed_feature/green_kyber_ore.json; ore/feature placement has no Bedrock equivalent
+- `placed_feature/purple_kyber_ore`: worldgen placement not translatable — data/starwars/worldgen/placed_feature/purple_kyber_ore.json; ore/feature placement has no Bedrock equivalent
+- `placed_feature/red_kyber_ore`: worldgen placement not translatable — data/starwars/worldgen/placed_feature/red_kyber_ore.json; ore/feature placement has no Bedrock equivalent
+
 ## Jukebox songs not translatable
 
 Bedrock has no data-driven jukebox songs (`jukebox_song/`). The disc item itself translates as a plain item; the music only plays on Java:

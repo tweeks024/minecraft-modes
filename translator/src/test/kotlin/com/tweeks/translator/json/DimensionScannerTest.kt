@@ -147,4 +147,30 @@ class DimensionScannerTest {
         assertTrue(report.contains("## Custom biomes not translated")) { report }
         assertTrue(report.contains("## Custom noise settings / chunk generation not expressible")) { report }
     }
+
+    @Test
+    fun `damage types, features and biome modifiers are recorded as silent drops`(@TempDir tmp: Path) {
+        val modRoot = tmp.resolve("themod")
+        val families = mapOf(
+            "damage_type" to "blaster_bolt",
+            "worldgen/configured_feature" to "kyber_ore",
+            "worldgen/placed_feature" to "kyber_ore",
+            "neoforge/biome_modifier" to "add_troopers",
+        )
+        for ((family, id) in families) {
+            val dir = modRoot.resolve("src/generated/serverData/data/themod/$family")
+            dir.createDirectories()
+            dir.resolve("$id.json").writeText("{}")
+        }
+
+        val unt = Untranslatable()
+        DimensionScanner(unt).scan(modRoot, "themod")
+
+        val report = unt.renderReport("themod")
+        assertTrue(report.contains("## Other datapack registries not translatable")) { report }
+        assertTrue(report.contains("- `damage_type/blaster_bolt`")) { report }
+        assertTrue(report.contains("- `configured_feature/kyber_ore`")) { report }
+        assertTrue(report.contains("- `placed_feature/kyber_ore`")) { report }
+        assertTrue(report.contains("- `biome_modifier/add_troopers`")) { report }
+    }
 }
