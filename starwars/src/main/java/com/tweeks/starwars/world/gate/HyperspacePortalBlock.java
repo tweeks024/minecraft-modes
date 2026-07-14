@@ -36,6 +36,7 @@ import org.jspecify.annotations.Nullable;
  * frame is broken.
  */
 public class HyperspacePortalBlock extends Block implements Portal {
+    private static final org.slf4j.Logger LOGGER = com.mojang.logging.LogUtils.getLogger();
     public static final MapCodec<HyperspacePortalBlock> CODEC = simpleCodec(HyperspacePortalBlock::new);
     public static final EnumProperty<Planet> PLANET = EnumProperty.create("planet", Planet.class);
     public static final EnumProperty<Direction.Axis> AXIS = BlockStateProperties.HORIZONTAL_AXIS;
@@ -89,14 +90,22 @@ public class HyperspacePortalBlock extends Block implements Portal {
         }
         Planet destination = state.getValue(PLANET);
         if (destination.levelKey().equals(currentLevel.dimension())) {
+            LOGGER.info("Hyperspace jump refused for {}: gate at {} is aimed at the world it stands in ({})",
+                entity.getName().getString(), portalEntryPos, destination);
             return null; // gate aimed at the world it already stands in
         }
         ServerLevel targetLevel = currentLevel.getServer().getLevel(destination.levelKey());
         if (targetLevel == null) {
+            LOGGER.warn("Hyperspace jump refused for {}: dimension {} is not loaded in this world",
+                entity.getName().getString(), destination.levelKey().identifier());
             return null;
         }
         Planet origin = Planet.byLevel(currentLevel.dimension());
         boolean axisX = state.getValue(AXIS) == Direction.Axis.X;
+        LOGGER.info("Hyperspace jump: {} travelling {} -> {}",
+            entity.getName().getString(),
+            origin == null ? currentLevel.dimension().identifier() : origin,
+            destination);
         return PortalLink.exitFor(targetLevel, entity, origin == null ? Planet.HOME : origin, axisX);
     }
 

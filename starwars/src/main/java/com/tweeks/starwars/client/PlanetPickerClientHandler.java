@@ -14,6 +14,8 @@ public final class PlanetPickerClientHandler {
         ctx.enqueueWork(() -> {
             Minecraft mc = Minecraft.getInstance();
             if (mc.screen == null) {
+                com.mojang.logging.LogUtils.getLogger()
+                    .info("Opening planet picker for gate at {}", pkt.origin());
                 mc.setScreen(new PlanetPickerScreen(pkt.origin(), pkt.axisX()));
             }
         });

@@ -130,6 +130,36 @@ class GateShapeTest {
     }
 
     @Test
+    void anyFaceOfAnyRingBlockIgnites() {
+        // Simulates the star-compass UX: whichever ring block the player
+        // clicks (top of the lintel, outside of a jamb, …), the gate is
+        // found via findNearFrame. Corners are exempt — they have no
+        // interior neighbour.
+        Set<BlockPos> frame = ring(Direction.Axis.X, 2, 3, true);
+        for (BlockPos frameBlock : frame) {
+            boolean corner = frameBlock.getY() == -1 || frameBlock.getY() == 3
+                ? (frameBlock.getX() == -1 || frameBlock.getX() == 2)
+                : false;
+            Optional<GateShape.Result> result =
+                GateShape.findNearFrame(frameBlock, frameOf(frame), emptyExcept(frame));
+            if (corner) {
+                continue; // free-standing corners may legitimately fail
+            }
+            assertTrue(result.isPresent(), "gate not found from ring block " + frameBlock);
+            assertEquals(BlockPos.ZERO, result.get().origin());
+        }
+    }
+
+    @Test
+    void findNearFrameIgnoresLooseIronBlock() {
+        Set<BlockPos> frame = ring(Direction.Axis.X, 2, 3, true);
+        BlockPos loose = new BlockPos(40, 0, 40);
+        Set<BlockPos> world = new HashSet<>(frame);
+        world.add(loose);
+        assertTrue(GateShape.findNearFrame(loose, frameOf(world), emptyExcept(world)).isEmpty());
+    }
+
+    @Test
     void interiorPositionsEnumerateTheFullWindow() {
         Set<BlockPos> frame = ring(Direction.Axis.X, 3, 4, true);
         GateShape.Result result =

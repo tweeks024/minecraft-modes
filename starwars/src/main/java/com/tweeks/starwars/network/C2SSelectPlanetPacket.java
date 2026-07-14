@@ -68,14 +68,17 @@ public record C2SSelectPlanetPacket(BlockPos origin, boolean axisX, int wedge) i
             }
             ServerLevel level = player.level();
             if (player.distanceToSqr(pkt.origin().getCenter()) > MAX_REACH_SQ) {
+                LOGGER.info("Gate ignition rejected: {} too far from gate at {}", player.getName().getString(), pkt.origin());
                 return; // too far — stale or spoofed
             }
             if (destination.levelKey().equals(level.dimension())) {
+                LOGGER.info("Gate ignition rejected: {} picked {} while already in it", player.getName().getString(), destination);
                 player.sendSystemMessage(Component.translatable("starwars.gate.already_there"), true);
                 return;
             }
             Optional<GateShape.Result> shape = StarCompassItem.findShape(level, pkt.origin());
             if (shape.isEmpty()) {
+                LOGGER.info("Gate ignition rejected: frame at {} no longer valid", pkt.origin());
                 player.sendSystemMessage(Component.translatable("starwars.gate.invalid"), true);
                 return;
             }
@@ -83,11 +86,15 @@ public record C2SSelectPlanetPacket(BlockPos origin, boolean axisX, int wedge) i
             BlockState film = Registration.HYPERSPACE_PORTAL.get().defaultBlockState()
                 .setValue(HyperspacePortalBlock.PLANET, destination)
                 .setValue(HyperspacePortalBlock.AXIS, result.axis());
+            int placed = 0;
             for (BlockPos pos : result.interiorPositions()) {
                 if (!level.getBlockState(pos).equals(film)) {
                     level.setBlock(pos, film, Block.UPDATE_ALL);
+                    placed++;
                 }
             }
+            LOGGER.info("Gate at {} locked to {} by {} ({} film blocks placed)",
+                result.origin(), destination, player.getName().getString(), placed);
             PortalRecords.get(level).put(new PortalRecords.GateRecord(
                 result.origin(), result.axis() == Direction.Axis.X, destination));
             level.playSound(null, pkt.origin(), SoundEvents.END_PORTAL_SPAWN, SoundSource.BLOCKS, 0.7F, 1.4F);

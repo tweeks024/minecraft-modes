@@ -46,6 +46,29 @@ public final class GateShape {
     }
 
     /**
+     * Player-friendly entry point: the player clicked some face of a frame
+     * block — probe every in-plane neighbour of that block (both axes) so a
+     * click on ANY face of ANY ring block finds the gate. Only free-standing
+     * corner blocks have no interior neighbour and stay unignitable.
+     */
+    public static Optional<Result> findNearFrame(BlockPos frameBlock,
+                                                 Predicate<BlockPos> isFrame, Predicate<BlockPos> isInterior) {
+        for (Direction.Axis axis : new Direction.Axis[]{Direction.Axis.X, Direction.Axis.Z}) {
+            Direction along = alongAxis(axis);
+            for (Direction dir : new Direction[]{Direction.UP, along, along.getOpposite(), Direction.DOWN}) {
+                BlockPos start = frameBlock.relative(dir);
+                if (isInterior.test(start)) {
+                    Optional<Result> result = find(start, axis, isFrame, isInterior);
+                    if (result.isPresent()) {
+                        return result;
+                    }
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    /**
      * Searches the vertical plane through {@code start} along {@code axis}.
      * {@code isInterior} decides what counts as fillable interior (air,
      * replaceable plants, existing portal film for re-aiming); {@code isFrame}
