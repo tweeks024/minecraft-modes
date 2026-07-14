@@ -18,9 +18,10 @@ import net.minecraft.network.chat.Component;
  */
 public class GalaxyMapScreen extends Screen {
 
-    /** Same hues as the planet picker wedges, ordinal-aligned. */
+    /** Fallback silhouette hues for uncharted worlds, ordinal-aligned. */
     private static final int[] PLANET_COLORS = {
-        0xFFE8A33D, 0xFF57B86B, 0xFF8E6BE8, 0xFF6B8E4E, 0xFFA8D8F0, 0xFF6E7178, 0xFF4D9BE8,
+        0xFFE8A33D, 0xFF57B86B, 0xFF8E6BE8, 0xFF6B8E4E, 0xFFA8D8F0, 0xFF6E7178,
+        0xFF4E8636, 0xFFB0442A, 0xFF4D9BE8,
     };
 
     private final S2CGalaxyMapPacket data;

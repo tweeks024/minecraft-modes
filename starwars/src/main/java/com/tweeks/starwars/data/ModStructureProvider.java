@@ -3,6 +3,7 @@ package com.tweeks.starwars.data;
 import com.tweeks.starwars.StarWarsMod;
 import com.tweeks.starwars.world.EchoBaseStructure;
 import com.tweeks.starwars.world.EscapePodStructure;
+import com.tweeks.starwars.world.EwokVillageStructure;
 import com.tweeks.starwars.world.FerrixTownStructure;
 import com.tweeks.starwars.world.ImperialOutpostStructure;
 import com.tweeks.starwars.world.JediRuinStructure;
@@ -10,6 +11,7 @@ import com.tweeks.starwars.world.KraytSkeletonStructure;
 import com.tweeks.starwars.world.MoistureFarmStructure;
 import com.tweeks.starwars.world.MosEisleyStructure;
 import com.tweeks.starwars.world.SandcrawlerStructure;
+import com.tweeks.starwars.world.VaderCastleStructure;
 import com.tweeks.starwars.world.WampaCaveStructure;
 import com.tweeks.starwars.world.XwingWreckStructure;
 import com.tweeks.starwars.world.YodaHutStructure;
@@ -128,6 +130,22 @@ public final class ModStructureProvider {
         Registries.STRUCTURE_SET,
         Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "wampa_caves"));
 
+    public static final ResourceKey<Structure> EWOK_VILLAGE = ResourceKey.create(
+        Registries.STRUCTURE,
+        Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "ewok_village"));
+
+    public static final ResourceKey<StructureSet> EWOK_VILLAGE_SET = ResourceKey.create(
+        Registries.STRUCTURE_SET,
+        Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "ewok_villages"));
+
+    public static final ResourceKey<Structure> VADER_CASTLE = ResourceKey.create(
+        Registries.STRUCTURE,
+        Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "vader_castle"));
+
+    public static final ResourceKey<StructureSet> VADER_CASTLE_SET = ResourceKey.create(
+        Registries.STRUCTURE_SET,
+        Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "vader_castles"));
+
     public static void bootstrapStructures(BootstrapContext<Structure> ctx) {
         var biomes = ctx.lookup(Registries.BIOME);
         ctx.register(ESCAPE_POD, new EscapePodStructure(new Structure.StructureSettings(
@@ -222,6 +240,20 @@ public final class ModStructureProvider {
             Map.of(),                                  // no spawn overrides
             GenerationStep.Decoration.SURFACE_STRUCTURES,
             TerrainAdjustment.BEARD_THIN)));
+
+        ctx.register(EWOK_VILLAGE, new EwokVillageStructure(new Structure.StructureSettings(
+            HolderSet.direct(
+                biomes.getOrThrow(PlanetBiomes.ENDOR_FOREST)),
+            Map.of(),                                  // no spawn overrides
+            GenerationStep.Decoration.SURFACE_STRUCTURES,
+            TerrainAdjustment.BEARD_THIN)));
+
+        ctx.register(VADER_CASTLE, new VaderCastleStructure(new Structure.StructureSettings(
+            HolderSet.direct(
+                biomes.getOrThrow(PlanetBiomes.MUSTAFAR_WASTES)),
+            Map.of(),                                  // no spawn overrides
+            GenerationStep.Decoration.SURFACE_STRUCTURES,
+            TerrainAdjustment.BEARD_THIN)));           // beard the tall keep onto the lava plains
     }
 
     public static void bootstrapSets(BootstrapContext<StructureSet> ctx) {
@@ -273,5 +305,13 @@ public final class ModStructureProvider {
         ctx.register(WAMPA_CAVE_SET, new StructureSet(
             structures.getOrThrow(WAMPA_CAVE),
             new RandomSpreadStructurePlacement(20, 7, RandomSpreadType.LINEAR, 1977100512)));
+
+        ctx.register(EWOK_VILLAGE_SET, new StructureSet(
+            structures.getOrThrow(EWOK_VILLAGE),
+            new RandomSpreadStructurePlacement(28, 9, RandomSpreadType.LINEAR, 1977100513)));
+
+        ctx.register(VADER_CASTLE_SET, new StructureSet(
+            structures.getOrThrow(VADER_CASTLE),
+            new RandomSpreadStructurePlacement(40, 12, RandomSpreadType.LINEAR, 1977100514)));
     }
 }

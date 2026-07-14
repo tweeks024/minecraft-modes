@@ -59,6 +59,10 @@ public final class PlanetDimensions {
         ResourceKey.create(Registries.NOISE_SETTINGS, Identifier.fromNamespaceAndPath("starwars", "dagobah"));
     public static final ResourceKey<NoiseGeneratorSettings> HOTH_NOISE =
         ResourceKey.create(Registries.NOISE_SETTINGS, Identifier.fromNamespaceAndPath("starwars", "hoth"));
+    public static final ResourceKey<NoiseGeneratorSettings> ENDOR_NOISE =
+        ResourceKey.create(Registries.NOISE_SETTINGS, Identifier.fromNamespaceAndPath("starwars", "endor"));
+    public static final ResourceKey<NoiseGeneratorSettings> MUSTAFAR_NOISE =
+        ResourceKey.create(Registries.NOISE_SETTINGS, Identifier.fromNamespaceAndPath("starwars", "mustafar"));
 
     private PlanetDimensions() {
     }
@@ -93,6 +97,43 @@ public final class PlanetDimensions {
             EnvironmentAttributeMap.builder()
                 .set(EnvironmentAttributes.CLOUD_HEIGHT, 180.0F)
                 .set(EnvironmentAttributes.BED_RULE, BedRule.CAN_SLEEP_WHEN_DARK)
+                .set(EnvironmentAttributes.NETHER_PORTAL_SPAWNS_PIGLINS, false)
+                .set(EnvironmentAttributes.CAN_START_RAID, false)
+                .build(),
+            timelines.getOrThrow(TimelineTags.IN_OVERWORLD),
+            Optional.of(clocks.getOrThrow(WorldClocks.OVERWORLD))));
+
+        // Endor: bright forest-moon day, faint green canopy haze.
+        ctx.register(Planet.ENDOR.dimensionTypeKey(), new DimensionType(
+            false, true, false, false, 1.0, -64, 384, 384,
+            BlockTags.INFINIBURN_OVERWORLD, 0.0F, overworldMonsters,
+            DimensionType.Skybox.OVERWORLD, CardinalLighting.Type.DEFAULT,
+            EnvironmentAttributeMap.builder()
+                .set(EnvironmentAttributes.SKY_COLOR, 0xFF88BADE)
+                .set(EnvironmentAttributes.FOG_COLOR, 0xFFB4CBA0)
+                .set(EnvironmentAttributes.CLOUD_HEIGHT, 200.0F)
+                .set(EnvironmentAttributes.BED_RULE, BedRule.CAN_SLEEP_WHEN_DARK)
+                .set(EnvironmentAttributes.NETHER_PORTAL_SPAWNS_PIGLINS, false)
+                .set(EnvironmentAttributes.CAN_START_RAID, false)
+                .build(),
+            timelines.getOrThrow(TimelineTags.IN_OVERWORLD),
+            Optional.of(clocks.getOrThrow(WorldClocks.OVERWORLD))));
+
+        // Mustafar: a black-ash sky glowing from below, choking red haze,
+        // ambient heat-light so the ground never goes fully dark.
+        ctx.register(Planet.MUSTAFAR.dimensionTypeKey(), new DimensionType(
+            false, true, false, false, 1.0, -64, 384, 384,
+            BlockTags.INFINIBURN_OVERWORLD, 0.25F,
+            new DimensionType.MonsterSettings(net.minecraft.util.valueproviders.ConstantInt.of(7), 15),
+            DimensionType.Skybox.NONE, CardinalLighting.Type.DEFAULT,
+            EnvironmentAttributeMap.builder()
+                .set(EnvironmentAttributes.SKY_COLOR, 0xFF1A0F0C)
+                .set(EnvironmentAttributes.FOG_COLOR, 0xFF6E2410)
+                .set(EnvironmentAttributes.FOG_START_DISTANCE, 20.0F)
+                .set(EnvironmentAttributes.FOG_END_DISTANCE, 140.0F)
+                .set(EnvironmentAttributes.AMBIENT_LIGHT_COLOR, 0xFF7A3A20)
+                .set(EnvironmentAttributes.BED_RULE, BedRule.EXPLODES)
+                .set(EnvironmentAttributes.WATER_EVAPORATES, true)
                 .set(EnvironmentAttributes.NETHER_PORTAL_SPAWNS_PIGLINS, false)
                 .set(EnvironmentAttributes.CAN_START_RAID, false)
                 .build(),
@@ -206,6 +247,41 @@ public final class PlanetDimensions {
             base.noiseSettings(), base.defaultBlock(), base.defaultFluid(),
             base.noiseRouter(), hothSurface(), base.spawnTarget(), 63,
             false, true, false, false));
+        // Endor: lush green world, ordinary water and terrain.
+        ctx.register(ENDOR_NOISE, new NoiseGeneratorSettings(
+            base.noiseSettings(), base.defaultBlock(), base.defaultFluid(),
+            base.noiseRouter(), endorSurface(), base.spawnTarget(), 63,
+            false, true, false, false));
+        // Mustafar: seas of LAVA instead of water; volcanic surface.
+        ctx.register(MUSTAFAR_NOISE, new NoiseGeneratorSettings(
+            base.noiseSettings(), base.defaultBlock(), Blocks.LAVA.defaultBlockState(),
+            base.noiseRouter(), mustafarSurface(), base.spawnTarget(), 40,
+            false, false, false, false));
+    }
+
+    private static SurfaceRules.RuleSource endorSurface() {
+        SurfaceRules.RuleSource top = SurfaceRules.sequence(
+            // Podzol patches under the big trees, grass elsewhere.
+            SurfaceRules.ifTrue(SurfaceRules.noiseCondition(Noises.SURFACE, 0.25, Double.MAX_VALUE), state(Blocks.PODZOL)),
+            SurfaceRules.ifTrue(SurfaceRules.waterBlockCheck(-1, 0), state(Blocks.GRASS_BLOCK)),
+            state(Blocks.DIRT));
+        return SurfaceRules.sequence(
+            bedrockFloor(),
+            SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, top),
+            SurfaceRules.ifTrue(SurfaceRules.UNDER_FLOOR, state(Blocks.DIRT)));
+    }
+
+    private static SurfaceRules.RuleSource mustafarSurface() {
+        return SurfaceRules.sequence(
+            bedrockFloor(),
+            SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, SurfaceRules.sequence(
+                // Cooling crust: magma veins in the low hot zones, basalt
+                // fields, blackstone highlands.
+                SurfaceRules.ifTrue(SurfaceRules.noiseCondition(Noises.SURFACE, 0.35, Double.MAX_VALUE), state(Blocks.MAGMA_BLOCK)),
+                SurfaceRules.ifTrue(SurfaceRules.noiseCondition(Noises.SURFACE, -0.2, 0.35), state(Blocks.BASALT)),
+                state(Blocks.BLACKSTONE))),
+            SurfaceRules.ifTrue(SurfaceRules.UNDER_FLOOR, state(Blocks.BLACKSTONE)),
+            SurfaceRules.ifTrue(SurfaceRules.DEEP_UNDER_FLOOR, state(Blocks.BASALT)));
     }
 
     private static SurfaceRules.RuleSource state(net.minecraft.world.level.block.Block block) {
@@ -287,6 +363,67 @@ public final class PlanetDimensions {
         ctx.register(PlanetBiomes.DAGOBAH_SWAMP, dagobahBiome(features, carvers));
         ctx.register(PlanetBiomes.HOTH_PLAINS, hothBiome(features, carvers));
         ctx.register(PlanetBiomes.DEATH_STAR_INTERIOR, deathStarBiome(features, carvers));
+        ctx.register(PlanetBiomes.ENDOR_FOREST, endorBiome(features, carvers));
+        ctx.register(PlanetBiomes.MUSTAFAR_WASTES, mustafarBiome(features, carvers));
+    }
+
+    private static Biome endorBiome(HolderGetter<PlacedFeature> features, HolderGetter<ConfiguredWorldCarver<?>> carvers) {
+        MobSpawnSettings.Builder mobs = new MobSpawnSettings.Builder();
+        mobs.addSpawn(MobCategory.CREATURE, 8, new MobSpawnSettings.SpawnerData(EntityType.WOLF, 2, 4));
+        mobs.addSpawn(MobCategory.CREATURE, 6, new MobSpawnSettings.SpawnerData(EntityType.FOX, 1, 2));
+        mobs.addSpawn(MobCategory.MONSTER, 8, new MobSpawnSettings.SpawnerData(ModEntities.STORMTROOPER.get(), 1, 3));
+        // A few Ewoks forage the forest floor; the rest live in their villages.
+        mobs.addSpawn(MobCategory.CREATURE, 5, new MobSpawnSettings.SpawnerData(ModEntities.EWOK.get(), 2, 4));
+
+        BiomeGenerationSettings.Builder gen = new BiomeGenerationSettings.Builder(features, carvers);
+        BiomeDefaultFeatures.addDefaultCarversAndLakes(gen);
+        BiomeDefaultFeatures.addDefaultCrystalFormations(gen);
+        BiomeDefaultFeatures.addDefaultUndergroundVariety(gen);
+        BiomeDefaultFeatures.addDefaultSprings(gen);
+        BiomeDefaultFeatures.addDefaultOres(gen);
+        BiomeDefaultFeatures.addDefaultSoftDisks(gen);
+        gen.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, VegetationPlacements.TREES_OLD_GROWTH_SPRUCE_TAIGA);
+        gen.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, VegetationPlacements.TREES_TAIGA);
+        BiomeDefaultFeatures.addFerns(gen);
+        BiomeDefaultFeatures.addDefaultFlowers(gen);
+        BiomeDefaultFeatures.addGiantTaigaVegetation(gen);
+        BiomeDefaultFeatures.addDefaultMushrooms(gen);
+
+        return new Biome.BiomeBuilder()
+            .hasPrecipitation(true)
+            .temperature(0.6F)
+            .downfall(0.8F)
+            .setAttribute(EnvironmentAttributes.SKY_COLOR, 0xFF88BADE)
+            .specialEffects(new BiomeSpecialEffects.Builder()
+                .waterColor(0x3E6E52)
+                .foliageColorOverride(0x3A6E28)
+                .build())
+            .mobSpawnSettings(mobs.build())
+            .generationSettings(gen.build())
+            .build();
+    }
+
+    private static Biome mustafarBiome(HolderGetter<PlacedFeature> features, HolderGetter<ConfiguredWorldCarver<?>> carvers) {
+        MobSpawnSettings.Builder mobs = new MobSpawnSettings.Builder();
+        mobs.addSpawn(MobCategory.MONSTER, 12, new MobSpawnSettings.SpawnerData(ModEntities.STORMTROOPER.get(), 2, 4));
+        mobs.addSpawn(MobCategory.MONSTER, 8, new MobSpawnSettings.SpawnerData(EntityType.MAGMA_CUBE, 1, 3));
+
+        BiomeGenerationSettings.Builder gen = new BiomeGenerationSettings.Builder(features, carvers);
+        BiomeDefaultFeatures.addDefaultCarversAndLakes(gen);
+        BiomeDefaultFeatures.addDefaultUndergroundVariety(gen);
+        BiomeDefaultFeatures.addDefaultOres(gen);
+        gen.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, features.getOrThrow(ModOreFeatures.RED_ORE_PLACED));
+
+        return new Biome.BiomeBuilder()
+            .hasPrecipitation(false)
+            .temperature(2.0F)
+            .downfall(0.0F)
+            .setAttribute(EnvironmentAttributes.SKY_COLOR, 0xFF1A0F0C)
+            .setAttribute(EnvironmentAttributes.FOG_COLOR, 0xFF6E2410)
+            .specialEffects(new BiomeSpecialEffects.Builder().waterColor(0x8A2A10).build())
+            .mobSpawnSettings(mobs.build())
+            .generationSettings(gen.build())
+            .build();
     }
 
     private static Biome deathStarBiome(HolderGetter<PlacedFeature> features, HolderGetter<ConfiguredWorldCarver<?>> carvers) {
@@ -505,5 +642,17 @@ public final class PlanetDimensions {
         ctx.register(Planet.DEATH_STAR.stemKey(), new LevelStem(
             types.getOrThrow(Planet.DEATH_STAR.dimensionTypeKey()),
             new DeathStarChunkGenerator(biomes.getOrThrow(PlanetBiomes.DEATH_STAR_INTERIOR))));
+
+        ctx.register(Planet.ENDOR.stemKey(), new LevelStem(
+            types.getOrThrow(Planet.ENDOR.dimensionTypeKey()),
+            new NoiseBasedChunkGenerator(
+                new FixedBiomeSource(biomes.getOrThrow(PlanetBiomes.ENDOR_FOREST)),
+                noise.getOrThrow(ENDOR_NOISE))));
+
+        ctx.register(Planet.MUSTAFAR.stemKey(), new LevelStem(
+            types.getOrThrow(Planet.MUSTAFAR.dimensionTypeKey()),
+            new NoiseBasedChunkGenerator(
+                new FixedBiomeSource(biomes.getOrThrow(PlanetBiomes.MUSTAFAR_WASTES)),
+                noise.getOrThrow(MUSTAFAR_NOISE))));
     }
 }

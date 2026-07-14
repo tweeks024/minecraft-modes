@@ -643,6 +643,46 @@ GROGU_CUBES = [
     ('robe_skirt', GROGU_BODY_BONE, (-2.5, -2.0, -2.0, 5, 3, 4), (14, 22)),
 ]
 
+# Ewok (32x32): small furry forest native. Feet at world-y 0; legs 0..5,
+# body 5..11, head/hood 10..17 (sunk onto the body, no neck), two ear bumps
+# at world-y 14..16. HEAD/BODY bone origins honor the brief (head @ y=13,
+# body @ y=7); Java bone-y = 24 - world-y (head 11, body 17, arms 13, legs 19).
+#
+# HEAD+HOOD MERGED: the brief lists a 7x6x6 head plus an 8x7x7 hood cube, but
+# two head-region cubes that big cannot both be box-UV-packed onto a 32x32
+# sheet alongside body+limbs (head net alone is 26x12; a second ~26-30-wide
+# net leaves no room for the body's 9-tall net). So the 'head' bone carries a
+# single 8x7x7 cube painted as the furry cowl with a tan face on its front —
+# the natural way to render a hooded face on a small sheet. The repo's other
+# hooded humanoids (jedi_knight/obi_wan) keep a discrete hood cube only
+# because they are 64x64. Ears stay as two 1x2x2 bumps on the head bone.
+EWOK_HEAD_BONE = (0, 13, 0)
+EWOK_BODY_BONE = (0, 7, 0)
+EWOK_RARM_BONE = (-3.5, 11, 0)
+EWOK_LARM_BONE = (3.5, 11, 0)
+EWOK_RLEG_BONE = (-1, 5, 0)
+EWOK_LLEG_BONE = (1, 5, 0)
+
+EWOK_BONE_DEFS = [
+    ('head', EWOK_HEAD_BONE),
+    ('body', EWOK_BODY_BONE),
+    ('right_arm', EWOK_RARM_BONE),
+    ('left_arm', EWOK_LARM_BONE),
+    ('right_leg', EWOK_RLEG_BONE),
+    ('left_leg', EWOK_LLEG_BONE),
+]
+
+EWOK_CUBES = [
+    ('head',      EWOK_HEAD_BONE, (-4.0, -4.0, -3.5, 8, 7, 7), (0, 0)),
+    ('ear_right', EWOK_HEAD_BONE, (-5.0, -3.0, -1.0, 1, 2, 2), (24, 14)),
+    ('ear_left',  EWOK_HEAD_BONE, ( 4.0, -3.0, -1.0, 1, 2, 2), (24, 18)),
+    ('body',      EWOK_BODY_BONE, (-2.5, -4.0, -1.5, 5, 6, 3), (0, 14)),
+    ('right_arm', EWOK_RARM_BONE, (-1.0,  0.0, -1.0, 2, 6, 2), (16, 14)),
+    ('left_arm',  EWOK_LARM_BONE, (-1.0,  0.0, -1.0, 2, 6, 2), (0, 23)),
+    ('right_leg', EWOK_RLEG_BONE, (-1.0,  0.0, -1.0, 2, 5, 2), (8, 23)),
+    ('left_leg',  EWOK_LLEG_BONE, (-1.0,  0.0, -1.0, 2, 5, 2), (16, 23)),
+]
+
 # mob_name -> bone_defs override (only needed for mobs whose bone set/pivots
 # aren't the standard humanoid table).
 MOB_BONE_DEFS = {
@@ -663,6 +703,7 @@ MOB_BONE_DEFS = {
     'band_droid': BAND_DROID_BONE_DEFS,
     'chewbacca': CHEWBACCA_BONE_DEFS,
     'grogu': GROGU_BONE_DEFS,
+    'ewok': EWOK_BONE_DEFS,
 }
 
 # mob_name -> (tex_width, tex_height) for non-64x64 texture canvases.
@@ -674,6 +715,7 @@ MOB_TEX_SIZES = {
     'tie_fighter': (128, 64),
     'at_at': (256, 128),
     'grogu': (32, 32),
+    'ewok': (32, 32),
     # speeder_bike + band_droid + chewbacca use the default 64x64 canvas.
 }
 
@@ -725,6 +767,8 @@ MOBS = {
     # Companions: custom skeletons (see *_BONE_DEFS above).
     'chewbacca': CHEWBACCA_CUBES,
     'grogu': GROGU_CUBES,
+    # Forest native: small humanoid-skeleton rig (see EWOK_BONE_DEFS above).
+    'ewok': EWOK_CUBES,
 }
 
 

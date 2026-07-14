@@ -101,6 +101,20 @@ public final class ModStructures {
         STRUCTURE_PIECES.register("wampa_cave",
             () -> (StructurePieceType) WampaCavePiece::new);
 
+    public static final DeferredHolder<StructureType<?>, StructureType<EwokVillageStructure>> EWOK_VILLAGE_TYPE =
+        STRUCTURE_TYPES.register("ewok_village", () -> () -> EwokVillageStructure.CODEC);
+
+    public static final DeferredHolder<StructurePieceType, StructurePieceType> EWOK_VILLAGE_PIECE =
+        STRUCTURE_PIECES.register("ewok_village",
+            () -> (StructurePieceType) EwokVillagePiece::new);
+
+    public static final DeferredHolder<StructureType<?>, StructureType<VaderCastleStructure>> VADER_CASTLE_TYPE =
+        STRUCTURE_TYPES.register("vader_castle", () -> () -> VaderCastleStructure.CODEC);
+
+    public static final DeferredHolder<StructurePieceType, StructurePieceType> VADER_CASTLE_PIECE =
+        STRUCTURE_PIECES.register("vader_castle",
+            () -> (StructurePieceType) VaderCastlePiece::new);
+
     public static void register(IEventBus modEventBus) {
         STRUCTURE_TYPES.register(modEventBus);
         STRUCTURE_PIECES.register(modEventBus);

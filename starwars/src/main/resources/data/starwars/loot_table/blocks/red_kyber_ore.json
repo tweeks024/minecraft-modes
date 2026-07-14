@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "starwars:kyber_crystal",
+          "functions": [
+            { "function": "minecraft:set_components",
+              "components": { "starwars:kyber_color": 2 } }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -35,6 +35,8 @@ PORTALS = {
     'dagobah':   (0x6B, 0x8E, 0x4E),   # murky swamp green
     'hoth':      (0xA8, 0xD8, 0xF0),   # glacier blue-white
     'death_star': (0x9A, 0x9E, 0xA6),  # cold imperial gray
+    'endor':     (0x4E, 0xA8, 0x54),   # forest green
+    'mustafar':  (0xF0, 0x6A, 0x1E),   # lava orange
     'home':      (0x4D, 0x9B, 0xE8),   # blue
 }
 
@@ -156,6 +158,7 @@ KYBER_ORES = {
     'blue_kyber_ore':   (0x3E, 0x7B, 0xFF),
     'green_kyber_ore':  (0x3B, 0xE8, 0x6B),
     'purple_kyber_ore': (0xA6, 0x3B, 0xE8),
+    'red_kyber_ore':    (0xFF, 0x2A, 0x2A),
 }
 
 # Deepslate host stone — 4 tones (darkest "pit" .. lightest fleck).

@@ -1,0 +1,14 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 1977100513,
+    "separation": 9,
+    "spacing": 28
+  },
+  "structures": [
+    {
+      "structure": "starwars:ewok_village",
+      "weight": 1
+    }
+  ]
+}

@@ -100,6 +100,16 @@ def _surface(name, seed, sx, sy, sz, base):
         if cap:
             return (0xF4, 0xFA, 0xFF)
         return _mix(base, (0x9A, 0xC4, 0xE4), n * 0.5)
+    if name == 'endor':
+        if n < 0.30:
+            return (0x2E, 0x5A, 0x74)
+        return _mix(base, (0x2A, 0x52, 0x22), n * 0.7)
+    if name == 'mustafar':
+        if n > 0.72:
+            return (0xF0, 0x7A, 0x1E)
+        if n > 0.55:
+            return (0xB0, 0x38, 0x10)
+        return _mix(base, (0x1C, 0x14, 0x12), n * 0.5)
     if name == 'death_star':
         # Grey plating, a dark equatorial trench, and the superlaser dish
         # up and to the right.
@@ -126,6 +136,8 @@ PLANETS = {
     'dagobah':    (0x4A, 0x58, 0x36),
     'hoth':       (0xC6, 0xE2, 0xF2),
     'death_star': (0x7C, 0x80, 0x88),
+    'endor':      (0x3C, 0x66, 0x30),
+    'mustafar':   (0x3A, 0x1E, 0x16),
     'home':       (0x4D, 0x9B, 0xE8),
 }
 

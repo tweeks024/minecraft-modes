@@ -62,6 +62,10 @@ public final class Registration {
         GREEN_KYBER_ORE = BLOCKS.registerBlock("green_kyber_ore", net.minecraft.world.level.block.Block::new, kyberOreProps());
     public static final net.neoforged.neoforge.registries.DeferredBlock<net.minecraft.world.level.block.Block>
         PURPLE_KYBER_ORE = BLOCKS.registerBlock("purple_kyber_ore", net.minecraft.world.level.block.Block::new, kyberOreProps());
+    // Red kyber is bled, not grown — the only place it occurs raw is the
+    // fire of Mustafar, hot enough to make the crystals scream.
+    public static final net.neoforged.neoforge.registries.DeferredBlock<net.minecraft.world.level.block.Block>
+        RED_KYBER_ORE = BLOCKS.registerBlock("red_kyber_ore", net.minecraft.world.level.block.Block::new, kyberOreProps());
 
     public static final DeferredItem<net.minecraft.world.item.BlockItem> BLUE_KYBER_ORE_ITEM =
         ITEMS.registerSimpleBlockItem(BLUE_KYBER_ORE);
@@ -69,6 +73,8 @@ public final class Registration {
         ITEMS.registerSimpleBlockItem(GREEN_KYBER_ORE);
     public static final DeferredItem<net.minecraft.world.item.BlockItem> PURPLE_KYBER_ORE_ITEM =
         ITEMS.registerSimpleBlockItem(PURPLE_KYBER_ORE);
+    public static final DeferredItem<net.minecraft.world.item.BlockItem> RED_KYBER_ORE_ITEM =
+        ITEMS.registerSimpleBlockItem(RED_KYBER_ORE);
 
     public static final DeferredItem<com.tweeks.starwars.item.KyberCrystalItem> KYBER_CRYSTAL =
         ITEMS.registerItem("kyber_crystal", com.tweeks.starwars.item.KyberCrystalItem::new, p -> p);
@@ -162,6 +168,9 @@ public final class Registration {
 
     public static final DeferredItem<SpawnEggItem> GROGU_SPAWN_EGG = ITEMS.registerItem(
         "grogu_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.GROGU.get()));
+
+    public static final DeferredItem<SpawnEggItem> EWOK_SPAWN_EGG = ITEMS.registerItem(
+        "ewok_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.EWOK.get()));
 
     public static final DeferredItem<Item> STORMTROOPER_HELMET = ITEMS.registerItem("stormtrooper_helmet",
         Item::new,
@@ -270,6 +279,7 @@ public final class Registration {
                     output.accept(BLUE_KYBER_ORE.get());
                     output.accept(GREEN_KYBER_ORE.get());
                     output.accept(PURPLE_KYBER_ORE.get());
+                    output.accept(RED_KYBER_ORE.get());
                     output.accept(SABER_HILT.get());
                     for (com.tweeks.starwars.item.SaberColor color : com.tweeks.starwars.item.SaberColor.values()) {
                         output.accept(com.tweeks.starwars.item.KyberCrystalItem.withColor(color));
@@ -289,6 +299,7 @@ public final class Registration {
                     output.accept(BAND_DROID_SPAWN_EGG.get());
                     output.accept(CHEWBACCA_SPAWN_EGG.get());
                     output.accept(GROGU_SPAWN_EGG.get());
+                    output.accept(EWOK_SPAWN_EGG.get());
                     // Later tasks append their items here.
                 })
                 .build());

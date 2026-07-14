@@ -324,6 +324,16 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
 
         // Grogu: no drops — you would never.
         this.add(ModEntities.GROGU.get(), LootTable.lootTable());
+
+        // Ewok: 0-2 sticks (spear hafts) + 0-1 leather (hide scraps).
+        this.add(ModEntities.EWOK.get(),
+            LootTable.lootTable()
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.STICK)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(0.0f, 2.0f)))))
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.LEATHER)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(0.0f, 1.0f))))));
     }
 
     @Override
@@ -353,7 +363,8 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
             ModEntities.AT_AT.get(),
             ModEntities.BAND_DROID.get(),
             ModEntities.CHEWBACCA.get(),
-            ModEntities.GROGU.get()
+            ModEntities.GROGU.get(),
+            ModEntities.EWOK.get()
         );
         return BuiltInRegistries.ENTITY_TYPE.stream().filter(known::contains);
     }

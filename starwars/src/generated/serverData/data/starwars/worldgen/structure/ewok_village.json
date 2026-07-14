@@ -1,0 +1,7 @@
+{
+  "type": "starwars:ewok_village",
+  "biomes": "starwars:endor_forest",
+  "spawn_overrides": {},
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin"
+}

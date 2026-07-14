@@ -1,0 +1,11 @@
+{
+  "type": "starwars:endor",
+  "generator": {
+    "type": "minecraft:noise",
+    "biome_source": {
+      "type": "minecraft:fixed",
+      "biome": "starwars:endor_forest"
+    },
+    "settings": "starwars:endor"
+  }
+}

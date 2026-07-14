@@ -1,0 +1,7 @@
+{
+  "type": "starwars:vader_castle",
+  "biomes": "starwars:mustafar_wastes",
+  "spawn_overrides": {},
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin"
+}

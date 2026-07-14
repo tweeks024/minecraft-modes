@@ -1,0 +1,38 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": { "type": "minecraft:uniform", "min": 3, "max": 5 },
+      "entries": [
+        { "type": "minecraft:item", "name": "minecraft:iron_ingot", "weight": 18,
+          "functions": [ { "function": "minecraft:set_count",
+                           "count": { "type": "minecraft:uniform", "min": 2, "max": 5 } } ] },
+        { "type": "minecraft:item", "name": "minecraft:gold_ingot", "weight": 12,
+          "functions": [ { "function": "minecraft:set_count",
+                           "count": { "type": "minecraft:uniform", "min": 1, "max": 4 } } ] },
+        { "type": "minecraft:item", "name": "minecraft:obsidian", "weight": 12,
+          "functions": [ { "function": "minecraft:set_count",
+                           "count": { "type": "minecraft:uniform", "min": 1, "max": 3 } } ] },
+        { "type": "minecraft:item", "name": "minecraft:blaze_powder", "weight": 10,
+          "functions": [ { "function": "minecraft:set_count",
+                           "count": { "type": "minecraft:uniform", "min": 1, "max": 3 } } ] }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        { "type": "minecraft:item", "name": "starwars:blaster_rifle", "weight": 3 },
+        { "type": "minecraft:empty", "weight": 17 }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        { "type": "minecraft:item", "name": "starwars:kyber_crystal", "weight": 2,
+          "functions": [ { "function": "minecraft:set_components",
+                           "components": { "starwars:kyber_color": 2 } } ] },
+        { "type": "minecraft:empty", "weight": 18 }
+      ]
+    }
+  ]
+}

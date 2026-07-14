@@ -41,6 +41,18 @@
         },
         "planet=death_star,axis=z": {
             "model": "starwars:block/hyperspace_portal_death_star_z"
+        },
+        "planet=endor,axis=x": {
+            "model": "starwars:block/hyperspace_portal_endor_x"
+        },
+        "planet=endor,axis=z": {
+            "model": "starwars:block/hyperspace_portal_endor_z"
+        },
+        "planet=mustafar,axis=x": {
+            "model": "starwars:block/hyperspace_portal_mustafar_x"
+        },
+        "planet=mustafar,axis=z": {
+            "model": "starwars:block/hyperspace_portal_mustafar_z"
         }
     }
 }

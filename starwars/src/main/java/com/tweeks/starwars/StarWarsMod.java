@@ -139,6 +139,13 @@ public class StarWarsMod {
                 net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 net.minecraft.world.entity.PathfinderMob::checkMobSpawnRules,
                 net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
+            // Ewok is a CREATURE — generic ground mob rule (like the Jedi
+            // Knight). Group/village spawn wiring is left to the integrator.
+            event.register(ModEntities.EWOK.get(),
+                net.minecraft.world.entity.SpawnPlacementTypes.ON_GROUND,
+                net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                net.minecraft.world.entity.PathfinderMob::checkMobSpawnRules,
+                net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operation.REPLACE);
         });
     }
 
@@ -197,5 +204,7 @@ public class StarWarsMod {
             com.tweeks.starwars.entity.ChewbaccaEntity.createAttributes().build());
         event.put(ModEntities.GROGU.get(),
             com.tweeks.starwars.entity.GroguEntity.createAttributes().build());
+        event.put(ModEntities.EWOK.get(),
+            com.tweeks.starwars.entity.EwokEntity.createAttributes().build());
     }
 }

@@ -33,10 +33,12 @@ public final class ModOreFeatures {
     public static final ResourceKey<ConfiguredFeature<?, ?>> BLUE_ORE = configured("blue_kyber_ore");
     public static final ResourceKey<ConfiguredFeature<?, ?>> GREEN_ORE = configured("green_kyber_ore");
     public static final ResourceKey<ConfiguredFeature<?, ?>> PURPLE_ORE = configured("purple_kyber_ore");
+    public static final ResourceKey<ConfiguredFeature<?, ?>> RED_ORE = configured("red_kyber_ore");
 
     public static final ResourceKey<PlacedFeature> BLUE_ORE_PLACED = placed("blue_kyber_ore");
     public static final ResourceKey<PlacedFeature> GREEN_ORE_PLACED = placed("green_kyber_ore");
     public static final ResourceKey<PlacedFeature> PURPLE_ORE_PLACED = placed("purple_kyber_ore");
+    public static final ResourceKey<PlacedFeature> RED_ORE_PLACED = placed("red_kyber_ore");
 
     private static final RuleTest STONE = new TagMatchTest(BlockTags.STONE_ORE_REPLACEABLES);
     private static final RuleTest DEEPSLATE = new TagMatchTest(BlockTags.DEEPSLATE_ORE_REPLACEABLES);
@@ -56,6 +58,7 @@ public final class ModOreFeatures {
         register(ctx, BLUE_ORE, Registration.BLUE_KYBER_ORE.get());
         register(ctx, GREEN_ORE, Registration.GREEN_KYBER_ORE.get());
         register(ctx, PURPLE_ORE, Registration.PURPLE_KYBER_ORE.get());
+        register(ctx, RED_ORE, Registration.RED_KYBER_ORE.get());
     }
 
     private static void register(BootstrapContext<ConfiguredFeature<?, ?>> ctx,
@@ -71,6 +74,7 @@ public final class ModOreFeatures {
         register(ctx, BLUE_ORE_PLACED, configured.getOrThrow(BLUE_ORE));
         register(ctx, GREEN_ORE_PLACED, configured.getOrThrow(GREEN_ORE));
         register(ctx, PURPLE_ORE_PLACED, configured.getOrThrow(PURPLE_ORE));
+        register(ctx, RED_ORE_PLACED, configured.getOrThrow(RED_ORE));
     }
 
     private static void register(BootstrapContext<PlacedFeature> ctx, ResourceKey<PlacedFeature> key,

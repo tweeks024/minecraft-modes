@@ -19,8 +19,8 @@ import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 public class PlanetPickerScreen extends Screen {
 
     private static final double DEADZONE_PX = 18.0;
-    private static final int OUTER_RADIUS_PX = 95;
-    private static final int DISC_HALF_PX = 15;
+    private static final int OUTER_RADIUS_PX = 100;
+    private static final int DISC_HALF_PX = 14;
 
     private final BlockPos gateOrigin;
     private final boolean axisX;

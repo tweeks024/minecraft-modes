@@ -252,6 +252,16 @@ public final class ModEntities {
             .build(ResourceKey.create(Registries.ENTITY_TYPE,
                 Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "grogu"))));
 
+    // ---- forest native: small melee fighter of the Rebellion ----
+
+    public static final DeferredHolder<EntityType<?>, EntityType<com.tweeks.starwars.entity.EwokEntity>> EWOK =
+        ENTITY_TYPES.register("ewok", () -> EntityType.Builder.<com.tweeks.starwars.entity.EwokEntity>of(
+                com.tweeks.starwars.entity.EwokEntity::new, MobCategory.CREATURE)
+            .sized(0.6f, 1.0f)
+            .clientTrackingRange(10)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "ewok"))));
+
     public static void register(IEventBus modEventBus) {
         ENTITY_TYPES.register(modEventBus);
     }

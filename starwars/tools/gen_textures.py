@@ -1579,6 +1579,67 @@ def paint_grogu(rgba):
     for fx in (20, 24, 28):                          # cloth folds
         rectb(rgba, bw, fx, 26, fx + 1, 29, GROGU_ROBE_SH)
 
+# Ewok (32x32): warm-brown furry forest native in a russet cowl. The 'head'
+# bone carries ONE 8x7x7 cube that serves as both head and hood (a separate
+# inner-head + outer-hood cube pair cannot be box-UV-packed onto 32x32
+# alongside body+limbs — see tools/gen_bbmodels.py EWOK_CUBES note); its top/
+# back/sides paint as the russet cowl, its FRONT face (x7..15, y7..14) as a
+# tan face patch framed by the cowl, with big dark eyes + a tiny black nose.
+# Body/arms/legs are warm brown fur (3 browns) with shaggy vertical banding;
+# tiny dark paws/feet at the cuffs. Two 1x2x2 ear bumps flank the head.
+EWOK_FUR     = (0x7A, 0x50, 0x2E, 0xFF)   # warm brown base
+EWOK_FUR_HI  = (0x9A, 0x68, 0x3E, 0xFF)   # lighter brown
+EWOK_FUR_SH  = (0x52, 0x34, 0x1C, 0xFF)   # darker brown
+EWOK_HOOD    = (0x8A, 0x3E, 0x2A, 0xFF)   # russet cowl (contrasting earthy)
+EWOK_HOOD_HI = (0xA4, 0x52, 0x38, 0xFF)
+EWOK_HOOD_SH = (0x5E, 0x28, 0x1A, 0xFF)
+EWOK_FACE    = (0xC8, 0x9E, 0x6E, 0xFF)   # lighter tan face patch
+EWOK_FACE_HI = (0xDE, 0xB8, 0x8A, 0xFF)
+EWOK_FACE_SH = (0xA0, 0x7A, 0x50, 0xFF)
+EWOK_EYE     = (0x1E, 0x12, 0x0A, 0xFF)   # big dark friendly eye
+EWOK_EYE_HI  = (0x6A, 0x4A, 0x30, 0xFF)   # warm catchlight
+EWOK_NOSE    = (0x14, 0x0C, 0x08, 0xFF)   # tiny black nose
+EWOK_PAW     = (0x46, 0x2C, 0x18, 0xFF)   # dark paws/feet
+
+def paint_ewok(rgba):
+    bw = 32
+    fill_buf(rgba, (0, 0, 0, 0))
+    # Head/hood 8x7x7 @(0,0): russet cowl on every face; a couple of fur
+    # streaks on the wraparound so the cowl reads shaggy, not smooth cloth.
+    shade_box(rgba, bw, 0, 0, 8, 7, 7, EWOK_HOOD, EWOK_HOOD_HI, EWOK_HOOD_SH)
+    speckle(rgba, bw, 0, 8, 30, 13, EWOK_HOOD_SH, mod=5, salt=41)
+    # Face on the FRONT face (x7..15, y7..14): tan patch inset one pixel so the
+    # russet cowl frames it on every side.
+    rectb(rgba, bw, 8, 8, 14, 13, EWOK_FACE)
+    rectb(rgba, bw, 8, 8, 14, 9, EWOK_FACE_HI)      # brow highlight
+    rectb(rgba, bw, 8, 9, 10, 11, EWOK_EYE)         # left eye (2x2, big)
+    rectb(rgba, bw, 12, 9, 14, 11, EWOK_EYE)        # right eye
+    rectb(rgba, bw, 8, 9, 9, 10, EWOK_EYE_HI)       # catchlight L
+    rectb(rgba, bw, 12, 9, 13, 10, EWOK_EYE_HI)     # catchlight R
+    rectb(rgba, bw, 10, 11, 12, 12, EWOK_NOSE)      # tiny black nose
+    rectb(rgba, bw, 9, 12, 13, 13, EWOK_FACE_SH)    # muzzle/mouth shadow
+    # Body 5x6x3 @(0,14): warm brown fur, shaggy vertical banding, lighter belly.
+    shade_box(rgba, bw, 0, 14, 5, 6, 3, EWOK_FUR, EWOK_FUR_HI, EWOK_FUR_SH)
+    speckle(rgba, bw, 0, 17, 16, 23, EWOK_FUR_SH, mod=4, salt=42)
+    for bx in (1, 4, 7, 10, 13):                     # vertical fur bands
+        rectb(rgba, bw, bx, 18, bx + 1, 22, EWOK_FUR_SH)
+    rectb(rgba, bw, 4, 18, 7, 22, EWOK_FUR_HI)       # lighter chest/belly (front)
+    rectb(rgba, bw, 5, 19, 6, 22, EWOK_FUR_SH)       # belly center fold
+    # Arms 2x6x2 @(16,14)/(0,23): brown fur + dark paw at the cuff.
+    for (u0, v0) in ((16, 14), (0, 23)):
+        shade_box(rgba, bw, u0, v0, 2, 6, 2, EWOK_FUR, EWOK_FUR_HI, EWOK_FUR_SH)
+        speckle(rgba, bw, u0, v0 + 2, u0 + 8, v0 + 6, EWOK_FUR_SH, mod=3, salt=43)
+        rectb(rgba, bw, u0, v0 + 6, u0 + 8, v0 + 8, EWOK_PAW)   # tiny hands
+    # Legs 2x5x2 @(8,23)/(16,23): brown fur + dark feet at the sole.
+    for u0 in (8, 16):
+        shade_box(rgba, bw, u0, 23, 2, 5, 2, EWOK_FUR, EWOK_FUR_HI, EWOK_FUR_SH)
+        speckle(rgba, bw, u0, 25, u0 + 8, 30, EWOK_FUR_SH, mod=3, salt=44)
+        rectb(rgba, bw, u0, 29, u0 + 8, 30, EWOK_PAW)           # feet
+    # Ears 1x2x2 @(24,14)/(24,18): russet outer with a dark inner hollow.
+    for v0 in (14, 18):
+        shade_box(rgba, bw, 24, v0, 1, 2, 2, EWOK_HOOD, EWOK_HOOD_HI, EWOK_HOOD_SH)
+        rectb(rgba, bw, 26, v0 + 2, 27, v0 + 4, EWOK_FUR_SH)    # inner ear hollow
+
 MOBS = {
     'stormtrooper': paint_stormtrooper,
     'battle_droid': paint_battle_droid,
@@ -1618,6 +1679,8 @@ SIZED_MOBS = {
     'at_at': (256, 128, paint_at_at),
     # Companion: Grogu on a compact 32x32 canvas.
     'grogu': (32, 32, paint_grogu),
+    # Forest native: Ewok on a compact 32x32 canvas.
+    'ewok': (32, 32, paint_ewok),
 }
 
 # Worn-armor equipment layers: standard 64x32 vanilla armor-sheet UV layout

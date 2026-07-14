@@ -21,6 +21,10 @@ public final class PlanetBiomes {
     public static final ResourceKey<Biome> HOTH_PLAINS = key("hoth_plains");
     /** Death Star: the interior of the battle station. */
     public static final ResourceKey<Biome> DEATH_STAR_INTERIOR = key("death_star_interior");
+    /** Endor: the forest moon of towering conifers. */
+    public static final ResourceKey<Biome> ENDOR_FOREST = key("endor_forest");
+    /** Mustafar: rivers of lava under a black-ash sky. */
+    public static final ResourceKey<Biome> MUSTAFAR_WASTES = key("mustafar_wastes");
 
     private PlanetBiomes() {
     }

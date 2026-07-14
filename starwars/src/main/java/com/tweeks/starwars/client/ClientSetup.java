@@ -10,6 +10,7 @@ import com.tweeks.starwars.client.model.BattleDroidModel;
 import com.tweeks.starwars.client.model.BobaFettModel;
 import com.tweeks.starwars.client.model.BogwingModel;
 import com.tweeks.starwars.client.model.ChewbaccaModel;
+import com.tweeks.starwars.client.model.EwokModel;
 import com.tweeks.starwars.client.model.GroguModel;
 import com.tweeks.starwars.client.model.DragonsnakeModel;
 import com.tweeks.starwars.client.model.HanSoloModel;
@@ -72,6 +73,7 @@ public final class ClientSetup {
         // companions
         event.registerEntityRenderer(ModEntities.CHEWBACCA.get(), ChewbaccaRenderer::new);
         event.registerEntityRenderer(ModEntities.GROGU.get(), GroguRenderer::new);
+        event.registerEntityRenderer(ModEntities.EWOK.get(), EwokRenderer::new);
     }
 
     @SubscribeEvent
@@ -107,5 +109,6 @@ public final class ClientSetup {
         // companions
         event.registerLayerDefinition(ChewbaccaModel.LAYER_LOCATION, ChewbaccaModel::createBodyLayer);
         event.registerLayerDefinition(GroguModel.LAYER_LOCATION, GroguModel::createBodyLayer);
+        event.registerLayerDefinition(EwokModel.LAYER_LOCATION, EwokModel::createBodyLayer);
     }
 }

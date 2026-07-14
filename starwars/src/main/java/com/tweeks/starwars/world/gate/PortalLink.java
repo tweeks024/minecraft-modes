@@ -128,6 +128,8 @@ public final class PortalLink {
             case DAGOBAH -> Blocks.MUD_BRICKS.defaultBlockState();
             case HOTH -> Blocks.PACKED_ICE.defaultBlockState();
             case DEATH_STAR -> Blocks.LIGHT_GRAY_CONCRETE.defaultBlockState();
+            case ENDOR -> Blocks.MOSSY_COBBLESTONE.defaultBlockState();
+            case MUSTAFAR -> Blocks.POLISHED_BLACKSTONE.defaultBlockState();
             case ANDOR, HOME -> Blocks.STONE_BRICKS.defaultBlockState();
         };
     }
