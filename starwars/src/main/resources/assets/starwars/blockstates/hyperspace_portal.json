@@ -1,0 +1,12 @@
+{
+    "variants": {
+        "planet=tatooine,axis=x": { "model": "starwars:block/hyperspace_portal_tatooine_x" },
+        "planet=tatooine,axis=z": { "model": "starwars:block/hyperspace_portal_tatooine_z" },
+        "planet=andor,axis=x": { "model": "starwars:block/hyperspace_portal_andor_x" },
+        "planet=andor,axis=z": { "model": "starwars:block/hyperspace_portal_andor_z" },
+        "planet=coruscant,axis=x": { "model": "starwars:block/hyperspace_portal_coruscant_x" },
+        "planet=coruscant,axis=z": { "model": "starwars:block/hyperspace_portal_coruscant_z" },
+        "planet=home,axis=x": { "model": "starwars:block/hyperspace_portal_home_x" },
+        "planet=home,axis=z": { "model": "starwars:block/hyperspace_portal_home_z" }
+    }
+}

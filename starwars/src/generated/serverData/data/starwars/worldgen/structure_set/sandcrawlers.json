@@ -1,0 +1,14 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 1977100505,
+    "separation": 12,
+    "spacing": 40
+  },
+  "structures": [
+    {
+      "structure": "starwars:sandcrawler",
+      "weight": 1
+    }
+  ]
+}

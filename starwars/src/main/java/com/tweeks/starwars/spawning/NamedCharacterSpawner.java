@@ -104,38 +104,51 @@ public final class NamedCharacterSpawner {
         Registries.STRUCTURE,
         Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "jedi"));
 
-    private static final Set<ResourceKey<Biome>> VADER_BIOMES =
-        Set.of(Biomes.DESERT, Biomes.BADLANDS, Biomes.PLAINS);
     private static final Set<ResourceKey<Biome>> JEDI_BIOMES =
         Set.of(Biomes.FOREST, Biomes.JUNGLE, Biomes.TAIGA, Biomes.PLAINS);
-    private static final Set<ResourceKey<Biome>> BOBA_FETT_BIOMES =
-        Set.of(Biomes.DESERT, Biomes.BADLANDS);
+    /** Vader rules Coruscant now — he only appears in the endless city. */
+    private static final Set<ResourceKey<Biome>> VADER_BIOMES =
+        Set.of(com.tweeks.starwars.world.planet.PlanetBiomes.CORUSCANT_CITY);
+    /** Boba Fett hunts on Tatooine. */
+    private static final Set<ResourceKey<Biome>> BOBA_FETT_BIOMES = Set.of(
+        com.tweeks.starwars.world.planet.PlanetBiomes.DUNE_SEA,
+        com.tweeks.starwars.world.planet.PlanetBiomes.JUNDLAND_WASTES);
 
     private static int tickCounter = 0;
 
     @SubscribeEvent
     public static void onServerLevelTick(LevelTickEvent.Post event) {
         if (!(event.getLevel() instanceof ServerLevel sl)) return;
-        // LevelTickEvent fires once per loaded dimension per tick. Named
-        // characters only gate on overworld biomes, so restrict to the
-        // overworld — this also keeps tickCounter incrementing at 1x per
-        // game tick instead of 3x when nether/end are also loaded (mirrors
-        // LawmanVillageSpawner / AnomalyVillageSpawner).
+        // LevelTickEvent fires once per loaded dimension per tick; the
+        // overworld tick is the clock, and each roll then runs in the
+        // character's home dimension (Vader → Coruscant, Boba → Tatooine,
+        // heroes → overworld). A roll silently no-ops while nobody is in
+        // that dimension because tryRollCharacter needs a player to anchor.
         if (sl.dimension() != Level.OVERWORLD) return;
         if (++tickCounter < CHECK_INTERVAL_TICKS) return;
         tickCounter = 0;
 
-        tryRollCharacter(sl, VaderSavedData.get(sl.getServer()),
-            ModEntities.DARTH_VADER.get(), VADER_BIOMES, IMPERIAL_STRUCTURES, true);
-        tryRollCharacter(sl, LukeSavedData.get(sl.getServer()),
+        var server = sl.getServer();
+        ServerLevel coruscant = server.getLevel(
+            com.tweeks.starwars.world.planet.Planet.CORUSCANT.levelKey());
+        ServerLevel tatooine = server.getLevel(
+            com.tweeks.starwars.world.planet.Planet.TATOOINE.levelKey());
+
+        if (coruscant != null) {
+            tryRollCharacter(coruscant, VaderSavedData.get(server),
+                ModEntities.DARTH_VADER.get(), VADER_BIOMES, IMPERIAL_STRUCTURES, true);
+        }
+        if (tatooine != null) {
+            tryRollCharacter(tatooine, BobaFettSavedData.get(server),
+                ModEntities.BOBA_FETT.get(), BOBA_FETT_BIOMES, IMPERIAL_STRUCTURES, false);
+        }
+        tryRollCharacter(sl, LukeSavedData.get(server),
             ModEntities.LUKE_SKYWALKER.get(), JEDI_BIOMES, JEDI_STRUCTURES, false);
-        tryRollCharacter(sl, ObiWanSavedData.get(sl.getServer()),
+        tryRollCharacter(sl, ObiWanSavedData.get(server),
             ModEntities.OBI_WAN.get(), JEDI_BIOMES, JEDI_STRUCTURES, false);
-        tryRollCharacter(sl, BobaFettSavedData.get(sl.getServer()),
-            ModEntities.BOBA_FETT.get(), BOBA_FETT_BIOMES, IMPERIAL_STRUCTURES, false);
-        tryRollCharacter(sl, HanSavedData.get(sl.getServer()),
+        tryRollCharacter(sl, HanSavedData.get(server),
             ModEntities.HAN_SOLO.get(), JEDI_BIOMES, JEDI_STRUCTURES, false);
-        tryRollCharacter(sl, LeiaSavedData.get(sl.getServer()),
+        tryRollCharacter(sl, LeiaSavedData.get(server),
             ModEntities.PRINCESS_LEIA.get(), JEDI_BIOMES, JEDI_STRUCTURES, false);
     }
 

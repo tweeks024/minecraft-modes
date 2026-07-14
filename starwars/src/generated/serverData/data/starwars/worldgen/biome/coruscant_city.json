@@ -1,0 +1,39 @@
+{
+  "attributes": {
+    "minecraft:visual/fog_color": "#53387a",
+    "minecraft:visual/sky_color": "#2b1b4d"
+  },
+  "carvers": [],
+  "downfall": 0.0,
+  "effects": {
+    "water_color": "#3f76e4"
+  },
+  "features": [],
+  "has_precipitation": false,
+  "spawn_costs": {},
+  "spawners": {
+    "ambient": [],
+    "axolotls": [],
+    "creature": [
+      {
+        "type": "starwars:jedi_knight",
+        "maxCount": 1,
+        "minCount": 1,
+        "weight": 3
+      }
+    ],
+    "misc": [],
+    "monster": [
+      {
+        "type": "starwars:battle_droid",
+        "maxCount": 4,
+        "minCount": 2,
+        "weight": 14
+      }
+    ],
+    "underground_water_creature": [],
+    "water_ambient": [],
+    "water_creature": []
+  },
+  "temperature": 0.6
+}

@@ -38,6 +38,34 @@ public final class ModStructures {
         STRUCTURE_PIECES.register("jedi_ruin",
             () -> (StructurePieceType) JediRuinPiece::new);
 
+    public static final DeferredHolder<StructureType<?>, StructureType<MoistureFarmStructure>> MOISTURE_FARM_TYPE =
+        STRUCTURE_TYPES.register("moisture_farm", () -> () -> MoistureFarmStructure.CODEC);
+
+    public static final DeferredHolder<StructurePieceType, StructurePieceType> MOISTURE_FARM_PIECE =
+        STRUCTURE_PIECES.register("moisture_farm",
+            () -> (StructurePieceType) MoistureFarmPiece::new);
+
+    public static final DeferredHolder<StructureType<?>, StructureType<SandcrawlerStructure>> SANDCRAWLER_TYPE =
+        STRUCTURE_TYPES.register("sandcrawler", () -> () -> SandcrawlerStructure.CODEC);
+
+    public static final DeferredHolder<StructurePieceType, StructurePieceType> SANDCRAWLER_PIECE =
+        STRUCTURE_PIECES.register("sandcrawler",
+            () -> (StructurePieceType) SandcrawlerPiece::new);
+
+    public static final DeferredHolder<StructureType<?>, StructureType<FerrixTownStructure>> FERRIX_TOWN_TYPE =
+        STRUCTURE_TYPES.register("ferrix_town", () -> () -> FerrixTownStructure.CODEC);
+
+    public static final DeferredHolder<StructurePieceType, StructurePieceType> FERRIX_TOWN_PIECE =
+        STRUCTURE_PIECES.register("ferrix_town",
+            () -> (StructurePieceType) FerrixTownPiece::new);
+
+    public static final DeferredHolder<StructureType<?>, StructureType<KraytSkeletonStructure>> KRAYT_SKELETON_TYPE =
+        STRUCTURE_TYPES.register("krayt_skeleton", () -> () -> KraytSkeletonStructure.CODEC);
+
+    public static final DeferredHolder<StructurePieceType, StructurePieceType> KRAYT_SKELETON_PIECE =
+        STRUCTURE_PIECES.register("krayt_skeleton",
+            () -> (StructurePieceType) KraytSkeletonPiece::new);
+
     public static void register(IEventBus modEventBus) {
         STRUCTURE_TYPES.register(modEventBus);
         STRUCTURE_PIECES.register(modEventBus);

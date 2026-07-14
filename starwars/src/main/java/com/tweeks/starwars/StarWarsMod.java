@@ -20,6 +20,7 @@ public class StarWarsMod {
         com.tweeks.starwars.item.ModDataComponents.register(modEventBus);
         com.tweeks.starwars.faction.ModAttachments.register(modEventBus);
         com.tweeks.starwars.world.ModStructures.register(modEventBus);
+        com.tweeks.starwars.world.planet.ModChunkGenerators.register(modEventBus);
 
         modEventBus.addListener(StarWarsMod::registerEntityAttributes);
 

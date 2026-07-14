@@ -64,6 +64,18 @@ public class ModLanguageProvider extends LanguageProvider {
         add("screen.starwars.force_radial", "Force Powers");
         add("screen.starwars.force_radial.prompt", "Select Power");
 
+        add(com.tweeks.starwars.Registration.STAR_COMPASS.get(), "Star Compass");
+        add(com.tweeks.starwars.Registration.HYPERSPACE_PORTAL.get(), "Hyperspace Portal");
+        add("screen.starwars.planet_radial", "Hyperspace Navigation");
+        add("screen.starwars.planet_radial.prompt", "Choose Destination");
+        add("starwars.planet.tatooine", "Tatooine");
+        add("starwars.planet.andor", "Andor");
+        add("starwars.planet.coruscant", "Coruscant");
+        add("starwars.planet.home", "Home");
+        add("starwars.gate.invalid", "The gate frame is incomplete - build an iron block rectangle (2x3 up to 8x8 inside)");
+        add("starwars.gate.already_there", "This gate already leads to the world you are standing in");
+        add("starwars.gate.locked", "Destination locked: %s");
+
         add("death.attack.starwars.blaster_bolt", "%1$s was vaporized by %2$s");
         add("death.attack.starwars.blaster_bolt.player", "%1$s was vaporized by %2$s");
         add("death.attack.starwars.blaster_bolt.item", "%1$s was vaporized by %2$s using %3$s");

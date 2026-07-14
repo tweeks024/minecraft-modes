@@ -424,6 +424,71 @@ def gen_landspeeder(out_path):
 
     write_png(out_path, rgba)
 
+def gen_star_compass(out_path):
+    """16x16 star-compass icon for the hyperspace-portal feature: a round
+    brass/gold compass body (stepped-circle silhouette via outline_and_fill,
+    rim highlight top-left / shade bottom-right per the existing icon style),
+    a dark navy star-field face with 4 tiny white star pixels, a 4-point
+    white needle with light-blue tips centered on the face, and a small red
+    north pixel above the needle."""
+    rgba = bytearray(W * H * 4)  # fully transparent
+
+    brass    = (0xC8, 0x9A, 0x46, 0xFF)
+    brass_hi = (0xE8, 0xC8, 0x74, 0xFF)
+    brass_sh = (0x8E, 0x66, 0x2C, 0xFF)
+    brass_ol = (0x2E, 0x20, 0x0E, 0xFF)   # deep-brown outline
+    navy     = (0x14, 0x1C, 0x34, 0xFF)   # star-field face
+    navy_dk  = (0x0C, 0x12, 0x24, 0xFF)   # face shade, lower rows
+    star     = (0xF0, 0xF4, 0xFF, 0xFF)
+    needle   = (0xF6, 0xF9, 0xFF, 0xFF)
+    needle_b = (0x9C, 0xC4, 0xF0, 0xFF)   # light-blue needle tips
+    north    = (0xC0, 0x30, 0x28, 0xFF)
+
+    # Round body: stepped-circle silhouette, 3 brass tones + outline.
+    segs = [
+        (2,  [(5, 11)]),
+        (3,  [(4, 12)]),
+        (4,  [(3, 13)]),
+        (5,  [(2, 14)]),
+        (6,  [(2, 14)]),
+        (7,  [(2, 14)]),
+        (8,  [(2, 14)]),
+        (9,  [(2, 14)]),
+        (10, [(2, 14)]),
+        (11, [(3, 13)]),
+        (12, [(4, 12)]),
+        (13, [(5, 11)]),
+    ]
+    outline_and_fill(rgba, segs, outline=brass_ol, base=brass, hi=brass_hi,
+                      sh=brass_sh, hi_rows={2, 3, 4}, sh_rows={11, 12, 13})
+
+    # Face: inset navy disc (leaves a 1-2px brass ring inside the outline),
+    # shaded darker on the bottom rows.
+    rect(rgba, 6, 4, 10, 5, navy)
+    rect(rgba, 5, 5, 11, 6, navy)
+    rect(rgba, 4, 6, 12, 10, navy)
+    rect(rgba, 5, 10, 11, 11, navy_dk)
+    rect(rgba, 6, 11, 10, 12, navy_dk)
+
+    # Tiny background stars on the face, clear of the needle arms.
+    rect(rgba, 5, 5, 6, 6, star)
+    rect(rgba, 11, 6, 12, 7, star)
+    rect(rgba, 4, 9, 5, 10, star)
+    rect(rgba, 9, 11, 10, 12, star)
+
+    # 4-point star needle: white cross arms with light-blue tips.
+    rect(rgba, 7, 5, 9, 11, needle)     # N-S arm
+    rect(rgba, 5, 7, 11, 9, needle)     # E-W arm
+    rect(rgba, 7, 5, 9, 6, needle_b)    # north tip
+    rect(rgba, 7, 10, 9, 11, needle_b)  # south tip
+    rect(rgba, 5, 7, 6, 9, needle_b)    # west tip
+    rect(rgba, 10, 7, 11, 9, needle_b)  # east tip
+
+    # Red north marker, just above the needle's north tip.
+    rect(rgba, 7, 4, 8, 5, north)
+
+    write_png(out_path, rgba)
+
 if __name__ == '__main__':
     out_dir = sys.argv[1] if len(sys.argv) > 1 else '.'
     # blaster_pistol.png / blaster_rifle.png are no longer generated here —
@@ -437,4 +502,5 @@ if __name__ == '__main__':
     gen_han_solo_leggings(os.path.join(out_dir, 'han_solo_leggings.png'))
     gen_han_solo_boots(os.path.join(out_dir, 'han_solo_boots.png'))
     gen_landspeeder(os.path.join(out_dir, 'landspeeder.png'))
+    gen_star_compass(os.path.join(out_dir, 'star_compass.png'))
     print('OK')

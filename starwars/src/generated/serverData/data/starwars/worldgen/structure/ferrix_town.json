@@ -1,0 +1,7 @@
+{
+  "type": "starwars:ferrix_town",
+  "biomes": "starwars:aldhani_highlands",
+  "spawn_overrides": {},
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin"
+}

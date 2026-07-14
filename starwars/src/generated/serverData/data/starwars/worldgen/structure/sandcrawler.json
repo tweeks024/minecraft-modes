@@ -1,0 +1,7 @@
+{
+  "type": "starwars:sandcrawler",
+  "biomes": "starwars:dune_sea",
+  "spawn_overrides": {},
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin"
+}

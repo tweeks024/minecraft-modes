@@ -1,0 +1,10 @@
+{
+  "type": "starwars:krayt_skeleton",
+  "biomes": [
+    "starwars:dune_sea",
+    "starwars:jundland_wastes"
+  ],
+  "spawn_overrides": {},
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin"
+}

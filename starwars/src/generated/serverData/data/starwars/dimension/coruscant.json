@@ -1,0 +1,7 @@
+{
+  "type": "starwars:coruscant",
+  "generator": {
+    "type": "starwars:coruscant",
+    "biome": "starwars:coruscant_city"
+  }
+}

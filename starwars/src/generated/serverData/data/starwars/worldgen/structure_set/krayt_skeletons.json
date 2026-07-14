@@ -1,0 +1,14 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 1977100507,
+    "separation": 10,
+    "spacing": 32
+  },
+  "structures": [
+    {
+      "structure": "starwars:krayt_skeleton",
+      "weight": 1
+    }
+  ]
+}

@@ -27,8 +27,16 @@ public class DataGenerators {
             .add(Registries.DAMAGE_TYPE, ModDamageTypeProvider::bootstrap)
             .add(net.neoforged.neoforge.registries.NeoForgeRegistries.Keys.BIOME_MODIFIERS,
                  ModBiomeModifierProvider::bootstrap)
+            .add(Registries.DIMENSION_TYPE,
+                 com.tweeks.starwars.world.planet.PlanetDimensions::bootstrapDimensionTypes)
+            .add(Registries.NOISE_SETTINGS,
+                 com.tweeks.starwars.world.planet.PlanetDimensions::bootstrapNoiseSettings)
+            .add(Registries.BIOME,
+                 com.tweeks.starwars.world.planet.PlanetDimensions::bootstrapBiomes)
             .add(Registries.STRUCTURE, ModStructureProvider::bootstrapStructures)
-            .add(Registries.STRUCTURE_SET, ModStructureProvider::bootstrapSets);
+            .add(Registries.STRUCTURE_SET, ModStructureProvider::bootstrapSets)
+            .add(Registries.LEVEL_STEM,
+                 com.tweeks.starwars.world.planet.PlanetDimensions::bootstrapStems);
         gen.addProvider(true, new DatapackBuiltinEntriesProvider(
             output, lookup, builder, Set.of(StarWarsMod.MOD_ID)));
 

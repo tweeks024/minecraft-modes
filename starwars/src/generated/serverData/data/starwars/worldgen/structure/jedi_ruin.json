@@ -2,7 +2,8 @@
   "type": "starwars:jedi_ruin",
   "biomes": [
     "minecraft:forest",
-    "minecraft:jungle"
+    "minecraft:jungle",
+    "starwars:jundland_wastes"
   ],
   "spawn_overrides": {},
   "step": "surface_structures",

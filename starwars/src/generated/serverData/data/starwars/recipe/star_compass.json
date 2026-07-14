@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "A": "minecraft:amethyst_shard",
+    "C": "minecraft:compass",
+    "G": "minecraft:gold_ingot"
+  },
+  "pattern": [
+    "AGA",
+    "GCG",
+    "AGA"
+  ],
+  "result": {
+    "id": "starwars:star_compass"
+  }
+}

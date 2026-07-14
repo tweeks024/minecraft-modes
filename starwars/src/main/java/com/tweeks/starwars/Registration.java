@@ -16,8 +16,26 @@ public final class Registration {
     public static final DeferredRegister.Items ITEMS =
         DeferredRegister.createItems(StarWarsMod.MOD_ID);
 
+    public static final DeferredRegister.Blocks BLOCKS =
+        DeferredRegister.createBlocks(StarWarsMod.MOD_ID);
+
     public static final DeferredRegister<CreativeModeTab> CREATIVE_TABS =
         DeferredRegister.create(Registries.CREATIVE_MODE_TAB, StarWarsMod.MOD_ID);
+
+    // Technical block — no BlockItem; the film only exists inside gate frames.
+    public static final net.neoforged.neoforge.registries.DeferredBlock<com.tweeks.starwars.world.gate.HyperspacePortalBlock>
+        HYPERSPACE_PORTAL = BLOCKS.registerBlock("hyperspace_portal",
+            com.tweeks.starwars.world.gate.HyperspacePortalBlock::new,
+            () -> net.minecraft.world.level.block.state.BlockBehaviour.Properties.of()
+                .noCollision()
+                .strength(-1.0F)
+                .sound(net.minecraft.world.level.block.SoundType.GLASS)
+                .lightLevel(state -> 11)
+                .pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK)
+                .noLootTable());
+
+    public static final DeferredItem<com.tweeks.starwars.item.StarCompassItem> STAR_COMPASS =
+        ITEMS.registerItem("star_compass", com.tweeks.starwars.item.StarCompassItem::new, p -> p);
 
     public static final DeferredItem<com.tweeks.starwars.item.BlasterPistolItem> BLASTER_PISTOL =
         ITEMS.registerItem("blaster_pistol", com.tweeks.starwars.item.BlasterPistolItem::new, p -> p);
@@ -147,11 +165,14 @@ public final class Registration {
                     output.accept(HAN_SOLO_CHESTPLATE.get());
                     output.accept(HAN_SOLO_LEGGINGS.get());
                     output.accept(HAN_SOLO_BOOTS.get());
+                    output.accept(STAR_COMPASS.get());
                     // Later tasks append their items here.
                 })
                 .build());
 
     public static void register(IEventBus modEventBus) {
+        // Blocks first so BlockItems (if any ever exist) can resolve them.
+        BLOCKS.register(modEventBus);
         ITEMS.register(modEventBus);
         CREATIVE_TABS.register(modEventBus);
     }

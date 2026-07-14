@@ -1,0 +1,11 @@
+{
+  "type": "starwars:andor",
+  "generator": {
+    "type": "minecraft:noise",
+    "biome_source": {
+      "type": "minecraft:fixed",
+      "biome": "starwars:aldhani_highlands"
+    },
+    "settings": "starwars:andor"
+  }
+}

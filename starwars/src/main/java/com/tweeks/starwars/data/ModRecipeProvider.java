@@ -54,6 +54,18 @@ public class ModRecipeProvider extends RecipeProvider {
             .unlockedBy("has_quartz", this.has(Items.QUARTZ))
             .save(this.output);
 
+        // Star Compass: gold cross + amethyst corners around a compass —
+        // the key that ignites hyperspace gates.
+        ShapedRecipeBuilder.shaped(itemLookup, RecipeCategory.TOOLS, Registration.STAR_COMPASS.get())
+            .pattern("AGA")
+            .pattern("GCG")
+            .pattern("AGA")
+            .define('A', Items.AMETHYST_SHARD)
+            .define('G', Items.GOLD_INGOT)
+            .define('C', Items.COMPASS)
+            .unlockedBy("has_compass", this.has(Items.COMPASS))
+            .save(this.output);
+
         // Blasters: iron ingots + redstone + iron nuggets (astromech "parts").
         ShapedRecipeBuilder.shaped(itemLookup, RecipeCategory.COMBAT, Registration.BLASTER_PISTOL.get())
             .pattern("II")

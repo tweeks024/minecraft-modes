@@ -2,7 +2,9 @@
   "type": "starwars:imperial_outpost",
   "biomes": [
     "minecraft:desert",
-    "minecraft:badlands"
+    "minecraft:badlands",
+    "starwars:aldhani_highlands",
+    "starwars:jundland_wastes"
   ],
   "spawn_overrides": {},
   "step": "surface_structures",
