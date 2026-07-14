@@ -1,0 +1,151 @@
+{
+  "format_version": "1.16.0",
+  "minecraft:geometry": [
+    {
+      "description": {
+        "identifier": "geometry.starwars.dragonsnake",
+        "texture_width": 64,
+        "texture_height": 64,
+        "visible_bounds_width": 4,
+        "visible_bounds_height": 4,
+        "visible_bounds_offset": [
+          0,
+          0,
+          0
+        ]
+      },
+      "bones": [
+        {
+          "name": "head",
+          "pivot": [
+            0,
+            2,
+            -12
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -3,
+                0,
+                -20
+              ],
+              "size": [
+                6,
+                4,
+                8
+              ],
+              "uv": [
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "name": "seg0",
+          "pivot": [
+            0,
+            4,
+            -12
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -2.5,
+                0,
+                -12
+              ],
+              "size": [
+                5,
+                4,
+                8
+              ],
+              "uv": [
+                28,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "name": "seg1",
+          "pivot": [
+            0,
+            4,
+            -4
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -2.5,
+                0,
+                -4
+              ],
+              "size": [
+                5,
+                4,
+                8
+              ],
+              "uv": [
+                0,
+                12
+              ]
+            }
+          ]
+        },
+        {
+          "name": "seg2",
+          "pivot": [
+            0,
+            4,
+            4
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -2.5,
+                0,
+                4
+              ],
+              "size": [
+                5,
+                4,
+                8
+              ],
+              "uv": [
+                26,
+                12
+              ]
+            }
+          ]
+        },
+        {
+          "name": "seg3",
+          "pivot": [
+            0,
+            4,
+            12
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -2.5,
+                0,
+                12
+              ],
+              "size": [
+                5,
+                4,
+                8
+              ],
+              "uv": [
+                0,
+                24
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

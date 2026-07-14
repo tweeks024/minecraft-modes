@@ -24,15 +24,26 @@ Bedrock recipes do not accept Java's datagen-only `category` hint; the field is 
 Bedrock has no equivalent of Java's `random_sequence` field; loot rolls use the level RNG instead.
 
 - `entities/astromech.json`
+- `entities/bantha.json`
 - `entities/battle_droid.json`
 - `entities/boba_fett.json`
+- `entities/bogwing.json`
 - `entities/darth_vader.json`
+- `entities/dragonsnake.json`
 - `entities/han_solo.json`
+- `entities/jawa.json`
 - `entities/jedi_knight.json`
 - `entities/luke_skywalker.json`
 - `entities/obi_wan.json`
 - `entities/princess_leia.json`
+- `entities/probe_droid.json`
+- `entities/rebel_trooper.json`
+- `entities/snowtrooper.json`
 - `entities/stormtrooper.json`
+- `entities/tauntaun.json`
+- `entities/tusken_raider.json`
+- `entities/wampa.json`
+- `entities/yoda.json`
 
 ## Sound `subtitle` dropped
 
@@ -64,9 +75,14 @@ These goals produced a `// TODO LLM:` stub at `behavior_pack/scripts/goals/<Goal
 - `HanQuickdrawGoal` — cache miss; run :translate --with-llm to translate
 - `LeiaRallyGoal` — cache miss; run :translate --with-llm to translate
 - `LukeLeapGoal` — cache miss; run :translate --with-llm to translate
+- `NearestAttackableTargetGoal` — cache miss; run :translate --with-llm to translate
 - `ObiWanPushGoal` — cache miss; run :translate --with-llm to translate
+- `ProbeBlasterGoal` — cache miss; run :translate --with-llm to translate
+- `ProbeHoverGoal` — cache miss; run :translate --with-llm to translate
+- `RandomSwimmingGoal` — cache miss; run :translate --with-llm to translate
 - `SwTargetGoal` — cache miss; run :translate --with-llm to translate
 - `VaderChokeGoal` — cache miss; run :translate --with-llm to translate
+- `YodaLeapGoal` — cache miss; run :translate --with-llm to translate
 
 ## Entity goals gated off per-entity
 
@@ -88,9 +104,21 @@ These goals are registered on a shared superclass but gated by a per-entity cond
 
 - MeleeAttackGoal goal gated off for this entity by usesBlaster()
 
+### `RebelTrooperEntity`
+
+- MeleeAttackGoal goal gated off for this entity by usesBlaster()
+
+### `SnowtrooperEntity`
+
+- MeleeAttackGoal goal gated off for this entity by usesBlaster()
+
 ### `StormtrooperEntity`
 
 - MeleeAttackGoal goal gated off for this entity by usesBlaster()
+
+### `TauntaunEntity`
+
+- PanicGoal goal dropped — anonymous canUse gate unresolvable: canUse override, but no abstract boolean gate method in the hierarchy
 
 ## Item custom behavior
 
@@ -136,15 +164,32 @@ These items have a `resource_pack/attachables/<id>.json` (from a `.bbmodel`) who
 These spawn eggs received default base/overlay colors because the Java side computes them at runtime via `EntityType.Builder` defaults. Hand-tune per the source mod's mob palette if the colors look wrong in-game:
 
 - `astromech_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
+- `bantha_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `battle_droid_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `boba_fett_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
+- `bogwing_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `darth_vader_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
+- `dragonsnake_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `han_solo_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
+- `jawa_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `jedi_knight_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `luke_skywalker_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `obi_wan_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `princess_leia_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
+- `probe_droid_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
+- `rebel_trooper_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
+- `snowtrooper_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `stormtrooper_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
+- `tauntaun_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
+- `tusken_raider_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
+- `wampa_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
+- `yoda_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
+
+## Render-controller texture mapping ambiguous
+
+The Java entity renderer is too complex to parse statically. Phase 2 fell back to a heuristic geometry/texture name. Verify visually in-game and adjust the emitted `<entity_id>.entity.json` if wrong:
+
+- `snowtrooper`: no bbmodel matched id 'snowtrooper'; defaulted to 'geometry.humanoid'.
 
 ## Custom dimensions not translatable
 
@@ -152,9 +197,13 @@ Bedrock add-ons cannot define new dimensions — there is no counterpart to Java
 
 - `dimension/andor`: custom dimension not expressible in a Bedrock add-on — data/starwars/dimension/andor.json; the planet world and travel into it are Java-only
 - `dimension/coruscant`: custom dimension not expressible in a Bedrock add-on — data/starwars/dimension/coruscant.json; the planet world and travel into it are Java-only
+- `dimension/dagobah`: custom dimension not expressible in a Bedrock add-on — data/starwars/dimension/dagobah.json; the planet world and travel into it are Java-only
+- `dimension/hoth`: custom dimension not expressible in a Bedrock add-on — data/starwars/dimension/hoth.json; the planet world and travel into it are Java-only
 - `dimension/tatooine`: custom dimension not expressible in a Bedrock add-on — data/starwars/dimension/tatooine.json; the planet world and travel into it are Java-only
 - `dimension_type/andor`: custom dimension type not expressible in a Bedrock add-on — data/starwars/dimension_type/andor.json; sky/light/height rules for the planet are Java-only
 - `dimension_type/coruscant`: custom dimension type not expressible in a Bedrock add-on — data/starwars/dimension_type/coruscant.json; sky/light/height rules for the planet are Java-only
+- `dimension_type/dagobah`: custom dimension type not expressible in a Bedrock add-on — data/starwars/dimension_type/dagobah.json; sky/light/height rules for the planet are Java-only
+- `dimension_type/hoth`: custom dimension type not expressible in a Bedrock add-on — data/starwars/dimension_type/hoth.json; sky/light/height rules for the planet are Java-only
 - `dimension_type/tatooine`: custom dimension type not expressible in a Bedrock add-on — data/starwars/dimension_type/tatooine.json; sky/light/height rules for the planet are Java-only
 
 ## Custom biomes not translated
@@ -163,7 +212,9 @@ The translator has no Bedrock biome emitter, so these `worldgen/biome` datapack 
 
 - `aldhani_highlands`: custom biome not translated (no Bedrock biome emitter) — data/starwars/worldgen/biome/aldhani_highlands.json; surface rules, ambience, and spawn lists stay Java-only
 - `coruscant_city`: custom biome not translated (no Bedrock biome emitter) — data/starwars/worldgen/biome/coruscant_city.json; surface rules, ambience, and spawn lists stay Java-only
+- `dagobah_swamp`: custom biome not translated (no Bedrock biome emitter) — data/starwars/worldgen/biome/dagobah_swamp.json; surface rules, ambience, and spawn lists stay Java-only
 - `dune_sea`: custom biome not translated (no Bedrock biome emitter) — data/starwars/worldgen/biome/dune_sea.json; surface rules, ambience, and spawn lists stay Java-only
+- `hoth_plains`: custom biome not translated (no Bedrock biome emitter) — data/starwars/worldgen/biome/hoth_plains.json; surface rules, ambience, and spawn lists stay Java-only
 - `jundland_wastes`: custom biome not translated (no Bedrock biome emitter) — data/starwars/worldgen/biome/jundland_wastes.json; surface rules, ambience, and spawn lists stay Java-only
 
 ## Custom noise settings / chunk generation not expressible
@@ -171,19 +222,32 @@ The translator has no Bedrock biome emitter, so these `worldgen/biome` datapack 
 Bedrock add-ons cannot express Java's `worldgen/noise_settings` density-function terrain or a custom Java `ChunkGenerator`. Chunk generation for the custom dimensions stays Java-only:
 
 - `andor`: custom noise settings / chunk generation not expressible — data/starwars/worldgen/noise_settings/andor.json; terrain shaping lives in the datapack noise router and the mod's Java chunk generator
+- `dagobah`: custom noise settings / chunk generation not expressible — data/starwars/worldgen/noise_settings/dagobah.json; terrain shaping lives in the datapack noise router and the mod's Java chunk generator
+- `hoth`: custom noise settings / chunk generation not expressible — data/starwars/worldgen/noise_settings/hoth.json; terrain shaping lives in the datapack noise router and the mod's Java chunk generator
 - `tatooine`: custom noise settings / chunk generation not expressible — data/starwars/worldgen/noise_settings/tatooine.json; terrain shaping lives in the datapack noise router and the mod's Java chunk generator
+
+## Jukebox songs not translatable
+
+Bedrock has no data-driven jukebox songs (`jukebox_song/`). The disc item itself translates as a plain item; the music only plays on Java:
+
+- `cantina_band`: jukebox song not translatable — data/starwars/jukebox_song/cantina_band.json; Bedrock has no data-driven jukebox songs, so the disc item translates as a plain item and the tune plays on Java only
 
 ## Datapack worldgen structures not translatable
 
 Bedrock has no equivalent of Java's procedural `Structure`/`StructurePiece` datapack API — there is no `.nbt`/jigsaw template for these on disk, so there is nothing to translate. These structures (and the biome placement / spacing that controls where they generate) do not appear in Bedrock worldgen; any loot table they place is translated separately and listed elsewhere in this report:
 
+- `echo_base`: datapack worldgen structure not translatable to Bedrock — echo_base; garrison/loot behavior lives in the Java piece
 - `escape_pod`: datapack worldgen structure not translatable to Bedrock — escape_pod; garrison/loot behavior lives in the Java piece
 - `ferrix_town`: datapack worldgen structure not translatable to Bedrock — ferrix_town; garrison/loot behavior lives in the Java piece
 - `imperial_outpost`: datapack worldgen structure not translatable to Bedrock — imperial_outpost; garrison/loot behavior lives in the Java piece
 - `jedi_ruin`: datapack worldgen structure not translatable to Bedrock — jedi_ruin; garrison/loot behavior lives in the Java piece
 - `krayt_skeleton`: datapack worldgen structure not translatable to Bedrock — krayt_skeleton; garrison/loot behavior lives in the Java piece
 - `moisture_farm`: datapack worldgen structure not translatable to Bedrock — moisture_farm; garrison/loot behavior lives in the Java piece
+- `mos_eisley`: datapack worldgen structure not translatable to Bedrock — mos_eisley; garrison/loot behavior lives in the Java piece
 - `sandcrawler`: datapack worldgen structure not translatable to Bedrock — sandcrawler; garrison/loot behavior lives in the Java piece
+- `wampa_cave`: datapack worldgen structure not translatable to Bedrock — wampa_cave; garrison/loot behavior lives in the Java piece
+- `xwing_wreck`: datapack worldgen structure not translatable to Bedrock — xwing_wreck; garrison/loot behavior lives in the Java piece
+- `yoda_hut`: datapack worldgen structure not translatable to Bedrock — yoda_hut; garrison/loot behavior lives in the Java piece
 
 ## Vehicles (approximated)
 
@@ -201,4 +265,5 @@ These entities enforce a one-living-instance-per-server invariant on the Java si
 - `luke_skywalker`: Java enforces one living instance per server via SavedData (finalizeSpawn claim + die/remove clear); Bedrock output has no equivalent — duplicates are possible.
 - `obi_wan`: Java enforces one living instance per server via SavedData (finalizeSpawn claim + die/remove clear); Bedrock output has no equivalent — duplicates are possible.
 - `princess_leia`: Java enforces one living instance per server via SavedData (finalizeSpawn claim + die/remove clear); Bedrock output has no equivalent — duplicates are possible.
+- `yoda`: Java enforces one living instance per server via SavedData (finalizeSpawn claim + die/remove clear); Bedrock output has no equivalent — duplicates are possible.
 

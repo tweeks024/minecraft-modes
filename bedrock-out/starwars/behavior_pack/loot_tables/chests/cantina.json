@@ -1,0 +1,87 @@
+{
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "item",
+          "name": "starwars:cantina_record"
+        }
+      ]
+    },
+    {
+      "rolls": {
+        "type": "minecraft:uniform",
+        "min": 2,
+        "max": 4
+      },
+      "entries": [
+        {
+          "type": "item",
+          "name": "starwars:blaster_pistol",
+          "weight": 4
+        },
+        {
+          "type": "item",
+          "name": "minecraft:bread",
+          "weight": 15,
+          "functions": [
+            {
+              "count": {
+                "max": 3,
+                "min": 1,
+                "type": "uniform"
+              },
+              "function": "set_count"
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "minecraft:gold_nugget",
+          "weight": 15,
+          "functions": [
+            {
+              "count": {
+                "max": 6,
+                "min": 2,
+                "type": "uniform"
+              },
+              "function": "set_count"
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "minecraft:emerald",
+          "weight": 10,
+          "functions": [
+            {
+              "count": {
+                "max": 2,
+                "min": 1,
+                "type": "uniform"
+              },
+              "function": "set_count"
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "minecraft:iron_ingot",
+          "weight": 12,
+          "functions": [
+            {
+              "count": {
+                "max": 3,
+                "min": 1,
+                "type": "uniform"
+              },
+              "function": "set_count"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

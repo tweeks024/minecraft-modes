@@ -1,0 +1,66 @@
+{
+  "format_version": "1.21.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "starwars:dragonsnake",
+      "is_spawnable": true,
+      "is_summonable": true
+    },
+    "components": {
+      "minecraft:attack": {
+        "damage": 5
+      },
+      "minecraft:behavior.hurt_by_target": {
+        "priority": 1
+      },
+      "minecraft:behavior.look_at_player": {
+        "priority": 7,
+        "look_distance": 8,
+        "probability": 0.02
+      },
+      "minecraft:behavior.melee_attack": {
+        "priority": 2,
+        "speed_multiplier": 1.2,
+        "track_target": true
+      },
+      "minecraft:behavior.random_look_around": {
+        "priority": 8
+      },
+      "minecraft:can_climb": {},
+      "minecraft:collision_box": {
+        "width": 1.4,
+        "height": 0.6
+      },
+      "minecraft:follow_range": {
+        "value": 20,
+        "max": 20
+      },
+      "minecraft:health": {
+        "value": 24,
+        "max": 24
+      },
+      "minecraft:jump.static": {},
+      "minecraft:movement": {
+        "value": 0.7
+      },
+      "minecraft:movement.basic": {},
+      "minecraft:navigation.walk": {
+        "can_pass_doors": true,
+        "can_walk": true
+      },
+      "minecraft:physics": {},
+      "minecraft:pushable": {
+        "is_pushable": true,
+        "is_pushable_by_piston": true
+      },
+      "minecraft:type_family": {
+        "family": [
+          "dragonsnake",
+          "monster",
+          "mob"
+        ]
+      }
+    },
+    "events": {}
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "pools": [
+    {
+      "rolls": {
+        "type": "minecraft:uniform",
+        "min": 2,
+        "max": 4
+      },
+      "entries": [
+        {
+          "type": "item",
+          "name": "starwars:blaster_rifle",
+          "weight": 4
+        },
+        {
+          "type": "item",
+          "name": "minecraft:iron_ingot",
+          "weight": 20,
+          "functions": [
+            {
+              "count": {
+                "max": 4,
+                "min": 2,
+                "type": "uniform"
+              },
+              "function": "set_count"
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "minecraft:redstone",
+          "weight": 15,
+          "functions": [
+            {
+              "count": {
+                "max": 5,
+                "min": 2,
+                "type": "uniform"
+              },
+              "function": "set_count"
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "minecraft:copper_ingot",
+          "weight": 15,
+          "functions": [
+            {
+              "count": {
+                "max": 6,
+                "min": 2,
+                "type": "uniform"
+              },
+              "function": "set_count"
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "minecraft:gold_ingot",
+          "weight": 10,
+          "functions": [
+            {
+              "count": {
+                "max": 3,
+                "min": 1,
+                "type": "uniform"
+              },
+              "function": "set_count"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

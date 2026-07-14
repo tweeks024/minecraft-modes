@@ -1,0 +1,20 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "starwars:rebel_trooper",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/rebel_trooper.png"
+      },
+      "geometry": {
+        "default": "geometry.starwars.rebel_trooper"
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ]
+    }
+  }
+}

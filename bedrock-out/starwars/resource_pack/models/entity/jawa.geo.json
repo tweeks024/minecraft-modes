@@ -1,0 +1,177 @@
+{
+  "format_version": "1.16.0",
+  "minecraft:geometry": [
+    {
+      "description": {
+        "identifier": "geometry.starwars.jawa",
+        "texture_width": 64,
+        "texture_height": 64,
+        "visible_bounds_width": 4,
+        "visible_bounds_height": 4,
+        "visible_bounds_offset": [
+          0,
+          0,
+          0
+        ]
+      },
+      "bones": [
+        {
+          "name": "head",
+          "pivot": [
+            0,
+            15,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -4,
+                15,
+                -4
+              ],
+              "size": [
+                8,
+                8,
+                8
+              ],
+              "uv": [
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "name": "body",
+          "pivot": [
+            0,
+            6,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -4,
+                6,
+                -2
+              ],
+              "size": [
+                8,
+                9,
+                4
+              ],
+              "uv": [
+                0,
+                16
+              ]
+            }
+          ]
+        },
+        {
+          "name": "right_arm",
+          "pivot": [
+            -5.5,
+            13,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -7,
+                6,
+                -1.5
+              ],
+              "size": [
+                3,
+                9,
+                3
+              ],
+              "uv": [
+                24,
+                16
+              ]
+            }
+          ]
+        },
+        {
+          "name": "left_arm",
+          "pivot": [
+            5.5,
+            13,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                4,
+                6,
+                -1.5
+              ],
+              "size": [
+                3,
+                9,
+                3
+              ],
+              "uv": [
+                36,
+                16
+              ]
+            }
+          ]
+        },
+        {
+          "name": "right_leg",
+          "pivot": [
+            -1.5,
+            6,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -3,
+                0,
+                -1.5
+              ],
+              "size": [
+                3,
+                6,
+                3
+              ],
+              "uv": [
+                0,
+                32
+              ]
+            }
+          ]
+        },
+        {
+          "name": "left_leg",
+          "pivot": [
+            1.5,
+            6,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                0,
+                0,
+                -1.5
+              ],
+              "size": [
+                3,
+                6,
+                3
+              ],
+              "uv": [
+                12,
+                32
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

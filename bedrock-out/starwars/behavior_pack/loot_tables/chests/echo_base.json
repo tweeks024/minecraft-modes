@@ -1,0 +1,83 @@
+{
+  "pools": [
+    {
+      "rolls": {
+        "type": "minecraft:uniform",
+        "min": 3,
+        "max": 6
+      },
+      "entries": [
+        {
+          "type": "item",
+          "name": "starwars:blaster_rifle",
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "minecraft:golden_apple",
+          "weight": 3
+        },
+        {
+          "type": "item",
+          "name": "minecraft:bread",
+          "weight": 15,
+          "functions": [
+            {
+              "count": {
+                "max": 3,
+                "min": 1,
+                "type": "uniform"
+              },
+              "function": "set_count"
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "minecraft:leather",
+          "weight": 12,
+          "functions": [
+            {
+              "count": {
+                "max": 3,
+                "min": 1,
+                "type": "uniform"
+              },
+              "function": "set_count"
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "minecraft:iron_ingot",
+          "weight": 15,
+          "functions": [
+            {
+              "count": {
+                "max": 4,
+                "min": 2,
+                "type": "uniform"
+              },
+              "function": "set_count"
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "minecraft:arrow",
+          "weight": 12,
+          "functions": [
+            {
+              "count": {
+                "max": 8,
+                "min": 4,
+                "type": "uniform"
+              },
+              "function": "set_count"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

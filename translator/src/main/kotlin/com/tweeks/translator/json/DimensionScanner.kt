@@ -67,6 +67,15 @@ class DimensionScanner(
                     "noise router and the mod's Java chunk generator",
             )
         }
+        scanFamily(modRoot, modId, "jukebox_song") { id ->
+            untranslatable.recordDatapackJukeboxSong(
+                modId,
+                id,
+                "jukebox song not translatable — data/$modId/jukebox_song/$id.json; Bedrock has no " +
+                    "data-driven jukebox songs, so the disc item translates as a plain item and the " +
+                    "tune plays on Java only",
+            )
+        }
     }
 
     /**

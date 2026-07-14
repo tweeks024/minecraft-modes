@@ -49,6 +49,7 @@ class Untranslatable {
     private val datapackDimensions = TreeMap<String, TreeMap<String, String>>()
     private val datapackBiomes = TreeMap<String, TreeMap<String, String>>()
     private val datapackNoiseSettings = TreeMap<String, TreeMap<String, String>>()
+    private val datapackJukeboxSongs = TreeMap<String, TreeMap<String, String>>()
     private val blocksNotTranslated = TreeMap<String, TreeMap<String, String>>()
     private val phase2Failures = TreeMap<String, MutableList<String>>()
     private val duplicateBehaviorComponents = TreeMap<String, TreeMap<String, TreeSet<String>>>()
@@ -288,6 +289,16 @@ class Untranslatable {
     }
 
     /**
+     * Record a datapack jukebox song (a JSON file under
+     * `data/<mod>/jukebox_song/`). Bedrock has no data-driven jukebox
+     * songs, so the disc item translates as a plain item and the tune
+     * itself plays on Java only.
+     */
+    fun recordDatapackJukeboxSong(modId: String, songId: String, summary: String) {
+        datapackJukeboxSongs.getOrPut(modId) { TreeMap() }[songId] = summary
+    }
+
+    /**
      * Record a Java block registration (`BLOCKS.registerBlock` /
      * `BLOCKS.registerSimpleBlock`) with no Bedrock counterpart — the
      * translator has no Bedrock block emitter, so the block does not exist
@@ -379,6 +390,7 @@ class Untranslatable {
         ids.addAll(datapackDimensions.keys)
         ids.addAll(datapackBiomes.keys)
         ids.addAll(datapackNoiseSettings.keys)
+        ids.addAll(datapackJukeboxSongs.keys)
         ids.addAll(blocksNotTranslated.keys)
         ids.addAll(phase2Failures.keys)
         ids.addAll(duplicateBehaviorComponents.keys)
@@ -710,6 +722,16 @@ class Untranslatable {
             sb.append("Java-only:\n\n")
             for ((noiseId, summary) in items) {
                 sb.append("- `").append(noiseId).append("`: ").append(summary).append('\n')
+            }
+            sb.append('\n')
+        }
+        datapackJukeboxSongs[modId]?.takeIf { it.isNotEmpty() }?.let { items ->
+            any = true
+            sb.append("## Jukebox songs not translatable\n\n")
+            sb.append("Bedrock has no data-driven jukebox songs (`jukebox_song/`). The disc item itself ")
+            sb.append("translates as a plain item; the music only plays on Java:\n\n")
+            for ((songId, summary) in items) {
+                sb.append("- `").append(songId).append("`: ").append(summary).append('\n')
             }
             sb.append('\n')
         }

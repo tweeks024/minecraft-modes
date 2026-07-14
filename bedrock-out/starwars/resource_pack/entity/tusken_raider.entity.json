@@ -1,0 +1,20 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "starwars:tusken_raider",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/tusken_raider.png"
+      },
+      "geometry": {
+        "default": "geometry.starwars.tusken_raider"
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ]
+    }
+  }
+}

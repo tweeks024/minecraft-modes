@@ -10,6 +10,15 @@
         }
       ]
     },
+    "starwars:cantina_band": {
+      "category": "neutral",
+      "sounds": [
+        {
+          "name": "sounds/music/cantina_band",
+          "stream": true
+        }
+      ]
+    },
     "starwars:force_cast": {
       "category": "neutral",
       "sounds": [

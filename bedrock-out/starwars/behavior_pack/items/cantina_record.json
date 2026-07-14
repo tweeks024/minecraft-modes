@@ -1,0 +1,15 @@
+{
+  "format_version": "1.21.0",
+  "minecraft:item": {
+    "description": {
+      "identifier": "starwars:cantina_record",
+      "menu_category": {
+        "category": "items"
+      }
+    },
+    "components": {
+      "minecraft:icon": "starwars:cantina_record",
+      "minecraft:max_stack_size": 1
+    }
+  }
+}

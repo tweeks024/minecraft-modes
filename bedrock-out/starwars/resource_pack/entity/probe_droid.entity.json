@@ -1,0 +1,20 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "starwars:probe_droid",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/probe_droid.png"
+      },
+      "geometry": {
+        "default": "geometry.starwars.probe_droid"
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ]
+    }
+  }
+}

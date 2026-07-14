@@ -1,0 +1,229 @@
+{
+  "format_version": "1.16.0",
+  "minecraft:geometry": [
+    {
+      "description": {
+        "identifier": "geometry.starwars.tauntaun",
+        "texture_width": 64,
+        "texture_height": 64,
+        "visible_bounds_width": 4,
+        "visible_bounds_height": 4,
+        "visible_bounds_offset": [
+          0,
+          0,
+          0
+        ]
+      },
+      "bones": [
+        {
+          "name": "body",
+          "pivot": [
+            0,
+            22,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -4,
+                12,
+                -7
+              ],
+              "size": [
+                8,
+                10,
+                14
+              ],
+              "uv": [
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "name": "neck",
+          "pivot": [
+            0,
+            22,
+            -5
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -2,
+                20,
+                -7
+              ],
+              "size": [
+                4,
+                6,
+                4
+              ],
+              "uv": [
+                44,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "name": "head",
+          "pivot": [
+            0,
+            26,
+            -5
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -3,
+                25,
+                -13
+              ],
+              "size": [
+                6,
+                6,
+                8
+              ],
+              "uv": [
+                0,
+                24
+              ]
+            }
+          ]
+        },
+        {
+          "name": "right_arm",
+          "pivot": [
+            -4,
+            19,
+            -5
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -7,
+                13,
+                -6.5
+              ],
+              "size": [
+                3,
+                6,
+                3
+              ],
+              "uv": [
+                44,
+                10
+              ]
+            }
+          ]
+        },
+        {
+          "name": "left_arm",
+          "pivot": [
+            4,
+            19,
+            -5
+          ],
+          "cubes": [
+            {
+              "origin": [
+                4,
+                13,
+                -6.5
+              ],
+              "size": [
+                3,
+                6,
+                3
+              ],
+              "uv": [
+                44,
+                19
+              ]
+            }
+          ]
+        },
+        {
+          "name": "right_hind",
+          "pivot": [
+            -2,
+            12,
+            4
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -4,
+                0,
+                2
+              ],
+              "size": [
+                4,
+                12,
+                4
+              ],
+              "uv": [
+                0,
+                40
+              ]
+            }
+          ]
+        },
+        {
+          "name": "left_hind",
+          "pivot": [
+            2,
+            12,
+            4
+          ],
+          "cubes": [
+            {
+              "origin": [
+                0,
+                0,
+                2
+              ],
+              "size": [
+                4,
+                12,
+                4
+              ],
+              "uv": [
+                16,
+                40
+              ]
+            }
+          ]
+        },
+        {
+          "name": "tail",
+          "pivot": [
+            0,
+            15,
+            7
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -1.5,
+                13.5,
+                7
+              ],
+              "size": [
+                3,
+                3,
+                8
+              ],
+              "uv": [
+                28,
+                28
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

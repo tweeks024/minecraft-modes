@@ -1,0 +1,125 @@
+{
+  "format_version": "1.16.0",
+  "minecraft:geometry": [
+    {
+      "description": {
+        "identifier": "geometry.starwars.bogwing",
+        "texture_width": 32,
+        "texture_height": 32,
+        "visible_bounds_width": 4,
+        "visible_bounds_height": 4,
+        "visible_bounds_offset": [
+          0,
+          0,
+          0
+        ]
+      },
+      "bones": [
+        {
+          "name": "body",
+          "pivot": [
+            0,
+            17,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -2,
+                14,
+                -3
+              ],
+              "size": [
+                4,
+                3,
+                6
+              ],
+              "uv": [
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "name": "head",
+          "pivot": [
+            0,
+            17,
+            -3
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -1.5,
+                16,
+                -7
+              ],
+              "size": [
+                3,
+                3,
+                4
+              ],
+              "uv": [
+                0,
+                9
+              ]
+            }
+          ]
+        },
+        {
+          "name": "right_wing",
+          "pivot": [
+            -2,
+            17,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -12,
+                16,
+                -3
+              ],
+              "size": [
+                10,
+                1,
+                6
+              ],
+              "uv": [
+                0,
+                16
+              ]
+            }
+          ]
+        },
+        {
+          "name": "left_wing",
+          "pivot": [
+            2,
+            17,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                2,
+                16,
+                -3
+              ],
+              "size": [
+                10,
+                1,
+                6
+              ],
+              "uv": [
+                0,
+                23
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

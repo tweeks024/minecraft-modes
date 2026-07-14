@@ -1,0 +1,55 @@
+{
+  "format_version": "1.21.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "starwars:probe_droid",
+      "is_spawnable": true,
+      "is_summonable": true
+    },
+    "components": {
+      "minecraft:behavior.hurt_by_target": {
+        "priority": 1
+      },
+      "minecraft:behavior.look_at_player": {
+        "priority": 8,
+        "look_distance": 12,
+        "probability": 0.02
+      },
+      "minecraft:can_climb": {},
+      "minecraft:collision_box": {
+        "width": 0.9,
+        "height": 1.6
+      },
+      "minecraft:follow_range": {
+        "value": 32,
+        "max": 32
+      },
+      "minecraft:health": {
+        "value": 20,
+        "max": 20
+      },
+      "minecraft:jump.static": {},
+      "minecraft:movement": {
+        "value": 0.25
+      },
+      "minecraft:movement.basic": {},
+      "minecraft:navigation.walk": {
+        "can_pass_doors": true,
+        "can_walk": true
+      },
+      "minecraft:physics": {},
+      "minecraft:pushable": {
+        "is_pushable": true,
+        "is_pushable_by_piston": true
+      },
+      "minecraft:type_family": {
+        "family": [
+          "probe_droid",
+          "monster",
+          "mob"
+        ]
+      }
+    },
+    "events": {}
+  }
+}

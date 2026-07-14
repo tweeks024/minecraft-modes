@@ -1,0 +1,20 @@
+{
+  "pools": [
+    {
+      "rolls": 1.0,
+      "entries": [
+        {
+          "type": "item",
+          "name": "minecraft:feather",
+          "functions": [
+            {
+              "add": false,
+              "count": 1.0,
+              "function": "set_count"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

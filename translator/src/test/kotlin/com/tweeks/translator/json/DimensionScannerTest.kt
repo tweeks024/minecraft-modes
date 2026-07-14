@@ -75,6 +75,23 @@ class DimensionScannerTest {
     }
 
     @Test
+    fun `jukebox songs land in their own honesty section`(@TempDir tmp: Path) {
+        val modRoot = tmp.resolve("themod")
+        val songDir = modRoot.resolve("src/generated/serverData/data/themod/jukebox_song")
+        songDir.createDirectories()
+        songDir.resolve("cantina_band.json").writeText("""{"sound_event": "themod:cantina_band"}""")
+
+        val unt = Untranslatable()
+        DimensionScanner(unt).scan(modRoot, "themod")
+
+        val report = unt.renderReport("themod")
+        assertTrue(report.contains("## Jukebox songs not translatable")) { report }
+        assertTrue(report.contains("- `cantina_band`")) { report }
+        assertTrue(report.contains("data/themod/jukebox_song/cantina_band.json")) { report }
+        assertTrue(!report.contains("## Custom dimensions not translatable")) { report }
+    }
+
+    @Test
     fun `reads dimension json from src main resources when generated serverData absent`(@TempDir tmp: Path) {
         val modRoot = tmp.resolve("themod")
         val dimDir = modRoot.resolve("src/main/resources/data/themod/dimension")

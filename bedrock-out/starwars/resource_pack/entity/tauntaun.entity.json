@@ -1,0 +1,20 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "starwars:tauntaun",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/tauntaun.png"
+      },
+      "geometry": {
+        "default": "geometry.starwars.tauntaun"
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ]
+    }
+  }
+}
