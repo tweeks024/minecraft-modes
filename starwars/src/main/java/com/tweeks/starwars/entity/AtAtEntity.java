@@ -14,7 +14,6 @@ import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
-import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.sounds.SoundEvent;
@@ -86,10 +85,11 @@ public class AtAtEntity extends SwMob implements Enemy {
         this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
 
         this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
-        // Cross-faction targeting: engages LIGHT combatants via the faction seam.
+        // Cross-faction targeting: engages LIGHT combatants AND Empire-hostile
+        // players (SwTargetGoal already scores players by alignment). A neutral
+        // passer-by is left alone — no unconditional player hunt, so a child
+        // isn't chased down by a 300 HP walker the moment they arrive on Hoth.
         this.targetSelector.addGoal(2, new SwTargetGoal(this));
-        // Siege boss: also bears down on any player it spots (like the probe droid).
-        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Player.class, true));
     }
 
     // ---------- sounds ----------

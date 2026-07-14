@@ -58,4 +58,23 @@ class ForceCooldownsTest {
         assertFalse(com.tweeks.starwars.faction.PacifyState.isActive(200L, 200L));
         assertFalse(com.tweeks.starwars.faction.PacifyState.isActive(0L, 5L));
     }
+
+    @Test
+    void slotCount_coversEveryForcePower() {
+        // If a power were added past SLOT_COUNT, applyCooldown would silently
+        // drop that slot's cooldown. This coupling must hold.
+        assertTrue(ForceCooldowns.SLOT_COUNT >= com.tweeks.starwars.item.ForcePower.values().length,
+            "SLOT_COUNT (" + ForceCooldowns.SLOT_COUNT + ") must cover all "
+                + com.tweeks.starwars.item.ForcePower.values().length + " Force powers");
+    }
+
+    @Test
+    void applyCooldown_recordsTheHighestPowerSlot() {
+        int last = ForceCooldowns.SLOT_COUNT - 1;
+        List<Long> after = ForceCooldowns.applyCooldown(ForceCooldowns.emptyCooldowns(), last, 100L, 40);
+        assertEquals(ForceCooldowns.SLOT_COUNT, after.size());
+        assertTrue(ForceCooldowns.isOnCooldown(after, last, 100L),
+            "the top power slot must actually record a cooldown");
+        assertFalse(ForceCooldowns.isOnCooldown(after, last, 140L));
+    }
 }

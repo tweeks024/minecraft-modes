@@ -157,6 +157,25 @@ public class BlasterPistolItem extends Item {
         fireFromMob(shooter, target, DAMAGE, S2CBlasterTracerPacket.COLOR_EMPIRE);
     }
 
+    /**
+     * A bolt from a mob passes harmlessly through the shooter's own side:
+     * its tame owner, and any same-(non-neutral)-faction combatant. Without
+     * this, a bolt hits whatever the aim ray reaches first — a companion
+     * shooting past its owner would hit the owner, and troopers firing
+     * through a squadmate would trigger Empire-vs-Empire infighting.
+     */
+    private static boolean isFriendlyFire(LivingEntity shooter, LivingEntity candidate) {
+        if (shooter instanceof net.minecraft.world.entity.TamableAnimal pet && candidate == pet.getOwner()) {
+            return true;
+        }
+        if (shooter instanceof com.tweeks.starwars.faction.SwCombatant a
+            && candidate instanceof com.tweeks.starwars.faction.SwCombatant b) {
+            var faction = a.getFaction();
+            return faction != com.tweeks.starwars.faction.SwFaction.NEUTRAL && faction == b.getFaction();
+        }
+        return false;
+    }
+
     public static void fireFromMob(LivingEntity shooter, LivingEntity target,
                                    float damage, int tracerColor) {
         Level level = shooter.level();
@@ -188,7 +207,8 @@ public class BlasterPistolItem extends Item {
             LivingEntity.class,
             new AABB(start, end).inflate(1.0),
             e -> e != shooter && e.canBeHitByProjectile() && !e.isSpectator()
-                && !e.isInvulnerableTo(serverLevel, blasterSource));
+                && !e.isInvulnerableTo(serverLevel, blasterSource)
+                && !isFriendlyFire(shooter, e));
 
         List<Hitscan.Candidate> candidates = new ArrayList<>();
         Map<String, LivingEntity> byId = new HashMap<>();
