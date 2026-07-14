@@ -211,11 +211,13 @@ Bedrock add-ons cannot define new dimensions — there is no counterpart to Java
 - `dimension/andor`: custom dimension not expressible in a Bedrock add-on — data/starwars/dimension/andor.json; the planet world and travel into it are Java-only
 - `dimension/coruscant`: custom dimension not expressible in a Bedrock add-on — data/starwars/dimension/coruscant.json; the planet world and travel into it are Java-only
 - `dimension/dagobah`: custom dimension not expressible in a Bedrock add-on — data/starwars/dimension/dagobah.json; the planet world and travel into it are Java-only
+- `dimension/death_star`: custom dimension not expressible in a Bedrock add-on — data/starwars/dimension/death_star.json; the planet world and travel into it are Java-only
 - `dimension/hoth`: custom dimension not expressible in a Bedrock add-on — data/starwars/dimension/hoth.json; the planet world and travel into it are Java-only
 - `dimension/tatooine`: custom dimension not expressible in a Bedrock add-on — data/starwars/dimension/tatooine.json; the planet world and travel into it are Java-only
 - `dimension_type/andor`: custom dimension type not expressible in a Bedrock add-on — data/starwars/dimension_type/andor.json; sky/light/height rules for the planet are Java-only
 - `dimension_type/coruscant`: custom dimension type not expressible in a Bedrock add-on — data/starwars/dimension_type/coruscant.json; sky/light/height rules for the planet are Java-only
 - `dimension_type/dagobah`: custom dimension type not expressible in a Bedrock add-on — data/starwars/dimension_type/dagobah.json; sky/light/height rules for the planet are Java-only
+- `dimension_type/death_star`: custom dimension type not expressible in a Bedrock add-on — data/starwars/dimension_type/death_star.json; sky/light/height rules for the planet are Java-only
 - `dimension_type/hoth`: custom dimension type not expressible in a Bedrock add-on — data/starwars/dimension_type/hoth.json; sky/light/height rules for the planet are Java-only
 - `dimension_type/tatooine`: custom dimension type not expressible in a Bedrock add-on — data/starwars/dimension_type/tatooine.json; sky/light/height rules for the planet are Java-only
 
@@ -226,6 +228,7 @@ The translator has no Bedrock biome emitter, so these `worldgen/biome` datapack 
 - `aldhani_highlands`: custom biome not translated (no Bedrock biome emitter) — data/starwars/worldgen/biome/aldhani_highlands.json; surface rules, ambience, and spawn lists stay Java-only
 - `coruscant_city`: custom biome not translated (no Bedrock biome emitter) — data/starwars/worldgen/biome/coruscant_city.json; surface rules, ambience, and spawn lists stay Java-only
 - `dagobah_swamp`: custom biome not translated (no Bedrock biome emitter) — data/starwars/worldgen/biome/dagobah_swamp.json; surface rules, ambience, and spawn lists stay Java-only
+- `death_star_interior`: custom biome not translated (no Bedrock biome emitter) — data/starwars/worldgen/biome/death_star_interior.json; surface rules, ambience, and spawn lists stay Java-only
 - `dune_sea`: custom biome not translated (no Bedrock biome emitter) — data/starwars/worldgen/biome/dune_sea.json; surface rules, ambience, and spawn lists stay Java-only
 - `hoth_plains`: custom biome not translated (no Bedrock biome emitter) — data/starwars/worldgen/biome/hoth_plains.json; surface rules, ambience, and spawn lists stay Java-only
 - `jundland_wastes`: custom biome not translated (no Bedrock biome emitter) — data/starwars/worldgen/biome/jundland_wastes.json; surface rules, ambience, and spawn lists stay Java-only
