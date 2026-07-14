@@ -20,6 +20,7 @@ Re-run after editing the script with:
 """
 import base64
 import json
+import math
 import os
 import sys
 import uuid
@@ -81,30 +82,40 @@ DARTH_VADER_ACCESSORIES = [
     ('chest_panel',  BODY_BONE, (-2.0,  3.0, -2.6, 4, 3, 1),  (56, 54), 0.0),
 ]
 
-# Darth Maul: standard humanoid rig + a crown of ten Zabrak HORNS on the head
-# bone. The horns are extra CUBES on the head bone (not separate bones), so
-# they stay axis-aligned — the "outward" crown read comes from ringing the
-# 8x8 head-top rim, not per-cube rotation (a HumanoidModel addBox cube cannot
-# carry its own rotation; the parallel Java MaulModel adds these as head
-# children via addBox with the SAME texOffs + args). Head top is world-y 32;
-# a horn of height h sits on the rim with jy=-(8+h) (java_to_bbmodel then puts
-# its base at world-y 32, rising h above). Ring walks the rim perimeter (head
-# spans jx,jz in [-4,4]): 6 tall (1x3x1) + 4 short (1x2x1), symmetric about
-# x=0. UVs pack the free head-overlay region (u>=32, v<16). Must match
-# gen_textures.py MAUL_HORNS + the Java MaulModel EXACTLY.
-# (name, HEAD_BONE, (jx, jy, jz, jw, jh, jd), uv_offset)
-MAUL_ACCESSORIES = [
-    ('horn_fl',  HEAD_BONE, (-4, -10, -4, 1, 2, 1), (32, 0)),   # front-left corner
-    ('horn_fml', HEAD_BONE, (-2, -11, -4, 1, 3, 1), (36, 0)),   # front-mid-left
-    ('horn_fmr', HEAD_BONE, ( 1, -11, -4, 1, 3, 1), (40, 0)),   # front-mid-right
-    ('horn_fr',  HEAD_BONE, ( 3, -10, -4, 1, 2, 1), (44, 0)),   # front-right corner
-    ('horn_sr',  HEAD_BONE, ( 3, -11, -1, 1, 3, 1), (48, 0)),   # right side
-    ('horn_br',  HEAD_BONE, ( 3, -10,  3, 1, 2, 1), (52, 0)),   # back-right corner
-    ('horn_bmr', HEAD_BONE, ( 1, -11,  3, 1, 3, 1), (56, 0)),   # back-mid-right
-    ('horn_bml', HEAD_BONE, (-2, -11,  3, 1, 3, 1), (60, 0)),   # back-mid-left
-    ('horn_bl',  HEAD_BONE, (-4, -10,  3, 1, 2, 1), (32, 5)),   # back-left corner
-    ('horn_sl',  HEAD_BONE, (-4, -11, -1, 1, 3, 1), (36, 5)),   # left side
-]
+# Darth Maul horn crown — computed to match client/model/MaulModel.java
+# EXACTLY. Ten horns (separate bones horn_0..horn_9), each a 1x3x1 cube, ring
+# the top of the head. The head top is world-y 32 (head-local crown y=-8, and
+# 24-(-8)=32). Horn i sits on a radius-3 ring at angle theta = i/10 * 2*pi:
+# its bone pivots at world (cos(theta)*3, 32, sin(theta)*3) and its cube is
+# the Java addBox(-0.5, -3, -0.5, 1, 3, 1) (base on the crown, rising 3 up).
+# Each bone is tilted MAUL_HORN_TILT rad radially outward
+# (xRot=-tilt*sin(theta), zRot=tilt*cos(theta)), emitted here as the degree
+# equivalent on the bone group (the group rotation tilts its cube about the
+# pivot, exactly as PartPose.offsetAndRotation does in Java). UV per horn
+# tiles a 4x4 cell in the free right-leg-overlay band — u=(i%4)*4,
+# v=32+(i//4)*4 — identical to MaulModel's texOffs, so the single
+# darth_maul.png feeds both the runtime model and this bbmodel. The horns are
+# modeled as separate bones (in Java they are children of 'head'); the flat
+# outliner keeps parity with the repo's other rotated-bone rigs (xwing/at_at).
+# gen_textures.py paints the matching UV cells (see its MAUL_HORNS loop).
+MAUL_HORN_COUNT = 10
+MAUL_HORN_RING_RADIUS = 3.0
+MAUL_HORN_TILT = 0.35
+MAUL_HORN_HEIGHT = 3
+MAUL_CROWN_Y = 32  # world-y of the head-top crown (head-local -8)
+
+MAUL_HORN_BONE_DEFS = []
+MAUL_HORN_CUBES = []
+for _i in range(MAUL_HORN_COUNT):
+    _theta = (_i / MAUL_HORN_COUNT) * math.pi * 2.0
+    _origin = (math.cos(_theta) * MAUL_HORN_RING_RADIUS, float(MAUL_CROWN_Y),
+               math.sin(_theta) * MAUL_HORN_RING_RADIUS)
+    _rot = (math.degrees(-MAUL_HORN_TILT * math.sin(_theta)), 0.0,
+            math.degrees(MAUL_HORN_TILT * math.cos(_theta)))
+    _uv = ((_i % 4) * 4, 32 + (_i // 4) * 4)
+    MAUL_HORN_BONE_DEFS.append((f'horn_{_i}', _origin, _rot))
+    MAUL_HORN_CUBES.append((f'horn_{_i}', _origin,
+                            (-0.5, -MAUL_HORN_HEIGHT, -0.5, 1, MAUL_HORN_HEIGHT, 1), _uv))
 
 BOBA_FETT_ACCESSORIES = [
     ('helmet_shell', HEAD_BONE, (-4.0, -8.0, -4.0, 8, 8, 8),  (32, 0), 0.6),
@@ -749,8 +760,9 @@ MOBS = {
     'battle_droid': BATTLE_DROID_CUBES,
     'jedi_knight': HUMANOID_CUBES + JEDI_KNIGHT_ACCESSORIES,
     'darth_vader': HUMANOID_CUBES + DARTH_VADER_ACCESSORIES,
-    # Darth Maul: humanoid + a crown of 10 Zabrak horns on the head bone.
-    'darth_maul': HUMANOID_CUBES + MAUL_ACCESSORIES,
+    # Darth Maul: humanoid + a crown of 10 Zabrak horn bones (computed in
+    # MAUL_HORN_CUBES / MAUL_HORN_BONE_DEFS to match MaulModel.java exactly).
+    'darth_maul': HUMANOID_CUBES + MAUL_HORN_CUBES,
     # Plain humanoid — no accessory cubes. Luke's black tunic, blond hair,
     # and glove stripe are painted directly onto the standard UV layout.
     'luke_skywalker': HUMANOID_CUBES,
@@ -869,6 +881,12 @@ DEFAULT_BONE_DEFS = [
     ('right_leg', RLEG_BONE),
     ('left_leg', LLEG_BONE),
 ]
+
+# Darth Maul's bone table = the standard humanoid bones + the 10 computed horn
+# bones (each carrying its own ring pivot + outward-tilt rotation, see
+# MAUL_HORN_BONE_DEFS). Assigned here — after DEFAULT_BONE_DEFS exists — rather
+# than inline in MOB_BONE_DEFS (which is defined earlier in the file).
+MOB_BONE_DEFS['darth_maul'] = DEFAULT_BONE_DEFS + MAUL_HORN_BONE_DEFS
 
 
 def _parent_bone_name(bone_origin, bone_defs):

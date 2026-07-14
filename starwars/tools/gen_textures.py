@@ -1646,26 +1646,14 @@ def paint_ewok(rgba):
 # the body/arms/legs (3 black tones for fold shading) with dark gloves/boots
 # and a dark-red waist sash. Deterministic (rect() only, no RNG/speckle).
 #
-# HORN CROWN — the (jx, jz, h, uv) below must match gen_bbmodels.py
-# MAUL_ACCESSORIES and the parallel Java MaulModel EXACTLY. Ten 1-wide/1-deep
-# horns ring the 8x8 head-top rim (head spans model x,z in [-4,4]; its top is
-# world-y 32). A horn of height h sits on the rim; box-UV footprint per horn
-# is 4 wide x (1+h) tall (d + h, with d=1), packed into the free head-overlay
-# region (u>=32, v<16, unused because Maul has no helmet cube). 6 tall (h=3,
-# 1x3x1) + 4 short (h=2, 1x2x1), symmetric about x=0.
-# (name, jx, jz, h, uv_u, uv_v):
-MAUL_HORNS = [
-    ('horn_fl',  -4, -4, 2, 32, 0),   # front-left corner  (short)
-    ('horn_fml', -2, -4, 3, 36, 0),   # front-mid-left     (tall)
-    ('horn_fmr',  1, -4, 3, 40, 0),   # front-mid-right    (tall)
-    ('horn_fr',   3, -4, 2, 44, 0),   # front-right corner (short)
-    ('horn_sr',   3, -1, 3, 48, 0),   # right side         (tall)
-    ('horn_br',   3,  3, 2, 52, 0),   # back-right corner  (short)
-    ('horn_bmr',  1,  3, 3, 56, 0),   # back-mid-right     (tall)
-    ('horn_bml', -2,  3, 3, 60, 0),   # back-mid-left      (tall)
-    ('horn_bl',  -4,  3, 2, 32, 5),   # back-left corner   (short)
-    ('horn_sl',  -4, -1, 3, 36, 5),   # left side          (tall)
-]
+# HORN CROWN — the horn UV cells must match client/model/MaulModel.java (and
+# gen_bbmodels.py) EXACTLY, because this single darth_maul.png feeds both the
+# runtime model and the bbmodel. MaulModel rings 10 Zabrak horns (each a
+# 1x3x1 cube, a child bone of 'head') around the crown; each horn's box-UV
+# footprint is a 4x4 cell (width 2*(1+1)=4, height 1+3=4) at texOffs
+# u=(i%4)*4, v=32+(i//4)*4 — tiling the free right-leg-overlay band
+# u[0..16] x v[32..44] (Maul's right leg has no overlay cube, so it is unused).
+MAUL_HORN_UV = [((i % 4) * 4, 32 + (i // 4) * 4) for i in range(10)]
 
 MAUL_SKIN     = (0xB0, 0x18, 0x10, 0xFF)   # crimson Sith skin (egg primary #B01810)
 MAUL_SKIN_HI  = (0xD0, 0x30, 0x24, 0xFF)   # lit cheek/brow
@@ -1699,27 +1687,33 @@ def paint_darth_maul(rgba):
         rect(rgba, u0 + 5, 8, u0 + 6, 16, MAUL_TATTOO)
     rect(rgba, 0, 14, 8, 16, MAUL_SKIN_SH)
     rect(rgba, 16, 14, 32, 16, MAUL_SKIN_SH)
-    # Face (north u8..16,v8..16): radiating black tattoo + yellow-red Sith eyes.
-    rect(rgba, 8, 8, 16, 9, MAUL_TATTOO)           # forehead band (between horns)
-    rect(rgba, 9, 9, 10, 11, MAUL_TATTOO)          # inner brow spike L
-    rect(rgba, 14, 9, 15, 11, MAUL_TATTOO)         # inner brow spike R (mirror)
-    rect(rgba, 9, 10, 15, 12, MAUL_TATTOO)         # eye band
-    rect(rgba, 11, 11, 13, 15, MAUL_TATTOO)        # nose / center stripe
-    rect(rgba, 8, 12, 9, 16, MAUL_TATTOO)          # cheek stripe L (outer col)
-    rect(rgba, 15, 12, 16, 16, MAUL_TATTOO)        # cheek stripe R
-    rect(rgba, 10, 15, 14, 16, MAUL_TATTOO)        # chin band
-    rect(rgba, 9, 13, 10, 14, MAUL_SKIN_HI)        # lit cheek fleck L (3rd skin tone)
-    rect(rgba, 14, 13, 15, 14, MAUL_SKIN_HI)       # lit cheek fleck R
+    # Face (north u8..16,v8..16): crimson base kept DOMINANT, with angular black
+    # tattoos radiating from a central spine (thin stripes, not a solid mask) and
+    # yellow-red Sith eyes.
+    rect(rgba, 11, 8, 13, 15, MAUL_TATTOO)         # central spine (forehead -> nose)
+    rect(rgba, 9, 8, 10, 11, MAUL_TATTOO)          # forehead brow spike L
+    rect(rgba, 14, 8, 15, 11, MAUL_TATTOO)         # forehead brow spike R (mirror)
+    rect(rgba, 9, 10, 11, 11, MAUL_TATTOO)         # over-eye bar L
+    rect(rgba, 13, 10, 15, 11, MAUL_TATTOO)        # over-eye bar R
+    rect(rgba, 8, 12, 9, 14, MAUL_TATTOO)          # cheek stripe L (upper, outer)
+    rect(rgba, 9, 13, 10, 15, MAUL_TATTOO)         # cheek stripe L (lower, stepped in)
+    rect(rgba, 15, 12, 16, 14, MAUL_TATTOO)        # cheek stripe R (upper, outer)
+    rect(rgba, 14, 13, 15, 15, MAUL_TATTOO)        # cheek stripe R (lower, stepped in)
+    rect(rgba, 11, 15, 13, 16, MAUL_TATTOO)        # chin point
+    rect(rgba, 9, 12, 11, 13, MAUL_SKIN_HI)        # lit cheek L (3rd skin tone)
+    rect(rgba, 13, 12, 15, 13, MAUL_SKIN_HI)       # lit cheek R
     rect(rgba, 10, 11, 11, 12, MAUL_EYE)           # Sith eye L (yellow)
     rect(rgba, 13, 11, 14, 12, MAUL_EYE)           # Sith eye R
     rect(rgba, 10, 12, 11, 13, MAUL_EYE_RED)       # yellow-red lower lid L
     rect(rgba, 13, 12, 14, 13, MAUL_EYE_RED)       # yellow-red lower lid R
     # ================= HORN CROWN (ivory, 3 tones each) ======================
-    for (_n, _jx, _jz, h, u0, v0) in MAUL_HORNS:
-        blk_h = 1 + h                              # box-UV height (d + h, d=1)
-        rect(rgba, u0, v0, u0 + 4, v0 + blk_h, MAUL_HORN)                 # body
-        rect(rgba, u0, v0, u0 + 4, v0 + 1, MAUL_HORN_HI)                  # lit tip
-        rect(rgba, u0, v0 + blk_h - 1, u0 + 4, v0 + blk_h, MAUL_HORN_SH)  # base shade
+    # 10 horns, each a 4x4 box-UV cell (1x3x1 -> 2*(1+1) wide x (1+3) tall) in
+    # the free right-leg-overlay band; painted here (before body/arms/legs,
+    # none of which touch u[0..16] x v[32..44]).
+    for (u0, v0) in MAUL_HORN_UV:
+        rect(rgba, u0, v0, u0 + 4, v0 + 4, MAUL_HORN)          # ivory body
+        rect(rgba, u0, v0, u0 + 4, v0 + 1, MAUL_HORN_HI)       # lit tip (up face)
+        rect(rgba, u0, v0 + 3, u0 + 4, v0 + 4, MAUL_HORN_SH)   # shadowed base
     # ================= BODY: black Sith robe + dark-red sash =================
     rect(rgba, 16, 16, 40, 32, MAUL_ROBE)
     rect(rgba, 16, 16, 40, 17, MAUL_ROBE_HI)       # collar/shoulder highlight
