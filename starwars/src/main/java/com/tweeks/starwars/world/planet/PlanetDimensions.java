@@ -325,6 +325,7 @@ public final class PlanetDimensions {
         BiomeDefaultFeatures.addDefaultSoftDisks(gen);
         BiomeDefaultFeatures.addMangroveSwampVegetation(gen);
         BiomeDefaultFeatures.addMangroveSwampExtraVegetation(gen);
+        gen.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, features.getOrThrow(ModOreFeatures.GREEN_ORE_PLACED));
 
         return new Biome.BiomeBuilder()
             .hasPrecipitation(true)
@@ -357,6 +358,7 @@ public final class PlanetDimensions {
         BiomeDefaultFeatures.addDefaultCarversAndLakes(gen);
         BiomeDefaultFeatures.addDefaultUndergroundVariety(gen);
         BiomeDefaultFeatures.addDefaultOres(gen);
+        gen.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, features.getOrThrow(ModOreFeatures.PURPLE_ORE_PLACED));
 
         return new Biome.BiomeBuilder()
             .hasPrecipitation(true)
@@ -424,6 +426,7 @@ public final class PlanetDimensions {
         BiomeDefaultFeatures.addDefaultFlowers(gen);
         BiomeDefaultFeatures.addDefaultGrass(gen);
         BiomeDefaultFeatures.addDefaultExtraVegetation(gen, false);
+        gen.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, features.getOrThrow(ModOreFeatures.BLUE_ORE_PLACED));
 
         return new Biome.BiomeBuilder()
             .hasPrecipitation(true)

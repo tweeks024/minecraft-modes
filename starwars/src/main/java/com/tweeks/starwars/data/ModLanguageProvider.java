@@ -78,6 +78,18 @@ public class ModLanguageProvider extends LanguageProvider {
         add(com.tweeks.starwars.Registration.CANTINA_RECORD.get(), "Music Disc");
         add("jukebox_song.starwars.cantina_band", "Figrin's Fizz - Cantina Swing");
         add(com.tweeks.starwars.Registration.GALAXY_MAP.get(), "Galaxy Map");
+        add(com.tweeks.starwars.Registration.BLUE_KYBER_ORE.get(), "Blue Kyber Ore");
+        add(com.tweeks.starwars.Registration.GREEN_KYBER_ORE.get(), "Green Kyber Ore");
+        add(com.tweeks.starwars.Registration.PURPLE_KYBER_ORE.get(), "Purple Kyber Ore");
+        add(com.tweeks.starwars.Registration.KYBER_CRYSTAL.get(), "Kyber Crystal");
+        add(com.tweeks.starwars.Registration.SABER_HILT.get(), "Lightsaber Hilt");
+        add("starwars.kyber.color.blue", "Attunement: Blue");
+        add("starwars.kyber.color.green", "Attunement: Green");
+        add("starwars.kyber.color.red", "Attunement: Sith Red");
+        add("starwars.kyber.color.purple", "Attunement: Purple");
+        add("starwars.kyber.hint_bleed", "A dark heart could bleed it red...");
+        add("starwars.kyber.resists", "The crystal resists your touch - only the dark side can bleed it");
+        add("starwars.kyber.bled", "The crystal screams and bleeds Sith red");
         add("screen.starwars.galaxy_map", "Galaxy Map");
         add("screen.starwars.galaxy_map.charted", "Charted");
         add("screen.starwars.galaxy_map.uncharted", "Uncharted");

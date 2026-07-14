@@ -1,0 +1,7 @@
+{
+    "variants": {
+        "": {
+            "model": "starwars:block/blue_kyber_ore"
+        }
+    }
+}

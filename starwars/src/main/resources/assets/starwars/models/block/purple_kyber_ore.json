@@ -1,0 +1,6 @@
+{
+    "parent": "minecraft:block/cube_all",
+    "textures": {
+        "all": "starwars:block/purple_kyber_ore"
+    }
+}

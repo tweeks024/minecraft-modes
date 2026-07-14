@@ -47,6 +47,35 @@ public final class Registration {
     public static final DeferredItem<com.tweeks.starwars.item.GalaxyMapItem> GALAXY_MAP =
         ITEMS.registerItem("galaxy_map", com.tweeks.starwars.item.GalaxyMapItem::new, p -> p);
 
+    // Kyber ores: deepslate-hosted, iron-pickaxe tier, one colour per planet.
+    private static java.util.function.Supplier<net.minecraft.world.level.block.state.BlockBehaviour.Properties> kyberOreProps() {
+        return () -> net.minecraft.world.level.block.state.BlockBehaviour.Properties.of()
+            .strength(4.5F, 3.0F)
+            .requiresCorrectToolForDrops()
+            .sound(net.minecraft.world.level.block.SoundType.DEEPSLATE)
+            .lightLevel(state -> 4);
+    }
+
+    public static final net.neoforged.neoforge.registries.DeferredBlock<net.minecraft.world.level.block.Block>
+        BLUE_KYBER_ORE = BLOCKS.registerBlock("blue_kyber_ore", net.minecraft.world.level.block.Block::new, kyberOreProps());
+    public static final net.neoforged.neoforge.registries.DeferredBlock<net.minecraft.world.level.block.Block>
+        GREEN_KYBER_ORE = BLOCKS.registerBlock("green_kyber_ore", net.minecraft.world.level.block.Block::new, kyberOreProps());
+    public static final net.neoforged.neoforge.registries.DeferredBlock<net.minecraft.world.level.block.Block>
+        PURPLE_KYBER_ORE = BLOCKS.registerBlock("purple_kyber_ore", net.minecraft.world.level.block.Block::new, kyberOreProps());
+
+    public static final DeferredItem<net.minecraft.world.item.BlockItem> BLUE_KYBER_ORE_ITEM =
+        ITEMS.registerSimpleBlockItem(BLUE_KYBER_ORE);
+    public static final DeferredItem<net.minecraft.world.item.BlockItem> GREEN_KYBER_ORE_ITEM =
+        ITEMS.registerSimpleBlockItem(GREEN_KYBER_ORE);
+    public static final DeferredItem<net.minecraft.world.item.BlockItem> PURPLE_KYBER_ORE_ITEM =
+        ITEMS.registerSimpleBlockItem(PURPLE_KYBER_ORE);
+
+    public static final DeferredItem<com.tweeks.starwars.item.KyberCrystalItem> KYBER_CRYSTAL =
+        ITEMS.registerItem("kyber_crystal", com.tweeks.starwars.item.KyberCrystalItem::new, p -> p);
+
+    public static final DeferredItem<com.tweeks.starwars.item.SaberHiltItem> SABER_HILT =
+        ITEMS.registerItem("saber_hilt", com.tweeks.starwars.item.SaberHiltItem::new, p -> p.stacksTo(1));
+
     public static final DeferredItem<com.tweeks.starwars.item.BlasterPistolItem> BLASTER_PISTOL =
         ITEMS.registerItem("blaster_pistol", com.tweeks.starwars.item.BlasterPistolItem::new, p -> p);
 
@@ -232,6 +261,13 @@ public final class Registration {
                     output.accept(SPEEDER_BIKE.get());
                     output.accept(XWING.get());
                     output.accept(TIE_FIGHTER.get());
+                    output.accept(BLUE_KYBER_ORE.get());
+                    output.accept(GREEN_KYBER_ORE.get());
+                    output.accept(PURPLE_KYBER_ORE.get());
+                    output.accept(SABER_HILT.get());
+                    for (com.tweeks.starwars.item.SaberColor color : com.tweeks.starwars.item.SaberColor.values()) {
+                        output.accept(com.tweeks.starwars.item.KyberCrystalItem.withColor(color));
+                    }
                     output.accept(JAWA_SPAWN_EGG.get());
                     output.accept(TUSKEN_RAIDER_SPAWN_EGG.get());
                     output.accept(BANTHA_SPAWN_EGG.get());

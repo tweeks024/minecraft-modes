@@ -66,6 +66,16 @@ public class ModRecipeProvider extends RecipeProvider {
             .unlockedBy("has_compass", this.has(Items.COMPASS))
             .save(this.output);
 
+        // Saber hilt: the metal half of a lightsaber — iron + a redstone stud.
+        ShapedRecipeBuilder.shaped(itemLookup, RecipeCategory.COMBAT, Registration.SABER_HILT.get())
+            .pattern("I")
+            .pattern("R")
+            .pattern("I")
+            .define('I', Items.IRON_INGOT)
+            .define('R', Items.REDSTONE)
+            .unlockedBy("has_iron", this.has(Items.IRON_INGOT))
+            .save(this.output);
+
         // Galaxy Map: a chart of paper around an amethyst focusing crystal.
         ShapedRecipeBuilder.shaped(itemLookup, RecipeCategory.TOOLS, Registration.GALAXY_MAP.get())
             .pattern("PPP")

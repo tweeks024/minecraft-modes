@@ -23,6 +23,14 @@ public final class ModDataComponents {
                 .persistent(Codec.INT)
                 .networkSynchronized(ByteBufCodecs.VAR_INT));
 
+    /** Kyber crystal color index into SaberColor.values(); defaults to 0 (BLUE). */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> KYBER_COLOR =
+        COMPONENTS.registerComponentType(
+            "kyber_color",
+            builder -> builder
+                .persistent(Codec.INT)
+                .networkSynchronized(ByteBufCodecs.VAR_INT));
+
     /** Active ForcePower index 0..4. Defaults to 0 (PUSH). */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> ACTIVE_POWER =
         COMPONENTS.registerComponentType(

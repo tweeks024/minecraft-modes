@@ -31,6 +31,10 @@ public class DataGenerators {
                  com.tweeks.starwars.world.planet.PlanetDimensions::bootstrapDimensionTypes)
             .add(Registries.NOISE_SETTINGS,
                  com.tweeks.starwars.world.planet.PlanetDimensions::bootstrapNoiseSettings)
+            .add(Registries.CONFIGURED_FEATURE,
+                 com.tweeks.starwars.world.planet.ModOreFeatures::bootstrapConfigured)
+            .add(Registries.PLACED_FEATURE,
+                 com.tweeks.starwars.world.planet.ModOreFeatures::bootstrapPlaced)
             .add(Registries.BIOME,
                  com.tweeks.starwars.world.planet.PlanetDimensions::bootstrapBiomes)
             .add(Registries.STRUCTURE, ModStructureProvider::bootstrapStructures)

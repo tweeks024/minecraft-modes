@@ -141,6 +141,80 @@ def paint_portal_sheet(name):
         sheet += paint_frame(seed, palette, t)
     return sheet
 
+# ── Kyber ore blocks ───────────────────────────────────────────────────
+# Static (non-animated) 16x16 ore faces: a mottled deepslate host stone —
+# four gray tones scattered by hash noise so no region is a flat fill —
+# speckled with embedded glowing crystals of the ore's hue. Each crystal
+# speck is a tiny faceted diamond (dark facet / mid body / bright lit core)
+# capped by one near-white specular pip. Deterministic in the file's own
+# style: every stone tone and every speck's position/size derives from
+# zlib.crc32 of the ore name (never Python's salted hash()), so re-runs are
+# byte-identical. Written to textures/block/ alongside the portal strips.
+
+# Kyber ore crystal hues (spec colors).
+KYBER_ORES = {
+    'blue_kyber_ore':   (0x3E, 0x7B, 0xFF),
+    'green_kyber_ore':  (0x3B, 0xE8, 0x6B),
+    'purple_kyber_ore': (0xA6, 0x3B, 0xE8),
+}
+
+# Deepslate host stone — 4 tones (darkest "pit" .. lightest fleck).
+_ORE_STONE = [
+    (0x1E, 0x1E, 0x22),   # pit (sparse darkest overlay)
+    (0x28, 0x28, 0x2E),   # dark
+    (0x35, 0x35, 0x3C),   # mid
+    (0x47, 0x47, 0x50),   # light
+]
+
+def _ore_seed(name):
+    """Per-ore hashing seed — distinct namespace from the portal seeds."""
+    return zlib.crc32(('kyber_ore_' + name).encode('utf-8')) & 0xffffffff
+
+def gen_kyber_ore(name, crystal_rgb, out):
+    """Paint one 16x16 kyber ore face for `crystal_rgb` and write it to `out`."""
+    seed = _ore_seed(name)
+    c_dark   = _mix(crystal_rgb, (0, 0, 0), 0.42)        # facet shadow
+    c_mid    = crystal_rgb                                # body
+    c_bright = _mix(crystal_rgb, (255, 255, 255), 0.45)  # lit core
+    c_pip    = _mix(crystal_rgb, (255, 255, 255), 0.82)  # specular pip
+    buf = bytearray(FRAME * FRAME * 4)
+
+    def put(x, y, rgb):
+        if 0 <= x < FRAME and 0 <= y < FRAME:
+            i = 4 * (y * FRAME + x)
+            buf[i:i+4] = bytes((rgb[0], rgb[1], rgb[2], 255))
+
+    # 1) Mottled deepslate: two hash layers choose among 3 base tones, with a
+    #    sparse darkest "pit" overlay — 4 tones, no flat region.
+    for y in range(FRAME):
+        for x in range(FRAME):
+            n = _noise(seed, x, y)
+            tone = _ORE_STONE[1] if n < 0.34 else (_ORE_STONE[2] if n < 0.74 else _ORE_STONE[3])
+            if _noise(seed ^ 0x5A5A5A5A, x, y) > 0.92:
+                tone = _ORE_STONE[0]
+            put(x, y, tone)
+
+    # 2) Embedded crystal specks. Count (5..7), positions and per-speck size
+    #    all hashed from the seed. Each speck: mid-body diamond, bright lit
+    #    core, dark lower-right facet, one near-white specular pip at the
+    #    top-left lit corner.
+    n_clusters = 5 + _hash2(seed, 99, 17) % 3
+    for k in range(n_clusters):
+        cx = 2 + _hash2(seed, k, 41) % 12      # inset 2..13
+        cy = 2 + _hash2(seed, k, 42) % 12
+        big = _hash2(seed, k, 43) % 2 == 0
+        put(cx,     cy,     c_bright)          # lit core
+        put(cx - 1, cy,     c_mid)
+        put(cx,     cy - 1, c_mid)
+        put(cx + 1, cy,     c_dark)            # right facet shadow
+        put(cx,     cy + 1, c_dark)            # bottom facet shadow
+        if big:
+            put(cx - 1, cy - 1, c_mid)         # extend the lit side
+            put(cx + 1, cy + 1, c_dark)        # extend the shadow side
+            put(cx - 2, cy,     c_dark)        # jagged facet tail
+        put(cx - 1, cy - 2 if big else cy - 1, c_pip)  # specular pip
+    write_png(out, buf, FRAME, FRAME)
+
 if __name__ == '__main__':
     out_dir = sys.argv[1] if len(sys.argv) > 1 else \
         'starwars/src/main/resources/assets/starwars/textures/block'
@@ -151,4 +225,8 @@ if __name__ == '__main__':
         with open(png_path + '.mcmeta', 'w') as f:
             f.write(MCMETA)
         print(f'hyperspace_portal_{name}')
+    # Kyber ore faces (static 16x16, no .mcmeta) into the same block dir.
+    for ore_name, crystal_rgb in KYBER_ORES.items():
+        gen_kyber_ore(ore_name, crystal_rgb, os.path.join(out_dir, f'{ore_name}.png'))
+        print(ore_name)
     print('OK')

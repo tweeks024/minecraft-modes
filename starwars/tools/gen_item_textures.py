@@ -577,6 +577,159 @@ def gen_galaxy_map(out_path):
 
     write_png(out_path, rgba)
 
+# ── Kyber crystals + saber hilt ────────────────────────────────────────
+# Lightsaber-crafting item icons. gen_kyber_crystal paints a faceted gem
+# shard (angular silhouette, diagonal lit->shadow facet gradient, dark
+# facet-edge ring, glowing core, one white sparkle) in any hue; the 'red'
+# (bled/Sith) variant gets a jaggier outline plus darker veins.
+# gen_saber_hilt paints a bladeless chrome cylinder hilt. Both are static
+# and fully explicit — no randomness — so re-runs are byte-identical.
+
+def _mix(c0, c1, f):
+    """Blend RGB c0 toward c1 by fraction f (per channel, rounded)."""
+    return tuple(int(a + (b - a) * f + 0.5) for a, b in zip(c0, c1))
+
+def _rgba(rgb, a=0xFF):
+    """RGB triple -> RGBA 4-tuple (opaque by default)."""
+    return (rgb[0], rgb[1], rgb[2], a)
+
+
+def gen_kyber_crystal(color_rgb, variant, out_path):
+    """16x16 faceted kyber shard for `color_rgb`. `variant` names the hue
+    ('blue'/'green'/'red'/'purple'); 'red' also triggers the jagged Sith
+    silhouette + dark veins."""
+    rgba = bytearray(W * H * 4)  # fully transparent
+
+    c_edge   = _rgba(_mix(color_rgb, (0, 0, 0), 0.58))          # facet edges
+    c_dark   = _rgba(_mix(color_rgb, (0, 0, 0), 0.30))          # shadow facet
+    c_mid    = _rgba(color_rgb)                                 # body
+    c_bright = _rgba(_mix(color_rgb, (255, 255, 255), 0.40))    # lit facet
+    c_core   = _rgba(_mix(color_rgb, (255, 255, 255), 0.66))    # glowing core
+    c_vein   = _rgba(_mix(color_rgb, (0, 0, 0), 0.66))          # Sith veins
+    sparkle  = (0xFF, 0xFF, 0xFF, 0xFF)
+
+    def px(x, y, color):
+        rect(rgba, x, y, x + 1, y + 1, color)
+
+    # Angular shard silhouette (half-open x-span per row), symmetric about
+    # x=7.5: a short crown above a longer pavilion tapering to a point.
+    spans = {
+        2: (7, 9), 3: (6, 10), 4: (5, 11), 5: (4, 12), 6: (4, 12),
+        7: (5, 11), 8: (5, 11), 9: (6, 10), 10: (6, 10), 11: (7, 9), 12: (7, 9),
+    }
+    jagged = variant == 'red'
+    if jagged:
+        spans = dict(spans)
+        spans[1] = (7, 9)     # spike above the crown
+        spans[7] = (4, 11)    # left-jut facet
+        spans[9] = (6, 11)    # right-jut facet
+        spans[13] = (7, 8)    # long sharp bottom spike
+
+    # 1) Facet gradient fill: lit crown-left, mid crown-right & pavilion-left,
+    #    shadowed pavilion-right — a diagonal light-to-dark cut.
+    for y, (x0, x1) in spans.items():
+        for x in range(x0, x1):
+            crown = y <= 6
+            left = x <= 7
+            if crown and left:
+                col = c_bright
+            elif crown or left:
+                col = c_mid
+            else:
+                col = c_dark
+            px(x, y, col)
+
+    # 2) Facet-edge ring: darken each row's left/right border + top/bottom caps.
+    for y, (x0, x1) in spans.items():
+        px(x0, y, c_edge)
+        px(x1 - 1, y, c_edge)
+    for x in range(*spans[min(spans)]):
+        px(x, min(spans), c_edge)
+    for x in range(*spans[max(spans)]):
+        px(x, max(spans), c_edge)
+
+    # 3) Glowing core: a near-white-tinted cluster just above center.
+    px(7, 4, c_bright); px(8, 4, c_bright)
+    px(7, 5, c_core);   px(8, 5, c_core)
+    px(7, 6, c_core);   px(8, 6, c_core)
+
+    # 4) Red veins: two dark diagonal fractures across the body.
+    if jagged:
+        for vx, vy in ((6, 4), (7, 6), (8, 8), (9, 10)):
+            px(vx, vy, c_vein)
+        for vx, vy in ((9, 5), (8, 7), (7, 9)):
+            px(vx, vy, c_vein)
+
+    # 5) One white sparkle on the upper-left lit facet.
+    px(6, 4, sparkle)
+
+    write_png(out_path, rgba)
+
+
+def gen_saber_hilt(out_path):
+    """16x16 lightsaber hilt icon (no blade): a vertical chrome cylinder —
+    4 metal tones (edge/highlight/base/shade columns for a rounded read), a
+    flared emitter head with a dark blade aperture at the top, three black
+    grip bands and a red activation stud."""
+    rgba = bytearray(W * H * 4)  # fully transparent
+
+    edge    = (0x34, 0x37, 0x3E, 0xFF)   # dark metal outline
+    hi      = (0xD6, 0xDA, 0xE2, 0xFF)   # left specular highlight
+    base    = (0x9C, 0xA0, 0xA8, 0xFF)   # chrome base
+    shade   = (0x64, 0x68, 0x70, 0xFF)   # right shade
+    emit    = (0xE4, 0xE8, 0xF0, 0xFF)   # emitter lip (brightest metal)
+    hole    = (0x1C, 0x1E, 0x26, 0xFF)   # blade aperture (dark)
+    band    = (0x17, 0x17, 0x1B, 0xFF)   # black grip band
+    band_hi = (0x30, 0x30, 0x38, 0xFF)   # band sheen
+    stud    = (0xC4, 0x30, 0x28, 0xFF)   # red activation button
+    stud_hi = (0xE8, 0x60, 0x50, 0xFF)
+
+    def px(x, y, c):
+        rect(rgba, x, y, x + 1, y + 1, c)
+
+    def metal_row(y, x0, x1):
+        """A horizontal metal slice: edge | highlight | base... | shade | edge."""
+        for x in range(x0, x1):
+            if x == x0 or x == x1 - 1:
+                c = edge
+            elif x == x0 + 1:
+                c = hi
+            elif x == x1 - 2:
+                c = shade
+            else:
+                c = base
+            px(x, y, c)
+
+    # Flared emitter head, rows 1-2, with a dark blade aperture dead center.
+    metal_row(1, 4, 12)
+    metal_row(2, 4, 12)
+    for x in range(5, 11):
+        px(x, 1, emit)            # bright emitter lip
+    px(4, 1, edge); px(11, 1, edge)
+    px(7, 1, hole); px(8, 1, hole)
+
+    # Neck taper, then the body cylinder (6px wide) rows 3-13.
+    metal_row(3, 5, 11)
+    for y in range(4, 14):
+        metal_row(y, 5, 11)
+
+    # Pommel cap, row 14 (darker).
+    for x in range(5, 11):
+        px(x, 14, edge if x in (5, 10) else shade)
+
+    # Three black grip bands wrapping the body interior.
+    for by in (7, 9, 11):
+        for x in range(6, 10):
+            px(x, by, band)
+        px(6, by, band_hi)
+
+    # Red activation stud on the upper body.
+    px(8, 5, stud); px(9, 5, stud)
+    px(8, 5, stud_hi)
+
+    write_png(out_path, rgba)
+
+
 if __name__ == '__main__':
     out_dir = sys.argv[1] if len(sys.argv) > 1 else '.'
     # blaster_pistol.png / blaster_rifle.png are no longer generated here —
@@ -593,4 +746,11 @@ if __name__ == '__main__':
     gen_star_compass(os.path.join(out_dir, 'star_compass.png'))
     gen_cantina_record(os.path.join(out_dir, 'cantina_record.png'))
     gen_galaxy_map(os.path.join(out_dir, 'galaxy_map.png'))
+    # Kyber crystals (one icon per hue) + the bladeless saber hilt.
+    for variant, color in (('blue',   (0x3E, 0x7B, 0xFF)),
+                           ('green',  (0x3B, 0xE8, 0x6B)),
+                           ('red',    (0xFF, 0x2A, 0x2A)),
+                           ('purple', (0xA6, 0x3B, 0xE8))):
+        gen_kyber_crystal(color, variant, os.path.join(out_dir, f'kyber_crystal_{variant}.png'))
+    gen_saber_hilt(os.path.join(out_dir, 'saber_hilt.png'))
     print('OK')
