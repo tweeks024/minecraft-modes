@@ -81,6 +81,14 @@ public class ModLanguageProvider extends LanguageProvider {
         add(com.tweeks.starwars.Registration.CANTINA_RECORD.get(), "Music Disc");
         add("jukebox_song.starwars.cantina_band", "Figrin's Fizz - Cantina Swing");
         add(com.tweeks.starwars.Registration.GALAXY_MAP.get(), "Galaxy Map");
+        add(com.tweeks.starwars.Registration.CREDIT.get(), "Galactic Credit");
+        add(com.tweeks.starwars.Registration.BOUNTY_TERMINAL.get(), "Bounty Terminal");
+        add("starwars.bounty.accepted", "Bounty taken: hunt %s §e%s§r for §6%s credits§r. Sneak-click to abandon.");
+        add("starwars.bounty.status", "Bounty: %s of %s down - §6%s credits§r on completion");
+        add("starwars.bounty.progress", "Bounty: %s / %s");
+        add("starwars.bounty.done", "Target eliminated! Collect your reward at any bounty terminal");
+        add("starwars.bounty.collected", "Bounty paid: §6+%s credits");
+        add("starwars.bounty.abandoned", "Bounty abandoned");
         add(com.tweeks.starwars.Registration.BLUE_KYBER_ORE.get(), "Blue Kyber Ore");
         add(com.tweeks.starwars.Registration.GREEN_KYBER_ORE.get(), "Green Kyber Ore");
         add(com.tweeks.starwars.Registration.PURPLE_KYBER_ORE.get(), "Purple Kyber Ore");

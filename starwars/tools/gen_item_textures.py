@@ -577,6 +577,81 @@ def gen_galaxy_map(out_path):
 
     write_png(out_path, rgba)
 
+
+def gen_credit(out_path):
+    """16x16 galactic-credit icon: a hexagonal chip with a polished
+    chrome-silver rim (stepped-hexagon silhouette via outline_and_fill, 3
+    metal tones + dark outline) inset with a gold center face (3 gold tones,
+    lit upper-left / shaded lower-right), an engraved 4-point star emblem in
+    the darkest gold, and a bright specular glint on the upper-left rim.
+    Reads as a valuable coin/chip. Static + fully explicit — byte-identical
+    re-runs."""
+    rgba = bytearray(W * H * 4)  # fully transparent
+
+    chrome_ol = (0x35, 0x38, 0x40, 0xFF)   # dark chrome outline
+    chrome    = (0xB6, 0xBA, 0xC4, 0xFF)   # chrome base
+    chrome_hi = (0xE6, 0xEA, 0xF2, 0xFF)   # chrome top-left highlight
+    chrome_sh = (0x80, 0x84, 0x90, 0xFF)   # chrome bottom-right shade
+    spec      = (0xF8, 0xFB, 0xFF, 0xFF)   # bright specular glint
+    gold      = (0xC8, 0x9A, 0x46, 0xFF)   # gold face base (shared brass hue)
+    gold_hi   = (0xE8, 0xC8, 0x74, 0xFF)   # gold highlight
+    gold_sh   = (0x8E, 0x66, 0x2C, 0xFF)   # gold shade
+    engrave   = (0x74, 0x50, 0x1E, 0xFF)   # engraved emblem (darkest gold)
+
+    def px(x, y, c):
+        rect(rgba, x, y, x + 1, y + 1, c)
+
+    # Chrome hexagon body: flat top+bottom, points left+right — 3 chrome
+    # tones + dark outline, lit top rows / shaded bottom rows.
+    segs = [
+        (2,  [(6, 10)]),
+        (3,  [(5, 11)]),
+        (4,  [(4, 12)]),
+        (5,  [(3, 13)]),
+        (6,  [(2, 14)]),
+        (7,  [(2, 14)]),
+        (8,  [(2, 14)]),
+        (9,  [(3, 13)]),
+        (10, [(4, 12)]),
+        (11, [(5, 11)]),
+        (12, [(6, 10)]),
+    ]
+    outline_and_fill(rgba, segs, outline=chrome_ol, base=chrome,
+                      hi=chrome_hi, sh=chrome_sh,
+                      hi_rows={2, 3, 4}, sh_rows={10, 11, 12})
+
+    # Gold center face (a smaller hexagon inset into the chrome), leaving a
+    # chrome rim all around.
+    gold_face = {
+        5:  (7, 9),     # top point
+        6:  (6, 10),
+        7:  (5, 11),
+        8:  (5, 11),
+        9:  (6, 10),
+        10: (7, 9),     # bottom point
+    }
+    for y, (x0, x1) in gold_face.items():
+        for x in range(x0, x1):
+            px(x, y, gold)
+    # Gold rim gradient: lit upper-left, shaded lower-right (3 gold tones).
+    for x, y in ((7, 5), (8, 5), (6, 6), (5, 7), (6, 7)):
+        px(x, y, gold_hi)
+    for x, y in ((7, 10), (8, 10), (9, 9), (10, 8), (9, 8)):
+        px(x, y, gold_sh)
+
+    # Engraved 4-point star emblem, incised into the gold face.
+    for x, y in ((7, 6), (8, 6),                    # top arm
+                 (6, 7), (7, 7), (8, 7), (9, 7),    # upper cross row
+                 (6, 8), (7, 8), (8, 8), (9, 8),    # lower cross row
+                 (7, 9), (8, 9)):                   # bottom arm
+        px(x, y, engrave)
+
+    # Bright specular glint on the upper-left chrome rim.
+    for x, y in ((6, 3), (7, 3), (5, 4)):
+        px(x, y, spec)
+
+    write_png(out_path, rgba)
+
 # ── Kyber crystals + saber hilt ────────────────────────────────────────
 # Lightsaber-crafting item icons. gen_kyber_crystal paints a faceted gem
 # shard (angular silhouette, diagonal lit->shadow facet gradient, dark
@@ -746,6 +821,7 @@ if __name__ == '__main__':
     gen_star_compass(os.path.join(out_dir, 'star_compass.png'))
     gen_cantina_record(os.path.join(out_dir, 'cantina_record.png'))
     gen_galaxy_map(os.path.join(out_dir, 'galaxy_map.png'))
+    gen_credit(os.path.join(out_dir, 'credit.png'))
     # Kyber crystals (one icon per hue) + the bladeless saber hilt.
     for variant, color in (('blue',   (0x3E, 0x7B, 0xFF)),
                            ('green',  (0x3B, 0xE8, 0x6B)),

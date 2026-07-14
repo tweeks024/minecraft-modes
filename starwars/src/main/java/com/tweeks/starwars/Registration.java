@@ -47,6 +47,21 @@ public final class Registration {
     public static final DeferredItem<com.tweeks.starwars.item.GalaxyMapItem> GALAXY_MAP =
         ITEMS.registerItem("galaxy_map", com.tweeks.starwars.item.GalaxyMapItem::new, p -> p);
 
+    // Galactic credits: bounty reward + jawa currency.
+    public static final DeferredItem<Item> CREDIT =
+        ITEMS.registerItem("credit", Item::new, p -> p);
+
+    public static final net.neoforged.neoforge.registries.DeferredBlock<com.tweeks.starwars.bounty.BountyTerminalBlock>
+        BOUNTY_TERMINAL = BLOCKS.registerBlock("bounty_terminal",
+            com.tweeks.starwars.bounty.BountyTerminalBlock::new,
+            () -> net.minecraft.world.level.block.state.BlockBehaviour.Properties.of()
+                .strength(3.0F)
+                .requiresCorrectToolForDrops()
+                .sound(net.minecraft.world.level.block.SoundType.METAL)
+                .lightLevel(state -> 7));
+    public static final DeferredItem<net.minecraft.world.item.BlockItem> BOUNTY_TERMINAL_ITEM =
+        ITEMS.registerSimpleBlockItem(BOUNTY_TERMINAL);
+
     // Kyber ores: deepslate-hosted, iron-pickaxe tier, one colour per planet.
     private static java.util.function.Supplier<net.minecraft.world.level.block.state.BlockBehaviour.Properties> kyberOreProps() {
         return () -> net.minecraft.world.level.block.state.BlockBehaviour.Properties.of()
@@ -273,6 +288,8 @@ public final class Registration {
                     output.accept(STAR_COMPASS.get());
                     output.accept(CANTINA_RECORD.get());
                     output.accept(GALAXY_MAP.get());
+                    output.accept(CREDIT.get());
+                    output.accept(BOUNTY_TERMINAL.get());
                     output.accept(SPEEDER_BIKE.get());
                     output.accept(XWING.get());
                     output.accept(TIE_FIGHTER.get());

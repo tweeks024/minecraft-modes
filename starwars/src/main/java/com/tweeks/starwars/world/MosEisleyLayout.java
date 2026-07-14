@@ -25,7 +25,7 @@ public final class MosEisleyLayout {
 
     public enum Kind {
         STREET, FLOOR, WALL, DOME, ROOF, WINDOW, DOOR_AIR, AIR,
-        LAMP, VAPORATOR, BAR, SEAT, TABLE, JUKEBOX, LANTERN,
+        LAMP, VAPORATOR, BAR, SEAT, TABLE, JUKEBOX, LANTERN, BOUNTY_TERMINAL,
         PAD, PAD_WALL, CHEST_CANTINA, CHEST_DOCKING,
         JAWA, STORMTROOPER, ASTROMECH, BAND_DROID
     }
@@ -243,6 +243,8 @@ public final class MosEisleyLayout {
         }
         put(out, 9, 1, 37, Kind.JUKEBOX);
         put(out, 10, 1, 37, Kind.CHEST_CANTINA);
+        // The bounty board, mounted on the back wall behind the bar.
+        put(out, 13, 2, 37, Kind.BOUNTY_TERMINAL);
 
         // Four table clusters (fence + pressure-plate builds); the cell above
         // each marker is cleared so the tabletop survives the interior air.

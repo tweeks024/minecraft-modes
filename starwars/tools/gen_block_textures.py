@@ -218,6 +218,90 @@ def gen_kyber_ore(name, crystal_rgb, out):
         put(cx - 1, cy - 2 if big else cy - 1, c_pip)  # specular pip
     write_png(out, buf, FRAME, FRAME)
 
+# ── Bounty terminal block ──────────────────────────────────────────────
+# Static (non-animated) 16x16 full-face texture, used on all six faces as a
+# cube_all block: a wall-mounted Imperial holo-kiosk. A bevelled gunmetal
+# casing (3 gray tones — light top/left bevel, base, dark bottom/right —
+# plus near-black panel seams and four corner bolts) frames a dark bezel
+# around a glowing amber screen. The screen carries a 5-band vertical
+# brightness gradient (no flat fill) plus a dark head-and-shoulders "wanted
+# poster" bust and two dim text lines; a red and a green status LED sit on
+# the control bar beneath it. Fully explicit — no randomness — so re-runs
+# are byte-identical, matching gen_kyber_ore's determinism style.
+
+# Gunmetal casing tones (bevel highlight / base / shade) + seam/bolt + bezel.
+_BT_CASE_HI = (0x54, 0x58, 0x62)
+_BT_CASE    = (0x3A, 0x3E, 0x46)
+_BT_CASE_DK = (0x24, 0x26, 0x2C)
+_BT_SEAM    = (0x12, 0x13, 0x18)   # panel seams / corner bolts
+_BT_BEZEL   = (0x16, 0x17, 0x1D)   # dark bezel ring around the screen
+# Amber holo-screen tones: hotspot / bright core / base / mid / shade bands.
+_BT_SCR_HOT = (0xFF, 0xE2, 0x9E)
+_BT_SCR_CORE = (0xF6, 0xC6, 0x58)
+_BT_SCR     = (0xE8, 0xA3, 0x3D)   # cantina-amber base (shared spec hue)
+_BT_SCR_MID = (0xCE, 0x8E, 0x30)
+_BT_SCR_DK  = (0xB4, 0x78, 0x24)
+_BT_FIG     = (0x4A, 0x30, 0x10)   # poster bust shoulders (dark ink on amber)
+_BT_FIG_HI  = (0x60, 0x40, 0x18)   # poster bust head (lighter ink)
+_BT_TEXT    = (0x88, 0x59, 0x1C)   # poster text lines
+# Status LEDs (housing base + lit pip).
+_BT_RED     = (0xC8, 0x2E, 0x26)
+_BT_RED_HI  = (0xF0, 0x74, 0x60)
+_BT_GREEN   = (0x34, 0xC0, 0x48)
+_BT_GREEN_HI = (0x86, 0xF0, 0x96)
+
+def gen_bounty_terminal(out):
+    """Paint the 16x16 bounty-terminal kiosk face and write it to `out`."""
+    buf = bytearray(FRAME * FRAME * 4)
+
+    def put(x, y, rgb):
+        if 0 <= x < FRAME and 0 <= y < FRAME:
+            i = 4 * (y * FRAME + x)
+            buf[i:i+4] = bytes((rgb[0], rgb[1], rgb[2], 255))
+
+    def fill(x0, y0, x1, y1, rgb):
+        for y in range(y0, y1):
+            for x in range(x0, x1):
+                put(x, y, rgb)
+
+    # 1) Casing: base fill, then a raised bevel (light top/left, dark
+    #    bottom/right edge) so the block reads as a panel, not a flat slab.
+    fill(0, 0, FRAME, FRAME, _BT_CASE)
+    fill(0, 0, FRAME, 1, _BT_CASE_HI)              # top bevel row
+    fill(0, 0, 1, FRAME, _BT_CASE_HI)              # left bevel col
+    fill(0, FRAME - 1, FRAME, FRAME, _BT_CASE_DK)  # bottom bevel row
+    fill(FRAME - 1, 0, FRAME, FRAME, _BT_CASE_DK)  # right bevel col
+    for bx, by in ((1, 1), (14, 1), (1, 14), (14, 14)):
+        put(bx, by, _BT_SEAM)                      # corner bolts
+
+    # 2) Dark bezel ring, then the amber screen inset (x3..12, y3..10) with a
+    #    5-band top->bottom brightness gradient + an upper-left glow hotspot.
+    fill(2, 2, 14, 12, _BT_BEZEL)
+    fill(3, 3, 13, 11, _BT_SCR)                    # base band (rows 5,6)
+    fill(3, 3, 13, 5, _BT_SCR_CORE)                # bright header (rows 3,4)
+    fill(3, 7, 13, 9, _BT_SCR_MID)                 # mid band (rows 7,8)
+    fill(3, 9, 13, 11, _BT_SCR_DK)                 # dim base band (rows 9,10)
+    for hx, hy in ((4, 3), (5, 3), (4, 4)):
+        put(hx, hy, _BT_SCR_HOT)                   # glow hotspot
+
+    # 3) Wanted-poster bust (head + shoulders) + two dim text lines.
+    fill(7, 5, 9, 7, _BT_FIG_HI)                   # head
+    fill(6, 7, 10, 9, _BT_FIG)                     # shoulders
+    fill(5, 9, 10, 10, _BT_TEXT)                   # text line 1
+    fill(6, 10, 9, 11, _BT_TEXT)                   # text line 2
+
+    # 4) Control bar under the screen: a recessed shelf, two status LEDs
+    #    (red left / green right, lit pips toward center), and a keypad strip.
+    fill(1, 12, 15, 13, _BT_CASE_DK)               # recessed shelf row
+    put(3, 13, _BT_RED);    put(4, 13, _BT_RED_HI)
+    put(12, 13, _BT_GREEN); put(11, 13, _BT_GREEN_HI)
+    for kx in (6, 8, 10):
+        put(kx, 14, _BT_CASE_HI)                   # keypad keys
+    for kx in (7, 9):
+        put(kx, 14, _BT_SEAM)                      # keypad gaps
+
+    write_png(out, buf, FRAME, FRAME)
+
 if __name__ == '__main__':
     out_dir = sys.argv[1] if len(sys.argv) > 1 else \
         'starwars/src/main/resources/assets/starwars/textures/block'
@@ -232,4 +316,7 @@ if __name__ == '__main__':
     for ore_name, crystal_rgb in KYBER_ORES.items():
         gen_kyber_ore(ore_name, crystal_rgb, os.path.join(out_dir, f'{ore_name}.png'))
         print(ore_name)
+    # Bounty-terminal kiosk face (static 16x16, no .mcmeta) into the block dir.
+    gen_bounty_terminal(os.path.join(out_dir, 'bounty_terminal.png'))
+    print('bounty_terminal')
     print('OK')

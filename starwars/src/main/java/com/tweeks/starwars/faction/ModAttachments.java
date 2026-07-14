@@ -37,6 +37,14 @@ public final class ModAttachments {
                 .copyOnDeath()
                 .build());
 
+    /** A player's active cantina bounty (null when none is taken). */
+    public static final DeferredHolder<AttachmentType<?>, AttachmentType<com.tweeks.starwars.bounty.BountyState>> BOUNTY =
+        ATTACHMENTS.register("bounty",
+            () -> AttachmentType.<com.tweeks.starwars.bounty.BountyState>builder(() -> null)
+                .serialize(com.tweeks.starwars.bounty.BountyState.CODEC, attachment -> attachment != null)
+                .copyOnDeath()
+                .build());
+
     public static void register(IEventBus modEventBus) {
         ATTACHMENTS.register(modEventBus);
     }

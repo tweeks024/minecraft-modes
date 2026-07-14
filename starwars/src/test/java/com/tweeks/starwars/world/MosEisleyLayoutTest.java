@@ -35,6 +35,12 @@ class MosEisleyLayoutTest {
     }
 
     @Test
+    void cantinaHasExactlyOneBountyTerminal() {
+        assertEquals(1, MosEisleyLayout.placements().stream()
+            .filter(p -> p.kind() == MosEisleyLayout.Kind.BOUNTY_TERMINAL).count());
+    }
+
+    @Test
     void bandDroidsStandOnTheCantinaStageBesideTheJukebox() {
         var placements = MosEisleyLayout.placements();
         var jukebox = placements.stream()

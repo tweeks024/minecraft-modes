@@ -1,0 +1,7 @@
+{
+    "variants": {
+        "": {
+            "model": "starwars:block/bounty_terminal"
+        }
+    }
+}

@@ -66,6 +66,19 @@ public class ModRecipeProvider extends RecipeProvider {
             .unlockedBy("has_compass", this.has(Items.COMPASS))
             .save(this.output);
 
+        // Bounty terminal: an iron kiosk around a glowing screen (sea lantern)
+        // wired with redstone and read by a compass.
+        ShapedRecipeBuilder.shaped(itemLookup, RecipeCategory.MISC, Registration.BOUNTY_TERMINAL.get())
+            .pattern("III")
+            .pattern("RLC")
+            .pattern("III")
+            .define('I', Items.IRON_INGOT)
+            .define('R', Items.REDSTONE)
+            .define('L', Items.SEA_LANTERN)
+            .define('C', Items.COMPASS)
+            .unlockedBy("has_iron", this.has(Items.IRON_INGOT))
+            .save(this.output);
+
         // Saber hilt: the metal half of a lightsaber — iron + a redstone stud.
         ShapedRecipeBuilder.shaped(itemLookup, RecipeCategory.COMBAT, Registration.SABER_HILT.get())
             .pattern("I")

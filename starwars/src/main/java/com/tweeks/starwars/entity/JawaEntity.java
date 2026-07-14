@@ -66,9 +66,15 @@ public class JawaEntity extends PathfinderMob implements SwCombatant {
 
     // ---------- barter ----------
 
+    /** Jawas value credits over scrap — pay this many for a premium good. */
+    private static final int CREDIT_PRICE = 3;
+
     @Override
     protected InteractionResult mobInteract(Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
+        if (stack.is(com.tweeks.starwars.Registration.CREDIT.get())) {
+            return creditTrade(player, stack);
+        }
         if (!stack.is(Items.IRON_INGOT)) {
             return super.mobInteract(player, hand);
         }
@@ -100,6 +106,26 @@ public class JawaEntity extends PathfinderMob implements SwCombatant {
             case IRON_NUGGET -> Items.IRON_NUGGET;
             case GLOWSTONE_DUST -> Items.GLOWSTONE_DUST;
         };
+    }
+
+    /** Credits buy premium goods — better than the iron-scrap table. */
+    private InteractionResult creditTrade(Player player, ItemStack stack) {
+        if (this.level().isClientSide()) {
+            return InteractionResult.SUCCESS;
+        }
+        if (stack.getCount() < CREDIT_PRICE) {
+            this.playSound(SoundEvents.VILLAGER_NO, 1.0F, 1.5F);
+            return InteractionResult.CONSUME;
+        }
+        stack.consume(CREDIT_PRICE, player);
+        int roll = this.random.nextInt(100);
+        ItemStack reward = roll < 8 ? new ItemStack(Items.DIAMOND)
+            : roll < 38 ? new ItemStack(Items.GOLD_BLOCK)
+            : roll < 68 ? new ItemStack(Items.IRON_BLOCK)
+            : new ItemStack(Items.REDSTONE_BLOCK, 2);
+        this.spawnAtLocation((ServerLevel) this.level(), reward);
+        this.playSound(SoundEvents.VILLAGER_YES, 1.0F, 1.6F);
+        return InteractionResult.SUCCESS;
     }
 
     // ---------- persistence ----------

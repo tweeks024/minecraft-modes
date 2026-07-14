@@ -79,6 +79,8 @@ public class MosEisleyPiece extends ScatteredFeaturePiece {
                 case PAD, PAD_WALL -> Blocks.SMOOTH_STONE.defaultBlockState();
                 case JUKEBOX -> Blocks.JUKEBOX.defaultBlockState();
                 case LANTERN -> Blocks.LANTERN.defaultBlockState();
+                case BOUNTY_TERMINAL -> com.tweeks.starwars.Registration.BOUNTY_TERMINAL.get().defaultBlockState()
+                    .setValue(net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING, net.minecraft.core.Direction.SOUTH);
                 case DOOR_AIR, AIR -> Blocks.AIR.defaultBlockState();
                 case LAMP, VAPORATOR, TABLE, CHEST_CANTINA, CHEST_DOCKING -> null; // handled below
                 case JAWA, STORMTROOPER, ASTROMECH, BAND_DROID -> Blocks.AIR.defaultBlockState(); // carve air so street life doesn't suffocate on slopes; entity spawn below
