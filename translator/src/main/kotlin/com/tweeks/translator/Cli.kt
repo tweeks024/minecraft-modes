@@ -6,6 +6,7 @@ import com.tweeks.translator.discover.ModDiscovery
 import com.tweeks.translator.discover.ModMetadata
 import com.tweeks.translator.emit.AddonWriter
 import com.tweeks.translator.emit.Untranslatable
+import com.tweeks.translator.java.BlockRegistrationScanner
 import com.tweeks.translator.java.ClasspathResolver
 import com.tweeks.translator.java.EntityAnalyzer
 import com.tweeks.translator.java.ItemAnalyzer
@@ -17,6 +18,7 @@ import com.tweeks.translator.java.llm.RealClaudeClient
 import com.tweeks.translator.java.llm.TranslationCache
 import com.tweeks.translator.java.llm.TranslationPrompt
 import com.tweeks.translator.json.AssetCopier
+import com.tweeks.translator.json.DimensionScanner
 import com.tweeks.translator.json.ItemAtlasBuilder
 import com.tweeks.translator.json.LangTransform
 import com.tweeks.translator.json.LootTableTransform
@@ -154,6 +156,7 @@ private fun runPipeline(repoRoot: Path, opts: CliOptions, outputRoot: Path) {
     val atlasBuilder = ItemAtlasBuilder()
     val bbmodelConverter = { unt: Untranslatable -> BbmodelConverter(target, unt) }
     val worldgenStructureScanner = { unt: Untranslatable -> WorldgenStructureScanner(unt) }
+    val dimensionScanner = { unt: Untranslatable -> DimensionScanner(unt) }
 
     // Phase 2a Java pipeline foundation. The full discovered list is
     // needed so [JavaSourceLoader] can wire sibling mods' src dirs as
@@ -217,6 +220,7 @@ private fun runPipeline(repoRoot: Path, opts: CliOptions, outputRoot: Path) {
         copyResult?.let { runStage("atlas", mod.modId, unt) { atlasBuilder.build(mod.modId, it.itemTextureShortNames, outputRoot) } }
         runStage("bbmodel", mod.modId, unt) { bbmodelConverter(unt).convert(mod.modId, mod.rootDir.resolve("tools"), outputRoot) }
         runStage("worldgen-structures", mod.modId, unt) { worldgenStructureScanner(unt).scan(mod.rootDir, mod.modId) }
+        runStage("worldgen-dimensions", mod.modId, unt) { dimensionScanner(unt).scan(mod.rootDir, mod.modId) }
 
         // Phase 2: parse the Java sources, then run entity + item
         // analyzers against the AST. The classpath property is set by
@@ -236,6 +240,9 @@ private fun runPipeline(repoRoot: Path, opts: CliOptions, outputRoot: Path) {
                 )
                 EntityAnalyzer(target, unt, gate).analyze(mod, resolved, outputRoot)
                 ItemAnalyzer(target, unt).analyze(mod, resolved, outputRoot)
+                // Recording-only: custom block registrations have no Bedrock
+                // block emitter, so the honest move is a per-block report entry.
+                BlockRegistrationScanner(unt).scan(mod.modId, resolved)
             }
         }
 

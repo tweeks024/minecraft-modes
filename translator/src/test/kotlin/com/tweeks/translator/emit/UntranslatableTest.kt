@@ -99,4 +99,48 @@ class UntranslatableTest {
         assertTrue(report.contains("minecraft:behavior.random_stroll")) { report }
         assertTrue(report.contains("priority 7: RandomStrollGoal")) { report }
     }
+
+    @Test
+    fun `datapack dimension biome and noise findings appear in their sections`() {
+        val unt = Untranslatable()
+        unt.recordDatapackDimension(
+            "foo", "dimension/moon",
+            "custom dimension not expressible in a Bedrock add-on — data/foo/dimension/moon.json",
+        )
+        unt.recordDatapackDimension(
+            "foo", "dimension_type/moon",
+            "custom dimension type not expressible in a Bedrock add-on — data/foo/dimension_type/moon.json",
+        )
+        unt.recordDatapackBiome(
+            "foo", "crater",
+            "custom biome not translated (no Bedrock biome emitter) — data/foo/worldgen/biome/crater.json",
+        )
+        unt.recordDatapackNoiseSettings(
+            "foo", "moon",
+            "custom noise settings / chunk generation not expressible — data/foo/worldgen/noise_settings/moon.json",
+        )
+
+        val report = unt.renderReport("foo")
+        assertTrue(report.contains("## Custom dimensions not translatable")) { report }
+        assertTrue(report.contains("- `dimension/moon`")) { report }
+        assertTrue(report.contains("- `dimension_type/moon`")) { report }
+        assertTrue(report.contains("## Custom biomes not translated")) { report }
+        assertTrue(report.contains("- `crater`")) { report }
+        assertTrue(report.contains("## Custom noise settings / chunk generation not expressible")) { report }
+        assertTrue(report.contains("- `moon`")) { report }
+    }
+
+    @Test
+    fun `custom block finding appears in its own section`() {
+        val unt = Untranslatable()
+        unt.recordBlockNotTranslated(
+            "foo", "hyperspace_portal",
+            "custom block 'hyperspace_portal' not translated — translator has no Bedrock block emitter",
+        )
+
+        val report = unt.renderReport("foo")
+        assertTrue(report.contains("## Custom blocks not translated")) { report }
+        assertTrue(report.contains("- `hyperspace_portal`")) { report }
+        assertTrue(report.contains("no Bedrock block emitter")) { report }
+    }
 }

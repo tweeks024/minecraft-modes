@@ -13,6 +13,7 @@ Bedrock recipes do not accept Java's datagen-only `category` hint; the field is 
 - `han_solo_helmet`
 - `han_solo_leggings`
 - `landspeeder`
+- `star_compass`
 - `stormtrooper_boots`
 - `stormtrooper_chestplate`
 - `stormtrooper_helmet`
@@ -103,10 +104,17 @@ These items override `Item` methods (e.g. `postHurtEnemy`, `useOn`, `hurtEnemy`)
 - `holocron`: HolocronItem overrides: use
 - `landspeeder`: LandspeederItem overrides: use
 - `lightsaber`: LightsaberItem overrides: use, hurtEnemy
+- `star_compass`: StarCompassItem overrides: useOn. Gate ignition (iron-block frame validation + planet-picker UI that fills the frame with hyperspace_portal film) is server-side Java logic — absent on Bedrock; the hyperspace_portal block and the planet dimensions it leads to are not translated.
 - `stormtrooper_boots`: worn-armor visuals are absent on Bedrock — the item equips and protects (minecraft:wearable); the armor geometry/textures are emitted but no attachable consumes them, so nothing renders on the player's body.
 - `stormtrooper_chestplate`: worn-armor visuals are absent on Bedrock — the item equips and protects (minecraft:wearable); the armor geometry/textures are emitted but no attachable consumes them, so nothing renders on the player's body.
 - `stormtrooper_helmet`: worn-armor visuals are absent on Bedrock — the item equips and protects (minecraft:wearable); the armor geometry/textures are emitted but no attachable consumes them, so nothing renders on the player's body.
 - `stormtrooper_leggings`: worn-armor visuals are absent on Bedrock — the item equips and protects (minecraft:wearable); the armor geometry/textures are emitted but no attachable consumes them, so nothing renders on the player's body.
+
+## Custom blocks not translated
+
+The translator has no Bedrock block emitter. These Java block registrations (`BLOCKS.registerBlock` / `BLOCKS.registerSimpleBlock`) have no Bedrock counterpart in the output — the block does not exist on the Bedrock side, and any mechanic built on it is absent:
+
+- `hyperspace_portal`: custom block 'hyperspace_portal' not translated — translator has no Bedrock block emitter; portal/teleport behavior impossible without a scripting harness (block class HyperspacePortalBlock)
 
 ## Item model selector not translatable — static icon used
 
@@ -138,13 +146,44 @@ These spawn eggs received default base/overlay colors because the Java side comp
 - `princess_leia_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `stormtrooper_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 
+## Custom dimensions not translatable
+
+Bedrock add-ons cannot define new dimensions — there is no counterpart to Java's `data/<mod>/dimension/*.json` + `dimension_type/*.json` datapack registries (a Bedrock world has exactly the built-in Overworld/Nether/End). These dimensions do not exist on the Bedrock side; anything that would teleport players there has nowhere to go:
+
+- `dimension/andor`: custom dimension not expressible in a Bedrock add-on — data/starwars/dimension/andor.json; the planet world and travel into it are Java-only
+- `dimension/coruscant`: custom dimension not expressible in a Bedrock add-on — data/starwars/dimension/coruscant.json; the planet world and travel into it are Java-only
+- `dimension/tatooine`: custom dimension not expressible in a Bedrock add-on — data/starwars/dimension/tatooine.json; the planet world and travel into it are Java-only
+- `dimension_type/andor`: custom dimension type not expressible in a Bedrock add-on — data/starwars/dimension_type/andor.json; sky/light/height rules for the planet are Java-only
+- `dimension_type/coruscant`: custom dimension type not expressible in a Bedrock add-on — data/starwars/dimension_type/coruscant.json; sky/light/height rules for the planet are Java-only
+- `dimension_type/tatooine`: custom dimension type not expressible in a Bedrock add-on — data/starwars/dimension_type/tatooine.json; sky/light/height rules for the planet are Java-only
+
+## Custom biomes not translated
+
+The translator has no Bedrock biome emitter, so these `worldgen/biome` datapack entries do not exist in the translated output — the surface rules, ambience, and spawn lists they define are absent:
+
+- `aldhani_highlands`: custom biome not translated (no Bedrock biome emitter) — data/starwars/worldgen/biome/aldhani_highlands.json; surface rules, ambience, and spawn lists stay Java-only
+- `coruscant_city`: custom biome not translated (no Bedrock biome emitter) — data/starwars/worldgen/biome/coruscant_city.json; surface rules, ambience, and spawn lists stay Java-only
+- `dune_sea`: custom biome not translated (no Bedrock biome emitter) — data/starwars/worldgen/biome/dune_sea.json; surface rules, ambience, and spawn lists stay Java-only
+- `jundland_wastes`: custom biome not translated (no Bedrock biome emitter) — data/starwars/worldgen/biome/jundland_wastes.json; surface rules, ambience, and spawn lists stay Java-only
+
+## Custom noise settings / chunk generation not expressible
+
+Bedrock add-ons cannot express Java's `worldgen/noise_settings` density-function terrain or a custom Java `ChunkGenerator`. Chunk generation for the custom dimensions stays Java-only:
+
+- `andor`: custom noise settings / chunk generation not expressible — data/starwars/worldgen/noise_settings/andor.json; terrain shaping lives in the datapack noise router and the mod's Java chunk generator
+- `tatooine`: custom noise settings / chunk generation not expressible — data/starwars/worldgen/noise_settings/tatooine.json; terrain shaping lives in the datapack noise router and the mod's Java chunk generator
+
 ## Datapack worldgen structures not translatable
 
 Bedrock has no equivalent of Java's procedural `Structure`/`StructurePiece` datapack API — there is no `.nbt`/jigsaw template for these on disk, so there is nothing to translate. These structures (and the biome placement / spacing that controls where they generate) do not appear in Bedrock worldgen; any loot table they place is translated separately and listed elsewhere in this report:
 
 - `escape_pod`: datapack worldgen structure not translatable to Bedrock — escape_pod; garrison/loot behavior lives in the Java piece
+- `ferrix_town`: datapack worldgen structure not translatable to Bedrock — ferrix_town; garrison/loot behavior lives in the Java piece
 - `imperial_outpost`: datapack worldgen structure not translatable to Bedrock — imperial_outpost; garrison/loot behavior lives in the Java piece
 - `jedi_ruin`: datapack worldgen structure not translatable to Bedrock — jedi_ruin; garrison/loot behavior lives in the Java piece
+- `krayt_skeleton`: datapack worldgen structure not translatable to Bedrock — krayt_skeleton; garrison/loot behavior lives in the Java piece
+- `moisture_farm`: datapack worldgen structure not translatable to Bedrock — moisture_farm; garrison/loot behavior lives in the Java piece
+- `sandcrawler`: datapack worldgen structure not translatable to Bedrock — sandcrawler; garrison/loot behavior lives in the Java piece
 
 ## Vehicles (approximated)
 

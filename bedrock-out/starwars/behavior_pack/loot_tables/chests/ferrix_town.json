@@ -1,0 +1,88 @@
+{
+  "pools": [
+    {
+      "rolls": {
+        "type": "minecraft:uniform",
+        "min": 2,
+        "max": 5
+      },
+      "entries": [
+        {
+          "type": "item",
+          "name": "starwars:blaster_rifle",
+          "weight": 3
+        },
+        {
+          "type": "item",
+          "name": "minecraft:brick",
+          "weight": 20,
+          "functions": [
+            {
+              "count": {
+                "max": 6,
+                "min": 2,
+                "type": "uniform"
+              },
+              "function": "set_count"
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "minecraft:candle",
+          "weight": 12,
+          "functions": [
+            {
+              "count": {
+                "max": 3,
+                "min": 1,
+                "type": "uniform"
+              },
+              "function": "set_count"
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "minecraft:iron_pickaxe",
+          "weight": 6
+        },
+        {
+          "type": "item",
+          "name": "minecraft:iron_shovel",
+          "weight": 6
+        },
+        {
+          "type": "item",
+          "name": "minecraft:bread",
+          "weight": 15,
+          "functions": [
+            {
+              "count": {
+                "max": 3,
+                "min": 1,
+                "type": "uniform"
+              },
+              "function": "set_count"
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "minecraft:emerald",
+          "weight": 10,
+          "functions": [
+            {
+              "count": {
+                "max": 3,
+                "min": 1,
+                "type": "uniform"
+              },
+              "function": "set_count"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

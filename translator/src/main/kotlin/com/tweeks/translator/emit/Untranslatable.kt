@@ -46,6 +46,10 @@ class Untranslatable {
     private val renderControllerAmbiguous = TreeMap<String, TreeMap<String, String>>()
     private val entityAttributesUnresolved = TreeMap<String, TreeMap<String, TreeSet<String>>>()
     private val datapackWorldgenStructures = TreeMap<String, TreeMap<String, String>>()
+    private val datapackDimensions = TreeMap<String, TreeMap<String, String>>()
+    private val datapackBiomes = TreeMap<String, TreeMap<String, String>>()
+    private val datapackNoiseSettings = TreeMap<String, TreeMap<String, String>>()
+    private val blocksNotTranslated = TreeMap<String, TreeMap<String, String>>()
     private val phase2Failures = TreeMap<String, MutableList<String>>()
     private val duplicateBehaviorComponents = TreeMap<String, TreeMap<String, TreeSet<String>>>()
     private val vehiclesApproximated = TreeMap<String, TreeMap<String, String>>()
@@ -252,6 +256,48 @@ class Untranslatable {
     }
 
     /**
+     * Record a datapack dimension or dimension type (a JSON file under
+     * `data/<mod>/dimension/` or `data/<mod>/dimension_type/`) that a Bedrock
+     * add-on cannot express — a Bedrock world has exactly the built-in
+     * Overworld/Nether/End, and behavior packs cannot register more.
+     * [entryId] is prefixed with its family so the sorted report reads
+     * cleanly (`dimension/andor`, `dimension_type/andor`).
+     */
+    fun recordDatapackDimension(modId: String, entryId: String, summary: String) {
+        datapackDimensions.getOrPut(modId) { TreeMap() }[entryId] = summary
+    }
+
+    /**
+     * Record a datapack biome (a JSON file under
+     * `data/<mod>/worldgen/biome/`) that was not translated — the translator
+     * has no Bedrock biome emitter, so the biome and everything it defines
+     * (surface rules, ambience, spawns) are absent from the output.
+     */
+    fun recordDatapackBiome(modId: String, biomeId: String, summary: String) {
+        datapackBiomes.getOrPut(modId) { TreeMap() }[biomeId] = summary
+    }
+
+    /**
+     * Record datapack noise settings (a JSON file under
+     * `data/<mod>/worldgen/noise_settings/`). Java's density-function
+     * terrain — and any custom Java `ChunkGenerator` driving it — has no
+     * Bedrock counterpart, so chunk generation stays Java-only.
+     */
+    fun recordDatapackNoiseSettings(modId: String, noiseId: String, summary: String) {
+        datapackNoiseSettings.getOrPut(modId) { TreeMap() }[noiseId] = summary
+    }
+
+    /**
+     * Record a Java block registration (`BLOCKS.registerBlock` /
+     * `BLOCKS.registerSimpleBlock`) with no Bedrock counterpart — the
+     * translator has no Bedrock block emitter, so the block does not exist
+     * in the translated output at all.
+     */
+    fun recordBlockNotTranslated(modId: String, blockId: String, summary: String) {
+        blocksNotTranslated.getOrPut(modId) { TreeMap() }[blockId] = summary
+    }
+
+    /**
      * Record a Phase 2 analyzer that threw on this mod. The CLI catches
      * the exception so other mods continue to translate; this entry
      * tells the user what went wrong.
@@ -330,6 +376,10 @@ class Untranslatable {
         ids.addAll(renderControllerAmbiguous.keys)
         ids.addAll(entityAttributesUnresolved.keys)
         ids.addAll(datapackWorldgenStructures.keys)
+        ids.addAll(datapackDimensions.keys)
+        ids.addAll(datapackBiomes.keys)
+        ids.addAll(datapackNoiseSettings.keys)
+        ids.addAll(blocksNotTranslated.keys)
         ids.addAll(phase2Failures.keys)
         ids.addAll(duplicateBehaviorComponents.keys)
         ids.addAll(vehiclesApproximated.keys)
@@ -565,6 +615,15 @@ class Untranslatable {
             for ((itemId, summary) in items) sb.append("- `").append(itemId).append("`: ").append(summary).append('\n')
             sb.append('\n')
         }
+        blocksNotTranslated[modId]?.takeIf { it.isNotEmpty() }?.let { items ->
+            any = true
+            sb.append("## Custom blocks not translated\n\n")
+            sb.append("The translator has no Bedrock block emitter. These Java block registrations ")
+            sb.append("(`BLOCKS.registerBlock` / `BLOCKS.registerSimpleBlock`) have no Bedrock counterpart in the ")
+            sb.append("output — the block does not exist on the Bedrock side, and any mechanic built on it is absent:\n\n")
+            for ((blockId, summary) in items) sb.append("- `").append(blockId).append("`: ").append(summary).append('\n')
+            sb.append('\n')
+        }
         itemModelSelectorStatic[modId]?.takeIf { it.isNotEmpty() }?.let { items ->
             any = true
             sb.append("## Item model selector not translatable — static icon used\n\n")
@@ -619,6 +678,40 @@ class Untranslatable {
                 for (a in attrs) sb.append("- ").append(a).append('\n')
                 sb.append('\n')
             }
+        }
+        datapackDimensions[modId]?.takeIf { it.isNotEmpty() }?.let { items ->
+            any = true
+            sb.append("## Custom dimensions not translatable\n\n")
+            sb.append("Bedrock add-ons cannot define new dimensions — there is no counterpart to Java's ")
+            sb.append("`data/<mod>/dimension/*.json` + `dimension_type/*.json` datapack registries (a Bedrock ")
+            sb.append("world has exactly the built-in Overworld/Nether/End). These dimensions do not exist on ")
+            sb.append("the Bedrock side; anything that would teleport players there has nowhere to go:\n\n")
+            for ((entryId, summary) in items) {
+                sb.append("- `").append(entryId).append("`: ").append(summary).append('\n')
+            }
+            sb.append('\n')
+        }
+        datapackBiomes[modId]?.takeIf { it.isNotEmpty() }?.let { items ->
+            any = true
+            sb.append("## Custom biomes not translated\n\n")
+            sb.append("The translator has no Bedrock biome emitter, so these `worldgen/biome` datapack entries ")
+            sb.append("do not exist in the translated output — the surface rules, ambience, and spawn lists ")
+            sb.append("they define are absent:\n\n")
+            for ((biomeId, summary) in items) {
+                sb.append("- `").append(biomeId).append("`: ").append(summary).append('\n')
+            }
+            sb.append('\n')
+        }
+        datapackNoiseSettings[modId]?.takeIf { it.isNotEmpty() }?.let { items ->
+            any = true
+            sb.append("## Custom noise settings / chunk generation not expressible\n\n")
+            sb.append("Bedrock add-ons cannot express Java's `worldgen/noise_settings` density-function terrain ")
+            sb.append("or a custom Java `ChunkGenerator`. Chunk generation for the custom dimensions stays ")
+            sb.append("Java-only:\n\n")
+            for ((noiseId, summary) in items) {
+                sb.append("- `").append(noiseId).append("`: ").append(summary).append('\n')
+            }
+            sb.append('\n')
         }
         datapackWorldgenStructures[modId]?.takeIf { it.isNotEmpty() }?.let { items ->
             any = true

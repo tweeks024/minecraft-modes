@@ -564,6 +564,94 @@ class ItemAnalyzerTest {
         assertFalse(report.contains("Scoundrel's Luck set bonus")) { report }
     }
 
+    @Test
+    fun `starwars star_compass records the useOn override and the gate-ignition honesty note`(@TempDir outDir: Path) {
+        // StarCompassItem.useOn validates an iron-block gate frame and opens
+        // the planet-picker UI — the whole hyperspace-gate chain (portal
+        // block, custom planet dimensions) has no Bedrock counterpart, so
+        // the compass must not silently become an inert trinket.
+        val resolver = ClasspathResolver.fromSystemProperties()
+        assertTrue(resolver.isAvailable())
+        val all = ModDiscovery(repoRoot).discover()
+        val mod = all.first { it.modId == "starwars" }
+        val unt = Untranslatable()
+        val sources = JavaSourceLoader(resolver, unt).load(mod, all)
+        ItemAnalyzer(target, unt).analyze(mod, sources, outDir)
+
+        // The static item JSON is still emitted; stacksTo(1) lives in the
+        // item class's constructor, not the registration lambda.
+        val compass = itemComponents(read(outDir, "starwars/behavior_pack/items/star_compass.json"))
+        assertEquals(1, compass["minecraft:max_stack_size"]!!.jsonPrimitive.intOrNull)
+
+        val report = unt.renderReport("starwars")
+        assertTrue(report.contains("`star_compass`: StarCompassItem overrides: useOn")) { report }
+        assertTrue(
+            report.contains(
+                "Gate ignition (iron-block frame validation + planet-picker UI that fills the " +
+                    "frame with hyperspace_portal film) is server-side Java logic — absent on " +
+                    "Bedrock; the hyperspace_portal block and the planet dimensions it leads to " +
+                    "are not translated.",
+            ),
+        ) { report }
+    }
+
+    @Test
+    fun `gate-ignition note fires only for items referencing GateShape`(@TempDir outDir: Path) {
+        val registrationSrc = """
+            package com.example.themod;
+            class Registration {
+                public static final Object COMPASS = ITEMS.registerItem(
+                    "gate_compass", GateCompassItem::new, p -> p);
+                public static final Object WRENCH = ITEMS.registerItem(
+                    "wrench", WrenchItem::new, p -> p);
+            }
+        """.trimIndent()
+        val compassItemSrc = """
+            package com.example.themod;
+            public class GateCompassItem extends Item {
+                public GateCompassItem(Properties properties) {
+                    super(properties);
+                }
+                @Override
+                public InteractionResult useOn(UseOnContext context) {
+                    Optional<GateShape.Result> shape = GateShape.find(context.getClickedPos());
+                    return InteractionResult.CONSUME;
+                }
+            }
+        """.trimIndent()
+        val wrenchItemSrc = """
+            package com.example.themod;
+            public class WrenchItem extends Item {
+                public WrenchItem(Properties properties) {
+                    super(properties);
+                }
+                @Override
+                public InteractionResult useOn(UseOnContext context) {
+                    return InteractionResult.CONSUME;
+                }
+            }
+        """.trimIndent()
+        val mod = ModDiscovery.DiscoveredMod(modId = "themod", rootDir = outDir.resolve("themodroot"))
+        java.nio.file.Files.createDirectories(mod.rootDir)
+        val parser = com.github.javaparser.JavaParser()
+        val units = listOf(registrationSrc, compassItemSrc, wrenchItemSrc).map { parser.parse(it).result.orElseThrow() }
+        val sources = JavaSourceLoader.ResolvedModSources(
+            mod = mod,
+            units = units,
+            typeSolver = com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver(),
+        )
+
+        val unt = Untranslatable()
+        ItemAnalyzer(target, unt).analyze(mod, sources, outDir)
+
+        val report = unt.renderReport("themod")
+        assertTrue(report.contains("`gate_compass`: GateCompassItem overrides: useOn. Gate ignition")) { report }
+        // The plain useOn override is still recorded for the wrench, but
+        // without the gate-ignition sentence.
+        assertTrue(report.contains("`wrench`: WrenchItem overrides: useOn")) { report }
+        assertFalse(report.contains("`wrench`: WrenchItem overrides: useOn. Gate ignition")) { report }
+    }
+
     private fun read(outDir: Path, rel: String): JsonObject {
         val path = outDir.resolve(rel)
         assertTrue(path.toFile().exists()) { "expected $path to exist" }

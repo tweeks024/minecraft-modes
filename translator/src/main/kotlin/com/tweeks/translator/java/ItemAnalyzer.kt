@@ -436,6 +436,22 @@ internal class ItemAnalyzer(
                         "shot against each new target) is server-side Java logic — absent on Bedrock.",
                 )
             }
+            // Hyperspace-gate ignition (starwars' StarCompassItem): `useOn`
+            // validates an iron-block gate frame and opens the planet-picker
+            // UI whose selection fills the frame with hyperspace_portal film
+            // leading to a custom planet dimension. None of that chain exists
+            // on Bedrock (no block emitter, no custom dimensions — see the
+            // block/dimension sections of the report). Same simple-name AST
+            // scan — and the same override-gap limitation — as the set-bonus
+            // note above.
+            if (itemClass != null && referencesSimpleName(itemClass, "GateShape")) {
+                summary.append(
+                    ". Gate ignition (iron-block frame validation + planet-picker UI that fills the " +
+                        "frame with hyperspace_portal film) is server-side Java logic — absent on " +
+                        "Bedrock; the hyperspace_portal block and the planet dimensions it leads to " +
+                        "are not translated.",
+                )
+            }
             behaviorNotes += summary.toString()
         }
         if (behaviorNotes.isNotEmpty()) {

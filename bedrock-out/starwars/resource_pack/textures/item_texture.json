@@ -65,6 +65,9 @@
     "starwars:princess_leia_spawn_egg": {
       "textures": "textures/items/princess_leia_spawn_egg"
     },
+    "starwars:star_compass": {
+      "textures": "textures/items/star_compass"
+    },
     "starwars:stormtrooper_boots": {
       "textures": "textures/items/stormtrooper_boots"
     },
