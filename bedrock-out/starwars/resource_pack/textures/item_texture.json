@@ -74,6 +74,9 @@
     "starwars:holocron": {
       "textures": "textures/items/holocron"
     },
+    "starwars:jabba_spawn_egg": {
+      "textures": "textures/items/jabba_spawn_egg"
+    },
     "starwars:jawa_spawn_egg": {
       "textures": "textures/items/jawa_spawn_egg"
     },
@@ -118,6 +121,9 @@
     },
     "starwars:probe_droid_spawn_egg": {
       "textures": "textures/items/probe_droid_spawn_egg"
+    },
+    "starwars:rancor_spawn_egg": {
+      "textures": "textures/items/rancor_spawn_egg"
     },
     "starwars:rebel_trooper_spawn_egg": {
       "textures": "textures/items/rebel_trooper_spawn_egg"

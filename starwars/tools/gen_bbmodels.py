@@ -719,6 +719,79 @@ EWOK_CUBES = [
     ('left_leg',  EWOK_LLEG_BONE, (-1.0,  0.0, -1.0, 2, 5, 2), (16, 23)),
 ]
 
+# -----------------------------------------------------------------------------
+# Jabba's Palace beasts. Bone names + cube sizes are the hand-off contract with
+# RancorModel.java / JabbaModel.java — verbatim, do not rename/resize. Both are
+# custom skeletons. For the rancor, brow/jaw/right_tusk/left_tusk ride the head
+# bone and right_claw/left_claw ride the arm bones (like wampa's horns ride the
+# head), so head and each arm hold more than one cube — those accessory cubes
+# reuse the parent bone's origin so _parent_bone_name groups them correctly.
+# -----------------------------------------------------------------------------
+
+# Rancor (128x128): hunched bipedal beast ~4.2 blocks tall. Thick torso
+# (model-y -24..6), a big head thrust forward at the shoulders with a heavy
+# brow, an underbite jaw and two upward tusks; long arms hung wide of the
+# torso with knuckle claws swinging below the body; stubby legs to the ground
+# (0..24); a short tail off the lower back.
+RANCOR_BODY_BONE = (0, 18, 0)
+RANCOR_HEAD_BONE = (0, 50, -4)
+RANCOR_RARM_BONE = (-16, 46, -1)
+RANCOR_LARM_BONE = (16, 46, -1)
+RANCOR_RLEG_BONE = (-6, 20, 1)
+RANCOR_LLEG_BONE = (6, 20, 1)
+RANCOR_TAIL_BONE = (0, 24, 7)
+
+RANCOR_BONE_DEFS = [
+    ('body', RANCOR_BODY_BONE),
+    ('head', RANCOR_HEAD_BONE),
+    ('right_arm', RANCOR_RARM_BONE),
+    ('left_arm', RANCOR_LARM_BONE),
+    ('right_leg', RANCOR_RLEG_BONE),
+    ('left_leg', RANCOR_LLEG_BONE),
+    ('tail', RANCOR_TAIL_BONE),
+]
+
+RANCOR_CUBES = [
+    ('body',       RANCOR_BODY_BONE, (-11.0, -30.0,  -7.0, 22, 30, 14), (0, 0)),
+    ('head',       RANCOR_HEAD_BONE, ( -9.0, -13.0, -15.0, 18, 15, 14), (0, 44)),
+    ('brow',       RANCOR_HEAD_BONE, (-10.0, -16.0, -16.0, 20, 4, 5),   (64, 86)),
+    ('jaw',        RANCOR_HEAD_BONE, ( -7.0,   2.0, -18.0, 14, 6, 10),  (0, 109)),
+    ('right_tusk', RANCOR_HEAD_BONE, ( -6.0,  -4.0, -18.0, 2, 6, 2),    (120, 0)),
+    ('left_tusk',  RANCOR_HEAD_BONE, (  4.0,  -4.0, -18.0, 2, 6, 2),    (120, 8)),
+    ('right_arm',  RANCOR_RARM_BONE, ( -4.0,  -2.0,  -4.0, 8, 28, 8),   (0, 73)),
+    ('right_claw', RANCOR_RARM_BONE, ( -4.5,  26.0,  -5.0, 9, 5, 9),    (84, 58)),
+    ('left_arm',   RANCOR_LARM_BONE, ( -4.0,  -2.0,  -4.0, 8, 28, 8),   (32, 73)),
+    ('left_claw',  RANCOR_LARM_BONE, ( -4.5,  26.0,  -5.0, 9, 5, 9),    (84, 72)),
+    ('right_leg',  RANCOR_RLEG_BONE, ( -5.0,   0.0,  -4.5, 10, 20, 9),  (72, 0)),
+    ('left_leg',   RANCOR_LLEG_BONE, ( -5.0,   0.0,  -4.5, 10, 20, 9),  (72, 29)),
+    ('tail',       RANCOR_TAIL_BONE, ( -3.0,   0.0,   0.0, 6, 6, 12),   (48, 109)),
+]
+
+# Jabba (128x64): a ground-blob slug ~2 blocks tall, wider + longer than tall.
+# Vast body belly-on-the-ground (model-y 4..24), a broad toad head rising off
+# the front, a tapering tail dragging back, two tiny arms on the front flanks.
+JABBA_BODY_BONE = (0, 20, 0)
+JABBA_HEAD_BONE = (0, 20, -10)
+JABBA_TAIL_BONE = (0, 8, 8)
+JABBA_RARM_BONE = (-13, 16, -6)
+JABBA_LARM_BONE = (13, 16, -6)
+
+JABBA_BONE_DEFS = [
+    ('body', JABBA_BODY_BONE),
+    ('head', JABBA_HEAD_BONE),
+    ('tail', JABBA_TAIL_BONE),
+    ('right_arm', JABBA_RARM_BONE),
+    ('left_arm', JABBA_LARM_BONE),
+]
+
+JABBA_CUBES = [
+    ('body',      JABBA_BODY_BONE, (-13.0,   0.0, -12.0, 26, 20, 20), (0, 0)),
+    ('head',      JABBA_HEAD_BONE, ( -9.0, -12.0, -12.0, 18, 12, 12), (64, 40)),
+    ('tail',      JABBA_TAIL_BONE, ( -8.0,   0.0,   0.0, 16, 8, 16),  (0, 40)),
+    ('right_arm', JABBA_RARM_BONE, ( -4.0,   0.0,  -2.0, 4, 8, 4),    (92, 0)),
+    ('left_arm',  JABBA_LARM_BONE, (  0.0,   0.0,  -2.0, 4, 8, 4),    (108, 0)),
+]
+
 # mob_name -> bone_defs override (only needed for mobs whose bone set/pivots
 # aren't the standard humanoid table).
 MOB_BONE_DEFS = {
@@ -740,6 +813,8 @@ MOB_BONE_DEFS = {
     'chewbacca': CHEWBACCA_BONE_DEFS,
     'grogu': GROGU_BONE_DEFS,
     'ewok': EWOK_BONE_DEFS,
+    'rancor': RANCOR_BONE_DEFS,
+    'jabba': JABBA_BONE_DEFS,
 }
 
 # mob_name -> (tex_width, tex_height) for non-64x64 texture canvases.
@@ -752,6 +827,8 @@ MOB_TEX_SIZES = {
     'at_at': (256, 128),
     'grogu': (32, 32),
     'ewok': (32, 32),
+    'rancor': (128, 128),
+    'jabba': (128, 64),
     # speeder_bike + band_droid + chewbacca use the default 64x64 canvas.
 }
 
@@ -808,6 +885,9 @@ MOBS = {
     'grogu': GROGU_CUBES,
     # Forest native: small humanoid-skeleton rig (see EWOK_BONE_DEFS above).
     'ewok': EWOK_CUBES,
+    # Jabba's Palace beasts: custom skeletons (see RANCOR/JABBA_BONE_DEFS above).
+    'rancor': RANCOR_CUBES,
+    'jabba': JABBA_CUBES,
 }
 
 

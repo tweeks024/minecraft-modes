@@ -1,0 +1,20 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "starwars:jabba",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/jabba.png"
+      },
+      "geometry": {
+        "default": "geometry.starwars.jabba"
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ]
+    }
+  }
+}

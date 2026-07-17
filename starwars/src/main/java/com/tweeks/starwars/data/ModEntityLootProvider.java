@@ -346,6 +346,37 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
                 .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
                     .add(LootItem.lootTableItem(Items.LEATHER)
                         .apply(SetItemCountFunction.setCount(UniformGenerator.between(0.0f, 1.0f))))));
+
+        // Rancor: the beast's leavings — bones and hide — plus a real prize for
+        // felling a boss (guaranteed emeralds, and a rare diamond).
+        this.add(ModEntities.RANCOR.get(),
+            LootTable.lootTable()
+                .withPool(LootPool.lootPool().setRolls(UniformGenerator.between(2.0f, 4.0f))
+                    .add(LootItem.lootTableItem(Items.BONE).setWeight(60)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0f, 2.0f))))
+                    .add(LootItem.lootTableItem(Items.LEATHER).setWeight(40)))
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.EMERALD)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0f, 3.0f)))))
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .when(LootItemRandomChanceCondition.randomChance(0.20f))
+                    .add(LootItem.lootTableItem(Items.DIAMOND))));
+
+        // Jabba: a crime lord's purse — gold and emeralds, with a chance at a
+        // gem lifted from the hoard.
+        this.add(ModEntities.JABBA.get(),
+            LootTable.lootTable()
+                .withPool(LootPool.lootPool().setRolls(UniformGenerator.between(2.0f, 4.0f))
+                    .add(LootItem.lootTableItem(Items.GOLD_INGOT).setWeight(50)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0f, 3.0f))))
+                    .add(LootItem.lootTableItem(Items.GOLD_NUGGET).setWeight(50)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0f, 6.0f)))))
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.EMERALD)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0f, 4.0f)))))
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .when(LootItemRandomChanceCondition.randomChance(0.25f))
+                    .add(LootItem.lootTableItem(Items.DIAMOND))));
     }
 
     @Override
@@ -377,7 +408,9 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
             ModEntities.BAND_DROID.get(),
             ModEntities.CHEWBACCA.get(),
             ModEntities.GROGU.get(),
-            ModEntities.EWOK.get()
+            ModEntities.EWOK.get(),
+            ModEntities.RANCOR.get(),
+            ModEntities.JABBA.get()
         );
         return BuiltInRegistries.ENTITY_TYPE.stream().filter(known::contains);
     }

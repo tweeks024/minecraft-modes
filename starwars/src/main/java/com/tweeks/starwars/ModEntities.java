@@ -270,6 +270,25 @@ public final class ModEntities {
             .build(ResourceKey.create(Registries.ENTITY_TYPE,
                 Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "ewok"))));
 
+    // ---- Jabba's Palace: the caged beast + the crime lord (piece-spawned) ----
+
+    public static final DeferredHolder<EntityType<?>, EntityType<com.tweeks.starwars.entity.RancorEntity>> RANCOR =
+        ENTITY_TYPES.register("rancor", () -> EntityType.Builder.<com.tweeks.starwars.entity.RancorEntity>of(
+                com.tweeks.starwars.entity.RancorEntity::new, MobCategory.MONSTER)
+            .sized(2.4f, 4.4f)
+            .eyeHeight(3.8f)
+            .clientTrackingRange(12)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "rancor"))));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<com.tweeks.starwars.entity.JabbaEntity>> JABBA =
+        ENTITY_TYPES.register("jabba", () -> EntityType.Builder.<com.tweeks.starwars.entity.JabbaEntity>of(
+                com.tweeks.starwars.entity.JabbaEntity::new, MobCategory.CREATURE)
+            .sized(2.0f, 2.0f)
+            .clientTrackingRange(10)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "jabba"))));
+
     public static void register(IEventBus modEventBus) {
         ENTITY_TYPES.register(modEventBus);
     }

@@ -210,5 +210,11 @@ public class StarWarsMod {
             com.tweeks.starwars.entity.GroguEntity.createAttributes().build());
         event.put(ModEntities.EWOK.get(),
             com.tweeks.starwars.entity.EwokEntity.createAttributes().build());
+        // Jabba's Palace residents — attributes only; both are spawned by the
+        // structure piece, never by a spawn placement.
+        event.put(ModEntities.RANCOR.get(),
+            com.tweeks.starwars.entity.RancorEntity.createAttributes().build());
+        event.put(ModEntities.JABBA.get(),
+            com.tweeks.starwars.entity.JabbaEntity.createAttributes().build());
     }
 }

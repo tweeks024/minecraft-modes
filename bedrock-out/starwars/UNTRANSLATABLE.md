@@ -48,12 +48,14 @@ Bedrock has no equivalent of Java's `random_sequence` field; loot rolls use the 
 - `entities/ewok.json`
 - `entities/grogu.json`
 - `entities/han_solo.json`
+- `entities/jabba.json`
 - `entities/jawa.json`
 - `entities/jedi_knight.json`
 - `entities/luke_skywalker.json`
 - `entities/obi_wan.json`
 - `entities/princess_leia.json`
 - `entities/probe_droid.json`
+- `entities/rancor.json`
 - `entities/rebel_trooper.json`
 - `entities/snowtrooper.json`
 - `entities/stormtrooper.json`
@@ -225,12 +227,14 @@ These spawn eggs received default base/overlay colors because the Java side comp
 - `ewok_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `grogu_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `han_solo_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
+- `jabba_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `jawa_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `jedi_knight_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `luke_skywalker_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `obi_wan_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `princess_leia_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `probe_droid_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
+- `rancor_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `rebel_trooper_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `snowtrooper_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `stormtrooper_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
@@ -326,6 +330,7 @@ Bedrock has no equivalent of Java's procedural `Structure`/`StructurePiece` data
 - `ewok_village`: datapack worldgen structure not translatable to Bedrock — ewok_village; garrison/loot behavior lives in the Java piece
 - `ferrix_town`: datapack worldgen structure not translatable to Bedrock — ferrix_town; garrison/loot behavior lives in the Java piece
 - `imperial_outpost`: datapack worldgen structure not translatable to Bedrock — imperial_outpost; garrison/loot behavior lives in the Java piece
+- `jabba_palace`: datapack worldgen structure not translatable to Bedrock — jabba_palace; garrison/loot behavior lives in the Java piece
 - `jedi_ruin`: datapack worldgen structure not translatable to Bedrock — jedi_ruin; garrison/loot behavior lives in the Java piece
 - `krayt_skeleton`: datapack worldgen structure not translatable to Bedrock — krayt_skeleton; garrison/loot behavior lives in the Java piece
 - `moisture_farm`: datapack worldgen structure not translatable to Bedrock — moisture_farm; garrison/loot behavior lives in the Java piece

@@ -193,6 +193,12 @@ public final class Registration {
     public static final DeferredItem<SpawnEggItem> EWOK_SPAWN_EGG = ITEMS.registerItem(
         "ewok_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.EWOK.get()));
 
+    public static final DeferredItem<SpawnEggItem> RANCOR_SPAWN_EGG = ITEMS.registerItem(
+        "rancor_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.RANCOR.get()));
+
+    public static final DeferredItem<SpawnEggItem> JABBA_SPAWN_EGG = ITEMS.registerItem(
+        "jabba_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.JABBA.get()));
+
     public static final DeferredItem<Item> STORMTROOPER_HELMET = ITEMS.registerItem("stormtrooper_helmet",
         Item::new,
         p -> p.humanoidArmor(com.tweeks.starwars.item.StormtrooperArmorMaterials.STORMTROOPER,
@@ -325,6 +331,8 @@ public final class Registration {
                     output.accept(CHEWBACCA_SPAWN_EGG.get());
                     output.accept(GROGU_SPAWN_EGG.get());
                     output.accept(EWOK_SPAWN_EGG.get());
+                    output.accept(RANCOR_SPAWN_EGG.get());
+                    output.accept(JABBA_SPAWN_EGG.get());
                     // Later tasks append their items here.
                 })
                 .build());

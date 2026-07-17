@@ -1,0 +1,51 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": { "type": "minecraft:uniform", "min": 3, "max": 6 },
+      "entries": [
+        { "type": "minecraft:item", "name": "minecraft:gold_ingot", "weight": 18,
+          "functions": [ { "function": "minecraft:set_count",
+                           "count": { "type": "minecraft:uniform", "min": 2, "max": 6 } } ] },
+        { "type": "minecraft:item", "name": "minecraft:emerald", "weight": 14,
+          "functions": [ { "function": "minecraft:set_count",
+                           "count": { "type": "minecraft:uniform", "min": 2, "max": 5 } } ] },
+        { "type": "minecraft:item", "name": "minecraft:iron_ingot", "weight": 16,
+          "functions": [ { "function": "minecraft:set_count",
+                           "count": { "type": "minecraft:uniform", "min": 2, "max": 6 } } ] },
+        { "type": "minecraft:item", "name": "minecraft:lapis_lazuli", "weight": 10,
+          "functions": [ { "function": "minecraft:set_count",
+                           "count": { "type": "minecraft:uniform", "min": 3, "max": 8 } } ] },
+        { "type": "minecraft:item", "name": "minecraft:diamond", "weight": 8,
+          "functions": [ { "function": "minecraft:set_count",
+                           "count": { "type": "minecraft:uniform", "min": 1, "max": 2 } } ] },
+        { "type": "minecraft:item", "name": "minecraft:gold_block", "weight": 4 }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        { "type": "minecraft:item", "name": "starwars:blaster_rifle", "weight": 4 },
+        { "type": "minecraft:item", "name": "starwars:blaster_pistol", "weight": 8 },
+        { "type": "minecraft:empty", "weight": 8 }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        { "type": "minecraft:item", "name": "starwars:kyber_crystal", "weight": 3,
+          "functions": [ { "function": "minecraft:set_components",
+                           "components": { "starwars:kyber_color": 1 } } ] },
+        { "type": "minecraft:empty", "weight": 15 }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        { "type": "minecraft:item", "name": "minecraft:enchanted_golden_apple", "weight": 2 },
+        { "type": "minecraft:item", "name": "minecraft:golden_apple", "weight": 6 },
+        { "type": "minecraft:empty", "weight": 12 }
+      ]
+    }
+  ]
+}

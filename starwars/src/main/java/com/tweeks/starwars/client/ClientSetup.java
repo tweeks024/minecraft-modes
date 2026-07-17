@@ -32,6 +32,8 @@ import com.tweeks.starwars.client.model.TuskenRaiderModel;
 import com.tweeks.starwars.client.model.VaderModel;
 import com.tweeks.starwars.client.model.WampaModel;
 import com.tweeks.starwars.client.model.YodaModel;
+import com.tweeks.starwars.client.model.RancorModel;
+import com.tweeks.starwars.client.model.JabbaModel;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -76,6 +78,8 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.CHEWBACCA.get(), ChewbaccaRenderer::new);
         event.registerEntityRenderer(ModEntities.GROGU.get(), GroguRenderer::new);
         event.registerEntityRenderer(ModEntities.EWOK.get(), EwokRenderer::new);
+        event.registerEntityRenderer(ModEntities.RANCOR.get(), RancorRenderer::new);
+        event.registerEntityRenderer(ModEntities.JABBA.get(), JabbaRenderer::new);
     }
 
     @SubscribeEvent
@@ -113,5 +117,7 @@ public final class ClientSetup {
         event.registerLayerDefinition(ChewbaccaModel.LAYER_LOCATION, ChewbaccaModel::createBodyLayer);
         event.registerLayerDefinition(GroguModel.LAYER_LOCATION, GroguModel::createBodyLayer);
         event.registerLayerDefinition(EwokModel.LAYER_LOCATION, EwokModel::createBodyLayer);
+        event.registerLayerDefinition(RancorModel.LAYER_LOCATION, RancorModel::createBodyLayer);
+        event.registerLayerDefinition(JabbaModel.LAYER_LOCATION, JabbaModel::createBodyLayer);
     }
 }

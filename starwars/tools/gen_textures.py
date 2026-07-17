@@ -1739,6 +1739,132 @@ def paint_darth_maul(rgba):
         rect(rgba, u0, v0 + 12, u0 + 16, v0 + 16, MAUL_LEATHER)    # boot
         rect(rgba, u0, v0 + 12, u0 + 16, v0 + 13, MAUL_ROBE_SH)    # boot top seam
 
+# Rancor (128x128): brown/tan leathery hide, darker spine, pale underbelly,
+# ivory tusks + knuckle claws, deep-set red eyes, fanged maw.
+# UV (gen_bbmodels RANCOR_CUBES == RancorModel.java): body 22x30x14 @(0,0);
+# head 18x15x14 @(0,44); brow 20x4x5 @(64,86); jaw 14x6x10 @(0,109);
+# right_tusk/left_tusk 2x6x2 @(120,0)/(120,8); right_arm/left_arm 8x28x8
+# @(0,73)/(32,73); right_claw/left_claw 9x5x9 @(84,58)/(84,72);
+# right_leg/left_leg 10x20x9 @(72,0)/(72,29); tail 6x6x12 @(48,109).
+RANCOR_HIDE    = (0x7A, 0x5C, 0x3E, 0xFF)   # brown leathery
+RANCOR_HIDE_HI = (0x94, 0x72, 0x50, 0xFF)
+RANCOR_HIDE_SH = (0x5A, 0x42, 0x2C, 0xFF)
+RANCOR_HIDE_DK = (0x40, 0x2E, 0x1E, 0xFF)   # spine / deep streaks
+RANCOR_BELLY   = (0xB0, 0x9A, 0x74, 0xFF)   # pale underbelly
+RANCOR_BELLY_SH= (0x94, 0x7E, 0x5C, 0xFF)
+RANCOR_IVORY   = (0xD8, 0xCC, 0xA8, 0xFF)   # tusks / claws
+RANCOR_IVORY_HI= (0xEC, 0xE2, 0xC4, 0xFF)
+RANCOR_IVORY_DK= (0xA8, 0x98, 0x70, 0xFF)
+RANCOR_TOOTH   = (0xC8, 0xBC, 0x98, 0xFF)
+RANCOR_MOUTH   = (0x3A, 0x18, 0x14, 0xFF)
+RANCOR_EYE     = (0xD8, 0x30, 0x24, 0xFF)   # red eye
+RANCOR_EYE_DK  = (0x8A, 0x1C, 0x14, 0xFF)   # red socket rim
+
+def paint_rancor(rgba):
+    bw = 128
+    fill_buf(rgba, (0, 0, 0, 0))
+    # Body @(0,0), fp 72x44: brown hide; front face x[14,36) y[14,44), back
+    # face x[50,72). Pale belly on the lower front, dark spine down the back.
+    shade_box(rgba, bw, 0, 0, 22, 30, 14, RANCOR_HIDE, RANCOR_HIDE_HI, RANCOR_HIDE_SH)
+    speckle(rgba, bw, 0, 14, 72, 44, RANCOR_HIDE_SH, mod=5, salt=1)
+    speckle(rgba, bw, 0, 14, 72, 44, RANCOR_HIDE_DK, mod=11, salt=2)
+    rectb(rgba, bw, 14, 32, 36, 44, RANCOR_BELLY)        # pale belly (front lower)
+    rectb(rgba, bw, 14, 42, 36, 44, RANCOR_BELLY_SH)
+    rectb(rgba, bw, 50, 14, 72, 44, RANCOR_HIDE_SH)      # back a touch darker
+    rectb(rgba, bw, 59, 14, 63, 44, RANCOR_HIDE_DK)      # spine ridge
+    # Head @(0,44), fp 64x29: face on front x[14,32) y[58,73).
+    shade_box(rgba, bw, 0, 44, 18, 15, 14, RANCOR_HIDE, RANCOR_HIDE_HI, RANCOR_HIDE_SH)
+    speckle(rgba, bw, 0, 58, 72, 73, RANCOR_HIDE_SH, mod=6, salt=3)
+    rectb(rgba, bw, 14, 59, 32, 61, RANCOR_HIDE_DK)      # heavy brow shadow
+    rectb(rgba, bw, 17, 61, 20, 64, RANCOR_EYE_DK)       # left socket
+    rectb(rgba, bw, 26, 61, 29, 64, RANCOR_EYE_DK)       # right socket
+    rectb(rgba, bw, 18, 62, 19, 63, RANCOR_EYE)          # left eye
+    rectb(rgba, bw, 27, 62, 28, 63, RANCOR_EYE)          # right eye
+    rectb(rgba, bw, 22, 65, 24, 67, RANCOR_HIDE_DK)      # nostrils/snout shadow
+    rectb(rgba, bw, 15, 70, 31, 73, RANCOR_MOUTH)        # upper maw
+    for tx in (16, 19, 22, 25, 28):                      # upper fangs
+        rectb(rgba, bw, tx, 70, tx + 1, 72, RANCOR_TOOTH)
+    # Brow @(64,86), fp 50x9: heavy hide ridge.
+    shade_box(rgba, bw, 64, 86, 20, 4, 5, RANCOR_HIDE, RANCOR_HIDE_HI, RANCOR_HIDE_SH)
+    speckle(rgba, bw, 64, 91, 114, 95, RANCOR_HIDE_DK, mod=7, salt=4)
+    # Jaw @(0,109), fp 48x16: underbite, lower fangs on the front x[10,24).
+    shade_box(rgba, bw, 0, 109, 14, 6, 10, RANCOR_HIDE, RANCOR_HIDE_HI, RANCOR_HIDE_SH)
+    rectb(rgba, bw, 10, 119, 24, 121, RANCOR_MOUTH)      # inner mouth line
+    for tx in (11, 14, 17, 20, 23):                      # lower fangs (jut up)
+        rectb(rgba, bw, tx, 119, tx + 1, 121, RANCOR_TOOTH)
+    # Tusks @(120,0)/(120,8), fp 8x8: ivory.
+    for v0 in (0, 8):
+        shade_box(rgba, bw, 120, v0, 2, 6, 2, RANCOR_IVORY, RANCOR_IVORY_HI, RANCOR_IVORY_DK)
+    # Arms @(0,73)/(32,73), fp 32x36: hide, darker forearm.
+    for u0 in (0, 32):
+        shade_box(rgba, bw, u0, 73, 8, 28, 8, RANCOR_HIDE, RANCOR_HIDE_HI, RANCOR_HIDE_SH)
+        speckle(rgba, bw, u0, 81, u0 + 32, 109, RANCOR_HIDE_SH, mod=5, salt=u0 + 5)
+        rectb(rgba, bw, u0, 101, u0 + 32, 109, RANCOR_HIDE_DK)   # dark forearm band
+    # Claws @(84,58)/(84,72), fp 36x14: ivory, dirty tips (front x[93,102)).
+    for v0 in (58, 72):
+        shade_box(rgba, bw, 84, v0, 9, 5, 9, RANCOR_IVORY, RANCOR_IVORY_HI, RANCOR_IVORY_DK)
+        rectb(rgba, bw, 93, v0 + 11, 102, v0 + 14, RANCOR_IVORY_DK)  # claw tips
+    # Legs @(72,0)/(72,29), fp 38x29: hide, clawed toes (front x[81,91)).
+    for v0 in (0, 29):
+        shade_box(rgba, bw, 72, v0, 10, 20, 9, RANCOR_HIDE, RANCOR_HIDE_HI, RANCOR_HIDE_SH)
+        speckle(rgba, bw, 72, v0 + 9, 110, v0 + 29, RANCOR_HIDE_SH, mod=5, salt=v0 + 7)
+        rectb(rgba, bw, 81, v0 + 26, 91, v0 + 29, RANCOR_HIDE_DK)    # foot shadow
+        for cx in (82, 85, 88):
+            rectb(rgba, bw, cx, v0 + 27, cx + 1, v0 + 29, RANCOR_IVORY)  # toe claws
+    # Tail @(48,109), fp 40x18: hide tapering to a dark tip.
+    shade_box(rgba, bw, 48, 109, 6, 6, 12, RANCOR_HIDE, RANCOR_HIDE_HI, RANCOR_HIDE_SH)
+    speckle(rgba, bw, 48, 121, 88, 127, RANCOR_HIDE_DK, mod=6, salt=8)
+
+# Jabba (128x64): tan-to-green-brown slimy hide with a paler belly, mottled
+# slime sheen, big dark lidded eyes, and a wide dark mouth.
+# UV (gen_bbmodels JABBA_CUBES == JabbaModel.java): body 26x20x20 @(0,0);
+# tail 16x8x16 @(0,40); head 18x12x12 @(64,40); right_arm/left_arm 4x8x4
+# @(92,0)/(108,0).
+JABBA_HIDE    = (0x8C, 0x8A, 0x54, 0xFF)   # tan-green slimy
+JABBA_HIDE_HI = (0xA6, 0xA4, 0x6C, 0xFF)
+JABBA_HIDE_SH = (0x6A, 0x68, 0x3E, 0xFF)
+JABBA_HIDE_DK = (0x50, 0x50, 0x30, 0xFF)   # deep folds / nostrils
+JABBA_BELLY   = (0xC2, 0xB6, 0x84, 0xFF)   # paler tan belly
+JABBA_BELLY_SH= (0xA6, 0x9A, 0x6E, 0xFF)
+JABBA_SLIME   = (0x9E, 0x9C, 0x60, 0xFF)   # slime sheen dots
+JABBA_EYE     = (0x1A, 0x16, 0x12, 0xFF)   # big dark eyes
+JABBA_EYE_HI  = (0x50, 0x46, 0x38, 0xFF)   # heavy lid
+JABBA_MOUTH   = (0x4A, 0x24, 0x22, 0xFF)   # wide mouth
+JABBA_MOUTH_DK= (0x30, 0x16, 0x16, 0xFF)
+
+def paint_jabba(rgba):
+    bw = 128
+    fill_buf(rgba, (0, 0, 0, 0))
+    # Body @(0,0), fp 92x40: front face x[20,46) y[20,40); down face (belly)
+    # x[46,72) y[0,20). Pale belly on the underside + lower front, slime mottle.
+    shade_box(rgba, bw, 0, 0, 26, 20, 20, JABBA_HIDE, JABBA_HIDE_HI, JABBA_HIDE_SH)
+    speckle(rgba, bw, 0, 20, 92, 40, JABBA_HIDE_SH, mod=6, salt=1)
+    speckle(rgba, bw, 0, 20, 92, 40, JABBA_SLIME, mod=13, salt=2)
+    rectb(rgba, bw, 46, 0, 72, 20, JABBA_BELLY)          # underside belly (down face)
+    rectb(rgba, bw, 20, 30, 46, 40, JABBA_BELLY)         # belly roll (front lower)
+    rectb(rgba, bw, 20, 38, 46, 40, JABBA_BELLY_SH)
+    rectb(rgba, bw, 20, 33, 46, 34, JABBA_BELLY_SH)      # belly fold
+    rectb(rgba, bw, 20, 36, 46, 37, JABBA_BELLY_SH)      # belly fold
+    # Tail @(0,40), fp 64x24: hide, pale underside (down face x[32,48) y[40,56)).
+    shade_box(rgba, bw, 0, 40, 16, 8, 16, JABBA_HIDE, JABBA_HIDE_HI, JABBA_HIDE_SH)
+    speckle(rgba, bw, 0, 56, 64, 64, JABBA_HIDE_SH, mod=6, salt=3)
+    speckle(rgba, bw, 0, 56, 64, 64, JABBA_SLIME, mod=13, salt=4)
+    rectb(rgba, bw, 32, 40, 48, 56, JABBA_BELLY)         # tail underside
+    # Head @(64,40), fp 60x24: face on front x[76,94) y[52,64).
+    shade_box(rgba, bw, 64, 40, 18, 12, 12, JABBA_HIDE, JABBA_HIDE_HI, JABBA_HIDE_SH)
+    speckle(rgba, bw, 64, 52, 124, 64, JABBA_HIDE_SH, mod=7, salt=5)
+    rectb(rgba, bw, 78, 53, 82, 56, JABBA_EYE_HI)        # left lid
+    rectb(rgba, bw, 88, 53, 92, 56, JABBA_EYE_HI)        # right lid
+    rectb(rgba, bw, 79, 54, 81, 56, JABBA_EYE)           # left eye
+    rectb(rgba, bw, 89, 54, 91, 56, JABBA_EYE)           # right eye
+    rectb(rgba, bw, 83, 57, 84, 58, JABBA_HIDE_DK)       # nostril
+    rectb(rgba, bw, 86, 57, 87, 58, JABBA_HIDE_DK)       # nostril
+    rectb(rgba, bw, 76, 60, 94, 63, JABBA_MOUTH)         # wide mouth
+    rectb(rgba, bw, 76, 62, 94, 63, JABBA_MOUTH_DK)      # lower-lip shadow
+    # Arms @(92,0)/(108,0), fp 16x12: stubby hide.
+    for u0 in (92, 108):
+        shade_box(rgba, bw, u0, 0, 4, 8, 4, JABBA_HIDE, JABBA_HIDE_HI, JABBA_HIDE_SH)
+
 MOBS = {
     'stormtrooper': paint_stormtrooper,
     'battle_droid': paint_battle_droid,
@@ -1781,6 +1907,9 @@ SIZED_MOBS = {
     'grogu': (32, 32, paint_grogu),
     # Forest native: Ewok on a compact 32x32 canvas.
     'ewok': (32, 32, paint_ewok),
+    # Jabba's Palace beasts.
+    'rancor': (128, 128, paint_rancor),
+    'jabba': (128, 64, paint_jabba),
 }
 
 # Worn-armor equipment layers: standard 64x32 vanilla armor-sheet UV layout

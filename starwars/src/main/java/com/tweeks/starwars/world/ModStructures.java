@@ -115,6 +115,13 @@ public final class ModStructures {
         STRUCTURE_PIECES.register("vader_castle",
             () -> (StructurePieceType) VaderCastlePiece::new);
 
+    public static final DeferredHolder<StructureType<?>, StructureType<JabbaPalaceStructure>> JABBA_PALACE_TYPE =
+        STRUCTURE_TYPES.register("jabba_palace", () -> () -> JabbaPalaceStructure.CODEC);
+
+    public static final DeferredHolder<StructurePieceType, StructurePieceType> JABBA_PALACE_PIECE =
+        STRUCTURE_PIECES.register("jabba_palace",
+            () -> (StructurePieceType) JabbaPalacePiece::new);
+
     public static void register(IEventBus modEventBus) {
         STRUCTURE_TYPES.register(modEventBus);
         STRUCTURE_PIECES.register(modEventBus);

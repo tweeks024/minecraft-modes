@@ -8,7 +8,7 @@
 /*
 Original Java source — translate this:
 
-this.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, LivingEntity.class, 10, false, false, (target, level) -> this.isTame() && target instanceof SwCombatant sc && TargetPredicates.shouldTarget(SwFaction.LIGHT, true, sc.getFaction(), false, 0, false)))
+this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true))
 */
 
 // Empty handler so Bedrock's script engine accepts the file.

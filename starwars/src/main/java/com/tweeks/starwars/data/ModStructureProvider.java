@@ -6,6 +6,7 @@ import com.tweeks.starwars.world.EscapePodStructure;
 import com.tweeks.starwars.world.EwokVillageStructure;
 import com.tweeks.starwars.world.FerrixTownStructure;
 import com.tweeks.starwars.world.ImperialOutpostStructure;
+import com.tweeks.starwars.world.JabbaPalaceStructure;
 import com.tweeks.starwars.world.JediRuinStructure;
 import com.tweeks.starwars.world.KraytSkeletonStructure;
 import com.tweeks.starwars.world.MoistureFarmStructure;
@@ -146,6 +147,14 @@ public final class ModStructureProvider {
         Registries.STRUCTURE_SET,
         Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "vader_castles"));
 
+    public static final ResourceKey<Structure> JABBA_PALACE = ResourceKey.create(
+        Registries.STRUCTURE,
+        Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "jabba_palace"));
+
+    public static final ResourceKey<StructureSet> JABBA_PALACE_SET = ResourceKey.create(
+        Registries.STRUCTURE_SET,
+        Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "jabba_palaces"));
+
     public static void bootstrapStructures(BootstrapContext<Structure> ctx) {
         var biomes = ctx.lookup(Registries.BIOME);
         ctx.register(ESCAPE_POD, new EscapePodStructure(new Structure.StructureSettings(
@@ -254,6 +263,14 @@ public final class ModStructureProvider {
             Map.of(),                                  // no spawn overrides
             GenerationStep.Decoration.SURFACE_STRUCTURES,
             TerrainAdjustment.BEARD_THIN)));           // beard the tall keep onto the lava plains
+
+        ctx.register(JABBA_PALACE, new JabbaPalaceStructure(new Structure.StructureSettings(
+            HolderSet.direct(
+                biomes.getOrThrow(PlanetBiomes.DUNE_SEA),
+                biomes.getOrThrow(PlanetBiomes.JUNDLAND_WASTES)),
+            Map.of(),                                  // no spawn overrides
+            GenerationStep.Decoration.SURFACE_STRUCTURES,
+            TerrainAdjustment.BEARD_THIN)));           // beard the domed fortress onto the dunes
     }
 
     public static void bootstrapSets(BootstrapContext<StructureSet> ctx) {
@@ -313,5 +330,10 @@ public final class ModStructureProvider {
         ctx.register(VADER_CASTLE_SET, new StructureSet(
             structures.getOrThrow(VADER_CASTLE),
             new RandomSpreadStructurePlacement(40, 12, RandomSpreadType.LINEAR, 1977100514)));
+
+        // A rare landmark — spaced wide so a palace is a genuine find.
+        ctx.register(JABBA_PALACE_SET, new StructureSet(
+            structures.getOrThrow(JABBA_PALACE),
+            new RandomSpreadStructurePlacement(48, 16, RandomSpreadType.LINEAR, 1977100515)));
     }
 }
