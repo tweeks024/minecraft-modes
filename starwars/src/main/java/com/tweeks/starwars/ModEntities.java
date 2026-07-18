@@ -289,6 +289,16 @@ public final class ModEntities {
             .build(ResourceKey.create(Registries.ENTITY_TYPE,
                 Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "jabba"))));
 
+    // ---- the endgame: Emperor Palpatine, enthroned on Coruscant ----
+
+    public static final DeferredHolder<EntityType<?>, EntityType<com.tweeks.starwars.entity.PalpatineEntity>> PALPATINE =
+        ENTITY_TYPES.register("palpatine", () -> EntityType.Builder.<com.tweeks.starwars.entity.PalpatineEntity>of(
+                com.tweeks.starwars.entity.PalpatineEntity::new, MobCategory.MONSTER)
+            .sized(0.6f, 1.9f)
+            .clientTrackingRange(12)
+            .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                Identifier.fromNamespaceAndPath(StarWarsMod.MOD_ID, "palpatine"))));
+
     public static void register(IEventBus modEventBus) {
         ENTITY_TYPES.register(modEventBus);
     }

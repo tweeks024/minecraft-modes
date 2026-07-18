@@ -377,6 +377,21 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
                 .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
                     .when(LootItemRandomChanceCondition.randomChance(0.25f))
                     .add(LootItem.lootTableItem(Items.DIAMOND))));
+
+        // Emperor Palpatine — the endgame prize: his Holocron of dark powers
+        // always drops, plus diamonds and a shot at a Nether Star trophy of
+        // "unlimited power" for the one who fells him.
+        this.add(ModEntities.PALPATINE.get(),
+            LootTable.lootTable()
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.DIAMOND)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0f, 4.0f)))))
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Registration.HOLOCRON.get())))
+                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.NETHER_STAR).setWeight(35))
+                    .add(LootItem.lootTableItem(Items.EMERALD).setWeight(65)
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(3.0f, 6.0f))))));
     }
 
     @Override
@@ -410,7 +425,8 @@ public class ModEntityLootProvider extends EntityLootSubProvider {
             ModEntities.GROGU.get(),
             ModEntities.EWOK.get(),
             ModEntities.RANCOR.get(),
-            ModEntities.JABBA.get()
+            ModEntities.JABBA.get(),
+            ModEntities.PALPATINE.get()
         );
         return BuiltInRegistries.ENTITY_TYPE.stream().filter(known::contains);
     }

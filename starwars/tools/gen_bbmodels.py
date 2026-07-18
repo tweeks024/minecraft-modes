@@ -792,6 +792,45 @@ JABBA_CUBES = [
     ('left_arm',  JABBA_LARM_BONE, (  0.0,   0.0,  -2.0, 4, 8, 4),    (108, 0)),
 ]
 
+# -----------------------------------------------------------------------------
+# Emperor Palpatine (64x64): a hunched hooded Sith. Bone names + cube sizes are
+# the hand-off contract with PalpatineModel.java — verbatim, do not
+# rename/resize. Custom skeleton: a robe torso + floor-length flared skirt ride
+# the 'body' bone; a small pale face + a heavier cowl shell ride the 'head'
+# bone (the cowl's front-lower window is painted transparent so the face peeks
+# out); draped sleeves carry bony hands at their cuffs (right_hand/left_hand
+# ride the arm bones, like rancor's claws); short leg stubs sit at the ground
+# under the hem. Feet at model-y 24 (the shared java_to_bbmodel convention:
+# bbmodel y=0 is the ground-contact plane).
+PALP_BODY_BONE = (0, 24, 0)
+PALP_HEAD_BONE = (0, 23, 0)
+PALP_RARM_BONE = (-6, 22, 0)
+PALP_LARM_BONE = (6, 22, 0)
+PALP_RLEG_BONE = (-2, 4, 0)
+PALP_LLEG_BONE = (2, 4, 0)
+
+PALPATINE_BONE_DEFS = [
+    ('body', PALP_BODY_BONE),
+    ('head', PALP_HEAD_BONE),
+    ('right_arm', PALP_RARM_BONE),
+    ('left_arm', PALP_LARM_BONE),
+    ('right_leg', PALP_RLEG_BONE),
+    ('left_leg', PALP_LLEG_BONE),
+]
+
+PALPATINE_CUBES = [
+    ('robe',       PALP_BODY_BONE, (-4.5,  0.0, -3.0,  9, 11, 5), (36, 0)),
+    ('robe_skirt', PALP_BODY_BONE, (-5.5, 10.0, -3.5, 11, 14, 7), (0, 0)),
+    ('head',       PALP_HEAD_BONE, (-3.0, -5.0, -4.0,  6, 6, 5),  (30, 21)),
+    ('cowl',       PALP_HEAD_BONE, (-4.0, -6.0, -4.5,  8, 8, 7),  (0, 21)),
+    ('right_arm',  PALP_RARM_BONE, (-2.0,  0.0, -2.0,  4, 10, 4), (0, 36)),
+    ('right_hand', PALP_RARM_BONE, (-1.5, 10.0, -3.5,  3, 4, 3),  (44, 36)),
+    ('left_arm',   PALP_LARM_BONE, (-2.0,  0.0, -2.0,  4, 10, 4), (16, 36)),
+    ('left_hand',  PALP_LARM_BONE, (-1.5, 10.0, -3.5,  3, 4, 3),  (44, 43)),
+    ('right_leg',  PALP_RLEG_BONE, (-1.5,  0.0, -1.5,  3, 4, 3),  (32, 36)),
+    ('left_leg',   PALP_LLEG_BONE, (-1.5,  0.0, -1.5,  3, 4, 3),  (32, 43)),
+]
+
 # mob_name -> bone_defs override (only needed for mobs whose bone set/pivots
 # aren't the standard humanoid table).
 MOB_BONE_DEFS = {
@@ -815,6 +854,7 @@ MOB_BONE_DEFS = {
     'ewok': EWOK_BONE_DEFS,
     'rancor': RANCOR_BONE_DEFS,
     'jabba': JABBA_BONE_DEFS,
+    'palpatine': PALPATINE_BONE_DEFS,
 }
 
 # mob_name -> (tex_width, tex_height) for non-64x64 texture canvases.
@@ -888,6 +928,8 @@ MOBS = {
     # Jabba's Palace beasts: custom skeletons (see RANCOR/JABBA_BONE_DEFS above).
     'rancor': RANCOR_CUBES,
     'jabba': JABBA_CUBES,
+    # Emperor Palpatine: hooded-Sith custom skeleton (see PALPATINE_BONE_DEFS).
+    'palpatine': PALPATINE_CUBES,
 }
 
 

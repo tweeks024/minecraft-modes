@@ -116,6 +116,9 @@
     "starwars:obi_wan_spawn_egg": {
       "textures": "textures/items/obi_wan_spawn_egg"
     },
+    "starwars:palpatine_spawn_egg": {
+      "textures": "textures/items/palpatine_spawn_egg"
+    },
     "starwars:princess_leia_spawn_egg": {
       "textures": "textures/items/princess_leia_spawn_egg"
     },

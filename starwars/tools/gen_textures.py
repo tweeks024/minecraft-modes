@@ -1865,6 +1865,105 @@ def paint_jabba(rgba):
     for u0 in (92, 108):
         shade_box(rgba, bw, u0, 0, 4, 8, 4, JABBA_HIDE, JABBA_HIDE_HI, JABBA_HIDE_SH)
 
+# Emperor Palpatine (64x64): a hunched hooded Sith drowned in near-black robes,
+# a pale gnarled face sunk in the shadow of the cowl. Box-UV offsets match
+# gen_bbmodels.py PALPATINE_CUBES / PalpatineModel.java exactly.
+# UV: robe 9x11x5 @(36,0); robe_skirt 11x14x7 @(0,0); head 6x6x5 @(30,21);
+# cowl 8x8x7 @(0,21); right_arm/left_arm 4x10x4 @(0,36)/(16,36); right_hand/
+# left_hand 3x4x3 @(44,36)/(44,43); right_leg/left_leg 3x4x3 @(32,36)/(32,43).
+PALP_ROBE      = (0x1A, 0x18, 0x1E, 0xFF)   # near-black robe, faintly cool
+PALP_ROBE_HI   = (0x2C, 0x29, 0x33, 0xFF)   # dark-grey fold highlight
+PALP_ROBE_SH   = (0x0C, 0x0B, 0x10, 0xFF)   # deep fold shadow
+PALP_ROBE_TINT = (0x30, 0x18, 0x26, 0xFF)   # bruised-purple/sith tint in folds
+PALP_COWL      = (0x12, 0x10, 0x16, 0xFF)   # even darker hood
+PALP_COWL_HI   = (0x22, 0x1F, 0x28, 0xFF)
+PALP_COWL_SH   = (0x07, 0x06, 0x0A, 0xFF)
+PALP_VOID      = (0x04, 0x04, 0x06, 0xFF)   # deep shadow inside the cowl
+PALP_SKIN      = (0xC2, 0xB6, 0xA6, 0xFF)   # pale sickly grey-tan
+PALP_SKIN_HI   = (0xD6, 0xCC, 0xBE, 0xFF)
+PALP_SKIN_SH   = (0x94, 0x86, 0x7A, 0xFF)   # wrinkle shadow
+PALP_SKIN_DK   = (0x5E, 0x52, 0x4A, 0xFF)   # sunken sockets / deep wrinkle
+PALP_EYE       = (0xC8, 0xA8, 0x38, 0xFF)   # faint sith-yellow glint
+PALP_HAND      = (0xBC, 0xB0, 0xA0, 0xFF)   # bony pale hands
+PALP_HAND_HI   = (0xD0, 0xC6, 0xB8, 0xFF)
+PALP_HAND_SH   = (0x8A, 0x7E, 0x72, 0xFF)
+PALP_BOOT      = (0x0E, 0x0D, 0x11, 0xFF)   # near-black boots/leg stubs
+PALP_BOOT_HI   = (0x1C, 0x1A, 0x20, 0xFF)
+PALP_BOOT_SH   = (0x06, 0x05, 0x08, 0xFF)
+
+def paint_palpatine(rgba):
+    fill(rgba, (0, 0, 0, 0))
+    # Robe skirt @(0,0), fp 36x21: floor-length flare, front face x[7,18)
+    # y[7,21). Near-black with deep vertical folds, a bruised-purple tint bled
+    # into two fold shadows, and a shaded hem.
+    shade_box(rgba, W, 0, 0, 11, 14, 7, PALP_ROBE, PALP_ROBE_HI, PALP_ROBE_SH)
+    speckle(rgba, W, 0, 7, 36, 21, PALP_ROBE_SH, mod=6, salt=41)
+    for fx in (8, 11, 14, 17):                       # vertical skirt folds
+        rect(rgba, fx, 7, fx + 1, 21, PALP_ROBE_SH)
+    rect(rgba, 10, 12, 11, 20, PALP_ROBE_TINT)       # sith tint deep in a fold
+    rect(rgba, 15, 12, 16, 20, PALP_ROBE_TINT)
+    rect(rgba, 7, 19, 18, 21, PALP_ROBE_SH)          # hem shadow
+
+    # Robe torso @(36,0), fp 28x16: front face x[41,50) y[5,16). Crossed-over
+    # collar V at the neck, a central seam, tinted chest folds.
+    shade_box(rgba, W, 36, 0, 9, 11, 5, PALP_ROBE, PALP_ROBE_HI, PALP_ROBE_SH)
+    rect(rgba, 41, 5, 50, 7, PALP_ROBE_SH)           # collar shadow band
+    rect(rgba, 45, 5, 46, 9, PALP_COWL_SH)           # V-collar left fold
+    rect(rgba, 44, 6, 45, 8, PALP_COWL_SH)
+    rect(rgba, 46, 6, 47, 8, PALP_COWL_SH)           # V-collar right fold
+    rect(rgba, 45, 8, 46, 16, PALP_ROBE_SH)          # central seam
+    rect(rgba, 42, 9, 43, 16, PALP_ROBE_TINT)        # tint in a chest fold
+    rect(rgba, 48, 9, 49, 16, PALP_ROBE_TINT)
+
+    # Cowl @(0,21), fp 30x15: front face x[7,15) y[28,36). Very dark hood; the
+    # heavy brow (top 2 rows) stays solid, the lower-front is carved
+    # transparent (the hood opening) so the shadowed face behind peeks out,
+    # ringed by deep void shadow on the inner edges.
+    shade_box(rgba, W, 0, 21, 8, 8, 7, PALP_COWL, PALP_COWL_HI, PALP_COWL_SH)
+    speckle(rgba, W, 0, 28, 30, 36, PALP_COWL_SH, mod=7, salt=42)
+    rect(rgba, 7, 28, 15, 30, PALP_VOID)             # heavy overhanging brow
+    rect(rgba, 7, 30, 8, 36, PALP_VOID)              # inner-left of the opening
+    rect(rgba, 14, 30, 15, 36, PALP_VOID)            # inner-right of the opening
+    rect(rgba, 8, 30, 14, 36, (0, 0, 0, 0))          # hood opening (transparent)
+
+    # Face @(30,21), fp 22x11: front face x[35,41) y[26,32). Pale, gaunt,
+    # sunken — brow shadow up top (under the hood), hollow eyes with a faint
+    # sith-yellow glint, a hooked nose, cheek hollows, a down-turned mouth.
+    shade_box(rgba, W, 30, 21, 6, 6, 5, PALP_SKIN, PALP_SKIN_HI, PALP_SKIN_SH)
+    rect(rgba, 35, 26, 41, 27, PALP_SKIN_DK)         # deep under-hood brow shadow
+    rect(rgba, 35, 27, 41, 28, PALP_SKIN_SH)         # furrowed forehead
+    rect(rgba, 35, 28, 37, 30, PALP_SKIN_DK)         # left eye socket
+    rect(rgba, 39, 28, 41, 30, PALP_SKIN_DK)         # right eye socket
+    rect(rgba, 35, 29, 36, 30, PALP_EYE)             # left eye glint
+    rect(rgba, 40, 29, 41, 30, PALP_EYE)             # right eye glint
+    rect(rgba, 37, 29, 38, 31, PALP_SKIN_SH)         # hooked nose shadow
+    rect(rgba, 35, 30, 36, 31, PALP_SKIN_SH)         # left cheek hollow
+    rect(rgba, 40, 30, 41, 31, PALP_SKIN_SH)         # right cheek hollow
+    rect(rgba, 36, 31, 40, 32, PALP_SKIN_SH)         # jaw shadow
+    rect(rgba, 37, 31, 39, 32, PALP_SKIN_DK)         # down-turned mouth
+
+    # Sleeves @(0,36)/(16,36), fp 16x14: front face x[u+4,u+8) y[40,50). Wide
+    # draped robe with vertical folds + a shaded cuff at the wrist.
+    for u0 in (0, 16):
+        shade_box(rgba, W, u0, 36, 4, 10, 4, PALP_ROBE, PALP_ROBE_HI, PALP_ROBE_SH)
+        rect(rgba, u0 + 5, 40, u0 + 6, 50, PALP_ROBE_SH)   # drape fold
+        rect(rgba, u0 + 7, 41, u0 + 8, 50, PALP_ROBE_SH)   # drape fold
+        rect(rgba, u0, 48, u0 + 16, 50, PALP_ROBE_SH)      # cuff shadow
+
+    # Hands @(44,36)/(44,43), fp 12x7: front face x[47,50) y[v+3,v+7). Bony
+    # pale claw with a knuckle groove, fingertip shadow + a dark cuff row.
+    for v0 in (36, 43):
+        shade_box(rgba, W, 44, v0, 3, 4, 3, PALP_HAND, PALP_HAND_HI, PALP_HAND_SH)
+        rect(rgba, 44, v0 + 3, 56, v0 + 4, PALP_ROBE_SH)   # cuff over the wrist
+        rect(rgba, 48, v0 + 4, 49, v0 + 7, PALP_HAND_SH)   # knuckle groove
+        rect(rgba, 47, v0 + 6, 50, v0 + 7, PALP_HAND_SH)   # fingertip shadow
+
+    # Leg stubs @(32,36)/(32,43), fp 12x7: near-black, all but hidden under the
+    # hem — just a shaded hem row up top.
+    for v0 in (36, 43):
+        shade_box(rgba, W, 32, v0, 3, 4, 3, PALP_BOOT, PALP_BOOT_HI, PALP_BOOT_SH)
+        rect(rgba, 32, v0 + 3, 44, v0 + 4, PALP_ROBE_SH)   # hem shadow at the top
+
 MOBS = {
     'stormtrooper': paint_stormtrooper,
     'battle_droid': paint_battle_droid,
@@ -1892,6 +1991,8 @@ MOBS = {
     # Companions: Chewbacca uses the default 64x64 canvas (Grogu is 32x32,
     # see SIZED_MOBS).
     'chewbacca': paint_chewbacca,
+    # Emperor Palpatine: hooded-Sith humanoid on the default 64x64 canvas.
+    'palpatine': paint_palpatine,
 }
 
 # Mobs whose skins are NOT on the default 64x64 canvas: name -> (w, h, fn).

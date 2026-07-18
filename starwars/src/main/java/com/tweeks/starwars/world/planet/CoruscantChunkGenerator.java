@@ -105,6 +105,34 @@ public class CoruscantChunkGenerator extends ChunkGenerator {
         };
     }
 
+    /** The city's street foundation, reused under the palace footprint. */
+    private BlockState foundationState(int y) {
+        if (y == CityLayout.BOTTOM_Y) {
+            return Blocks.BEDROCK.defaultBlockState();
+        }
+        return y >= CityLayout.STREET_Y - 16
+            ? Blocks.GRAY_CONCRETE.defaultBlockState()
+            : Blocks.DEEPSLATE.defaultBlockState();
+    }
+
+    /** Block palette for the Imperial Palace — dark blackstone, gilded accents. */
+    private BlockState palaceStateFor(PalaceLayout.Kind kind) {
+        return switch (kind) {
+            // The Emperor's seat is left air here; the throne spawner seats him.
+            case AIR, THRONE_MARKER -> Blocks.AIR.defaultBlockState();
+            case PLAZA, STAIR, FLOOR -> Blocks.POLISHED_BLACKSTONE.defaultBlockState();
+            case WALL -> Blocks.BLACKSTONE.defaultBlockState();
+            case ACCENT -> Blocks.GILDED_BLACKSTONE.defaultBlockState();
+            case WINDOW -> Blocks.GRAY_STAINED_GLASS.defaultBlockState();
+            case BANNER -> Blocks.RED_WOOL.defaultBlockState();
+            case PILLAR -> Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState();
+            case DAIS -> Blocks.CHISELED_POLISHED_BLACKSTONE.defaultBlockState();
+            case THRONE -> Blocks.CRYING_OBSIDIAN.defaultBlockState();
+            case LAMP -> Blocks.SEA_LANTERN.defaultBlockState();
+            case SPIRE -> Blocks.END_ROD.defaultBlockState();
+        };
+    }
+
     @Override
     public CompletableFuture<ChunkAccess> fillFromNoise(Blender blender, RandomState randomState, StructureManager structureManager, ChunkAccess chunk) {
         long seed = this.citySeed;
@@ -118,6 +146,25 @@ public class CoruscantChunkGenerator extends ChunkGenerator {
             for (int z = 0; z < 16; z++) {
                 int wx = chunkPos.getMinBlockX() + x;
                 int wz = chunkPos.getMinBlockZ() + z;
+                // The Imperial Palace overrides the procedural city on its
+                // fixed footprint (same street foundation, palace above).
+                if (PalaceLayout.contains(wx, wz)) {
+                    int lx = wx - PalaceLayout.ORIGIN_X;
+                    int lz = wz - PalaceLayout.ORIGIN_Z;
+                    int ptop = PalaceLayout.topY(lx, lz);
+                    for (int y = Math.max(minY, CityLayout.BOTTOM_Y); y <= ptop; y++) {
+                        BlockState state = y < CityLayout.STREET_Y
+                            ? foundationState(y)
+                            : palaceStateFor(PalaceLayout.kindAt(lx, y, lz));
+                        if (state.isAir()) {
+                            continue;
+                        }
+                        chunk.setBlockState(pos.set(x, y, z), state);
+                        oceanFloor.update(x, y, z, state);
+                        worldSurface.update(x, y, z, state);
+                    }
+                    continue;
+                }
                 CellSpec spec = CityLayout.cellSpec(seed, CityLayout.cellOf(wx), CityLayout.cellOf(wz));
                 int top = CityLayout.topY(seed, wx, wz);
                 for (int y = Math.max(minY, CityLayout.BOTTOM_Y); y <= top; y++) {
@@ -154,14 +201,29 @@ public class CoruscantChunkGenerator extends ChunkGenerator {
 
     @Override
     public int getBaseHeight(int x, int z, Heightmap.Types type, LevelHeightAccessor heightAccessor, RandomState randomState) {
+        if (PalaceLayout.contains(x, z)) {
+            return PalaceLayout.topY(x - PalaceLayout.ORIGIN_X, z - PalaceLayout.ORIGIN_Z) + 1;
+        }
         return CityLayout.topY(this.citySeed, x, z) + 1;
     }
 
     @Override
     public NoiseColumn getBaseColumn(int x, int z, LevelHeightAccessor heightAccessor, RandomState randomState) {
         long seed = this.citySeed;
-        CellSpec spec = CityLayout.cellSpec(seed, CityLayout.cellOf(x), CityLayout.cellOf(z));
         int minY = heightAccessor.getMinY();
+        if (PalaceLayout.contains(x, z)) {
+            int lx = x - PalaceLayout.ORIGIN_X;
+            int lz = z - PalaceLayout.ORIGIN_Z;
+            int ptop = PalaceLayout.topY(lx, lz);
+            BlockState[] pstates = new BlockState[Math.max(0, ptop - minY + 1)];
+            for (int y = minY; y <= ptop; y++) {
+                pstates[y - minY] = y < CityLayout.STREET_Y
+                    ? foundationState(y)
+                    : palaceStateFor(PalaceLayout.kindAt(lx, y, lz));
+            }
+            return new NoiseColumn(minY, pstates);
+        }
+        CellSpec spec = CityLayout.cellSpec(seed, CityLayout.cellOf(x), CityLayout.cellOf(z));
         int top = CityLayout.topY(seed, x, z);
         BlockState[] states = new BlockState[Math.max(0, top - minY + 1)];
         for (int y = minY; y <= top; y++) {

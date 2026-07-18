@@ -1,0 +1,456 @@
+{
+  "meta": {
+    "format_version": "4.5",
+    "model_format": "modded_entity",
+    "box_uv": true
+  },
+  "name": "palpatine",
+  "model_identifier": "",
+  "visible_box": [
+    4,
+    4,
+    0
+  ],
+  "variable_placeholders": "",
+  "variable_placeholder_buttons": [],
+  "unhandled_root_fields": {},
+  "resolution": {
+    "width": 64,
+    "height": 64
+  },
+  "elements": [
+    {
+      "name": "robe",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -4.5,
+        13.0,
+        -3.0
+      ],
+      "to": [
+        4.5,
+        24.0,
+        2.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        36,
+        0
+      ],
+      "type": "cube",
+      "uuid": "c4f6d42b-2182-5e86-9a6b-ee10e9a70790"
+    },
+    {
+      "name": "robe_skirt",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -5.5,
+        0.0,
+        -3.5
+      ],
+      "to": [
+        5.5,
+        14.0,
+        3.5
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "uv_offset": [
+        0,
+        0
+      ],
+      "type": "cube",
+      "uuid": "20f59fe1-50e5-5c85-abe8-738ccc32de04"
+    },
+    {
+      "name": "head",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -3.0,
+        22.0,
+        -4.0
+      ],
+      "to": [
+        3.0,
+        28.0,
+        1.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        23,
+        0
+      ],
+      "uv_offset": [
+        30,
+        21
+      ],
+      "type": "cube",
+      "uuid": "c5cce58a-287e-50ed-a9c0-a58babfc3fcf"
+    },
+    {
+      "name": "cowl",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -4.0,
+        21.0,
+        -4.5
+      ],
+      "to": [
+        4.0,
+        29.0,
+        2.5
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        0,
+        23,
+        0
+      ],
+      "uv_offset": [
+        0,
+        21
+      ],
+      "type": "cube",
+      "uuid": "7eef56b6-36c3-59f9-961f-bb1e8b71af0d"
+    },
+    {
+      "name": "right_arm",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -8.0,
+        12.0,
+        -2.0
+      ],
+      "to": [
+        -4.0,
+        22.0,
+        2.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        -6,
+        22,
+        0
+      ],
+      "uv_offset": [
+        0,
+        36
+      ],
+      "type": "cube",
+      "uuid": "2b84d9c0-3d76-5683-895a-2564f1650b48"
+    },
+    {
+      "name": "right_hand",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -7.5,
+        8.0,
+        -3.5
+      ],
+      "to": [
+        -4.5,
+        12.0,
+        -0.5
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        -6,
+        22,
+        0
+      ],
+      "uv_offset": [
+        44,
+        36
+      ],
+      "type": "cube",
+      "uuid": "e8b7b7df-0b42-52ee-a30a-bf9e3ec7471f"
+    },
+    {
+      "name": "left_arm",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        4.0,
+        12.0,
+        -2.0
+      ],
+      "to": [
+        8.0,
+        22.0,
+        2.0
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        6,
+        22,
+        0
+      ],
+      "uv_offset": [
+        16,
+        36
+      ],
+      "type": "cube",
+      "uuid": "fb7b23a1-a17a-560c-afee-681065c0c502"
+    },
+    {
+      "name": "left_hand",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        4.5,
+        8.0,
+        -3.5
+      ],
+      "to": [
+        7.5,
+        12.0,
+        -0.5
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        6,
+        22,
+        0
+      ],
+      "uv_offset": [
+        44,
+        43
+      ],
+      "type": "cube",
+      "uuid": "fcee0675-1c0a-5411-956b-935d6d69c85e"
+    },
+    {
+      "name": "right_leg",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        -3.5,
+        0.0,
+        -1.5
+      ],
+      "to": [
+        -0.5,
+        4.0,
+        1.5
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        -2,
+        4,
+        0
+      ],
+      "uv_offset": [
+        32,
+        36
+      ],
+      "type": "cube",
+      "uuid": "91581e1c-1bbf-57d2-ab62-72a838fe09db"
+    },
+    {
+      "name": "left_leg",
+      "rescale": false,
+      "locked": false,
+      "mirror_uv": false,
+      "from": [
+        0.5,
+        0.0,
+        -1.5
+      ],
+      "to": [
+        3.5,
+        4.0,
+        1.5
+      ],
+      "autouv": 0,
+      "color": 0,
+      "origin": [
+        2,
+        4,
+        0
+      ],
+      "uv_offset": [
+        32,
+        43
+      ],
+      "type": "cube",
+      "uuid": "e36f1e5a-2784-50b8-a51f-b996f315b4a6"
+    }
+  ],
+  "outliner": [
+    {
+      "name": "body",
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "color": 0,
+      "uuid": "4f291338-078a-5ab6-9c4a-45b2f7ab9803",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "c4f6d42b-2182-5e86-9a6b-ee10e9a70790",
+        "20f59fe1-50e5-5c85-abe8-738ccc32de04"
+      ]
+    },
+    {
+      "name": "head",
+      "origin": [
+        0,
+        23,
+        0
+      ],
+      "color": 0,
+      "uuid": "ae958f98-9883-5442-894c-c5ba14be8553",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "c5cce58a-287e-50ed-a9c0-a58babfc3fcf",
+        "7eef56b6-36c3-59f9-961f-bb1e8b71af0d"
+      ]
+    },
+    {
+      "name": "right_arm",
+      "origin": [
+        -6,
+        22,
+        0
+      ],
+      "color": 0,
+      "uuid": "01957605-64b2-5039-a76c-399dc1d1f546",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "2b84d9c0-3d76-5683-895a-2564f1650b48",
+        "e8b7b7df-0b42-52ee-a30a-bf9e3ec7471f"
+      ]
+    },
+    {
+      "name": "left_arm",
+      "origin": [
+        6,
+        22,
+        0
+      ],
+      "color": 0,
+      "uuid": "adf9895b-5b24-5b09-8d5f-01987808b528",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "fb7b23a1-a17a-560c-afee-681065c0c502",
+        "fcee0675-1c0a-5411-956b-935d6d69c85e"
+      ]
+    },
+    {
+      "name": "right_leg",
+      "origin": [
+        -2,
+        4,
+        0
+      ],
+      "color": 0,
+      "uuid": "14f98d33-b419-52fd-9361-71f3a2411c17",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "91581e1c-1bbf-57d2-ab62-72a838fe09db"
+      ]
+    },
+    {
+      "name": "left_leg",
+      "origin": [
+        2,
+        4,
+        0
+      ],
+      "color": 0,
+      "uuid": "189e0bf2-a7d4-512e-a044-2a8b9e6e0aad",
+      "export": true,
+      "isOpen": true,
+      "locked": false,
+      "visibility": true,
+      "autouv": 0,
+      "children": [
+        "e36f1e5a-2784-50b8-a51f-b996f315b4a6"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "path": "/home/tweeks/code/minecraft-modes/starwars/src/main/resources/assets/starwars/textures/entity/palpatine.png",
+      "name": "palpatine.png",
+      "folder": "entity",
+      "namespace": "starwars",
+      "id": "0",
+      "particle": false,
+      "render_mode": "default",
+      "render_sides": "auto",
+      "frame_time": 1,
+      "frame_order_type": "loop",
+      "frame_order": "",
+      "frame_interpolate": false,
+      "visible": true,
+      "internal": true,
+      "saved": true,
+      "uuid": "2e0835ee-56fc-5cb6-9142-7183240b137a",
+      "relative_path": "../src/main/resources/assets/starwars/textures/entity/palpatine.png",
+      "use_as_default": false,
+      "layers_enabled": false,
+      "sync_to_project": "",
+      "width": 64,
+      "height": 64,
+      "uv_width": 64,
+      "uv_height": 64,
+      "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAACKUlEQVR4nO2av07DMBDGO5SA+KfCgKoKAWJAIDEgsfAMjDwAD8HIwMjAzAMwIUYmxIAYGBADAxOvYxQkVxdz57PjXBya+6RPai9xfPfzpQ60g4FHhwfHJtTLS6Ng++asm4fEvApAASgABdA6gJBrzxeLf2IxuUJ3DsBkvGVcu8Vbwzg2LsQDip6Nw+OQNhWnrhMa5xKGAOoWXQFAEa/7mrpOSrzuebUAuBe3791Wo+JSxR+N99BzYTwZAFUILJaLS628OICQ5Nq8HVoF4EvOHisnctveTk51QlPFiwLgknMBwDgEIFm8eAf4ksM6AAPQRPG+Zwe4ACHx4GcSLjkOQNO7QFYAvl0gpgNSOiL6eT1VocmFAki9HbIA6NIu0DqAlPtHwgqgS9rd3jc+w7/MMMfO9/35ajDfXl+ilqi5IgWgABSAApACgBV6fnaKmgKD+d8AeHu6N66plcbOpRxdpK+A4bDwmgPgM5a8XXHqvQiA9dGGocwB8I3ljCX/8XDyW7Bd9fJ1GcsKgBqXCoBq91TPBADb+jMNIDpRKfUeALcLUONSd4E2a/Sq9wBccd/6So7fnOwY62JuYWrq/K/3Z2N9c3UxdZ26GykgdbwC6COA7P9ii/nxQsyvRULPXV1Zi/LL413F5Yq7MWgWAPctDXacc8x42Oohhq0eYgXQdQAwlywfggpAAeQFkH0bzA0g+zYovQKcs+8CvQegUqlUKpVKpVKpVKoe6gc0T7UyqwR5qgAAAABJRU5ErkJggg=="
+    }
+  ]
+}

@@ -133,6 +133,7 @@ public class ModLanguageProvider extends LanguageProvider {
         add(com.tweeks.starwars.ModEntities.EWOK.get(), "Ewok");
         add(com.tweeks.starwars.ModEntities.RANCOR.get(), "Rancor");
         add(com.tweeks.starwars.ModEntities.JABBA.get(), "Jabba the Hutt");
+        add(com.tweeks.starwars.ModEntities.PALPATINE.get(), "Emperor Palpatine");
         add(com.tweeks.starwars.Registration.SPEEDER_BIKE.get(), "Speeder Bike");
         add(com.tweeks.starwars.Registration.XWING.get(), "X-wing");
         add(com.tweeks.starwars.Registration.TIE_FIGHTER.get(), "TIE Fighter");
@@ -154,6 +155,7 @@ public class ModLanguageProvider extends LanguageProvider {
         add(com.tweeks.starwars.Registration.EWOK_SPAWN_EGG.get(), "Ewok Spawn Egg");
         add(com.tweeks.starwars.Registration.RANCOR_SPAWN_EGG.get(), "Rancor Spawn Egg");
         add(com.tweeks.starwars.Registration.JABBA_SPAWN_EGG.get(), "Jabba the Hutt Spawn Egg");
+        add(com.tweeks.starwars.Registration.PALPATINE_SPAWN_EGG.get(), "Emperor Palpatine Spawn Egg");
         add("starwars.gate.invalid", "The gate frame is incomplete - build an iron block rectangle (2x3 up to 8x8 inside)");
         add("starwars.gate.already_there", "This gate already leads to the world you are standing in");
         add("starwars.gate.locked", "Destination locked: %s");

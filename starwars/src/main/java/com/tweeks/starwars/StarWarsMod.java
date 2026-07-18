@@ -216,5 +216,8 @@ public class StarWarsMod {
             com.tweeks.starwars.entity.RancorEntity.createAttributes().build());
         event.put(ModEntities.JABBA.get(),
             com.tweeks.starwars.entity.JabbaEntity.createAttributes().build());
+        // The Emperor — attributes only; the throne spawner seats him.
+        event.put(ModEntities.PALPATINE.get(),
+            com.tweeks.starwars.entity.PalpatineEntity.createAttributes().build());
     }
 }

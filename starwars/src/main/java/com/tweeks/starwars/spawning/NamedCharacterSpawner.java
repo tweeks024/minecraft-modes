@@ -79,6 +79,8 @@ public final class NamedCharacterSpawner {
     public static final int MAX_DISTANCE = 40;
     public static final int TROOPER_ESCORT_COUNT = 3;
     public static final int TROOPER_RING_RADIUS = 4;
+    /** A player within this range of the throne seats the Emperor in his palace. */
+    public static final int PALACE_ACTIVATION_RANGE = 110;
 
     /** Search radius (in chunks) for a faction structure to anchor a character to. */
     public static final int STRUCTURE_SEARCH_CHUNKS = 100;
@@ -144,6 +146,8 @@ public final class NamedCharacterSpawner {
         if (coruscant != null) {
             tryRollCharacter(coruscant, VaderSavedData.get(server),
                 ModEntities.DARTH_VADER.get(), VADER_BIOMES, IMPERIAL_STRUCTURES, true);
+            // The Emperor does not roam — he waits on his throne in the palace.
+            tryRollPalpatine(coruscant, com.tweeks.starwars.entity.PalpatineSavedData.get(server));
         }
         if (tatooine != null) {
             tryRollCharacter(tatooine, BobaFettSavedData.get(server),
@@ -209,6 +213,38 @@ public final class NamedCharacterSpawner {
         if (withTrooperEscort) {
             spawnTrooperEscort(level, pos);
         }
+    }
+
+    /**
+     * Seats the Emperor on his palace throne — a fixed position, not the
+     * roaming surface roll the others use. Only fires when a player is close
+     * enough that the throne room is generated and loaded, so he never spawns
+     * into ungenerated void.
+     */
+    private static void tryRollPalpatine(ServerLevel level, NamedCharacterSavedData data) {
+        if (data.isAlive()) return;
+
+        RandomSource random = level.getRandom();
+        if (random.nextFloat() >= SPAWN_CHANCE) return;
+
+        BlockPos throne = new BlockPos(
+            com.tweeks.starwars.world.planet.PalaceLayout.throneX(),
+            com.tweeks.starwars.world.planet.PalaceLayout.throneY(),
+            com.tweeks.starwars.world.planet.PalaceLayout.throneZ());
+
+        boolean nearby = false;
+        for (ServerPlayer p : level.players()) {
+            if (p.blockPosition().closerThan(throne, PALACE_ACTIVATION_RANGE)) { nearby = true; break; }
+        }
+        if (!nearby || !level.isLoaded(throne)) return;
+
+        var emperor = ModEntities.PALPATINE.get().create(level, EntitySpawnReason.STRUCTURE);
+        if (emperor == null) return;
+        // Face the grand approach (toward -z, where the stairway climbs).
+        emperor.snapTo(throne.getX() + 0.5, throne.getY(), throne.getZ() + 0.5, 180.0f, 0.0f);
+        emperor.finalizeSpawn(level, level.getCurrentDifficultyAt(throne), EntitySpawnReason.STRUCTURE, null);
+        level.addFreshEntity(emperor);
+        data.setAlive(emperor.getUUID(), level.dimension());
     }
 
     /**

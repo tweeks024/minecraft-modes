@@ -199,6 +199,9 @@ public final class Registration {
     public static final DeferredItem<SpawnEggItem> JABBA_SPAWN_EGG = ITEMS.registerItem(
         "jabba_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.JABBA.get()));
 
+    public static final DeferredItem<SpawnEggItem> PALPATINE_SPAWN_EGG = ITEMS.registerItem(
+        "palpatine_spawn_egg", SpawnEggItem::new, p -> p.spawnEgg(ModEntities.PALPATINE.get()));
+
     public static final DeferredItem<Item> STORMTROOPER_HELMET = ITEMS.registerItem("stormtrooper_helmet",
         Item::new,
         p -> p.humanoidArmor(com.tweeks.starwars.item.StormtrooperArmorMaterials.STORMTROOPER,
@@ -333,6 +336,7 @@ public final class Registration {
                     output.accept(EWOK_SPAWN_EGG.get());
                     output.accept(RANCOR_SPAWN_EGG.get());
                     output.accept(JABBA_SPAWN_EGG.get());
+                    output.accept(PALPATINE_SPAWN_EGG.get());
                     // Later tasks append their items here.
                 })
                 .build());

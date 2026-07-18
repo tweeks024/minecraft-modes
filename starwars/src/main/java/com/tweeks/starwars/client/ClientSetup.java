@@ -34,6 +34,7 @@ import com.tweeks.starwars.client.model.WampaModel;
 import com.tweeks.starwars.client.model.YodaModel;
 import com.tweeks.starwars.client.model.RancorModel;
 import com.tweeks.starwars.client.model.JabbaModel;
+import com.tweeks.starwars.client.model.PalpatineModel;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -80,6 +81,7 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.EWOK.get(), EwokRenderer::new);
         event.registerEntityRenderer(ModEntities.RANCOR.get(), RancorRenderer::new);
         event.registerEntityRenderer(ModEntities.JABBA.get(), JabbaRenderer::new);
+        event.registerEntityRenderer(ModEntities.PALPATINE.get(), PalpatineRenderer::new);
     }
 
     @SubscribeEvent
@@ -119,5 +121,6 @@ public final class ClientSetup {
         event.registerLayerDefinition(EwokModel.LAYER_LOCATION, EwokModel::createBodyLayer);
         event.registerLayerDefinition(RancorModel.LAYER_LOCATION, RancorModel::createBodyLayer);
         event.registerLayerDefinition(JabbaModel.LAYER_LOCATION, JabbaModel::createBodyLayer);
+        event.registerLayerDefinition(PalpatineModel.LAYER_LOCATION, PalpatineModel::createBodyLayer);
     }
 }

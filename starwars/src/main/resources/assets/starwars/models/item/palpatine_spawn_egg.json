@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "starwars:item/palpatine_spawn_egg"
+  }
+}

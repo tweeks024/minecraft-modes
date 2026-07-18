@@ -1,0 +1,20 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "starwars:palpatine",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/palpatine.png"
+      },
+      "geometry": {
+        "default": "geometry.starwars.palpatine"
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ]
+    }
+  }
+}

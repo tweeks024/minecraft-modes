@@ -53,6 +53,7 @@ Bedrock has no equivalent of Java's `random_sequence` field; loot rolls use the 
 - `entities/jedi_knight.json`
 - `entities/luke_skywalker.json`
 - `entities/obi_wan.json`
+- `entities/palpatine.json`
 - `entities/princess_leia.json`
 - `entities/probe_droid.json`
 - `entities/rancor.json`
@@ -112,6 +113,7 @@ These goals produced a `// TODO LLM:` stub at `behavior_pack/scripts/goals/<Goal
 - `ObiWanPushGoal` — cache miss; run :translate --with-llm to translate
 - `OwnerHurtByTargetGoal` — cache miss; run :translate --with-llm to translate
 - `OwnerHurtTargetGoal` — cache miss; run :translate --with-llm to translate
+- `PalpatineLightningGoal` — cache miss; run :translate --with-llm to translate
 - `ProbeBlasterGoal` — cache miss; run :translate --with-llm to translate
 - `ProbeHoverGoal` — cache miss; run :translate --with-llm to translate
 - `RandomSwimmingGoal` — cache miss; run :translate --with-llm to translate
@@ -232,6 +234,7 @@ These spawn eggs received default base/overlay colors because the Java side comp
 - `jedi_knight_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `luke_skywalker_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `obi_wan_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
+- `palpatine_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `princess_leia_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `probe_droid_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
 - `rancor_spawn_egg`: Java side computes colors via EntityType.Builder defaults; Phase 2 hardcodes #444444/#888888.
@@ -358,6 +361,7 @@ These entities enforce a one-living-instance-per-server invariant on the Java si
 - `han_solo`: Java enforces one living instance per server via SavedData (finalizeSpawn claim + die/remove clear); Bedrock output has no equivalent — duplicates are possible.
 - `luke_skywalker`: Java enforces one living instance per server via SavedData (finalizeSpawn claim + die/remove clear); Bedrock output has no equivalent — duplicates are possible.
 - `obi_wan`: Java enforces one living instance per server via SavedData (finalizeSpawn claim + die/remove clear); Bedrock output has no equivalent — duplicates are possible.
+- `palpatine`: Java enforces one living instance per server via SavedData (finalizeSpawn claim + die/remove clear); Bedrock output has no equivalent — duplicates are possible.
 - `princess_leia`: Java enforces one living instance per server via SavedData (finalizeSpawn claim + die/remove clear); Bedrock output has no equivalent — duplicates are possible.
 - `yoda`: Java enforces one living instance per server via SavedData (finalizeSpawn claim + die/remove clear); Bedrock output has no equivalent — duplicates are possible.
 
