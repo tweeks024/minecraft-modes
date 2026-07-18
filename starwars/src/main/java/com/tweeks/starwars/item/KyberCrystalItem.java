@@ -59,10 +59,14 @@ public class KyberCrystalItem extends Item {
             serverPlayer.sendSystemMessage(Component.translatable("starwars.kyber.resists"), true);
             return InteractionResult.CONSUME;
         }
-        // Bleed: the crystal turns Sith red.
-        ItemStack bled = stack.copy();
+        // Bleed a single crystal Sith red, leaving the rest of the stack pure.
+        ItemStack bled = stack.split(1);
         bled.set(ModDataComponents.KYBER_COLOR.get(), SaberColor.RED.ordinal());
-        player.setItemInHand(hand, bled);
+        if (stack.isEmpty()) {
+            player.setItemInHand(hand, bled);
+        } else if (!player.getInventory().add(bled)) {
+            player.drop(bled, false);
+        }
         ((ServerLevel) level).sendParticles(ParticleTypes.CRIMSON_SPORE,
             player.getX(), player.getEyeY(), player.getZ(), 20, 0.3, 0.3, 0.3, 0.02);
         level.playSound(null, player.blockPosition(), SoundEvents.AMETHYST_BLOCK_BREAK,

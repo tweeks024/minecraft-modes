@@ -72,7 +72,10 @@ public class DeathStarChunkGenerator extends ChunkGenerator {
             case FLOOR -> Blocks.LIGHT_GRAY_CONCRETE.defaultBlockState();
             case CEILING -> Blocks.GRAY_CONCRETE.defaultBlockState();
             case CORRIDOR_LIGHT, ROOM_LIGHT -> Blocks.SEA_LANTERN.defaultBlockState();
-            case REDSTONE_LAMP -> Blocks.REDSTONE_LAMP.defaultBlockState().setValue(net.minecraft.world.level.block.RedstoneLampBlock.LIT, true);
+            // A lit console indicator. Must be a self-lit block: an unpowered
+            // redstone lamp (LIT with no signal) flips dark on the first
+            // neighbor update, so use glowstone like the other station lights.
+            case REDSTONE_LAMP -> Blocks.GLOWSTONE.defaultBlockState();
             case BARS -> Blocks.IRON_BARS.defaultBlockState();
             case BUNK -> Blocks.CYAN_TERRACOTTA.defaultBlockState();
             case CONSOLE -> Blocks.POLISHED_BLACKSTONE.defaultBlockState();

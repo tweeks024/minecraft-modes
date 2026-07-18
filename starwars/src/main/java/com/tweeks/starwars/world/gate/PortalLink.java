@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import com.tweeks.starwars.Registration;
 import com.tweeks.starwars.world.planet.CityLayout;
+import com.tweeks.starwars.world.planet.PalaceLayout;
 import com.tweeks.starwars.world.planet.Planet;
 
 import net.minecraft.core.BlockPos;
@@ -74,12 +75,12 @@ public final class PortalLink {
     private static ArrivalSpot arrivalSpot(ServerLevel target, BlockPos approx, boolean requestedAxisX) {
         Planet here = Planet.byLevel(target.dimension());
         if (here == Planet.CORUSCANT) {
-            long snapped = snapToStreet(approx.getX(), approx.getZ());
-            int x = unpackX(snapped);
-            int z = unpackZ(snapped);
-            // Snapping x means the street runs north-south: the gate stands
+            long lane = coruscantArrivalLane(approx.getX(), approx.getZ());
+            int x = unpackX(lane);
+            int z = unpackZ(lane);
+            // A lane on X means the street runs north-south: the gate stands
             // along it (plane on Z) so its 3-wide footprint fits the road.
-            boolean axisX = x == approx.getX();
+            boolean axisX = snapToLane(x) != x;
             return new ArrivalSpot(new BlockPos(x, CityLayout.STREET_Y + 1, z), axisX);
         }
         if (here == Planet.DEATH_STAR) {
@@ -153,6 +154,26 @@ public final class PortalLink {
      * Snaps (x, z) onto the nearest street lane, moving only the axis that is
      * closer to a lane. Packed into a long as (x << 32 | z & 0xFFFFFFFF).
      */
+    /**
+     * A Coruscant street lane for arrival, guaranteed clear of the solid
+     * Imperial Palace: snap to the nearest street, then — if that lands inside
+     * the palace footprint — step one city block south at a time until the
+     * lane leaves it, onto an open street in front of the grand stairway. The
+     * step count is bounded so a pathological footprint can never spin forever.
+     */
+    static long coruscantArrivalLane(int approxX, int approxZ) {
+        long snapped = snapToStreet(approxX, approxZ);
+        int x = unpackX(snapped);
+        int z = unpackZ(snapped);
+        int steps = 0;
+        while (PalaceLayout.contains(x, z) && steps++ < 8) {
+            long clear = snapToStreet(x, z - CityLayout.CELL);
+            x = unpackX(clear);
+            z = unpackZ(clear);
+        }
+        return ((long) x << 32) | (z & 0xFFFFFFFFL);
+    }
+
     static long snapToStreet(int x, int z) {
         int laneX = snapToLane(x);
         int laneZ = snapToLane(z);
